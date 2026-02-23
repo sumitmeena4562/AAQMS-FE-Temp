@@ -1,74 +1,164 @@
 @import "tailwindcss";
-/* :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/* ── Google Font ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ============================================
+   AAQMS — Global Theme (Exact Design Match)
+   ============================================ */
+
+:root {
+    /* ── Brand Colors (Deep Indigo) ── */
+    --color-primary: #072267;
+    --color-primary-light: #4F46E5;
+    --color-primary-dark: #072267;
+    --color-primary-50: #EEF2FF;
+    --color-primary-100: #E0E7FF;
+
+    /* ── Accent Blue ── */
+    --color-accent: #2563EB;
+    --color-accent-light: #3B82F6;
+    --color-accent-dark: #1E40AF;
+
+    /* ── Success (Green) ── */
+    --color-success: #059669;
+    --color-success-light: #D1FAE5;
+    --color-success-lighter: #ECFDF5;
+    --color-success-dark: #065F46;
+
+    /* ── Warning (Orange/Amber) ── */
+    --color-warning: #EA580C;
+    --color-warning-light: #FFEDD5;
+    --color-warning-lighter: #FFF7ED;
+    --color-warning-dark: #9A3412;
+
+    /* ── Danger (Red) ── */
+    --color-danger: #EF4444;
+    --color-danger-light: #FEE2E2;
+    --color-danger-lighter: #FEF2F2;
+    --color-danger-dark: #DC2626;
+    --color-danger-darker: #B91C1C;
+
+    /* ── Info (Blue) ── */
+    --color-info: #2563EB;
+    --color-info-light: #DBEAFE;
+    --color-info-lighter: #EFF6FF;
+    --color-info-dark: #1E40AF;
+
+    /* ── Purple (for special badges) ── */
+    --color-purple: #9333EA;
+
+    /* ── Yellow (for tags/labels) ── */
+    --color-yellow-light: #FEF9C3;
+    --color-yellow-lighter: #FEFCE8;
+    --color-yellow-dark: #CA8A04;
+
+    /* ── Backgrounds ── */
+    --color-bg-primary: #F9FAFB;
+    --color-bg-secondary: #FFFFFF;
+    --color-bg-tertiary: #F3F4F6;
+    --color-bg-sidebar: #111827;
+    --color-bg-hover: #F3F4F6;
+
+    /* ── Text ── */
+    --color-text-primary: #111827;
+    --color-text-secondary: #4B5563;
+    --color-text-tertiary: #6B7280;
+    --color-text-muted: #9CA3AF;
+    --color-text-inverse: #FFFFFF;
+
+    /* ── Borders ── */
+    --color-border: #E5E7EB;
+    --color-border-light: #F3F4F6;
+    --color-border-dark: #D1D5DB;
+    --color-border-focus: var(--color-primary);
+
+    /* ── Shadows ── */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+
+    /* ── Spacing ── */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+
+    /* ── Border Radius ── */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-full: 9999px;
+
+    /* ── Font Sizes ── */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+
+    /* ── Transitions ── */
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+
+    /* ── Layout ── */
+    --sidebar-width: 260px;
+    --navbar-height: 52px;
+
+    /* ── Font ── */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+/* ============================================
+   Base Reset
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-a:hover {
-  color: #535bf2;
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+a {
+    color: var(--color-primary);
+    text-decoration: none;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
-button:hover {
-  border-color: #646cff;
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+    width: 6px;
 }
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+::-webkit-scrollbar-track {
+    background: transparent;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-
-  a:hover {
-    color: #747bff;
-  }
-
-  button {
-    background-color: #f9f9f9;
-  }
-} */
+::-webkit-scrollbar-thumb {
+    background: var(--color-text-muted);
+    border-radius: var(--radius-full);
+}
