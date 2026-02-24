@@ -19,6 +19,8 @@
     --color-accent: #2563EB;
     --color-accent-light: #3B82F6;
     --color-accent-dark: #1E40AF;
+    --color-accent-bright: #0066FF;
+    /* Added for specific text highlighting */
 
     /* ── Success (Green) ── */
     --color-success: #059669;
