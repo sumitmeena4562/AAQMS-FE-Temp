@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import toast, { Toaster } from 'react-hot-toast';
+
+import { loginSchema } from '../../schema/authSchema';
+import { validateEmail } from '../../util/validation';
 import AuthLayout from '../../layouts/AuthLayout';
 import InputField from '../../components/ui/InputField';
 import Button from '../../components/ui/Button';
@@ -20,21 +26,44 @@ const LockIcon = () => (
     </svg>
 );
 
+
+
 function Login() {
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
-    // State for inputs
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [rememberMe, setRememberMe] = useState(false);
+    // Ye Zod validation k sath connect ho gaya hai
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: zodResolver(loginSchema)
+    });
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        // Login logic here
-        console.log("Login user", { email, password, rememberMe });
-        // After successful login, redirect to dashboard
-        // navigate('/dashboard');
+    const onSubmit = async (data) => {
+        setIsLoading(true); // Disable button & show spinner state
+        console.log(data);
+        
+
+        try {
+            // Replace with actual API call later
+            // const response = await axios.post('/api/auth/login', data);
+
+            // Simulating a 2-second backend wait
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            if (data.email === "example@gmail.com" && data.password === "@Example123") {
+                toast.success("Login Successful!");
+                // Here you would save the real token
+                localStorage.setItem("token", "dummy-jwt-token");
+                navigate('/dashboard');
+            } else {
+                toast.error("Invalid Email Or Password!");
+            }
+        } catch (error) {
+            toast.error("An error occurred during login.");
+        } finally {
+            setIsLoading(false); // Enable button again
+        }
     };
+
 
     return (
         <AuthLayout>
@@ -58,15 +87,15 @@ function Login() {
                     </p>
                 </div>
 
-                <form onSubmit={handleLogin}>
+                {/* Yahan hum handleSubmit(onSubmit) paas kar rahe hain */}
+                <form onSubmit={handleSubmit(onSubmit)}>
                     <InputField
                         label="Email address"
                         type="email"
                         placeholder="name@company.com"
                         icon={<MailIcon />}
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
+                        {...register('email')}
+                        error={errors.email?.message}
                     />
 
                     <InputField
@@ -74,24 +103,22 @@ function Login() {
                         type="password"
                         placeholder="••••••••"
                         icon={<LockIcon />}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
+                        {...register('password')}
+                        error={errors.password?.message}
                     />
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                         <Checkbox
                             label="Remember me"
-                            checked={rememberMe}
-                            onChange={(e) => setRememberMe(e.target.checked)}
+                            {...register('rememberMe')}
                         />
                         <a href="/forgot-password" style={{ color: 'var(--color-text-primary)', fontSize: 'var(--font-size-sm)', fontWeight: 600, textDecoration: 'none' }}>
                             Forgot password?
                         </a>
                     </div>
 
-                    <Button type="submit" variant="dark" fullWidth>
-                        Sign In
+                    <Button type="submit" variant="dark" fullWidth disabled={isLoading}>
+                        {isLoading ? "Signing in..." : "Sign In"}
                     </Button>
                 </form>
 

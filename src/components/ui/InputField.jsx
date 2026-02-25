@@ -94,11 +94,11 @@ const InputField = ({
             </div>
 
             {/* Error or Help Text */}
-            {error ? (
-                <span style={{ color: 'var(--color-danger)', fontSize: '12px', marginTop: '2px' }}>{error}</span>
-            ) : helperText ? (
-                <span style={{ color: 'var(--color-text-muted)', fontSize: '12px', marginTop: '2px' }}>{helperText}</span>
-            ) : null}
+            {error && (
+                <span style={{ color: 'var(--color-danger)', fontSize: '12px', marginTop: '2px' }}>
+                    {error}
+                </span>
+            )}
         </div>
     );
 };
