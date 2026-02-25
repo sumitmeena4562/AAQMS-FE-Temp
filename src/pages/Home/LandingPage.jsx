@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/nav/Navbar';
 import Hero from './Hero';
 import RoleFeatures from './RoleFeatures';
@@ -10,20 +11,21 @@ import SitePlanning from './SitePlanning';
 import Footer from '../../components/nav/Footer';
 
 const LandingPage = () => {
+    const navigate = useNavigate();
     return (
         <div style={{ minHeight: '100vh', background: 'var(--color-bg-primary)', overflowX: 'hidden' }}>
             {/* Navbar */}
             <Navbar
                 navLinks={[
-                    { label: 'Roles', href: '#roles' },
-                    { label: 'Capabilities', href: '#capabilities' },
-                    { label: 'Planning', href: '#planning' },
-                    { label: 'Workflow', href: '#workflow' },
-                    { label: 'Mobile', href: '#mobile' },
-                    { label: 'Reporting', href: '#analytics' },
+                    { label: 'Roles', onClick:()=>navigate('/roles')},
+                    { label: 'Capabilities',onClick:()=>navigate('/capabilities"')},
+                    { label: 'Planning', onclick:()=>navigate('/planning') },
+                    { label: 'Workflow',onClick:()=>navigate('/workflow') },
+                    { label: 'Mobile', onClick:()=>navigate('/mobile') },
+                    { label: 'Reporting', onClick:()=>navigate('/analytics') },
                 ]}
                 buttons={[
-                    { label: 'Login', variant: 'filled' },
+                    { label: 'Login', variant: 'filled' ,onClick:()=>navigate('/login')},
                 ]}
             />
 
