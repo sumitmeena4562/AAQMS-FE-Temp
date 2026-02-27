@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 
 // eslint-disable-next-line no-unused-vars
-// eslint-disable-next-line no-unused-vars
 const SidebarItem = ({ to, label, icon: Icon }) => {
     return (
         <NavLink
