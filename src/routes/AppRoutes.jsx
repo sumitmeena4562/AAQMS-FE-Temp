@@ -10,6 +10,7 @@ import Login from '../pages/Auth/loginpage';
 import AdminRoutes from './AdminRoutes';
 import CoordinatorRoutes from './CoordinatorRoutes';
 import FieldOfficerRoutes from './FieldOfficerRoutes';
+import Ragisterpage from '../pages/Auth/Ragisterpage';
 
 const AppRoutes = () => {
     return (
@@ -18,6 +19,7 @@ const AppRoutes = () => {
                 {/* Public Access */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/ragister" element={<Ragisterpage/>}/>
 
                 {/* Role-Based Access */}
                 <Route path="/admin/*" element={<AdminRoutes />} />
