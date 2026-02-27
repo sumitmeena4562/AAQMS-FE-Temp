@@ -52,7 +52,7 @@ function Login() {
                 toast.success("Login Successful!");
                 // Here you would save the real token
                 localStorage.setItem("token", "dummy-jwt-token");
-                navigate('/dashboard');
+                navigate('/admin/dashboard');
             } else {
                 toast.error("Invalid Email Or Password!");
             }
