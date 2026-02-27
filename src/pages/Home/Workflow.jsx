@@ -7,6 +7,7 @@ import {
     MdOutlineFactCheck
 } from 'react-icons/md';
 
+// eslint-disable-next-line no-unused-vars
 const WorkflowStep = ({ number, title, description, icon: Icon, isLast }) => (
     <div style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
         {/* Connection Line */}

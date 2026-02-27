@@ -9,6 +9,7 @@ import {
     MdOutlineVerified
 } from 'react-icons/md';
 
+// eslint-disable-next-line no-unused-vars
 const CapabilityCard = ({ title, description, icon: Icon }) => {
     return (
         <Card

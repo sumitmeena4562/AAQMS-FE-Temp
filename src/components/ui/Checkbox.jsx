@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 const Checkbox = ({ label, checked, onChange, required = false, id, ...props }) => {
-    // Generate a quick ID if one is not provided so label clicking works
-    const inputId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+    const reactId = useId();
+    const inputId = id || `checkbox-${reactId}`;
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

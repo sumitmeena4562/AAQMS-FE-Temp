@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import toast, { Toaster } from 'react-hot-toast';
 
 import { loginSchema } from '../../schema/authSchema';
-import { validateEmail } from '../../util/validation';
 import AuthLayout from '../../layouts/AuthLayout';
 import InputField from '../../components/ui/InputField';
 import Button from '../../components/ui/Button';
@@ -40,7 +39,7 @@ function Login() {
     const onSubmit = async (data) => {
         setIsLoading(true); // Disable button & show spinner state
         console.log(data);
-        
+
 
         try {
             // Replace with actual API call later
@@ -57,7 +56,8 @@ function Login() {
             } else {
                 toast.error("Invalid Email Or Password!");
             }
-        } catch (error) {
+            // eslint-disable-next-line no-unused-vars
+        } catch (_error) {
             toast.error("An error occurred during login.");
         } finally {
             setIsLoading(false); // Enable button again

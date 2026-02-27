@@ -15,6 +15,7 @@ import {
     MdOutlineVerified
 } from 'react-icons/md';
 
+// eslint-disable-next-line no-unused-vars
 const FieldFeature = ({ icon: Icon, title, description }) => (
     <div style={{ display: 'flex', gap: '20px', marginBottom: '32px' }}>
         <div style={{

@@ -29,6 +29,7 @@ const FooterLink = ({ href, children }) => (
     </a>
 );
 
+// eslint-disable-next-line no-unused-vars
 const SocialIcon = ({ icon: Icon, href }) => (
     <a
         href={href}

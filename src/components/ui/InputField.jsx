@@ -8,7 +8,6 @@ const InputField = ({
     onChange,
     icon,
     error, // Pass error message text here
-    helperText, // Extra info under the input
     required = false,
     className = '',
     containerStyle = {},

@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 // A dynamic fade with a slight zoom effect
 export const FadeInView = ({ children, style, className }) => {

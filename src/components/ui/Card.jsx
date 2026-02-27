@@ -6,7 +6,6 @@ const Card = ({
     style = {},
     padding = 'var(--space-card)',
     borderRadius = 'var(--radius-card)',
-    hoverEffect = false,
     ...props
 }) => {
 

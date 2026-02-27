@@ -6,6 +6,7 @@ import {
     MdOutlineAutoGraph
 } from 'react-icons/md';
 
+// eslint-disable-next-line no-unused-vars
 const StatCard = ({ label, value, trend, icon: Icon, color }) => (
     <Card
         padding="24px"

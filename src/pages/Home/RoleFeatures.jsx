@@ -2,6 +2,7 @@ import React from 'react';
 import Card from '../../components/ui/Card';
 import { MdOutlineShield, MdOutlineMap, MdQrCodeScanner } from 'react-icons/md';
 
+// eslint-disable-next-line no-unused-vars
 const FeatureCard = ({ title, description, icon: Icon, colorTheme }) => {
     const themes = {
         primary: { bg: 'rgba(7, 34, 103, 0.05)', color: 'var(--color-primary-dark)' },

@@ -11,30 +11,7 @@ const StatusRow = ({
     isAlert = false
 }) => {
 
-    // Config based on status
-    const config = {
-        success: {
-            color: 'var(--color-success)',
-            bg: 'var(--color-success-lighter)',
-            borderColor: 'var(--color-border)',
-            borderLeft: '1px solid var(--color-border)'
-        },
-        alert: {
-            color: 'var(--color-danger)',
-            bg: 'var(--color-danger-lighter)',
-            borderColor: 'var(--color-danger-light)',
-            borderLeft: '4px solid var(--color-danger)',
-            cardBg: '#fff'
-        },
-        pending: {
-            color: 'var(--color-text-muted)',
-            bg: 'var(--color-bg-tertiary)',
-            borderColor: 'var(--color-border)',
-            borderLeft: '1px solid var(--color-border)'
-        }
-    };
 
-    const c = config[status] || config.pending;
 
     return (
         <div className={`flex flex-col sm:flex-row justify-between sm:items-center p-4 rounded-xl border transition-all duration-200 gap-4 sm:gap-0
