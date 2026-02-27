@@ -1,11 +1,14 @@
-import AppRoutes from './routes/AppRoutes';
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdminRoutes from "./routes/AdminRoutes";
+import LandingPage from "./pages/Home/LandingPage";
 
 function App() {
   return (
     <BrowserRouter>
-      <AdminRoutes />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="*" element={<AdminRoutes />} />
+      </Routes>
     </BrowserRouter>
   );
 }
