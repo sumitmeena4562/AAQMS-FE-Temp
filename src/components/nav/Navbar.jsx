@@ -70,11 +70,18 @@ const Navbar = ({
                     {navLinks.map((link) => (
                         <a
                             key={link.label}
-                            href={link.href}
+                            href={link.href || '#'}
+                            onClick={(e) => {
+                                if (link.onClick) {
+                                    e.preventDefault();
+                                    link.onClick();
+                                }
+                            }}
                             style={{
                                 fontWeight: 500,
                                 color: 'var(--color-text-secondary)',
                                 textDecoration: 'none',
+                                cursor: 'pointer'
                             }}
                             onMouseEnter={(e) => e.target.style.color = 'var(--color-primary)'}
                             onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
@@ -162,8 +169,14 @@ const Navbar = ({
                     {navLinks.map((link) => (
                         <a
                             key={link.label}
-                            href={link.href}
-                            onClick={() => setIsMenuOpen(false)}
+                            href={link.href || '#'}
+                            onClick={(e) => {
+                                setIsMenuOpen(false);
+                                if (link.onClick) {
+                                    e.preventDefault();
+                                    link.onClick();
+                                }
+                            }}
                             style={{
                                 fontSize: '18px',
                                 fontWeight: 600,
