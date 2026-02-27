@@ -10,7 +10,7 @@ import Login from '../pages/Auth/loginpage';
 import AdminRoutes from './AdminRoutes';
 import CoordinatorRoutes from './CoordinatorRoutes';
 import FieldOfficerRoutes from './FieldOfficerRoutes';
-import Ragisterpage from '../pages/Auth/Ragisterpage';
+import Registration from '../pages/Auth/Registrationpage';
 
 const AppRoutes = () => {
     return (
@@ -19,7 +19,7 @@ const AppRoutes = () => {
                 {/* Public Access */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/ragister" element={<Ragisterpage/>}/>
+                <Route path="/registration" element={<Registration/>}/>
 
                 {/* Role-Based Access */}
                 <Route path="/admin/*" element={<AdminRoutes />} />

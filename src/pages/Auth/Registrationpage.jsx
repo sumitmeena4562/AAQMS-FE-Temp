@@ -12,7 +12,7 @@ import { MailIcon, LockIcon, UserIcon } from "../../assets/icon";
 import Checkbox from "../../components/ui/Checkbox";
 import Button from "../../components/ui/Button";
 
-function Ragisterpage() {
+function Registrationpage() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -155,4 +155,4 @@ function Ragisterpage() {
     )
 }
 
-export default Ragisterpage;
+export default Registrationpage;
