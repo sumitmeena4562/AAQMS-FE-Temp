@@ -11,7 +11,7 @@ import { Navigate } from "react-router-dom";
 const AdminRoutes = () => {
     return (
         <Routes>
-            <Route path="/admin" element={<AdminLayout />}>
+            <Route path="/" element={<AdminLayout />}>
                 <Route index element={<Navigate to="dashboard" replace />} />
 
                 <Route path="Dashboard" element={<Dashboard />} />
