@@ -40,15 +40,15 @@ const Navbar = ({
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '0 32px',
-            height: 'var(--navbar-height)',
+            height: '4rem',
             background: 'var(--color-bg-secondary)',
             borderBottom: '1px solid var(--color-border)',
             position: sticky ? 'sticky' : 'relative',
             top: 0,
             zIndex: 50,
         }}>
-            {/* Left — Logo (compact size for navbar) */}
-            {showLogo && <Logo size="md" />}
+            {/* Left — Logo (compact size for navbar)
+            {showLogo && <Logo size="md" />} */}
 
             {/* Center — Nav Links */}
             {navLinks.length > 0 && (

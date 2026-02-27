@@ -132,6 +132,7 @@ html {
 
 body {
     font-family: var(--font-family);
+    font-family: 'Inter', sans-serif;
     font-size: var(--font-size-base);
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
@@ -140,7 +141,7 @@ body {
 }
 
 a {
-    color: var(--color-primary);
+    /* color: var(--color-text-primary); */
     text-decoration: none;
 }
 
