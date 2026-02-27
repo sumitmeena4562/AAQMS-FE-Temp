@@ -4,7 +4,6 @@ import Logo from '../Branding/Logo';
 const Navbar = ({
     navLinks = [],
     buttons = [],
-    showLogo = true,
     sticky = true,
 }) => {
     const buttonStyles = {
