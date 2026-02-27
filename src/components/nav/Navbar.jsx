@@ -4,7 +4,6 @@ import Logo from '../Branding/Logo';
 const Navbar = ({
     navLinks = [],
     buttons = [],
-    showLogo = true,
     sticky = true,
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -56,11 +55,9 @@ const Navbar = ({
                 margin: '0 auto',
             }}>
                 {/* Left — Logo */}
-                {showLogo && (
-                    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
-                        <Logo size="md" />
-                    </div>
-                )}
+                <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+                    <Logo size="md" />
+                </div>
 
                 {/* Center — Desktop Nav Links */}
                 <div className="desktop-nav" style={{
