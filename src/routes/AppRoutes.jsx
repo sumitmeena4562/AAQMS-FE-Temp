@@ -1,41 +1,34 @@
 import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-// Pages
+
+// Public Pages
 import LandingPage from '../pages/Home/LandingPage';
 import Login from '../pages/Auth/loginpage';
-import ProtectedRoute from './ProtectedRoute';
 
-// Example Dashboard Component for testing
-const DummyDashboard = () => <h1>Secure Dashboard Page</h1>;
-
-const router = createBrowserRouter([
-      // Public Routes
-    {
-        path: '/',
-        element: <LandingPage />,
-    },
-    {
-        path:'/login',
-        element:<Login/>
-    },
-
-    // Protected Routes 
-    {
-         element:<ProtectedRoute/>,
-         children:[
-            {path:'/dashboard',element:<DummyDashboard/>}
-         ]
-    }
-]);
+// Role Routes
+import AdminRoutes from './AdminRoutes';
+import CoordinatorRoutes from './CoordinatorRoutes';
+import FieldOfficerRoutes from './FieldOfficerRoutes';
 
 const AppRoutes = () => {
-    return (<>
-        
-    <RouterProvider router={router} />
-    <Toaster  position='top-center'/>
-    </>);
+    return (
+        <BrowserRouter>
+            <Routes>
+                {/* Public Access */}
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<Login />} />
 
+                {/* Role-Based Access */}
+                <Route path="/admin/*" element={<AdminRoutes />} />
+                <Route path="/coordinator/*" element={<CoordinatorRoutes />} />
+                <Route path="/field-officer/*" element={<FieldOfficerRoutes />} />
+            </Routes>
+
+            {/* Global Toaster for notifications */}
+            <Toaster position='top-center' />
+        </BrowserRouter>
+    );
 };
 
 export default AppRoutes;
