@@ -20,7 +20,6 @@ const Navbar = ({
             color: 'var(--color-text-primary)',
             cursor: 'pointer',
             fontFamily: 'var(--font-family)',
-            transition: 'all var(--transition-fast)',
             whiteSpace: 'nowrap',
         },
         filled: {
@@ -33,7 +32,6 @@ const Navbar = ({
             color: '#fff',
             cursor: 'pointer',
             fontFamily: 'var(--font-family)',
-            transition: 'all var(--transition-fast)',
             whiteSpace: 'nowrap',
         },
     };
@@ -77,11 +75,9 @@ const Navbar = ({
                             key={link.label}
                             href={link.href}
                             style={{
-                                fontSize: 'var(--font-size-sm)',
                                 fontWeight: 500,
                                 color: 'var(--color-text-secondary)',
                                 textDecoration: 'none',
-                                transition: 'color var(--transition-fast)',
                             }}
                             onMouseEnter={(e) => e.target.style.color = 'var(--color-primary)'}
                             onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
@@ -160,7 +156,6 @@ const Navbar = ({
                     padding: '32px 24px',
                     gap: '24px',
                     transform: isMenuOpen ? 'translateY(0)' : 'translateY(-100%)',
-                    transition: 'transform 0.3s ease-in-out',
                     visibility: isMenuOpen ? 'visible' : 'hidden',
                     overflowY: 'auto'
                 }}

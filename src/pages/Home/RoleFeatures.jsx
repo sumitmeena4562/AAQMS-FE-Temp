@@ -14,7 +14,6 @@ const FeatureCard = ({ title, description, icon: Icon, colorTheme }) => {
     return (
         <Card
             className="role-feature-card"
-            hoverEffect
             style={{
                 height: '100%',
                 display: 'flex',
@@ -115,7 +114,9 @@ const RoleFeatures = () => {
                     gap: '24px'
                 }}>
                     {features.map((feature, index) => (
-                        <FeatureCard key={index} {...feature} />
+                        <div key={index}>
+                            <FeatureCard {...feature} />
+                        </div>
                     ))}
                 </div>
             </div>

@@ -1,5 +1,4 @@
 import React from 'react';
-import Card from '../../components/ui/Card';
 import {
     MdOutlineFileUpload,
     MdOutlineQrCode2,
@@ -137,11 +136,12 @@ const Workflow = () => {
                     position: 'relative'
                 }}>
                     {steps.map((step, index) => (
-                        <WorkflowStep
-                            key={index}
-                            {...step}
-                            isLast={index === steps.length - 1}
-                        />
+                        <div key={index} style={{ flex: 1, display: 'flex' }}>
+                            <WorkflowStep
+                                {...step}
+                                isLast={index === steps.length - 1}
+                            />
+                        </div>
                     ))}
                 </div>
             </div>

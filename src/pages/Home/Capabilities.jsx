@@ -13,7 +13,6 @@ const CapabilityCard = ({ title, description, icon: Icon }) => {
     return (
         <Card
             className="capability-card"
-            hoverEffect
             style={{
                 height: '100%',
                 display: 'flex',
@@ -126,7 +125,9 @@ const Capabilities = () => {
                     gap: '24px'
                 }}>
                     {list.map((item, index) => (
-                        <CapabilityCard key={index} {...item} />
+                        <div key={index}>
+                            <CapabilityCard {...item} />
+                        </div>
                     ))}
                 </div>
             </div>

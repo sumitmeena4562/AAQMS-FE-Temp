@@ -3,7 +3,6 @@ import Card from '../../components/ui/Card';
 import {
     MdOutlineTrendingUp,
     MdOutlineAssignmentLate,
-    MdOutlineFactCheck,
     MdOutlineAutoGraph
 } from 'react-icons/md';
 
@@ -44,8 +43,9 @@ const Analytics = () => {
             <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.2fr)', gap: '60px', alignItems: 'center' }} className="analytics-grid">
 
                 {/* Left Side: Text */}
-                <div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-info)', letterSpacing: '0.1em', marginBottom: '12px' }}>REPORTING & COMPLIANCE</div>
+
                     <h2 style={{
                         fontSize: 'clamp(28px, 4vw, 42px)',
                         fontWeight: 800,
@@ -55,6 +55,7 @@ const Analytics = () => {
                     }}>
                         Real-Time Insights for Absolute Accountability
                     </h2>
+
                     <p style={{
                         fontSize: '17px',
                         color: 'var(--color-text-secondary)',

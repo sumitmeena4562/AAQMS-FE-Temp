@@ -94,7 +94,6 @@ const Hero = () => {
                             fontSize: '13px',
                             fontWeight: 600,
                             cursor: 'pointer',
-                            transition: 'all var(--transition-fast)',
                             boxShadow: '0 4px 12px rgba(7, 34, 103, 0.2)'
                         }}>
                             Request Demo
@@ -111,8 +110,7 @@ const Hero = () => {
                             cursor: 'pointer',
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '8px',
-                            transition: 'all var(--transition-fast)'
+                            gap: '8px'
                         }}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -129,7 +127,7 @@ const Hero = () => {
                         padding="20px"
                         borderRadius="20px"
                         style={{ width: '100%', maxWidth: '100%' }}
-                        hoverEffect
+                        hoverEffect={false}
                     >
                         {/* Header */}
                         <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '12px', flexWrap: 'wrap' }}>

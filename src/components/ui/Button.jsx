@@ -95,7 +95,6 @@ const Button = ({
                 borderRadius: 'var(--radius-lg)',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 fontFamily: 'var(--font-family)',
-                transition: 'all var(--transition-fast)',
                 opacity: disabled ? 0.6 : 1,
                 width: fullWidth ? '100%' : 'auto',
                 ...sizes[size],
