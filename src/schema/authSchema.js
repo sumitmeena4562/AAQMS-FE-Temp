@@ -27,7 +27,7 @@ export const registerSchema = z.object({
         .regex(/[0-9]/, { message: "Must contain a number" }),
     confirmPassword: z.string()
         .min(1, { message: "Confirm Password is required" }),
-    role: z.enum(['farmer', 'vendor', 'buyer'], {
+    role: z.enum(['admin', 'cordinator', 'field officer'], {
         errorMap: () => ({ message: "Please select a valid role" })
     }),
     termsAccepted: z.boolean().refine(val => val === true, {

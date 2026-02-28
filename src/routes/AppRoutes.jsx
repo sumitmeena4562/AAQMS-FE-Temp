@@ -4,13 +4,13 @@ import { Toaster } from 'react-hot-toast';
 
 // Public Pages
 import LandingPage from '../pages/Home/LandingPage';
-import Login from '../pages/Auth/loginpage';
+import Login from '../pages/Auth/LoginPage';
 
 // Role Routes
 import AdminRoutes from './AdminRoutes';
 import CoordinatorRoutes from './CoordinatorRoutes';
 import FieldOfficerRoutes from './FieldOfficerRoutes';
-import Registration from '../pages/Auth/Registrationpage';
+import Registration from '../pages/Auth/RegistrationPage';
 
 const AppRoutes = () => {
     return (
@@ -19,7 +19,7 @@ const AppRoutes = () => {
                 {/* Public Access */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/registration" element={<Registration/>}/>
+                <Route path="/registration" element={<Registration />} />
 
                 {/* Role-Based Access */}
                 <Route path="/admin/*" element={<AdminRoutes />} />

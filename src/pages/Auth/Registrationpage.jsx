@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 import { registerSchema } from '../../schema/authSchema';
 import AuthLayout from "../../layouts/AuthLayout";
@@ -12,7 +13,24 @@ import { MailIcon, LockIcon, UserIcon } from "../../assets/icon";
 import Checkbox from "../../components/ui/Checkbox";
 import Button from "../../components/ui/Button";
 
-function Registrationpage() {
+const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.6,
+            staggerChildren: 0.1
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: { opacity: 1, x: 0 }
+};
+
+function RegistrationPage() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
@@ -39,120 +57,157 @@ function Registrationpage() {
 
     return (
         <AuthLayout>
-            <div style={{
-                backgroundColor: 'var(--color-bg-secondary)',
-                padding: '28px 24px',
-                borderRadius: 'var(--radius-card)',
-                boxShadow: 'var(--shadow-premium)',
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px'
-            }}>
-                <div style={{ textAlign: 'center' }}>
-                    <h2 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+            <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+                style={{
+                    backgroundColor: 'var(--color-bg-secondary)',
+                    padding: '32px 28px',
+                    borderRadius: 'var(--radius-card)',
+                    boxShadow: 'var(--shadow-premium)',
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '20px',
+                    border: '1px solid var(--color-border-subtle, rgba(255,255,255,0.05))'
+                }}
+            >
+                <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+                    <motion.h2
+                        variants={itemVariants}
+                        style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}
+                    >
                         Create your account
-                    </h2>
-                    <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                        Join us and start your journey
-                    </p>
+                    </motion.h2>
+                    <motion.p
+                        variants={itemVariants}
+                        style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: '6px' }}
+                    >
+                        Join the next generation of risk management
+                    </motion.p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '16px' }}>
-                        <InputField
-                            label="Full Name"
-                            type="text"
-                            placeholder="John Doe"
-                            icon={<UserIcon />}
-                            {...register('fullName')}
-                            error={errors.fullName?.message}
-                            containerStyle={{ marginBottom: 0 }}
-                        />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+                        <motion.div variants={itemVariants}>
+                            <InputField
+                                label="Full Name"
+                                type="text"
+                                placeholder="John Doe"
+                                icon={<UserIcon />}
+                                {...register('fullName')}
+                                error={errors.fullName?.message}
+                                containerStyle={{ marginBottom: 0 }}
+                            />
+                        </motion.div>
 
-                        <InputField
-                            label="Email address"
-                            type="email"
-                            placeholder="name@company.com"
-                            icon={<MailIcon />}
-                            {...register('email')}
-                            error={errors.email?.message}
-                            containerStyle={{ marginBottom: 0 }}
-                        />
+                        <motion.div variants={itemVariants}>
+                            <InputField
+                                label="Email address"
+                                type="email"
+                                placeholder="name@company.com"
+                                icon={<MailIcon />}
+                                {...register('email')}
+                                error={errors.email?.message}
+                                containerStyle={{ marginBottom: 0 }}
+                            />
+                        </motion.div>
 
-                        <SelectField
-                            label="Role"
-                            icon={<UserIcon />}
-                            options={[
-                                { label: 'Admin', value: 'admin' },
-                                { label: 'Cordinator', value: 'cordinator' },
-                                { label: 'Field Officer', value: 'field officer' }
-                            ]}
-                            {...register('role')}
-                            error={errors.role?.message}
-                            containerStyle={{ marginBottom: 0 }}
-                        />
+                        <motion.div variants={itemVariants}>
+                            <SelectField
+                                label="Role"
+                                icon={<UserIcon />}
+                                options={[
+                                    { label: 'Admin', value: 'admin' },
+                                    { label: 'Cordinator', value: 'cordinator' },
+                                    { label: 'Field Officer', value: 'field officer' }
+                                ]}
+                                {...register('role')}
+                                error={errors.role?.message}
+                                containerStyle={{ marginBottom: 0 }}
+                            />
+                        </motion.div>
 
-                        <InputField
-                            label="Password"
-                            type="password"
-                            placeholder="••••••••"
-                            icon={<LockIcon />}
-                            {...register('password')}
-                            error={errors.password?.message}
-                            containerStyle={{ marginBottom: 0 }}
-                        />
+                        <motion.div variants={itemVariants}>
+                            <InputField
+                                label="Password"
+                                type="password"
+                                placeholder="••••••••"
+                                icon={<LockIcon />}
+                                {...register('password')}
+                                error={errors.password?.message}
+                                containerStyle={{ marginBottom: 0 }}
+                            />
+                        </motion.div>
 
-                        <InputField
-                            label="Confirm Password"
-                            type="password"
-                            placeholder="••••••••"
-                            icon={<LockIcon />}
-                            {...register('confirmPassword')}
-                            error={errors.confirmPassword?.message}
-                            containerStyle={{ marginBottom: 0, gridColumn: '1 / -1' }} // span full width if odd number of elements
-                        />
+                        <motion.div variants={itemVariants} style={{ gridColumn: '1 / -1' }}>
+                            <InputField
+                                label="Confirm Password"
+                                type="password"
+                                placeholder="••••••••"
+                                icon={<LockIcon />}
+                                {...register('confirmPassword')}
+                                error={errors.confirmPassword?.message}
+                                containerStyle={{ marginBottom: 0 }}
+                            />
+                        </motion.div>
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '8px', marginTop: '-8px' }}>
+                    <motion.div
+                        variants={itemVariants}
+                        style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '12px' }}
+                    >
                         <Checkbox
                             label={
                                 <span style={{ fontSize: 'var(--font-size-sm)' }}>
                                     I accept the{' '}
-                                    <a href="#" style={{ color: 'var(--color-text-primary)', fontWeight: 600, textDecoration: 'none' }}>
+                                    <a href="#" style={{ color: 'var(--color-primary, var(--color-text-primary))', fontWeight: 600, textDecoration: 'none' }}>
                                         Terms and Conditions
                                     </a>
                                 </span>
                             }
                             {...register('termsAccepted')}
                         />
-                    </div>
+                    </motion.div>
                     {errors.termsAccepted && (
-                        <p style={{ color: 'var(--color-danger)', fontSize: '12px', marginTop: '0px', marginBottom: '16px' }}>
+                        <motion.p
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            style={{ color: 'var(--color-danger)', fontSize: '12px', marginTop: '-4px', marginBottom: '16px' }}
+                        >
                             {errors.termsAccepted.message}
-                        </p>
+                        </motion.p>
                     )}
 
-                    <div style={{ marginTop: '16px' }}>
+                    <motion.div variants={itemVariants} style={{ marginTop: '24px' }}>
                         <Button type="submit" variant="dark" fullWidth disabled={isLoading}>
                             {isLoading ? "Creating account..." : "Sign Up"}
                         </Button>
-                    </div>
+                    </motion.div>
                 </form>
 
-                <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '12px', color: 'var(--color-text-muted)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px' }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <motion.div
+                    variants={itemVariants}
+                    style={{ textAlign: 'center', marginTop: '16px', fontSize: '12px', color: 'var(--color-text-muted)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                     </svg>
-                    Protected by secure JWT authentication
-                </div>
-            </div>
+                    Enterprise-grade AES-256 Encryption
+                </motion.div>
+            </motion.div>
 
-            <div style={{ textAlign: 'center', marginTop: '16px', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
-                Already have an account? <a href="/login" style={{ color: 'var(--color-text-primary)', fontWeight: 600 }}>Sign in here</a>
-            </div>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                style={{ textAlign: 'center', marginTop: '24px', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}
+            >
+                Already have an account? <a href="/login" style={{ color: 'var(--color-text-primary)', fontWeight: 700, textDecoration: 'none', borderBottom: '1.5px solid var(--color-text-primary)' }}>Sign in here</a>
+            </motion.div>
         </AuthLayout>
-    )
+    );
 }
 
-export default Registrationpage;
+export default RegistrationPage;
