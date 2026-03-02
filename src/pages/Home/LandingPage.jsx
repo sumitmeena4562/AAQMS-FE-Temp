@@ -35,7 +35,7 @@ const LandingPage = () => {
                 ]}
                 buttons={[
                     { label: 'Login', variant: 'filled', onClick: () => navigate('/login') },
-                    { label: 'Registration', onClick: () => navigate('/registration') }
+                    // { label: 'Registration', onClick: () => navigate('/registration') }
                 ]}
             />
 

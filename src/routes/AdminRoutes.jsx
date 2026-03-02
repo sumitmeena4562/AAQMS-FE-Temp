@@ -14,12 +14,12 @@ const AdminRoutes = () => {
             <Route path="/" element={<AdminLayout />}>
                 <Route index element={<Navigate to="dashboard" replace />} />
 
-                <Route path="Dashboard" element={<Dashboard />} />
-                <Route path="Organizations" element={<Organizations />} />
-                <Route path="Risk-Alerts" element={<RiskAlerts />} />
-                <Route path="Reports" element={<Reports />} />
-                <Route path="Users" element={<Users />} />
-                <Route path="Settings" element={<Settings />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="organizations" element={<Organizations />} />
+                <Route path="risk-alerts" element={<RiskAlerts />} />
+                <Route path="reports" element={<Reports />} />
+                <Route path="users" element={<Users />} />
+                <Route path="settings" element={<Settings />} />
             </Route>
         </Routes>
     );
