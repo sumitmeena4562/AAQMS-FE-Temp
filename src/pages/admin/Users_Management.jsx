@@ -30,7 +30,6 @@ const dummyUsers = [
 
 const Users = () => {
     const [users] = useState(dummyUsers);
-    const [searchQuery, setSearchQuery] = useState("");
 
     // Define table columns matching the design
     const columns = [
@@ -107,55 +106,6 @@ const Users = () => {
 
     return (
         <div className="flex flex-col w-full h-full min-h-screen pb-10" style={{ background: '#F9FAFB' }}>
-            {/* Top Bar */}
-            <div className="flex justify-between items-center py-3 px-6 border-b" style={{ borderColor: '#E5E7EB', background: '#FFFFFF' }}>
-                <div className="flex items-center gap-2">
-                    <span style={{ color: '#9CA3AF', fontSize: 13 }}>›</span>
-                    <span style={{
-                        fontWeight: 600,
-                        color: '#2563EB',
-                        background: '#EFF6FF',
-                        padding: '6px 14px',
-                        borderRadius: '8px',
-                        fontSize: '13px',
-                        textDecoration: 'underline',
-                        textUnderlineOffset: '2px'
-                    }}>Organizations</span>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    {/* Search */}
-                    <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg className="h-4 w-4" style={{ color: '#9CA3AF' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <input
-                            type="text"
-                            style={{ background: '#F9FAFB', border: '1px solid #E5E7EB', fontSize: '13px' }}
-                            className="text-[#111827] rounded-full block w-56 pl-10 py-2 outline-none transition-all focus:ring-1 focus:ring-blue-400"
-                            placeholder="Search organizations..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-
-                    {/* Bell Icon */}
-                    <button style={{ background: '#F3F4F6', border: 'none', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#6B7280' }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                    </button>
-
-                    {/* Profile Avatar */}
-                    <div style={{
-                        width: 36, height: 36, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #F59E0B, #EF4444)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer'
-                    }}>U</div>
-                </div>
-            </div>
-
             {/* Main Content Area */}
             <div className="px-6 mt-5">
                 {/* Filters Section */}

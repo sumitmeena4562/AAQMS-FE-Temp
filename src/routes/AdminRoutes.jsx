@@ -7,6 +7,7 @@ import Reports from "../pages/admin/Reports";
 import Users from "../pages/admin/Users_Management";
 import Settings from "../pages/admin/Settings";
 import { Navigate } from "react-router-dom";
+import Coordinator  from "../pages/admin/Coordinator";
 
 const AdminRoutes = () => {
     return (
@@ -16,6 +17,7 @@ const AdminRoutes = () => {
 
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="organizations" element={<Organizations />} />
+                <Route path="coordinators" element={<Coordinator/>}/>
                 <Route path="risk-alerts" element={<RiskAlerts />} />
                 <Route path="reports" element={<Reports />} />
                 <Route path="users" element={<Users />} />
