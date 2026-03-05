@@ -1,0 +1,34 @@
+import React from 'react';
+
+const DotStatus = ({ type, text }) => {
+    // Mapping types to Tailwind classes that use CSS variables defined in index.css
+    const typeStyles = {
+        unassigned: {
+            dot: 'bg-[var(--color-danger)]',
+            text: 'text-[var(--color-danger)]'
+        },
+        assigned: {
+            dot: 'bg-[var(--color-accent-bright)]',
+            text: 'text-[var(--color-accent-bright)]'
+        },
+        active: {
+            dot: 'bg-[var(--color-success)]',
+            text: 'text-[var(--color-success)]'
+        },
+        inactive: {
+            dot: 'bg-[var(--color-text-muted)]',
+            text: 'text-[var(--color-text-secondary)]'
+        }
+    };
+
+    const style = typeStyles[type?.toLowerCase()] || typeStyles.inactive;
+
+    return (
+        <div className="flex items-center gap-2">
+            <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`}></span>
+            <span className={`text-sm font-medium ${style.text}`}>{text}</span>
+        </div>
+    );
+};
+
+export default DotStatus;
