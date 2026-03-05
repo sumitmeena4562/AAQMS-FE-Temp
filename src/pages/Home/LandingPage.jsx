@@ -1,7 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../../components/nav/Navbar';
-import Footer from '../../components/nav/Footer';
+import LandingNavbar from '../../components/Navbar/LandingNavbar';
+import Footer from '../../components/Navbar/Footer';
 
 // Lazy load sections
 const Hero = lazy(() => import('./Hero'));
@@ -24,7 +24,7 @@ const LandingPage = () => {
     return (
         <div style={{ minHeight: '100vh', background: 'var(--color-bg-primary)', overflowX: 'clip' }}>
             {/* Navbar */}
-            <Navbar
+            <LandingNavbar
                 navLinks={[
                     { label: 'Roles', onClick: () => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' }) },
                     { label: 'Capabilities', onClick: () => document.getElementById('capabilities')?.scrollIntoView({ behavior: 'smooth' }) },
