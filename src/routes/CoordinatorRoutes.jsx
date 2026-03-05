@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import CoordLayout from "../layouts/CoordLayout/CoordLayout";
-import Dashboard from "../pages/coordinator/Dashboard";
+import Dashboard from "../pages/Coordinator/Dashboard";
 
 const CoordinatorRoutes = () => {
     return (

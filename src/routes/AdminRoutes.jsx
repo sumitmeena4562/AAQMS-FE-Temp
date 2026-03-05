@@ -1,13 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "../layouts/adminlayout"
-import Dashboard from "../pages/admin/Dashboard";
-import Organizations from "../pages/admin/Organizations";
-import RiskAlerts from "../pages/admin/RiskAlerts";
-import Reports from "../pages/admin/Reports";
-import Users from "../pages/admin/Users_Management";
-import Settings from "../pages/admin/Settings";
+import Dashboard from "../pages/Admin/Dashboard";
+import Organizations from "../pages/Admin/Organizations";
+import RiskAlerts from "../pages/Admin/RiskAlerts";
+import Reports from "../pages/Admin/Reports";
+import Users from "../pages/Admin/Users_Management";
+import Settings from "../pages/Admin/Settings";
 import { Navigate } from "react-router-dom";
-import Coordinator  from "../pages/admin/Coordinator";
+import Coordinator from "../pages/Admin/Coordinator";
 
 const AdminRoutes = () => {
     return (
@@ -17,7 +17,7 @@ const AdminRoutes = () => {
 
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="organizations" element={<Organizations />} />
-                <Route path="coordinators" element={<Coordinator/>}/>
+                <Route path="coordinators" element={<Coordinator />} />
                 <Route path="risk-alerts" element={<RiskAlerts />} />
                 <Route path="reports" element={<Reports />} />
                 <Route path="users" element={<Users />} />

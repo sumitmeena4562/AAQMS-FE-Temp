@@ -5,7 +5,7 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 
 import Navbar from "../../components/Navbar/Navbar";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
-import { BreadcrumbProvider, useBreadcrumb, generateBreadcrumbs } from "../../components/Breadcrumb/BreadcrumbContext";
+import { BreadcrumbProvider, useBreadcrumb, generateBreadcrumbs } from "../../context/BreadcrumbContext";
 
 // ── Nav Items Configuration ──
 // Items with `children` will show collapsible sub-menus.
