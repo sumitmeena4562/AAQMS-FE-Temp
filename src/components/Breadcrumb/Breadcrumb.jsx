@@ -19,7 +19,7 @@ const Breadcrumb = ({ items = [], className = "" }) => {
 
                         {/* Item */}
                         {isLast ? (
-                            <span className="px-3 py-[2px] text-blue-600 font-semibold bg-blue-50 border border-blue-100 rounded-full">
+                            <span className="px-3 py-[2px] text-blue-600 font-medium rounded-full text-[13.5px] flex items-center" style={{ backgroundColor: '#EFF6FF' }}>
                                 {item.label}
                             </span>
                         ) : (
