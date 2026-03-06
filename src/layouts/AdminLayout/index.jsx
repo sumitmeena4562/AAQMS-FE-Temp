@@ -99,7 +99,7 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'var(--font-family)' }}>
+        <div className="flex min-h-screen bg-[var(--color-bg-primary)] font-[var(--font-family)]">
             {/* Sidebar */}
             <Sidebar
                 navItems={navItems}
@@ -110,7 +110,7 @@ const AdminLayoutInner = () => {
             />
 
             {/* Main Content */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', overflow: 'hidden' }}>
+            <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
@@ -118,21 +118,19 @@ const AdminLayoutInner = () => {
                         breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />
                     }
                     rightContent={
-                        <div className="flex items-center gap-3 md:gap-6 w-full md:w-auto justify-end">
-                            <div className="flex-1 md:flex-none relative max-w-[180px] sm:max-w-none md:w-80 transition-all duration-300 md:ml-0">
+                        <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-end">
+                            <div className="flex-1 md:flex-none relative max-w-[220px] sm:max-w-none md:w-80 transition-all duration-300">
                                 <Search placeholder="Search..." />
                             </div>
-                            <div className="hidden sm:block h-6 w-px mx-1 md:mx-2" style={{ backgroundColor: 'var(--color-border)' }}></div>
-                            <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
+                            <div className="flex items-center gap-1 md:gap-3 flex-shrink-0">
                                 <button
-                                    className="p-1.5 md:p-2 transition-colors relative flex items-center justify-center cursor-pointer"
-                                    style={{ color: 'var(--color-text-muted)' }}
-                                    onMouseEnter={e => e.currentTarget.style.color = 'var(--color-text-primary)'}
-                                    onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-muted)'}
-                                    onLeave={e => e.currentTarget.style.color = 'var(--color-text-muted)'}
+                                    className="p-2 transition-colors relative flex items-center justify-center cursor-pointer text-[#94a3b8] hover:text-[#475569]"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                                    <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full border border-white" style={{ backgroundColor: 'var(--color-danger, #ef4444)' }}></span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                                    </svg>
+                                    <span className="absolute top-[11px] right-[11px] h-1.5 w-1.5 rounded-full border border-white bg-red-500 shadow-sm"></span>
                                 </button>
                                 {/* Profile Dropdown Component */}
                                 <ProfileDropdown userInfo={userInfo} />
@@ -140,7 +138,7 @@ const AdminLayoutInner = () => {
                         </div>
                     }
                 />
-                <main style={{ flex: 1, overflowY: 'auto', background: 'var(--color-bg-primary)' }}>
+                <main className="flex-1 overflow-y-auto bg-[var(--color-bg-primary)] py-6">
                     <Outlet />
                 </main>
             </div>
