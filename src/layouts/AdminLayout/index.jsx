@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Logo from "../../components/Branding/Logo";
 import Sidebar from "../../components/Sidebar/Sidebar";
+import Search from "../../components/UI/Search";
 
 import Navbar from "../../components/Navbar/Navbar";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
@@ -108,46 +109,29 @@ const AdminLayoutInner = () => {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', overflow: 'hidden' }}>
                 <Navbar
                     leftContent={
-                        <span style={{
-                            fontWeight: 600, fontSize: '13px',
-                            color: 'var(--color-accent)',
-                            background: 'var(--color-info-lighter)',
-                            padding: '6px 14px', borderRadius: '8px'
-                        }}>
-                            Organizations
-                        </span>
+                        breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />
                     }
                     rightContent={
                         <>
-                            {/* Search */}
-                            <div style={{ position: 'relative' }}>
-                                <div style={{ position: 'absolute', insetBlock: 0, left: 0, paddingLeft: '12px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
-                                    <svg style={{ width: 15, height: 15, color: 'var(--color-text-muted)' }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="Search organizations..."
-                                    style={{
-                                        background: 'var(--color-bg-primary)', border: '1px solid var(--color-border)',
-                                        fontSize: '13px', borderRadius: 'var(--radius-full)',
-                                        width: '220px', paddingLeft: '36px', paddingBlock: '8px',
-                                        outline: 'none', fontFamily: 'var(--font-family)', color: 'var(--color-text-primary)'
-                                    }}
-                                />
+                            <div className="relative w-80 hidden sm:block">
+                                <Search placeholder="Search Users..." />
                             </div>
-                            {/* Bell */}
-                            <button style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--color-bg-tertiary)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--color-text-tertiary)' }}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                            <div className="h-6 w-px mx-2" style={{ backgroundColor: 'var(--color-border)' }}></div>
+                            <button
+                                className="p-2 transition-colors relative flex items-center justify-center cursor-pointer"
+                                style={{ color: 'var(--color-text-muted)' }}
+                                onMouseEnter={e => e.currentTarget.style.color = 'var(--color-text-primary)'}
+                                onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-muted)'}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                                <span className="absolute top-2 right-2 h-2 w-2 rounded-full border border-white" style={{ backgroundColor: 'var(--color-danger, #ef4444)' }}></span>
                             </button>
-                            {/* Avatar */}
-                            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #F59E0B, #EF4444)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>U</div>
+                            <div className="h-8 w-8 rounded-full border overflow-hidden cursor-pointer" style={{ borderColor: 'var(--color-border)' }}>
+                                <img src="https://ui-avatars.com/api/?name=Admin+User&background=F59E0B&color=fff" alt="User Avatar" className="w-full h-full object-cover" />
+                            </div>
                         </>
                     }
                 />
-                {/* Dynamic Breadcrumb — har page apna set karega */}
-                {breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
                 <main style={{ flex: 1, overflowY: 'auto', background: 'var(--color-bg-primary)' }}>
                     <Outlet />
                 </main>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Button from '../../components/ui/Button';
-import Table from '../../components/ui/Table';
-import Badge from '../../components/ui/Badge';
-import DotStatus from '../../components/ui/DotStatus';
-import ActionLink from '../../components/ui/ActionLink';
+import Button from '../../components/UI/Button';
+import Table from '../../components/UI/Table';
+import Badge from '../../components/UI/Badge';
+import DotStatus from '../../components/UI/DotStatus'
+import ActionLink from '../../components/UI/ActionLink';
 
 
 // Dummy data based on the design
@@ -38,36 +38,27 @@ const Users = () => {
             accessor: "employeeName",
             render: (name, row) => (
                 <div className="flex flex-col">
-                    <span className="font-semibold text-[#111827]">{name}</span>
-                    <span className="text-xs text-[#9CA3AF] mt-0.5">{row.email}</span>
+                    <span className="font-semibold text-gray-900">{name}</span>
+                    <span className="text-xs text-gray-400 mt-0.5">{row.email}</span>
                 </div>
             )
         },
         {
             header: "ORGANIZATION",
             accessor: "organization",
-            render: (org) => <span className="text-sm font-medium text-[#4B5563]">{org}</span>
+            render: (org) => <span className="text-sm font-medium text-gray-600">{org}</span>
         },
         {
             header: "ROLE",
             accessor: "role",
             render: (role) => {
-                const colorMap = {
-                    'Coordinator': { bg: '#FEF3C7', text: '#D97706' },
-                    'Field Officer': { bg: '#DBEAFE', text: '#2563EB' }
+                const colorClasses = {
+                    'Coordinator': { bg: 'bg-[#FEF3C7]', text: 'text-[#D97706]' },
+                    'Field Officer': { bg: 'bg-[#DBEAFE]', text: 'text-[#2563EB]' }
                 };
-                const c = colorMap[role] || { bg: '#F3F4F6', text: '#4B5563' };
+                const c = colorClasses[role] || { bg: 'bg-gray-100', text: 'text-gray-600' };
                 return (
-                    <span style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        padding: '4px 12px',
-                        borderRadius: '6px',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        background: c.bg,
-                        color: c.text
-                    }}>
+                    <span className={`inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold ${c.bg} ${c.text}`}>
                         {role}
                     </span>
                 );
@@ -105,41 +96,41 @@ const Users = () => {
     ];
 
     return (
-        <div className="flex flex-col w-full h-full min-h-screen pb-10" style={{ background: '#F9FAFB' }}>
+        <div className="flex flex-col w-full h-full min-h-screen pb-10 bg-[#F9FAFB]">
             {/* Main Content Area */}
             <div className="px-6 mt-5">
                 {/* Filters Section */}
                 <div className="flex flex-col xl:flex-row justify-between xl:items-end gap-5 mb-6">
                     <div className="flex flex-wrap gap-4 w-full xl:w-auto">
                         <div className="w-full sm:w-auto min-w-[200px]">
-                            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', fontFamily: 'inherit' }}>Organization</label>
+                            <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 font-inherit">Organization</label>
                             <div className="relative">
-                                <select style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', color: '#1F2937', fontSize: '14px', borderRadius: '4px', width: '100%', padding: '8px 36px 8px 16px', outline: 'none', appearance: 'none', cursor: 'pointer', fontWeight: 500 }}>
+                                <select className="bg-white border border-gray-200 text-gray-800 text-sm rounded py-2 pl-4 pr-9 w-full outline-none appearance-none cursor-pointer font-medium">
                                     <option>All Organization</option>
                                 </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none" style={{ color: '#6B7280' }}>
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </div>
                             </div>
                         </div>
                         <div className="w-full sm:w-auto min-w-[200px]">
-                            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', fontFamily: 'inherit' }}>Active Status</label>
+                            <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 font-inherit">Active Status</label>
                             <div className="relative">
-                                <select style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', color: '#1F2937', fontSize: '14px', borderRadius: '4px', width: '100%', padding: '8px 36px 8px 16px', outline: 'none', appearance: 'none', cursor: 'pointer', fontWeight: 500 }}>
+                                <select className="bg-white border border-gray-200 text-gray-800 text-sm rounded py-2 pl-4 pr-9 w-full outline-none appearance-none cursor-pointer font-medium">
                                     <option>All Statuses</option>
                                 </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none" style={{ color: '#6B7280' }}>
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </div>
                             </div>
                         </div>
                         <div className="w-full sm:w-auto min-w-[200px]">
-                            <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', fontFamily: 'inherit' }}>Role</label>
+                            <label className="block text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 font-inherit">Role</label>
                             <div className="relative">
-                                <select style={{ background: '#FFFFFF', border: '1px solid #E5E7EB', color: '#1F2937', fontSize: '14px', borderRadius: '4px', width: '100%', padding: '8px 36px 8px 16px', outline: 'none', appearance: 'none', cursor: 'pointer', fontWeight: 500 }}>
+                                <select className="bg-white border border-gray-200 text-gray-800 text-sm rounded py-2 pl-4 pr-9 w-full outline-none appearance-none cursor-pointer font-medium">
                                     <option>All Role</option>
                                 </select>
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none" style={{ color: '#6B7280' }}>
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </div>
                             </div>
@@ -147,70 +138,36 @@ const Users = () => {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-                        <button style={{
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            padding: '0 20px', height: '38px', fontSize: '14px', fontWeight: 500,
-                            borderRadius: '8px', border: '1px solid #D1D5DB',
-                            background: '#FFFFFF', color: '#374151', cursor: 'pointer',
-                            transition: 'all 150ms ease'
-                        }}
-                            onMouseEnter={e => { e.currentTarget.style.background = '#F9FAFB'; e.currentTarget.style.borderColor = '#9CA3AF'; }}
-                            onMouseLeave={e => { e.currentTarget.style.background = '#FFFFFF'; e.currentTarget.style.borderColor = '#D1D5DB'; }}
-                        >
+                        <button className="flex items-center gap-2 px-5 h-[38px] text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 cursor-pointer transition-all duration-150 hover:bg-gray-50 hover:border-gray-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.27l-5.3 5.3"></path></svg>
                             Reset
                         </button>
-                        <button style={{
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            padding: '0 20px', height: '38px', fontSize: '14px', fontWeight: 500,
-                            borderRadius: '8px', border: 'none',
-                            background: '#2563EB', color: '#FFFFFF', cursor: 'pointer',
-                            transition: 'all 150ms ease'
-                        }}
-                            onMouseEnter={e => e.currentTarget.style.background = '#1D4ED8'}
-                            onMouseLeave={e => e.currentTarget.style.background = '#2563EB'}
-                        >
+                        <button className="flex items-center gap-2 px-5 h-[38px] text-sm font-medium rounded-lg border-none bg-blue-600 text-white cursor-pointer transition-all duration-150 hover:bg-blue-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                             Apply Filters
                         </button>
-                        <button style={{
-                            display: 'flex', alignItems: 'center', gap: '8px',
-                            padding: '0 20px', height: '38px', fontSize: '14px', fontWeight: 500,
-                            borderRadius: '8px', border: 'none',
-                            background: '#0F172A', color: '#FFFFFF', cursor: 'pointer',
-                            transition: 'all 150ms ease'
-                        }}
-                            onMouseEnter={e => e.currentTarget.style.background = '#1E293B'}
-                            onMouseLeave={e => e.currentTarget.style.background = '#0F172A'}
-                        >
+                        <button className="flex items-center gap-2 px-5 h-[38px] text-sm font-medium rounded-lg border-none bg-slate-900 text-white cursor-pointer transition-all duration-150 hover:bg-slate-800">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             Add New User
                         </button>
                     </div>
                 </div>
 
-                <hr style={{ border: 'none', borderTop: '1px solid #E5E7EB', marginBottom: '24px' }} />
+                <hr className="border-none border-t border-gray-200 mb-6" />
 
                 {/* Table Title Area */}
                 <div className="flex justify-between items-end mb-4">
-                    <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#111827' }}>User Management</h2>
-                    <span style={{ fontSize: '13px', fontWeight: 500, color: '#9CA3AF' }}>Showing {users.length} total User</span>
+                    <h2 className="text-xl font-bold text-gray-900">User Management</h2>
+                    <span className="text-[13px] font-medium text-gray-400">Showing {users.length} total User</span>
                 </div>
 
                 {/* Main Table Container */}
-                <div style={{
-                    background: '#FFFFFF',
-                    borderRadius: '20px',
-                    border: '1px solid #E5E7EB',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                    overflow: 'hidden',
-                    padding: '6px'
-                }}>
+                <div className="bg-white rounded-[20px] border border-gray-200 shadow-sm overflow-hidden p-1.5">
                     <Table columns={columns} data={users} />
                 </div>
 
                 {/* Footer Note */}
-                <div className="mt-8 flex justify-center items-center gap-2" style={{ fontSize: '11px', color: '#9CA3AF', fontWeight: 500 }}>
+                <div className="mt-8 flex justify-center items-center gap-2 text-[11px] text-gray-400 font-medium">
                     <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                     AI assists detection. Final approval is human-controlled.
                 </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from '../ui/Card';
+import Card from '../UI/Card';
 
 const StatsCard = ({ title, value, change, changeType, icon: Icon }) => {
     return (

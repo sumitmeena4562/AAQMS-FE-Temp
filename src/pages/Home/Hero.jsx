@@ -1,6 +1,6 @@
 import React from 'react';
-import Card from '../../components/ui/Card';
-import StatusRow from '../../components/ui/StatusRow';
+import Card from '../../components/UI/Card';
+import StatusRow from '../../components/UI/StatusRow';
 
 // Icon components for StatusRow
 const CheckIcon = ({ size = 18 }) => (

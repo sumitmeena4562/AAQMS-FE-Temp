@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from '../../components/ui/Card';
+import Card from '../../components/UI/Card';
 import { MdOutlineShield, MdOutlineMap, MdQrCodeScanner } from 'react-icons/md';
 
 // eslint-disable-next-line no-unused-vars

@@ -1,4 +1,5 @@
 import React from 'react';
+import Search from '../UI/Search';
 
 /**
  * Navbar Component — Global, Reusable Container
@@ -24,48 +25,33 @@ const Navbar = ({
 }) => {
     return (
         <header
-            className={className}
-            style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '0 24px',
-                background: 'var(--color-bg-secondary)',
-                borderBottom: '1px solid var(--color-border)',
-                height: 'var(--navbar-height)',
-                minHeight: 'var(--navbar-height)',
-                position: 'sticky',
-                top: 0,
-                zIndex: 100,
-                fontFamily: 'var(--font-family)',
-                gap: '16px',
-                ...style
-            }}
+            className={`flex flex-col flex-shrink-0 z-10 sticky top-0 ${className}`}
+            style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-border)', ...style }}
         >
-            {children ? (
-                // Agar children diya hai toh seedha render karo — full control
-                children
-            ) : (
-                // Warna left / center / right slots use karo
-                <>
-                    {/* Left */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: leftContent ? '0 0 auto' : undefined }}>
-                        {leftContent}
-                    </div>
-
-                    {/* Center */}
-                    {centerContent && (
-                        <div style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
-                            {centerContent}
+            <div className="h-16 flex items-center justify-between px-8" style={{ borderBottom: '1px solid var(--color-bg-secondary)' }}>
+                {children ? (
+                    children
+                ) : (
+                    <>
+                        {/* Left Content (Breadcrumbs, title, etc) */}
+                        <div className="flex items-center gap-1.5 text-sm text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap flex-1">
+                            {leftContent}
                         </div>
-                    )}
 
-                    {/* Right */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {rightContent}
-                    </div>
-                </>
-            )}
+                        {/* Center Content */}
+                        {centerContent && (
+                            <div className="flex items-center flex-1 justify-center">
+                                {centerContent}
+                            </div>
+                        )}
+
+                        {/* Right Content (Search, Bell, Profile) */}
+                        <div className="flex items-center gap-6 ml-4">
+                            {rightContent}
+                        </div>
+                    </>
+                )}
+            </div>
         </header>
     );
 };

@@ -2,28 +2,15 @@ import React from 'react';
 
 const Table = ({ columns, data }) => {
     return (
-        <div style={{
-            width: '100%',
-            overflowX: 'auto',
-            background: '#fff',
-            borderRadius: 'var(--radius-lg)'
-        }}>
-            <table style={{
-                width: '100%',
-                borderCollapse: 'collapse',
-                textAlign: 'left'
-            }}>
+        <div className="w-full overflow-x-auto bg-white rounded-lg">
+            <table className="w-full border-collapse text-left">
                 <thead>
-                    <tr style={{ background: '#E0E7FF' }}> {/* Light blue header matching design */}
+                    <tr className="bg-[#E0E7FF]"> {/* Light blue header matching design */}
                         {columns.map((col, index) => (
-                            <th key={index} style={{
-                                padding: '12px 24px',
-                                fontSize: '11px',
-                                fontWeight: 700,
-                                color: 'var(--color-text-secondary)',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em'
-                            }}>
+                            <th
+                                key={index}
+                                className="px-6 py-3 text-[11px] font-bold text-gray-500 uppercase tracking-wider"
+                            >
                                 {col.header}
                             </th>
                         ))}
@@ -31,19 +18,15 @@ const Table = ({ columns, data }) => {
                 </thead>
                 <tbody>
                     {data.map((row, rowIndex) => (
-                        <tr key={rowIndex} style={{
-                            borderBottom: '1px solid var(--color-border-light)',
-                            transition: 'background var(--transition-fast)'
-                        }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-bg-secondary)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+                        <tr
+                            key={rowIndex}
+                            className="border-b border-gray-100 transition-colors duration-150 hover:bg-gray-50"
                         >
                             {columns.map((col, colIndex) => (
-                                <td key={colIndex} style={{
-                                    padding: '16px 24px',
-                                    fontSize: '13px',
-                                    color: 'var(--color-text-primary)'
-                                }}>
+                                <td
+                                    key={colIndex}
+                                    className="px-6 py-4 text-[13px] text-gray-700 font-medium"
+                                >
                                     {col.render ? col.render(row[col.accessor], row) : row[col.accessor]}
                                 </td>
                             ))}

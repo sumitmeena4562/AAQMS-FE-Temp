@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import AuthLayout from "../../layouts/AuthLayout";
-import Button from "../../components/ui/Button";
+import Button from "../../components/UI/Button";
 
 const containerVariants = {
     hidden: { opacity: 0, y: 20 },

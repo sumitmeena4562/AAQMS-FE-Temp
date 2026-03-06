@@ -5,9 +5,9 @@ import { motion } from 'framer-motion';
 
 import { registerSchema } from '../../schema/authSchema';
 import AuthForm from '../../components/Auth/AuthForm';
-import InputField from "../../components/ui/InputField";
-import SelectField from "../../components/ui/SelectField";
-import Checkbox from "../../components/ui/Checkbox";
+import InputField from "../../components/UI/InputField";
+import SelectField from "../../components/UI/SelectField";
+import Checkbox from "../../components/UI/Checkbox";
 import { MailIcon, LockIcon, UserIcon } from "../../assets/icon";
 
 function RegistrationPage() {

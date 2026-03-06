@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 
 import { loginSchema } from '../../schema/authSchema';
 import AuthForm from '../../components/Auth/AuthForm';
-import InputField from '../../components/ui/InputField';
-import Checkbox from '../../components/ui/Checkbox';
+import InputField from '../../components/UI/InputField';
+import Checkbox from '../../components/UI/Checkbox';
 import { MailIcon, LockIcon } from '../../assets/icon';
 
 function LoginPage() {

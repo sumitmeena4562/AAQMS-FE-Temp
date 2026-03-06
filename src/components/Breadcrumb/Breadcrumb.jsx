@@ -1,100 +1,88 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
-/**
- * Breadcrumb Component — Global, Reusable
- *
- * Props:
- * @param {Array} items - Breadcrumb trail array
- *   Format: [{ label: 'Dashboard', path: '/admin/dashboard' }, { label: 'Zones' }]
- *   Last item (no path) = current page (bold, no link)
- * @param {string} separator - Separator character (default: '›')
- * @param {Object} style - Extra custom styles for container
- * @param {string} className - Extra CSS classes
- *
- * Usage:
- *   <Breadcrumb items={[
- *       { label: 'Dashboard', path: '/admin/dashboard' },
- *       { label: 'Organizations', path: '/admin/organizations' },
- *       { label: 'Acme Logistics Hub', path: '/admin/organizations/1' },
- *       { label: 'Zones' }  // last item = current page
- *   ]} />
- */
+const Breadcrumb = ({ items = [], className = "" }) => {
+  if (!items.length) return null;
 
-const Breadcrumb = ({
-    items = [],
-    separator = '›',
-    style = {},
-    className = ''
-}) => {
-    if (!items.length) return null;
+  return (
+    <nav
+      className={`flex items-center gap-2 text-[15px] text-gray-600 ${className}`}
+      aria-label="Breadcrumb"
+    >
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
 
-    return (
-        <nav
-            className={className}
-            aria-label="Breadcrumb"
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 24px',
-                background: 'var(--color-bg-secondary)',
-                borderBottom: '1px solid var(--color-border)',
-                fontFamily: 'var(--font-family)',
-                fontSize: '13.5px',
-                flexWrap: 'wrap',
-                ...style
-            }}
-        >
-            {items.map((item, index) => {
-                const isLast = index === items.length - 1;
+        return (
+          <React.Fragment key={index}>
+            
+            {/* Breadcrumb Item */}
+            {isLast ? (
+              <span className="font-semibold text-gray-900 flex items-center gap-1">
+                {index === 0 && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                )}
+                {item.label}
+              </span>
+            ) : (
+              <Link
+                to={item.path}
+                className="flex items-center gap-1 hover:text-black transition-colors"
+              >
+                {index === 0 && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                  </svg>
+                )}
+                {item.label}
+              </Link>
+            )}
 
-                return (
-                    <React.Fragment key={index}>
-                        {/* Separator (skip before first item) */}
-                        {index > 0 && (
-                            <span style={{
-                                color: 'var(--color-text-muted)',
-                                fontSize: '14px',
-                                userSelect: 'none',
-                                opacity: 0.6
-                            }}>
-                                {separator}
-                            </span>
-                        )}
-
-                        {/* Breadcrumb Item */}
-                        {isLast || !item.path ? (
-                            // Current page — bold, no link
-                            <span style={{
-                                fontWeight: 600,
-                                color: 'var(--color-text-primary)',
-                                letterSpacing: '-0.01em'
-                            }}>
-                                {item.label}
-                            </span>
-                        ) : (
-                            // Clickable link
-                            <Link
-                                to={item.path}
-                                style={{
-                                    fontWeight: 450,
-                                    color: 'var(--color-text-tertiary)',
-                                    textDecoration: 'none',
-                                    transition: 'color 150ms ease',
-                                    letterSpacing: '-0.01em'
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.color = 'var(--color-accent)'}
-                                onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-tertiary)'}
-                            >
-                                {item.label}
-                            </Link>
-                        )}
-                    </React.Fragment>
-                );
-            })}
-        </nav>
-    );
+            {/* Separator */}
+            {!isLast && (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-gray-400"
+              >
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            )}
+          </React.Fragment>
+        );
+      })}
+    </nav>
+  );
 };
 
 export default Breadcrumb;
