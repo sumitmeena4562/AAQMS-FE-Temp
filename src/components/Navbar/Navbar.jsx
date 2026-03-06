@@ -1,57 +1,95 @@
-import React from 'react';
-import Search from '../UI/Search';
-
-/**
- * Navbar Component — Global, Reusable Container
- *
- * Ye ek khali frame hai — andar jo chahiye wo tum props mein de do.
- *
- * Props:
- * @param {React.ReactNode} leftContent  - Left side mein jo dikhana hai (breadcrumb, title, etc.)
- * @param {React.ReactNode} centerContent - Center mein jo dikhana hai (search bar, tabs, etc.)
- * @param {React.ReactNode} rightContent  - Right side mein jo dikhana hai (bell, avatar, buttons, etc.)
- * @param {React.ReactNode} children      - Ya seedha children de do, full control tumhara
- * @param {Object} style                  - Extra custom styles
- * @param {string} className              - Extra custom classes
- */
+import React from "react";
 
 const Navbar = ({
     leftContent,
     centerContent,
     rightContent,
+    showMenuButton = false,
+    onMenuClick,
+    className = "",
     children,
-    style = {},
-    className = ''
+    style
 }) => {
     return (
         <header
-            className={`flex flex-col flex-shrink-0 z-10 sticky top-0 ${className}`}
-            style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-border)', ...style }}
+            className={`flex flex-col flex-shrink-0 sticky top-0 z-20 ${className}`}
+            style={{
+                backgroundColor: "var(--color-bg-primary)",
+                borderBottom: "1px solid var(--color-border)",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
+                ...style
+            }}
         >
-            <div className="h-16 flex items-center justify-between px-8" style={{ borderBottom: '1px solid var(--color-bg-secondary)' }}>
+            {/* Top Row: Navigation + Search + User */}
+            <div className="flex items-center justify-between px-4 sm:px-6 h-12 md:h-16" style={{ paddingLeft: 'clamp(24px, 4vw, 40px)', paddingRight: 'clamp(24px, 4vw, 40px)' }}>
                 {children ? (
                     children
                 ) : (
                     <>
-                        {/* Left Content (Breadcrumbs, title, etc) */}
-                        <div className="flex items-center gap-1.5 text-sm text-gray-500 overflow-x-auto no-scrollbar whitespace-nowrap flex-1">
+                        {/* Hamburger (Mobile Only) */}
+                        <div className="md:hidden flex items-center">
+                            {showMenuButton && (
+                                <button
+                                    onClick={onMenuClick}
+                                    className="p-1.5 -ml-1.5 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors cursor-pointer"
+                                    aria-label="Open menu"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Breadcrumbs (Desktop Only in this row) */}
+                        <div className="hidden md:flex items-center flex-1 overflow-hidden mr-4">
                             {leftContent}
                         </div>
 
-                        {/* Center Content */}
-                        {centerContent && (
-                            <div className="flex items-center flex-1 justify-center">
-                                {centerContent}
-                            </div>
-                        )}
-
-                        {/* Right Content (Search, Bell, Profile) */}
-                        <div className="flex items-center gap-6 ml-4">
+                        {/* Search and Right Icons (Mobile & Desktop) */}
+                        <div className="flex-1 md:flex-none flex items-center justify-end">
                             {rightContent}
                         </div>
                     </>
                 )}
             </div>
+
+            {/* Bottom Row: Breadcrumbs (Mobile Only) */}
+            {!children && leftContent && (
+                <div
+                    className="md:hidden flex items-center overflow-x-auto no-scrollbar border-t"
+                    style={{
+                        backgroundColor: 'var(--color-bg-secondary)',
+                        borderColor:
+                            'color-mix(in srgb, var(--color-border) 60%, transparent)',
+                        paddingLeft: 'clamp(24px, 4vw, 40px)',
+                        paddingRight: 'clamp(24px, 4vw, 40px)'
+                    }}
+                >
+                    <div className="flex items-center whitespace-nowrap min-w-max py-2">
+                        {leftContent}
+                    </div>
+                </div>
+            )}
+
+            {/* Optional Center Content (Mobile) */}
+            {centerContent && (
+                <div className="md:hidden px-6 pb-2">
+                    {centerContent}
+                </div>
+            )}
+
+            {/* Hide Scrollbar */}
+            <style>
+                {`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+          -webkit-overflow-scrolling: touch;
+        }
+      `}
+            </style>
         </header>
     );
 };

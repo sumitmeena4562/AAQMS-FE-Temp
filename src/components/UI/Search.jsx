@@ -23,8 +23,8 @@ const Search = ({
 
             {/* Search Icon Container -  */}
             <div
-                 className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center"
-  style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+                className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center"
+                style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="11" cy="11" r="8"></circle>
@@ -38,7 +38,7 @@ const Search = ({
                 value={query}
                 placeholder={placeholder}
                 onChange={(e) => setQuery(e.target.value)}
-                className="block w-full text-sm rounded-xl focus:outline-none focus:ring-1 transition-all"
+                className="block w-full text-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-300"
                 style={{
                     paddingLeft: '32px',
                     paddingRight: '40px',
@@ -47,7 +47,16 @@ const Search = ({
                     backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
                     border: '1px solid var(--color-border, #E5E7EB)',
                     color: 'var(--color-text-primary, #111827)',
+                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03)'
                 }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--color-primary, #3B82F6)'}
+                onMouseLeave={e => {
+                    if (document.activeElement !== e.currentTarget) {
+                        e.currentTarget.style.borderColor = 'var(--color-border, #E5E7EB)';
+                    }
+                }}
+                onFocus={e => e.currentTarget.style.borderColor = 'var(--color-primary, #3B82F6)'}
+                onBlur={e => e.currentTarget.style.borderColor = 'var(--color-border, #E5E7EB)'}
             />
 
             {/* Clear Button */}

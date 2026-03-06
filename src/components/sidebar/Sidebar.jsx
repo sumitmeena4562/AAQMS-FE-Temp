@@ -42,11 +42,12 @@ const Sidebar = ({
     logo,
     userInfo,
     collapsed = false,
+    mobileOpen = false,
+    setMobileOpen,
     onToggle
 }) => {
     const location = useLocation();
     const [openMenus, setOpenMenus] = useState({});
-    const [mobileOpen, setMobileOpen] = useState(false);
 
     // Toggle sub-menu open/close
     const toggleMenu = (label) => {
@@ -74,8 +75,8 @@ const Sidebar = ({
 
     // Close mobile sidebar on route change
     useEffect(() => {
-        setMobileOpen(false);
-    }, [location.pathname]);
+        if (setMobileOpen) setMobileOpen(false);
+    }, [location.pathname, setMobileOpen]);
 
     // ── Render nav item with children (collapsible) ──
     const renderParentItem = (item) => {
@@ -247,7 +248,7 @@ const Sidebar = ({
 
     // ── Sidebar Content ──
     const sidebarContent = (
-        <>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
                 {/* Logo */}
                 {logo && (
@@ -316,41 +317,11 @@ const Sidebar = ({
                     )}
                 </div>
             )}
-        </>
+        </div>
     );
 
     return (
         <>
-            {/* ── Mobile Hamburger ── */}
-            <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="sidebar-mobile-toggle"
-                aria-label="Toggle sidebar"
-                style={{
-                    position: 'fixed',
-                    top: '14px',
-                    left: '14px',
-                    zIndex: 1001,
-                    width: 42, height: 42,
-                    borderRadius: '12px',
-                    background: '#FFFFFF',
-                    border: '1px solid var(--color-border)',
-                    boxShadow: 'var(--shadow-md)',
-                    display: 'none',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--color-text-secondary)',
-                    transition: 'all 150ms ease'
-                }}
-            >
-                {mobileOpen ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                )}
-            </button>
-
             {/* ── Mobile Overlay ── */}
             {mobileOpen && (
                 <div
@@ -362,7 +333,7 @@ const Sidebar = ({
                         background: 'rgba(0, 0, 0, 0.35)',
                         backdropFilter: 'blur(2px)',
                         zIndex: 999,
-                        display: 'none'
+                        display: 'block'
                     }}
                 />
             )}
@@ -404,12 +375,6 @@ const Sidebar = ({
                     background: transparent;
                 }
                 @media (max-width: 768px) {
-                    .sidebar-mobile-toggle {
-                        display: flex !important;
-                    }
-                    .sidebar-mobile-overlay {
-                        display: block !important;
-                    }
                     .sidebar-panel {
                         position: fixed !important;
                         top: 0 !important;

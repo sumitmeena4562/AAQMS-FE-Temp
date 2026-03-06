@@ -69,7 +69,9 @@ const Users = () => {
             accessor: "assignment",
             render: (assignment) => {
                 const type = assignment.toLowerCase() === 'unassigned' ? 'unassigned' : 'assigned';
-                return <DotStatus type={type} text={assignment} />;
+                // Standardize to Title Case
+                const formattedText = assignment.charAt(0).toUpperCase() + assignment.slice(1).toLowerCase();
+                return <DotStatus type={type} text={formattedText} />;
             }
         },
         {
@@ -77,7 +79,9 @@ const Users = () => {
             accessor: "status",
             render: (status) => {
                 const type = status.toLowerCase() === 'active' ? 'active' : 'inactive';
-                return <DotStatus type={type} text={status} />;
+                // Standardize to Title Case
+                const formattedText = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+                return <DotStatus type={type} text={formattedText} />;
             }
         },
         {
@@ -98,7 +102,7 @@ const Users = () => {
     return (
         <div className="flex flex-col w-full h-full min-h-screen pb-10 bg-[#F9FAFB]">
             {/* Main Content Area */}
-            <div className="px-6 mt-5">
+            <div className="mt-5" style={{ paddingLeft: 'clamp(24px, 4vw, 40px)', paddingRight: 'clamp(24px, 4vw, 40px)' }}>
                 {/* Filters Section */}
                 <div className="flex flex-col xl:flex-row justify-between xl:items-end gap-5 mb-6">
                     <div className="flex flex-wrap gap-4 w-full xl:w-auto">
@@ -137,7 +141,7 @@ const Users = () => {
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+                    <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto pr-1">
                         <button className="flex items-center gap-2 px-5 h-[38px] text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 cursor-pointer transition-all duration-150 hover:bg-gray-50 hover:border-gray-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.27l-5.3 5.3"></path></svg>
                             Reset
@@ -146,7 +150,7 @@ const Users = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                             Apply Filters
                         </button>
-                        <button className="flex items-center gap-2 px-5 h-[38px] text-sm font-medium rounded-lg border-none bg-slate-900 text-white cursor-pointer transition-all duration-150 hover:bg-slate-800">
+                        <button className="flex items-center gap-2 px-5 h-[38px] text-sm font-medium rounded-lg border-none bg-slate-900 text-white cursor-pointer transition-all duration-150 hover:bg-slate-800 mr-2 md:mr-0">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                             Add New User
                         </button>
@@ -156,9 +160,11 @@ const Users = () => {
                 <hr className="border-none border-t border-gray-200 mb-6" />
 
                 {/* Table Title Area */}
-                <div className="flex justify-between items-end mb-4">
+                <div className="flex justify-between items-center mb-6 px-1">
                     <h2 className="text-xl font-bold text-gray-900">User Management</h2>
-                    <span className="text-[13px] font-medium text-gray-400">Showing {users.length} total User</span>
+                    <span className="text-[13px] font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200 shadow-sm">
+                        Showing <span className="text-blue-600 font-bold">{users.length}</span> total Users
+                    </span>
                 </div>
 
                 {/* Main Table Container */}
@@ -167,9 +173,12 @@ const Users = () => {
                 </div>
 
                 {/* Footer Note */}
-                <div className="mt-8 flex justify-center items-center gap-2 text-[11px] text-gray-400 font-medium">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                    AI assists detection. Final approval is human-controlled.
+                <div className="mt-12 py-6 border-t border-gray-100 flex flex-col items-center justify-center gap-3">
+                    <div className="flex items-center gap-2 px-4 py-1.5 bg-white rounded-full border border-gray-100 shadow-sm text-[12px] text-gray-500 font-medium">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        AI assists detection. Final approval is human-controlled.
+                    </div>
+                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">© 2026 AAQMS Dashboard</p>
                 </div>
             </div>
         </div>
