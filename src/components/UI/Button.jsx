@@ -12,22 +12,22 @@ const Button = ({
     ...props
 }) => {
     // Base styles for the premium dashboard look
-    const baseStyles = "flex items-center justify-center gap-2.5 font-bold rounded-full transition-all duration-300 active:scale-[0.97] whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100";
+    const baseStyles = "flex items-center justify-center gap-2 font-semibold rounded-full transition-all duration-200 active:scale-[0.98] whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed";
 
     // Size maps
     const sizes = {
-        sm: "px-4 h-[38px] text-[12px]",
-        md: "px-6 h-[46px] text-[13.5px]",
-        lg: "px-8 h-[54px] text-[15px]",
+        sm: "px-4 h-9 text-[12px]",
+        md: "px-6 h-11 text-[13.5px]",
+        lg: "px-8 h-13 text-[15px]",
     };
 
     // Variant maps for colors
     const variants = {
-        primary: "bg-gradient-to-tr from-blue-700 to-blue-500 text-white shadow-[0_4px_15px_-3px_rgba(59,130,246,0.3)] hover:shadow-[0_8px_25px_-5px_rgba(59,130,246,0.4)] hover:-translate-y-0.5 border border-blue-400/20 active:shadow-inner",
-        secondary: "bg-gradient-to-tr from-slate-900 to-slate-800 text-white shadow-[0_4px_15px_-3px_rgba(15,23,42,0.3)] hover:shadow-[0_8px_25px_-5px_rgba(15,23,42,0.4)] hover:-translate-y-0.5 border border-slate-700/50 active:shadow-inner",
-        success: "bg-gradient-to-tr from-emerald-600 to-emerald-400 text-white shadow-[0_4px_15px_-3px_rgba(16,185,129,0.3)] hover:shadow-[0_8px_25px_-5px_rgba(16,185,129,0.4)] hover:-translate-y-0.5 border border-emerald-400/20 active:shadow-inner",
-        outline: "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800",
-        ghost: "bg-transparent text-slate-500 hover:bg-blue-50/50 hover:text-blue-600 shadow-none border-none",
+        primary: "bg-[var(--color-primary)] text-white hover:opacity-90 shadow-[var(--shadow-button)] border border-transparent",
+        secondary: "bg-[var(--color-accent)] text-white hover:opacity-90 shadow-[var(--shadow-button)] border border-transparent",
+        success: "bg-[var(--color-success)] text-white hover:opacity-90 shadow-[var(--shadow-button)] border border-transparent",
+        outline: "bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-hover)] hover:text-[var(--color-text-primary)]",
+        ghost: "bg-transparent text-[var(--color-text-secondary)] hover:bg-zinc-100 hover:text-[var(--color-text-primary)] shadow-none border-none",
     };
 
     return (

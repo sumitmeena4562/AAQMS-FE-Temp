@@ -8,8 +8,8 @@ const DotStatus = ({ type, text }) => {
             text: 'text-[var(--color-danger)]'
         },
         assigned: {
-            dot: 'bg-[var(--color-accent-bright)]',
-            text: 'text-[var(--color-accent-bright)]'
+            dot: 'bg-[var(--color-success)]',
+            text: 'text-[var(--color-success)]'
         },
         active: {
             dot: 'bg-[var(--color-success)]',
@@ -17,7 +17,7 @@ const DotStatus = ({ type, text }) => {
         },
         inactive: {
             dot: 'bg-[var(--color-text-muted)]',
-            text: 'text-[var(--color-text-secondary)]'
+            text: 'text-[var(--color-text-muted)]'
         }
     };
 

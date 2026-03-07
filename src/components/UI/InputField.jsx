@@ -53,7 +53,7 @@ const InputField = ({
                         borderRadius: 'var(--radius-lg)',
                         outline: 'none',
                         transition: 'border-color var(--transition-fast), box-shadow var(--transition-fast)',
-                        boxShadow: isFocused && !error ? '0 0 0 3px var(--color-primary-50)' : (error && isFocused ? '0 0 0 3px var(--color-danger-light)' : 'none')
+                        boxShadow: isFocused && !error ? '0 0 0 4px var(--color-accent-soft)' : (error && isFocused ? '0 0 0 3px rgba(239, 68, 68, 0.1)' : 'none')
                     }}
                     onFocus={(e) => {
                         setIsFocused(true);

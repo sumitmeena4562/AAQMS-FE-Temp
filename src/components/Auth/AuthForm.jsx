@@ -66,28 +66,28 @@ function AuthForm({
                     border: '1px solid var(--color-border-subtle, rgba(255,255,255,0.05))'
                 }}
             >
-                <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+                <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
                     <motion.h2
                         variants={itemVariants}
-                        style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}
+                        style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', lineHeight: 1.1 }}
                     >
                         {title}
                     </motion.h2>
                     <motion.p
                         variants={itemVariants}
-                        style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: '6px' }}
+                        style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}
                     >
                         {subtitle}
                     </motion.p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '20px' } : { display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' } : { display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
                         {renderedChildren}
                     </div>
 
-                    <motion.div variants={itemVariants} style={{ marginTop: '24px' }}>
-                        <Button type="submit" variant="dark" fullWidth disabled={isLoading}>
+                    <motion.div variants={itemVariants} style={{ marginTop: 'var(--space-6)' }}>
+                        <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
                             {isLoading ? loadingText : submitText}
                         </Button>
                     </motion.div>

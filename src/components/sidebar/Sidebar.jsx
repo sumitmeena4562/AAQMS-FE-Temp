@@ -93,16 +93,15 @@ const Sidebar = ({
                         gap: collapsed ? 0 : '12px',
                         justifyContent: collapsed ? 'center' : 'space-between',
                         width: '100%',
-                        padding: '10px 14px',
-                        borderRadius: '10px',
-                        fontSize: '13.5px',
+                        padding: '8px 12px',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '13px',
                         fontWeight: isChildActive || isOpen ? 600 : 500,
-                        color: isChildActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                        background: isOpen ? 'var(--color-primary-50)' : 'transparent',
+                        color: isChildActive ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                        background: isOpen ? 'var(--color-accent-soft)' : 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        transition: 'all 180ms ease',
-                        letterSpacing: '-0.01em',
+                        transition: 'all 150ms ease',
                         fontFamily: 'var(--font-family)',
                         textAlign: 'left',
                         outline: 'none'
@@ -209,29 +208,27 @@ const Sidebar = ({
                     alignItems: 'center',
                     gap: collapsed ? 0 : '12px',
                     justifyContent: collapsed ? 'center' : 'flex-start',
-                    padding: '10px 14px',
-                    borderRadius: '10px',
-                    fontSize: '13.5px',
+                    padding: '8px 12px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '13px',
                     fontWeight: isActive ? 600 : 500,
-                    color: isActive ? '#FFFFFF' : 'var(--color-text-secondary)',
-                    background: isActive ? 'var(--color-accent-light)' : 'transparent',
+                    color: isActive ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                    background: isActive ? 'var(--color-accent-soft)' : 'transparent',
                     textDecoration: 'none',
-                    transition: 'all 180ms ease',
-                    letterSpacing: '-0.01em',
+                    transition: 'all 150ms ease',
                     marginBottom: '2px',
-                    boxShadow: isActive ? '0 2px 8px rgba(59, 130, 246, 0.25)' : 'none'
                 }}
                 onMouseEnter={e => {
                     if (!isActive) e.currentTarget.style.background = 'var(--color-bg-hover)';
                 }}
                 onMouseLeave={e => {
-                    e.currentTarget.style.background = isActive ? 'var(--color-accent-light)' : 'transparent';
+                    e.currentTarget.style.background = isActive ? 'var(--color-accent-soft)' : 'transparent';
                 }}
             >
                 <span style={{
-                    opacity: isActive ? 1 : 0.55,
+                    opacity: isActive ? 1 : 0.45,
                     display: 'flex', alignItems: 'center',
-                    transition: 'opacity 180ms ease'
+                    transition: 'opacity 150ms ease'
                 }}>{item.icon}</span>
                 {!collapsed && item.label}
             </NavLink>
@@ -253,9 +250,12 @@ const Sidebar = ({
                 {/* Logo */}
                 {logo && (
                     <div style={{
-                        padding: collapsed ? '20px 8px' : '24px 20px 16px 20px',
-                        borderBottom: '1px solid var(--color-border-light)',
-                        marginBottom: '8px'
+                        height: '60px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: collapsed ? '0 12px' : '0 20px',
+                        borderBottom: '1px solid var(--color-border)',
+                        boxSizing: 'border-box'
                     }}>
                         {logo}
                     </div>
@@ -275,39 +275,41 @@ const Sidebar = ({
             {/* Bottom User Info */}
             {userInfo && (
                 <div style={{
-                    padding: collapsed ? '14px 8px' : '14px 20px',
+                    padding: collapsed ? '12px 8px' : '12px 16px',
                     borderTop: '1px solid var(--color-border)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: collapsed ? 0 : '12px',
                     justifyContent: collapsed ? 'center' : 'flex-start',
-                    background: 'var(--color-bg-primary)',
+                    background: 'transparent',
                     cursor: 'pointer',
-                    transition: 'background 150ms ease'
+                    transition: 'all 150ms ease',
+                    margin: '8px 12px 12px 12px',
+                    borderRadius: 'var(--radius-md)'
                 }}
                     onMouseEnter={e => e.currentTarget.style.background = 'var(--color-bg-hover)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'var(--color-bg-primary)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 >
                     <div style={{
-                        width: 36, height: 36, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, var(--color-success), #34D399)',
+                        width: 32, height: 32, borderRadius: '6px',
+                        background: 'var(--color-primary)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontWeight: 700, fontSize: 14, flexShrink: 0,
-                        boxShadow: '0 2px 6px rgba(5, 150, 105, 0.25)'
+                        color: '#fff', fontWeight: 800, fontSize: 13, flexShrink: 0
                     }}>
                         {userInfo.avatar || userInfo.name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                     {!collapsed && (
                         <div style={{ overflow: 'hidden', flex: 1 }}>
                             <div style={{
-                                fontWeight: 600, fontSize: 13,
+                                fontWeight: 700, fontSize: '13px',
                                 color: 'var(--color-text-primary)',
-                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                                lineHeight: 1.2
                             }}>
                                 {userInfo.name}
                             </div>
                             <div style={{
-                                fontSize: 11,
+                                fontSize: '11px',
                                 color: 'var(--color-text-muted)',
                                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                             }}>

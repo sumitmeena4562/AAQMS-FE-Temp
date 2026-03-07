@@ -10,10 +10,10 @@ const UserTable = ({ data = [] }) => {
             accessor: 'name',
             render: (_, row) => (
                 <div className="flex flex-col py-1">
-                    <span className="font-bold text-[15px] text-slate-900 leading-snug">
+                    <span className="font-extrabold text-[15px] text-text-primary leading-snug">
                         {row.name}
                     </span>
-                    <span className="text-[13px] text-slate-500 font-normal">
+                    <span className="text-[13px] text-text-muted font-medium">
                         {row.email}
                     </span>
                 </div>
@@ -23,7 +23,7 @@ const UserTable = ({ data = [] }) => {
             header: 'ORGANIZATION',
             accessor: 'organization',
             render: (value) => (
-                <span className="text-[14px] font-semibold text-slate-500 tracking-tight">
+                <span className="text-[14px] font-bold text-text-secondary tracking-tight">
                     {value || '------'}
                 </span>
             )
@@ -35,10 +35,10 @@ const UserTable = ({ data = [] }) => {
                 const isCoordinator = value?.toLowerCase() === 'coordinator';
                 return (
                     <span
-                        className={`inline-flex items-center px-4 py-1.5 rounded-full text-[12px] font-bold tracking-wide shadow-sm
+                        className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest
                         ${isCoordinator
-                                ? 'bg-purple-50 text-purple-600 border border-purple-100/50'
-                                : 'bg-blue-50 text-blue-600 border border-blue-100/50'}
+                                ? 'bg-bg-tertiary text-text-primary border border-border'
+                                : 'bg-bg-primary text-text-secondary border border-border'}
                     `}
                     >
                         {value}
@@ -52,7 +52,7 @@ const UserTable = ({ data = [] }) => {
             render: (value) => {
                 const displayValue = value?.toLowerCase() === 'unassigned' ? 'Unassigned' : 'Assigned';
                 return (
-                    <div className="scale-105 origin-left">
+                    <div className="scale-95 origin-left font-bold italic">
                         <DotStatus type={value?.toLowerCase()} text={displayValue} />
                     </div>
                 );
@@ -62,7 +62,7 @@ const UserTable = ({ data = [] }) => {
             header: 'STATUS',
             accessor: 'status',
             render: (value) => (
-                <div className="scale-105 origin-left">
+                <div className="scale-95 origin-left font-bold italic">
                     <DotStatus
                         type={value?.toLowerCase()}
                         text={value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}
@@ -76,23 +76,21 @@ const UserTable = ({ data = [] }) => {
             render: (_, row) => (
                 <Button
                     variant="ghost"
-                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50/50 px-4 h-[38px] rounded-xl"
+                    className="text-text-primary hover:bg-bg-tertiary px-5 h-[36px] rounded-full border border-transparent hover:border-border-hover transition-all"
                     onClick={() => row.onEdit && row.onEdit(row)}
                 >
-                    <span className="text-[13px] font-bold">Edit Details</span>
-                    <FiEdit2 className="w-3.5 h-3.5 opacity-70" />
+                    <span className="text-[12px] font-black uppercase tracking-wider">Edit</span>
+                    <FiEdit2 className="w-3.5 h-3.5" />
                 </Button>
             )
         }
     ];
 
     return (
-        <div className="w-full flex flex-col gap-8 py-4">
-            {/* Premium Table Card */}
-            <div
-                className="bg-white rounded-[40px] border border-slate-200/60 shadow-[0_25px_60px_rgba(0,0,0,0.05)] overflow-hidden"
-                style={{ padding: '56px' }}
-            >
+        <div className="w-full">
+            <div className="p-8" style={{padding:'1% 2% 1% 5%'} }>
+                {/* Custom Header Injection via Table component styling if supported, 
+                    otherwise we rely on the columns definition which 'Table' component should use */}
                 <Table columns={columns} data={data} />
             </div>
         </div>

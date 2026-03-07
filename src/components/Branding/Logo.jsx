@@ -22,13 +22,12 @@ const Logo = ({ collapsed = false, size = 'md' }) => {
             <div style={{
                 width: s.icon,
                 height: s.icon,
-                borderRadius: 'var(--radius-full)',
-                background: 'var(--color-primary-dark)',
+                borderRadius: '8px',
+                background: 'var(--color-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0,
-                boxShadow: '0 2px 8px rgba(7, 34, 103, 0.3)',
+                flexShrink: 0
             }}>
                 <svg
                     width={s.svg}
@@ -39,16 +38,8 @@ const Logo = ({ collapsed = false, size = 'md' }) => {
                 >
                     <path
                         d="M12 2L4 6V12C4 16.42 7.4 20.74 12 22C16.6 20.74 20 16.42 20 12V6L12 2Z"
-                        fill="rgba(255,255,255,0.15)"
-                        stroke="#fff"
-                        strokeWidth="1.5"
-                    />
-                    <path
-                        d="M9 12L11 14L15 10"
                         stroke="#fff"
                         strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
                     />
                 </svg>
             </div>

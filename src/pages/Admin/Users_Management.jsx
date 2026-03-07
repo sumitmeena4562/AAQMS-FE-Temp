@@ -122,17 +122,17 @@ const Users = () => {
     const roleOptions = [...new Set(dummyUsers.map(u => u.role))];
 
     return (
-        <div className="flex flex-col w-full">
+        <div className="flex flex-col w-full " style={{padding:'1%'}}>
             {/* Main Content Area */}
-            <div className="w-full" style={{ padding: '10px' }}>
+            <div className="w-full px-1">
                 {/* Header Row: Title and Actions Combined */}
-                <div className="flex justify-between items-center mb-10 mt-10">
-                    <div className="flex flex-col gap-1">
-                        <h2 className="text-[32px] font-extrabold text-slate-900 tracking-tight leading-none">
+                <div className="flex justify-between items-end mb-16 mt-4">
+                    <div className="flex flex-col gap-2">
+                        <h2 className="text-[34px] font-black text-text-primary tracking-tight leading-none">
                             User Management Hub
                         </h2>
-                        <div className="text-[14px] font-semibold text-slate-400 italic mt-2.5">
-                            Current directory of {filteredUsers.length} active platform users
+                        <div className="text-[14px] font-medium text-text-secondary opacity-70">
+                            Directory of {filteredUsers.length} active platform users
                         </div>
                     </div>
 
@@ -141,17 +141,17 @@ const Users = () => {
                             variant="primary"
                             icon={FiPlus}
                             onClick={() => setIsModalOpen(true)}
-                            className="shadow-xl shadow-blue-500/30 h-[36px] px-8 rounded-full"
+                            className="px-8 shadow-pro"
                         >
-                            <span className="text-[14px] font-bold">Add New User</span>
+                            <span>Add New User</span>
                         </Button>
                     </div>
                 </div>
 
                 {/* Filter Section (Modern-Pill UI) */}
-                <div className="flex items-center gap-2.5 mb-10 overflow-x-auto pb-2 scrollbar-none">
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100/60 rounded-full text-slate-500 text-[11px] font-black uppercase tracking-widest border border-slate-200/50">
-                        <FiFilter className="text-blue-500" /> Filters
+                <div className="flex items-center gap-4 mb-16 overflow-x-auto pb-4 scrollbar-none">
+                    <div className="flex items-center gap-2 text-text-muted text-[10px] font-black uppercase tracking-[0.2em] pr-2">
+                        <FiFilter className="text-[12px]" /> Filters
                     </div>
 
                     {/* Organization Pill */}
@@ -159,14 +159,14 @@ const Users = () => {
                         <select
                             value={filters.organization}
                             onChange={(e) => setFilters({ ...filters, organization: e.target.value })}
-                            className={`appearance-none border text-[12px] font-bold rounded-full pl-4 pr-10 py-1.5 outline-none transition-all cursor-pointer min-w-[150px]
-                                ${filters.organization ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300'}`}
+                            className={`appearance-none border text-[12px] font-extrabold rounded-full pl-5 pr-12 py-2.5 outline-none transition-all cursor-pointer min-w-[170px] shadow-sm
+                                ${filters.organization ? 'bg-primary text-text-inverse border-primary' : 'bg-bg-secondary border-border text-text-secondary hover:border-border-hover'}`}
                         >
                             <option value="">By Organization</option>
                             {orgOptions.map(org => <option key={org} value={org}>{org}</option>)}
                         </select>
-                        <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${filters.organization ? 'text-blue-400' : 'text-slate-400'}`}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                        <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${filters.organization ? 'text-text-inverse' : 'text-text-muted group-hover:text-text-secondary'}`}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
                         </div>
                     </div>
 
@@ -175,14 +175,14 @@ const Users = () => {
                         <select
                             value={filters.role}
                             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-                            className={`appearance-none border text-[12px] font-bold rounded-full pl-4 pr-10 py-1.5 outline-none transition-all cursor-pointer min-w-[130px]
-                                ${filters.role ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300'}`}
+                            className={`appearance-none border text-[12px] font-extrabold rounded-full pl-5 pr-12 py-2.5 outline-none transition-all cursor-pointer min-w-[140px] shadow-sm
+                                ${filters.role ? 'bg-primary text-text-inverse border-primary' : 'bg-bg-secondary border-border text-text-secondary hover:border-border-hover'}`}
                         >
                             <option value="">By Role</option>
                             {roleOptions.map(role => <option key={role} value={role}>{role}</option>)}
                         </select>
-                        <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${filters.role ? 'text-blue-400' : 'text-slate-400'}`}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                        <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${filters.role ? 'text-text-inverse' : 'text-text-muted group-hover:text-text-secondary'}`}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
                         </div>
                     </div>
 
@@ -191,15 +191,15 @@ const Users = () => {
                         <select
                             value={filters.status}
                             onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                            className={`appearance-none border text-[12px] font-bold rounded-full pl-4 pr-10 py-1.5 outline-none transition-all cursor-pointer min-w-[120px]
-                                ${filters.status ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300'}`}
+                            className={`appearance-none border text-[12px] font-extrabold rounded-full pl-5 pr-12 py-2.5 outline-none transition-all cursor-pointer min-w-[130px] shadow-sm
+                                ${filters.status ? 'bg-primary text-text-inverse border-primary' : 'bg-bg-secondary border-border text-text-secondary hover:border-border-hover'}`}
                         >
                             <option value="">By Status</option>
                             <option value="active">Active Only</option>
                             <option value="inactive">Inactive Only</option>
                         </select>
-                        <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${filters.status ? 'text-blue-400' : 'text-slate-400'}`}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                        <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors ${filters.status ? 'text-text-inverse' : 'text-text-muted group-hover:text-text-secondary'}`}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
                         </div>
                     </div>
 
@@ -207,25 +207,25 @@ const Users = () => {
                     {(filters.organization || filters.role || filters.status) && (
                         <button
                             onClick={resetFilters}
-                            className="flex items-center gap-1.5 px-4 py-1.5 bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 rounded-full transition-all text-[11px] font-black uppercase tracking-widest ml-2"
+                            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-text-inverse rounded-full hover:opacity-90 transition-all text-[11px] font-black uppercase tracking-widest ml-auto shadow-pro border border-primary/20"
                         >
-                            <FiRotateCcw className="text-[12px]" /> Clear All
+                            <FiRotateCcw className="text-[13px]" /> Clear All
                         </button>
                     )}
                 </div>
 
-                {/* Main Table Container */}
-                <div className="w-full">
+                {/* Main Table Surface */}
+                <div className="w-full bg-bg-secondary rounded-card border border-border shadow-premium overflow-hidden">
                     <UserTable data={filteredUsers} />
                 </div>
 
                 {/* Footer Note */}
-                <div className="mt-16 py-12 border-t border-slate-100 flex flex-col items-center justify-center gap-5">
-                    <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-50/80 border border-slate-100 text-[12px] text-slate-500 font-bold">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <div className="mt-16 py-12 border-t border-border/30 flex flex-col items-center justify-center gap-5">
+                    <div className="flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-bg-tertiary/50 border border-border text-[12px] text-text-secondary font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                         AI assists detection. Final approval is human-controlled.
                     </div>
-                    <p className="text-[11px] text-slate-300 uppercase tracking-[0.2em] font-extrabold">(c) 2026 AAQMS DASHBOARD</p>
+                    <p className="text-[10px] text-text-muted uppercase tracking-[0.25em] font-black opacity-60">(c) 2026 AAQMS DASHBOARD</p>
                 </div>
             </div>
         </div>

@@ -101,34 +101,32 @@ const AdminLayoutInner = () => {
                 mobileOpen={isMobileOpen}
                 setMobileOpen={setIsMobileOpen}
             />
-            <div
-                className="flex-1 flex flex-col h-full overflow-hidden bg-white pl-[120px]"
-            >
+            <div className="flex-1 flex flex-col h-full overflow-hidden bg-bg-primary">
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
                     leftContent={breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
-                    className="border-b border-slate-100"
-                    style={{ background: '#ffffff' }}
+                    className="border-b border-border px-12 h-15 flex-shrink-0"
+                    style={{ background: 'var(--color-bg-secondary)' }}
                     rightContent={
-                        <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-end">
-                            <div className="flex-1 md:flex-none relative max-w-[220px] sm:max-w-none md:w-80 transition-all duration-300">
-                                <Search placeholder="Search..." />
+                        <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+                            <div className="flex-1 md:flex-none relative max-w-[220px] sm:max-w-none md:w-72 transition-all">
+                                <Search placeholder="Search users, roles..." />
                             </div>
-                            <div className="flex items-center gap-1 md:gap-3 flex-shrink-0">
-                                <button className="p-2 transition-colors relative flex items-center justify-center cursor-pointer text-[#94a3b8] hover:text-[#475569]">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <div className="flex items-center gap-3 flex-shrink-0">
+                                <button className="p-2 transition-colors relative flex items-center justify-center cursor-pointer text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
                                     </svg>
-                                    <span className="absolute top-[11px] right-[11px] h-1.5 w-1.5 rounded-full border border-white bg-red-500 shadow-sm"></span>
+                                    <span className="absolute top-[8px] right-[8px] h-2 w-2 rounded-full border-2 border-white bg-blue-500"></span>
                                 </button>
                                 <ProfileDropdown userInfo={userInfo} />
                             </div>
                         </div>
                     }
                 />
-                <main className="flex-1 overflow-y-auto px-14 lg:px-24 py-16">
-                    <div className="w-full">
+                <main className="flex-1 overflow-y-auto px-12 py-12">
+                    <div className="w-full max-w-[1600px] mx-auto">
                         <Outlet />
                     </div>
                 </main>
