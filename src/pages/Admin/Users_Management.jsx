@@ -98,37 +98,125 @@ const dummyUsers = [
 ];
 
 const Users = () => {
-    const [users] = useState(dummyUsers);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [filters, setFilters] = useState({
+        organization: '',
+        role: '',
+        status: ''
+    });
+
+    // Derived filtered users list
+    const filteredUsers = React.useMemo(() => {
+        return dummyUsers.filter(user => {
+            const matchesOrg = !filters.organization || user.organization === filters.organization;
+            const matchesRole = !filters.role || user.role === filters.role;
+            const matchesStatus = !filters.status || user.status === filters.status;
+            return matchesOrg && matchesRole && matchesStatus;
+        });
+    }, [filters]);
+
+    const resetFilters = () => setFilters({ organization: '', role: '', status: '' });
+
+    // Unique options for filters
+    const orgOptions = [...new Set(dummyUsers.map(u => u.organization))];
+    const roleOptions = [...new Set(dummyUsers.map(u => u.role))];
 
     return (
         <div className="flex flex-col w-full">
             {/* Main Content Area */}
-            <div className="w-full">
+            <div className="w-full" style={{ padding: '10px' }}>
+                {/* Header Row: Title and Actions Combined */}
+                <div className="flex justify-between items-center mb-10 mt-10">
+                    <div className="flex flex-col gap-1">
+                        <h2 className="text-[32px] font-extrabold text-slate-900 tracking-tight leading-none">
+                            User Management Hub
+                        </h2>
+                        <div className="text-[14px] font-semibold text-slate-400 italic mt-2.5">
+                            Current directory of {filteredUsers.length} active platform users
+                        </div>
+                    </div>
 
-                {/* Row 1: Action Buttons (Top Right) */}
-                <div className="flex justify-end items-center gap-3 mb-6">
-                    <Button
-                        variant="primary"
-                        icon={FiPlus}
-                        onClick={() => console.log('Add')}
-                    >
-                        Add New User
-                    </Button>
+                    <div className="flex items-center gap-3">
+                        <Button
+                            variant="primary"
+                            icon={FiPlus}
+                            onClick={() => setIsModalOpen(true)}
+                            className="shadow-xl shadow-blue-500/30 h-[36px] px-8 rounded-full"
+                        >
+                            <span className="text-[14px] font-bold">Add New User</span>
+                        </Button>
+                    </div>
                 </div>
 
-                {/* Row 2: Title and Count */}
-                <div className="flex justify-between items-end mb-8 px-2 pl-0">
-                    <h2 className="text-[32px] font-extrabold text-slate-900 tracking-tight">
-                        User Management
-                    </h2>
-                    <div className="text-[14px] font-semibold text-slate-400 italic">
-                        Showing {users.length} total User
+                {/* Filter Section (Modern-Pill UI) */}
+                <div className="flex items-center gap-2.5 mb-10 overflow-x-auto pb-2 scrollbar-none">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100/60 rounded-full text-slate-500 text-[11px] font-black uppercase tracking-widest border border-slate-200/50">
+                        <FiFilter className="text-blue-500" /> Filters
                     </div>
+
+                    {/* Organization Pill */}
+                    <div className="relative group">
+                        <select
+                            value={filters.organization}
+                            onChange={(e) => setFilters({ ...filters, organization: e.target.value })}
+                            className={`appearance-none border text-[12px] font-bold rounded-full pl-4 pr-10 py-1.5 outline-none transition-all cursor-pointer min-w-[150px]
+                                ${filters.organization ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300'}`}
+                        >
+                            <option value="">By Organization</option>
+                            {orgOptions.map(org => <option key={org} value={org}>{org}</option>)}
+                        </select>
+                        <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${filters.organization ? 'text-blue-400' : 'text-slate-400'}`}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                        </div>
+                    </div>
+
+                    {/* Role Pill */}
+                    <div className="relative group">
+                        <select
+                            value={filters.role}
+                            onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+                            className={`appearance-none border text-[12px] font-bold rounded-full pl-4 pr-10 py-1.5 outline-none transition-all cursor-pointer min-w-[130px]
+                                ${filters.role ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300'}`}
+                        >
+                            <option value="">By Role</option>
+                            {roleOptions.map(role => <option key={role} value={role}>{role}</option>)}
+                        </select>
+                        <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${filters.role ? 'text-blue-400' : 'text-slate-400'}`}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                        </div>
+                    </div>
+
+                    {/* Status Pill */}
+                    <div className="relative group">
+                        <select
+                            value={filters.status}
+                            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                            className={`appearance-none border text-[12px] font-bold rounded-full pl-4 pr-10 py-1.5 outline-none transition-all cursor-pointer min-w-[120px]
+                                ${filters.status ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-slate-200 text-slate-600 hover:border-blue-300'}`}
+                        >
+                            <option value="">By Status</option>
+                            <option value="active">Active Only</option>
+                            <option value="inactive">Inactive Only</option>
+                        </select>
+                        <div className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${filters.status ? 'text-blue-400' : 'text-slate-400'}`}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+                        </div>
+                    </div>
+
+                    {/* Reset Pill */}
+                    {(filters.organization || filters.role || filters.status) && (
+                        <button
+                            onClick={resetFilters}
+                            className="flex items-center gap-1.5 px-4 py-1.5 bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 rounded-full transition-all text-[11px] font-black uppercase tracking-widest ml-2"
+                        >
+                            <FiRotateCcw className="text-[12px]" /> Clear All
+                        </button>
+                    )}
                 </div>
 
                 {/* Main Table Container */}
                 <div className="w-full">
-                    <UserTable data={users} />
+                    <UserTable data={filteredUsers} />
                 </div>
 
                 {/* Footer Note */}

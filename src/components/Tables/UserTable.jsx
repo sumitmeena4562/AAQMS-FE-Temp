@@ -90,8 +90,8 @@ const UserTable = ({ data = [] }) => {
         <div className="w-full flex flex-col gap-8 py-4">
             {/* Premium Table Card */}
             <div
-                className="bg-white rounded-[32px] border border-slate-200/60 shadow-[0_20px_50px_rgba(0,0,0,0.04)] overflow-hidden"
-                style={{ padding: '40px' }}
+                className="bg-white rounded-[40px] border border-slate-200/60 shadow-[0_25px_60px_rgba(0,0,0,0.05)] overflow-hidden"
+                style={{ padding: '56px' }}
             >
                 <Table columns={columns} data={data} />
             </div>

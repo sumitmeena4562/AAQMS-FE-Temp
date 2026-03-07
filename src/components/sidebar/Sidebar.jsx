@@ -44,8 +44,7 @@ const Sidebar = ({
     collapsed = false,
     mobileOpen = false,
     setMobileOpen,
-    onToggle,
-    className = ""
+    onToggle
 }) => {
     const location = useLocation();
     const [openMenus, setOpenMenus] = useState({});
@@ -341,7 +340,7 @@ const Sidebar = ({
 
             {/* ── Sidebar ── */}
             <aside
-                className={`sidebar-panel ${mobileOpen ? 'sidebar-mobile-open' : ''} ${className}`}
+                className={`sidebar-panel ${mobileOpen ? 'sidebar-mobile-open' : ''}`}
                 style={{
                     width: collapsed ? '72px' : 'var(--sidebar-width)',
                     minWidth: collapsed ? '72px' : 'var(--sidebar-width)',

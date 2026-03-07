@@ -21,7 +21,7 @@ const Navbar = ({
             }}
         >
             {/* Top Row: Navigation + Search + User */}
-            <div className="flex items-center justify-between px-4 sm:px-6 h-12 md:h-16" style={{ paddingLeft: 'clamp(24px, 4vw, 40px)', paddingRight: 'clamp(24px, 4vw, 40px)' }}>
+            <div className="flex items-center justify-between px-14 lg:px-24 h-12 md:h-16">
                 {children ? (
                     children
                 ) : (

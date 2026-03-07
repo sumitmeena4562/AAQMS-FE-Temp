@@ -10,8 +10,6 @@ import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 import { BreadcrumbProvider, useBreadcrumb, generateBreadcrumbs } from "../../context/BreadcrumbContext";
 
 // ── Nav Items Configuration ──
-// Items with `children` will show collapsible sub-menus.
-// Aap yahan apne hisaab se sub-items add/remove kar sakte ho.
 const navItems = [
     {
         label: 'Dashboard', path: '/admin/dashboard', icon: (
@@ -19,7 +17,6 @@ const navItems = [
         )
     },
     {
-        // ── Organization with sub-menus ──
         label: 'Organization Management', icon: (
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
         ),
@@ -56,7 +53,6 @@ const navItems = [
             },
         ]
     },
-
     {
         label: 'User Management', path: '/admin/users', icon: (
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -86,63 +82,53 @@ const userInfo = {
     avatar: 'A'
 };
 
-// ── Inner Layout (reads breadcrumb from context) ──
 const AdminLayoutInner = () => {
     const { breadcrumbs, setBreadcrumbs } = useBreadcrumb();
     const location = useLocation();
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
-    // Auto-generate breadcrumbs from sidebar navItems on every route change
     React.useEffect(() => {
         const autoCrumbs = generateBreadcrumbs(navItems, location.pathname);
         setBreadcrumbs(autoCrumbs);
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-slate-50 font-[var(--font-family)] gap-4 p-4">
-            {/* Sidebar */}
+        <div className="flex h-screen overflow-hidden bg-[var(--color-bg-primary)] font-[var(--font-family)]">
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}
                 userInfo={userInfo}
                 mobileOpen={isMobileOpen}
                 setMobileOpen={setIsMobileOpen}
-                className="rounded-3xl"
             />
-
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col h-full overflow-hidden bg-white rounded-3xl border border-slate-200/60 shadow-sm">
+            <div
+                className="flex-1 flex flex-col h-full overflow-hidden bg-white pl-[120px]"
+            >
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
-                    leftContent={
-                        breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />
-                    }
-                    className="border-none"
-                    style={{ background: 'transparent' }}
+                    leftContent={breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
+                    className="border-b border-slate-100"
+                    style={{ background: '#ffffff' }}
                     rightContent={
                         <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-end">
                             <div className="flex-1 md:flex-none relative max-w-[220px] sm:max-w-none md:w-80 transition-all duration-300">
                                 <Search placeholder="Search..." />
                             </div>
                             <div className="flex items-center gap-1 md:gap-3 flex-shrink-0">
-                                <button
-                                    className="p-2 transition-colors relative flex items-center justify-center cursor-pointer text-[#94a3b8] hover:text-[#475569]"
-                                >
+                                <button className="p-2 transition-colors relative flex items-center justify-center cursor-pointer text-[#94a3b8] hover:text-[#475569]">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
                                     </svg>
                                     <span className="absolute top-[11px] right-[11px] h-1.5 w-1.5 rounded-full border border-white bg-red-500 shadow-sm"></span>
                                 </button>
-                                {/* Profile Dropdown Component */}
                                 <ProfileDropdown userInfo={userInfo} />
                             </div>
                         </div>
                     }
                 />
-                <main className="flex-1 overflow-y-auto px-8 lg:px-12 py-8 scroll-smooth">
-                    <div className="max-w-[1600px] mx-auto w-full">
+                <main className="flex-1 overflow-y-auto px-14 lg:px-24 py-16">
+                    <div className="w-full">
                         <Outlet />
                     </div>
                 </main>
@@ -151,7 +137,6 @@ const AdminLayoutInner = () => {
     );
 };
 
-// ── Wrapper with BreadcrumbProvider ──
 const AdminLayout = () => (
     <BreadcrumbProvider>
         <AdminLayoutInner />
