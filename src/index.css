@@ -1,7 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+@theme {
+    /* Role-specific colors from premium screenshot */
+    --color-coordinator-bg: #F3E8FF;
+    --color-coordinator-text: #9333EA;
+    --color-field-bg: #DBEAFE;
+    --color-field-text: #2563EB;
+    --color-unassigned-text: #EF4444;
+}
+
 /* ── Google Font ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ============================================
    AAQMS — Global Theme (Exact Design Match)

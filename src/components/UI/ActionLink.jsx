@@ -2,9 +2,9 @@ import React from 'react';
 
 const ActionLink = ({ label, icon, onClick, type = 'edit' }) => {
     const typeStyles = {
-        edit: 'text-[var(--color-accent-bright)] hover:text-[var(--color-primary-dark)]',
-        delete: 'text-[var(--color-danger)] hover:text-[var(--color-danger-dark)]',
-        view: 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+        edit: 'text-[#3B82F6] hover:text-blue-700',
+        delete: 'text-red-500 hover:text-red-700',
+        view: 'text-gray-500 hover:text-gray-700'
     };
 
     return (
@@ -13,7 +13,7 @@ const ActionLink = ({ label, icon, onClick, type = 'edit' }) => {
             className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${typeStyles[type] || typeStyles.view}`}
         >
             {label}
-            {icon && <span className="opacity-70">{icon}</span>}
+            {icon && <span className="flex items-center">{icon}</span>}
         </button>
     );
 };
