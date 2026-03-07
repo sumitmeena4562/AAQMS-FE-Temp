@@ -99,7 +99,7 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div className="flex min-h-screen bg-[var(--color-bg-primary)] font-[var(--font-family)]">
+        <div className="flex h-screen overflow-hidden bg-slate-50 font-[var(--font-family)] gap-4 p-4">
             {/* Sidebar */}
             <Sidebar
                 navItems={navItems}
@@ -107,16 +107,19 @@ const AdminLayoutInner = () => {
                 userInfo={userInfo}
                 mobileOpen={isMobileOpen}
                 setMobileOpen={setIsMobileOpen}
+                className="rounded-3xl"
             />
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col h-full overflow-hidden bg-white rounded-3xl border border-slate-200/60 shadow-sm">
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
                     leftContent={
                         breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />
                     }
+                    className="border-none"
+                    style={{ background: 'transparent' }}
                     rightContent={
                         <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-end">
                             <div className="flex-1 md:flex-none relative max-w-[220px] sm:max-w-none md:w-80 transition-all duration-300">
@@ -138,8 +141,10 @@ const AdminLayoutInner = () => {
                         </div>
                     }
                 />
-                <main className="flex-1 overflow-y-auto bg-[var(--color-bg-primary)] py-6">
-                    <Outlet />
+                <main className="flex-1 overflow-y-auto px-8 lg:px-12 py-8 scroll-smooth">
+                    <div className="max-w-[1600px] mx-auto w-full">
+                        <Outlet />
+                    </div>
                 </main>
             </div>
         </div>
