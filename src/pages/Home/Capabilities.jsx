@@ -18,14 +18,16 @@ const CapabilityCard = ({ title, description, icon: Icon }) => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '20px'
+                gap: '16px',
+                backgroundColor: '#ffffff',
+                border: '1px solid #f1f5f9'
             }}
         >
             <div className="capability-icon-box" style={{
-                width: '44px',
-                height: '44px',
+                width: '48px',
+                height: '48px',
                 borderRadius: '12px',
-                background: 'rgba(59, 130, 246, 0.08)',
+                background: 'rgba(59, 130, 246, 0.05)',
                 color: '#3b82f6',
                 display: 'flex',
                 alignItems: 'center',
@@ -34,20 +36,20 @@ const CapabilityCard = ({ title, description, icon: Icon }) => {
                 <Icon size={24} />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <h3 className="capability-title" style={{
-                    fontSize: '17px',
-                    fontWeight: 700,
-                    color: 'var(--color-primary-dark)',
+                    fontSize: '18px',
+                    fontWeight: 800,
+                    color: '#0f172a',
                     margin: 0,
-                    letterSpacing: '-0.01em'
+                    letterSpacing: '-0.02em'
                 }}>
                     {title}
                 </h3>
                 <p className="capability-desc" style={{
                     fontSize: '14px',
-                    lineHeight: 1.5,
-                    color: 'var(--color-text-secondary)',
+                    lineHeight: 1.6,
+                    color: '#64748b',
                     margin: 0
                 }}>
                     {description}

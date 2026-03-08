@@ -19,35 +19,37 @@ const FeatureCard = ({ title, description, icon: Icon, colorTheme }) => {
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '20px'
+                gap: '24px',
+                border: `1px solid ${theme.bg.replace('0.05', '0.2')}`
             }}
         >
             <div className="feature-icon-box" style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '16px',
+                width: '56px',
+                height: '56px',
+                borderRadius: '14px',
                 background: theme.bg,
                 color: theme.color,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
             }}>
-                <Icon size={24} />
+                <Icon size={28} />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <h3 className="feature-title" style={{
-                    fontSize: '18px',
-                    fontWeight: 700,
-                    color: 'var(--color-primary-dark)',
-                    margin: 0
+                    fontSize: '20px',
+                    fontWeight: 800,
+                    color: '#0f172a',
+                    margin: 0,
+                    letterSpacing: '-0.01em'
                 }}>
                     {title}
                 </h3>
                 <p className="feature-desc" style={{
                     fontSize: '15px',
                     lineHeight: 1.6,
-                    color: 'var(--color-text-secondary)',
+                    color: '#475569',
                     margin: 0
                 }}>
                     {description}

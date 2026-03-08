@@ -7,51 +7,64 @@ const Navbar = ({
     sticky = true,
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    // Track scroll for background change
+    React.useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const buttonStyles = {
         outline: {
-            padding: '8px 18px',
-            fontSize: 'var(--font-size-xs)',
-            fontWeight: 600,
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-lg)',
+            padding: '10px 22px',
+            fontSize: '13px',
+            fontWeight: 700,
+            border: '1px solid #e2e8f0',
+            borderRadius: '10px',
             background: 'transparent',
-            color: 'var(--color-text-primary)',
+            color: '#0f172a',
             cursor: 'pointer',
-            fontFamily: 'var(--font-family)',
+            transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
         },
         filled: {
-            padding: '8px 18px',
-            fontSize: 'var(--font-size-xs)',
-            fontWeight: 600,
-            border: '1px solid var(--color-primary)',
-            borderRadius: 'var(--radius-lg)',
-            background: 'var(--color-primary)',
-            color: '#fff',
+            padding: '10px 22px',
+            fontSize: '13px',
+            fontWeight: 700,
+            border: 'none',
+            borderRadius: '10px',
+            background: '#072267',
+            color: '#ffffff',
             cursor: 'pointer',
-            fontFamily: 'var(--font-family)',
+            transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
         },
     };
 
     return (
         <header style={{
-            height: 'var(--navbar-height)',
-            background: 'var(--color-bg-secondary)',
-            borderBottom: '1px solid var(--color-border)',
+            height: '80px',
+            background: isScrolled ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
+            backdropFilter: isScrolled ? 'blur(12px)' : 'none',
+            WebkitBackdropFilter: isScrolled ? 'blur(12px)' : 'none',
+            borderBottom: isScrolled ? '1px solid #f1f5f9' : 'none',
             position: sticky ? 'sticky' : 'relative',
             top: 0,
-            zIndex: 100,
+            zIndex: 1000,
             width: '100%',
+            transition: 'all 0.3s ease'
         }}>
             <nav style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '0 24px',
+                padding: '0 40px',
                 height: '100%',
-                maxWidth: '1440px',
+                maxWidth: '1280px',
                 margin: '0 auto',
             }}>
                 {/* Left — Logo */}
@@ -63,7 +76,7 @@ const Navbar = ({
                 <div className="desktop-nav" style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '32px',
+                    gap: '40px',
                     justifyContent: 'center',
                     flex: 2,
                 }}>
@@ -78,13 +91,15 @@ const Navbar = ({
                                 }
                             }}
                             style={{
-                                fontWeight: 500,
-                                color: 'var(--color-text-secondary)',
+                                fontSize: '14px',
+                                fontWeight: 600,
+                                color: '#475569',
                                 textDecoration: 'none',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                transition: 'color 0.2s ease'
                             }}
-                            onMouseEnter={(e) => e.target.style.color = 'var(--color-primary)'}
-                            onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
+                            onMouseEnter={(e) => e.target.style.color = '#072267'}
+                            onMouseLeave={(e) => e.target.style.color = '#475569'}
                         >
                             {link.label}
                         </a>
@@ -92,24 +107,12 @@ const Navbar = ({
                 </div>
 
                 {/* Right — Desktop Buttons */}
-                <div className="desktop-actions" style={{ flex: 1, display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'flex-end' }}>
+                <div className="desktop-actions" style={{ flex: 1, display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'flex-end' }}>
                     {buttons.map((btn) => (
                         <button
                             key={btn.label}
                             onClick={btn.onClick}
                             style={buttonStyles[btn.variant || 'outline']}
-                            onMouseEnter={(e) => {
-                                if (btn.variant !== 'filled') {
-                                    e.target.style.background = 'var(--color-bg-primary)';
-                                    e.target.style.borderColor = 'var(--color-border-dark)';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (btn.variant !== 'filled') {
-                                    e.target.style.background = 'transparent';
-                                    e.target.style.borderColor = 'var(--color-border)';
-                                }
-                            }}
                         >
                             {btn.label}
                         </button>
