@@ -8,6 +8,7 @@ import AuthForm from '../../components/Auth/AuthForm';
 import InputField from '../../components/UI/InputField';
 import Checkbox from '../../components/UI/Checkbox';
 import useAuthStore from '../../store/authStore';
+import { MailIcon, LockIcon } from '../../assets/icon';
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -33,9 +34,9 @@ function LoginPage() {
             submitText="Sign In"
             loadingText="Signing in..."
             footer={
-                <>
-                    Don't have access? <a href="/registration" style={{ color: 'var(--color-text-primary)', fontWeight: 700, textDecoration: 'none', borderBottom: '1.5px solid var(--color-text-primary)' }}>Register Here</a>
-                </>
+                <span style={{ fontWeight: 500 }}>
+                    Don't have access? <a href="/registration" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none', marginLeft: '6px', borderBottom: '1.5px solid transparent', transition: 'all 0.2s ease' }} onMouseEnter={(e) => e.target.style.borderBottomColor = 'var(--color-primary)'} onMouseLeave={(e) => e.target.style.borderBottomColor = 'transparent'}>Register Here</a>
+                </span>
             }
         >
             {({ register, errors, itemVariants }) => (

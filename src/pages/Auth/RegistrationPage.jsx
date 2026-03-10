@@ -39,9 +39,9 @@ function RegistrationPage() {
             loadingText="Creating account..."
             grid={true}
             footer={
-                <>
-                    Already have an account? <a href="/login" style={{ color: 'var(--color-text-primary)', fontWeight: 700, textDecoration: 'none', borderBottom: '1.5px solid var(--color-text-primary)' }}>Sign in here</a>
-                </>
+                <span style={{ fontWeight: 500 }}>
+                    Already have an account? <a href="/login" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none', marginLeft: '6px', borderBottom: '1.5px solid transparent', transition: 'all 0.2s ease' }} onMouseEnter={(e) => e.target.style.borderBottomColor = 'var(--color-primary)'} onMouseLeave={(e) => e.target.style.borderBottomColor = 'transparent'}>Sign in here</a>
+                </span>
             }
         >
             {({ register, errors, itemVariants }) => (

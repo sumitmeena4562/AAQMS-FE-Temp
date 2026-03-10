@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Logo = ({ collapsed = false, size = 'md' }) => {
+const Logo = ({ collapsed = false, size = 'md', inverse = false }) => {
     // Size presets for different contexts
     const sizes = {
         sm: { icon: 30, svg: 16, font: 'var(--font-size-xs)', sub: '9px', gap: 8, padding: '0' },
@@ -50,7 +50,7 @@ const Logo = ({ collapsed = false, size = 'md' }) => {
                     <span style={{
                         fontSize: s.font,
                         fontWeight: 700,
-                        color: 'var(--color-text-primary)',
+                        color: inverse ? '#FFFFFF' : 'var(--color-text-primary)',
                         letterSpacing: '-0.01em',
                         lineHeight: 1.2,
                     }}>
@@ -59,7 +59,7 @@ const Logo = ({ collapsed = false, size = 'md' }) => {
                     <span style={{
                         fontSize: s.sub,
                         fontWeight: 500,
-                        color: 'var(--color-text-muted)',
+                        color: inverse ? 'rgba(255, 255, 255, 0.7)' : 'var(--color-text-muted)',
                         letterSpacing: '0.05em',
                         textTransform: 'uppercase',
                     }}>
