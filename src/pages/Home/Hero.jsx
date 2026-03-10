@@ -273,20 +273,29 @@ const Hero = () => {
             {/* Inline styles for media queries */}
             <style dangerouslySetInnerHTML={{
                 __html: `
+                @media (max-width: 1200px) {
+                    .hero-grid {
+                        grid-template-columns: 1fr 1fr !important;
+                        gap: 32px !important;
+                    }
+                }
                 @media (max-width: 1024px) {
                     .hero-grid {
                         grid-template-columns: 1fr !important;
                         text-align: center;
-                        padding-top: 60px !important;
+                        padding-top: 40px !important;
+                        padding-bottom: 60px !important;
                     }
                     .hero-heading {
                         margin-left: auto;
                         margin-right: auto;
                         max-width: 100% !important;
+                        font-size: clamp(2.2rem, 8vw, 3.2rem) !important;
                     }
                     .hero-paragraph {
                         margin-left: auto;
                         margin-right: auto;
+                        font-size: 16px !important;
                     }
                     .hero-buttons {
                         justify-content: center;
@@ -294,6 +303,24 @@ const Hero = () => {
                     .hero-pill {
                         margin-left: auto;
                         margin-right: auto;
+                    }
+                    .hero-card-container {
+                        max-width: 500px;
+                        margin: 40px auto 0;
+                    }
+                }
+                @media (max-width: 640px) {
+                    .hero-heading {
+                        font-size: 2rem !important;
+                        letter-spacing: -0.02em !important;
+                    }
+                    .hero-buttons {
+                        flex-direction: column;
+                        width: 100%;
+                    }
+                    .cta-button {
+                        width: 100%;
+                        justify-content: center;
                     }
                 }
             `}} />

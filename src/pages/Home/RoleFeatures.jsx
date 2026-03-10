@@ -92,9 +92,9 @@ const RoleFeatures = () => {
 
     return (
         <section className="role-features-section" style={{
-            padding: '100px 24px',
-            background: '#ffffff',
-            borderTop: '1px solid #f1f5f9'
+            padding: 'clamp(60px, 10vh, 100px) 24px',
+            background: 'var(--color-bg-primary)',
+            borderTop: '1px solid var(--color-border-light)'
         }}>
             <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
                 {/* Section Header */}
@@ -104,20 +104,20 @@ const RoleFeatures = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
                     className="section-header"
-                    style={{ textAlign: 'center', marginBottom: '80px' }}
+                    style={{ textAlign: 'center', marginBottom: 'clamp(40px, 8vh, 80px)' }}
                 >
                     <h2 className="section-title" style={{
-                        fontSize: 'clamp(28px, 4vw, 42px)',
+                        fontSize: 'clamp(26px, 5vw, 42px)',
                         fontWeight: 800,
-                        color: '#0f172a',
+                        color: 'var(--color-text-primary)',
                         marginBottom: '16px',
                         letterSpacing: '-0.02em'
                     }}>
                         Orchestrated Safety Operations
                     </h2>
                     <p className="section-subtitle" style={{
-                        fontSize: '17px',
-                        color: '#64748b',
+                        fontSize: 'clamp(15px, 2vw, 17px)',
+                        color: 'var(--color-text-secondary)',
                         maxWidth: '600px',
                         margin: '0 auto',
                         lineHeight: 1.6
@@ -129,7 +129,7 @@ const RoleFeatures = () => {
                 {/* Features Grid */}
                 <div className="features-grid" style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                     gap: '24px'
                 }}>
                     {features.map((feature, index) => (
@@ -141,15 +141,12 @@ const RoleFeatures = () => {
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @media (max-width: 768px) {
-                    .role-features-section {
-                        padding: 60px 20px !important;
-                    }
-                    .section-header {
-                        margin-bottom: 40px !important;
-                    }
                     .features-grid {
                         grid-template-columns: 1fr !important;
-                        gap: 20px !important;
+                        gap: 16px !important;
+                    }
+                    .section-header {
+                        text-align: center !important;
                     }
                 }
             `}} />

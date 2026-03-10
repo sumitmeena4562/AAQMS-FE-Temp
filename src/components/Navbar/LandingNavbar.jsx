@@ -47,22 +47,22 @@ const Navbar = ({
 
     return (
         <header style={{
-            height: '55px',
-            background: isScrolled ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
-            backdropFilter: isScrolled ? 'blur(12px)' : 'none',
-            WebkitBackdropFilter: isScrolled ? 'blur(12px)' : 'none',
+            height: 'var(--navbar-height)',
+            background: isScrolled ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
+            backdropFilter: isScrolled ? 'blur(16px)' : 'none',
+            WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
             borderBottom: isScrolled ? '1px solid var(--color-border-light)' : 'none',
             position: sticky ? 'sticky' : 'relative',
             top: 0,
             zIndex: 1000,
             width: '100%',
-            transition: 'all 0.3s ease'
+            transition: 'background 0.3s ease, height 0.3s ease, border 0.3s ease'
         }}>
             <nav style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                padding: '0 40px',
+                padding: '0 clamp(16px, 5vw, 40px)',
                 height: '100%',
                 maxWidth: '1280px',
                 margin: '0 auto',
@@ -156,19 +156,22 @@ const Navbar = ({
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: 'var(--color-bg-secondary)',
-                    zIndex: 90,
+                    background: 'var(--color-bg-primary)',
+                    zIndex: 999,
                     display: 'none',
                     flexDirection: 'column',
-                    padding: '32px 24px',
-                    gap: '24px',
-                    transform: isMenuOpen ? 'translateY(0)' : 'translateY(-100%)',
+                    padding: '24px',
+                    gap: '32px',
+                    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transform: isMenuOpen ? 'translateX(0)' : 'translateX(100%)',
+                    opacity: isMenuOpen ? 1 : 0,
                     visibility: isMenuOpen ? 'visible' : 'hidden',
-                    overflowY: 'auto'
+                    overflowY: 'auto',
+                    borderTop: '1px solid var(--color-border-light)'
                 }}
             >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-muted)', letterSpacing: '0.05em' }}>NAVIGATION</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', letterSpacing: '0.15em', opacity: 0.6 }}>MAIN NAVIGATION</span>
                     {navLinks.map((link) => (
                         <a
                             key={link.label}
@@ -181,10 +184,11 @@ const Navbar = ({
                                 }
                             }}
                             style={{
-                                fontSize: '18px',
-                                fontWeight: 600,
+                                fontSize: '20px',
+                                fontWeight: 700,
                                 color: 'var(--color-text-primary)',
                                 textDecoration: 'none',
+                                animation: isMenuOpen ? 'fadeInUp 0.4s ease forwards' : 'none'
                             }}
                         >
                             {link.label}
@@ -192,24 +196,25 @@ const Navbar = ({
                     ))}
                 </div>
 
-                <div style={{ height: '1px', background: 'var(--color-border-light)', width: '100%', margin: '8px 0' }}></div>
+                <div style={{ height: '1px', background: 'var(--color-border-light)', width: '100%' }}></div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-text-muted)', letterSpacing: '0.05em' }}>ACCOUNT</span>
+                    <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', letterSpacing: '0.15em', opacity: 0.6 }}>ACCESS PORTAL</span>
                     {buttons.map((btn) => (
                         <button
                             key={btn.label}
                             onClick={() => { btn.onClick?.(); setIsMenuOpen(false); }}
                             style={{
-                                padding: '12px',
+                                padding: '16px',
                                 width: '100%',
-                                textAlign: 'left',
-                                borderRadius: '12px',
+                                textAlign: 'center',
+                                borderRadius: '14px',
                                 border: btn.variant === 'filled' ? 'none' : '1px solid var(--color-border)',
                                 background: btn.variant === 'filled' ? 'var(--color-primary)' : 'transparent',
                                 color: btn.variant === 'filled' ? 'var(--color-text-inverse)' : 'var(--color-text-primary)',
-                                fontSize: '16px',
-                                fontWeight: 600,
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                boxShadow: btn.variant === 'filled' ? 'var(--shadow-premium)' : 'none'
                             }}
                         >
                             {btn.label}
@@ -220,6 +225,10 @@ const Navbar = ({
 
             <style dangerouslySetInnerHTML={{
                 __html: `
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
                 @media (max-width: 991px) {
                     .desktop-nav, .desktop-actions {
                         display: none !important;
