@@ -14,7 +14,7 @@ const Navbar = ({
         <header
             className={`flex flex-col  flex-shrink-0 sticky top-0 z-20 ${className}`}
             style={{
-                padding:"0 20px",
+                padding: "0 20px",
                 backgroundColor: "var(--color-bg-primary)",
                 borderBottom: "1px solid var(--color-border)",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
@@ -78,19 +78,6 @@ const Navbar = ({
                 </div>
             )}
 
-            {/* Hide Scrollbar */}
-            <style>
-                {`
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-          -webkit-overflow-scrolling: touch;
-        }
-      `}
-            </style>
         </header>
     );
 };

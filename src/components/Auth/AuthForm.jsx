@@ -66,7 +66,7 @@ function AuthForm({
                     border: '1px solid var(--color-border-subtle, rgba(255,255,255,0.05))'
                 }}
             >
-                <div style={{ textAlign: 'center', marginBottom: 'var(--space-8)' }}>
+                <div style={{ textAlign: 'center', marginBottom: 'var(--spacing-8)' }}>
                     <motion.h2
                         variants={itemVariants}
                         style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-0.02em', lineHeight: 1.1 }}
@@ -75,18 +75,18 @@ function AuthForm({
                     </motion.h2>
                     <motion.p
                         variants={itemVariants}
-                        style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}
+                        style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)', marginTop: 'var(--spacing-2)' }}
                     >
                         {subtitle}
                     </motion.p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' } : { display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--spacing-4)', marginBottom: 'var(--spacing-4)' } : { display: 'flex', flexDirection: 'column', gap: 'var(--spacing-1)' }}>
                         {renderedChildren}
                     </div>
 
-                    <motion.div variants={itemVariants} style={{ marginTop: 'var(--space-6)' }}>
+                    <motion.div variants={itemVariants} style={{ marginTop: 'var(--spacing-6)' }}>
                         <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
                             {isLoading ? loadingText : submitText}
                         </Button>

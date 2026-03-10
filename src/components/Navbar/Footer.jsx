@@ -47,7 +47,7 @@ const SocialIcon = ({ icon: Icon, href }) => (
         }}
         onMouseEnter={(e) => {
             e.currentTarget.style.background = 'var(--color-primary)';
-            e.currentTarget.style.color = '#fff';
+            e.currentTarget.style.color = 'var(--color-text-inverse)';
             e.currentTarget.style.transform = 'translateY(-2px)';
         }}
         onMouseLeave={(e) => {
@@ -63,7 +63,7 @@ const SocialIcon = ({ icon: Icon, href }) => (
 const Footer = () => {
     return (
         <footer style={{
-            background: '#fff',
+            background: 'var(--color-bg-secondary)',
             padding: '80px 24px 40px',
             borderTop: '1px solid var(--color-border-light)',
             position: 'relative',
@@ -88,7 +88,7 @@ const Footer = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                color: '#fff'
+                                color: 'var(--color-text-inverse)'
                             }}>
                                 <MdSecurity size={20} />
                             </div>

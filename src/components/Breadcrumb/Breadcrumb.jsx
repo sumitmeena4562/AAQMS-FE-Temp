@@ -19,13 +19,13 @@ const Breadcrumb = ({ items = [], className = "" }) => {
 
                         {/* Item */}
                         {isLast ? (
-                            <span className="px-3 py-[2px] text-blue-600 font-medium rounded-full text-[13.5px] flex items-center" style={{ backgroundColor: '#EFF6FF' }}>
+                            <span className="px-3 py-[2px] text-[var(--color-accent)] font-medium rounded-full text-[13.5px] flex items-center" style={{ backgroundColor: 'var(--color-accent-soft)' }}>
                                 {item.label}
                             </span>
                         ) : (
                             <Link
                                 to={item.path}
-                                className="flex items-center gap-1.5 text-gray-600 hover:text-blue-600 transition"
+                                className="flex items-center gap-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition"
                             >
                                 {isFirst && (
                                     <svg
@@ -50,23 +50,12 @@ const Breadcrumb = ({ items = [], className = "" }) => {
 
                         {/* Separator */}
                         {!isLast && (
-                            <span className="text-gray-400">{">"}</span>
+                            <span className="text-[var(--color-text-muted)]">{">"}</span>
                         )}
 
                     </React.Fragment>
                 );
             })}
-
-            {/* Hide Scrollbar */}
-            <style>{`
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
         </nav>
     );
 };

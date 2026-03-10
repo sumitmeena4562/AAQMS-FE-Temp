@@ -4,9 +4,9 @@ import Card from './Card';
 const FeatureCard = ({ title, description, icon: Icon, colorTheme = 'primary' }) => {
     // Theme mapping for the icon container
     const themes = {
-        primary: { bg: 'var(--color-primary-50)', color: 'var(--color-primary)' }, // Indigo/Purple
-        secondary: { bg: '#EFF6FF', color: '#3B82F6' }, // Blue
-        success: { bg: 'var(--color-success-lighter)', color: 'var(--color-success)' }, // Green
+        primary: { bg: 'var(--color-primary-50)', color: 'var(--color-primary)' },
+        secondary: { bg: 'var(--color-info-bg)', color: 'var(--color-info)' },
+        success: { bg: 'var(--color-success-lighter)', color: 'var(--color-success)' },
     };
 
     const theme = themes[colorTheme] || themes.primary;

@@ -11,15 +11,15 @@ const Card = ({
 }) => {
     const [isHovered, setIsHovered] = React.useState(false);
 
-    // Premium base styles using explicit values
+    // Premium base styles using theme variables
     const baseStyle = {
-        background: '#ffffff',
+        background: 'var(--color-bg-secondary)',
         borderRadius: borderRadius,
         padding: padding,
         boxShadow: isHovered && hoverEffect
-            ? '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-            : '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-        border: '1px solid #f1f5f9',
+            ? 'var(--shadow-premium)'
+            : 'var(--shadow-pro)',
+        border: '1px solid var(--color-border-light)',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: isHovered && hoverEffect ? 'translateY(-4px)' : 'translateY(0)',
         position: 'relative',

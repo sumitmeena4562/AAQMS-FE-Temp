@@ -30,7 +30,7 @@ const FilterDropdown = ({
         <div className={`flex flex-col gap-1 ${className}`} ref={dropdownRef}>
             {/* Label on Top */}
             {label && (
-                <span className="text-[9px] font-bold uppercase tracking-[0.05em] text-[#acb1b9] pl-3">
+                <span className="text-[9px] font-bold uppercase tracking-[0.05em] text-[var(--color-text-muted)] pl-3">
                     {label}
                 </span>
             )}
@@ -45,16 +45,16 @@ const FilterDropdown = ({
                         minWidth: minWidth,
                     }}
                     className={`flex items-center justify-between gap-2 px-4 bg-white border transition-all duration-200 cursor-pointer select-none w-full rounded-full
-                        ${isOpen ? 'border-blue-400 ring-2 ring-blue-50' : 'border-[#e2e8f0] hover:border-[#cbd5e1]'}
-                        ${value ? 'bg-[#f0f7ff] border-blue-200' : ''}`}
+                        ${isOpen ? 'border-[var(--color-accent)] ring-2 ring-[var(--color-accent-soft)]' : 'border-[var(--color-border)] hover:border-[var(--color-border-hover)]'}
+                        ${value ? 'bg-[var(--color-accent-soft)] border-[var(--color-accent)]' : ''}`}
                 >
                     <span className={`text-[12.5px] font-medium whitespace-nowrap overflow-hidden text-ellipsis leading-tight
-                        ${value ? 'text-slate-900' : 'text-slate-600'}`}>
+                        ${value ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}>
                         {selectedOption ? selectedOption.label : placeholder}
                     </span>
                     <FiChevronDown
-                        className={`text-[14px] text-slate-400 transition-transform duration-300 flex-shrink-0
-                            ${isOpen ? 'rotate-180 text-blue-500' : ''}`}
+                        className={`text-[14px] text-[var(--color-text-muted)] transition-transform duration-300 flex-shrink-0
+                            ${isOpen ? 'rotate-180 text-[var(--color-accent)]' : ''}`}
                     />
                 </button>
 

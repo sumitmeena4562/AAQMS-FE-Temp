@@ -23,10 +23,10 @@ const Navbar = ({
             padding: '10px 22px',
             fontSize: '13px',
             fontWeight: 700,
-            border: '1px solid #e2e8f0',
-            borderRadius: '10px',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
             background: 'transparent',
-            color: '#0f172a',
+            color: 'var(--color-text-primary)',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
@@ -36,9 +36,9 @@ const Navbar = ({
             fontSize: '13px',
             fontWeight: 700,
             border: 'none',
-            borderRadius: '10px',
-            background: '#072267',
-            color: '#ffffff',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--color-primary)',
+            color: 'var(--color-text-inverse)',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
@@ -51,7 +51,7 @@ const Navbar = ({
             background: isScrolled ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
             backdropFilter: isScrolled ? 'blur(12px)' : 'none',
             WebkitBackdropFilter: isScrolled ? 'blur(12px)' : 'none',
-            borderBottom: isScrolled ? '1px solid #f1f5f9' : 'none',
+            borderBottom: isScrolled ? '1px solid var(--color-border-light)' : 'none',
             position: sticky ? 'sticky' : 'relative',
             top: 0,
             zIndex: 1000,
@@ -93,13 +93,13 @@ const Navbar = ({
                             style={{
                                 fontSize: '14px',
                                 fontWeight: 600,
-                                color: '#475569',
+                                color: 'var(--color-text-secondary)',
                                 textDecoration: 'none',
                                 cursor: 'pointer',
                                 transition: 'color 0.2s ease'
                             }}
-                            onMouseEnter={(e) => e.target.style.color = '#072267'}
-                            onMouseLeave={(e) => e.target.style.color = '#475569'}
+                            onMouseEnter={(e) => e.target.style.color = 'var(--color-primary)'}
+                            onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
                         >
                             {link.label}
                         </a>
@@ -156,7 +156,7 @@ const Navbar = ({
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    background: '#fff',
+                    background: 'var(--color-bg-secondary)',
                     zIndex: 90,
                     display: 'none',
                     flexDirection: 'column',
@@ -207,7 +207,7 @@ const Navbar = ({
                                 borderRadius: '12px',
                                 border: btn.variant === 'filled' ? 'none' : '1px solid var(--color-border)',
                                 background: btn.variant === 'filled' ? 'var(--color-primary)' : 'transparent',
-                                color: btn.variant === 'filled' ? '#fff' : 'var(--color-text-primary)',
+                                color: btn.variant === 'filled' ? 'var(--color-text-inverse)' : 'var(--color-text-primary)',
                                 fontSize: '16px',
                                 fontWeight: 600,
                             }}

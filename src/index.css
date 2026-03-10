@@ -89,6 +89,17 @@
     --color-danger-lighter: #FFF1F1;
     --color-warning-lighter: #FFF9E9;
     --color-warning-dark: #B45309;
+
+    /* ── Transitions ── */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+
+    /* ── Layout Dimensions ── */
+    --sidebar-width: 260px;
+    --navbar-height: 80px;
+
+    /* ── Font Family ── */
+    --font-family: 'Inter', -apple-system, system-ui, sans-serif;
 }
 
 /* ============================================
@@ -108,7 +119,6 @@ html {
 
 body {
     font-family: var(--font-family);
-    font-family: 'Inter', sans-serif;
     font-size: var(--font-size-base);
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
@@ -138,4 +148,14 @@ a {
 ::-webkit-scrollbar-thumb {
     background: var(--color-text-muted);
     border-radius: var(--radius-full);
+}
+
+/* ── Scrollbar Hide Utility ── */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
