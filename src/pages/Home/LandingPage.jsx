@@ -11,6 +11,7 @@ const FieldApp = lazy(() => import('./FieldApp'));
 const Workflow = lazy(() => import('./Workflow'));
 const Analytics = lazy(() => import('./Analytics'));
 const SitePlanning = lazy(() => import('./SitePlanning'));
+const CTA = lazy(() => import('./CTA'));
 
 // Simple Section Loader
 const SectionLoader = () => (
@@ -69,9 +70,12 @@ const LandingPage = () => {
                 </div>
 
                 {/* Analytics Section */}
-                <div id="analytics">
+                <div id="analytics" style={{ marginBottom: '60px' }}>
                     <Analytics />
                 </div>
+
+                {/* CTA Section */}
+                <CTA />
             </Suspense>
 
             {/* Footer */}
