@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import useAuthStore from '../../store/authStore';
 
 /**
  * Sidebar Component — Global, Reusable, Fully Responsive
@@ -40,12 +40,12 @@ const CollapsibleSection = ({ isOpen, children }) => {
 const Sidebar = ({
     navItems = [],
     logo,
-    userInfo,
     collapsed = false,
     mobileOpen = false,
     setMobileOpen,
     onToggle
 }) => {
+    const { user } = useAuthStore();
     const location = useLocation();
     const [openMenus, setOpenMenus] = useState({});
 
@@ -273,7 +273,7 @@ const Sidebar = ({
             </div>
 
             {/* Bottom User Info */}
-            {userInfo && (
+            {user && (
                 <div style={{
                     padding: collapsed ? '12px 8px' : '12px 16px',
                     borderTop: '1px solid var(--color-border)',
@@ -296,7 +296,7 @@ const Sidebar = ({
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: '#fff', fontWeight: 800, fontSize: 13, flexShrink: 0
                     }}>
-                        {userInfo.avatar || userInfo.name?.charAt(0)?.toUpperCase() || 'U'}
+                        {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                     {!collapsed && (
                         <div style={{ overflow: 'hidden', flex: 1 }}>
@@ -306,14 +306,14 @@ const Sidebar = ({
                                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
                                 lineHeight: 1.2
                             }}>
-                                {userInfo.name}
+                                {user.name || 'Admin User'}
                             </div>
                             <div style={{
                                 fontSize: '11px',
                                 color: 'var(--color-text-muted)',
                                 whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
                             }}>
-                                {userInfo.email}
+                                {user.email || 'admin@aisafety.com'}
                             </div>
                         </div>
                     )}

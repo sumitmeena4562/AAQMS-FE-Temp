@@ -7,27 +7,19 @@ import { loginSchema } from '../../schema/authSchema';
 import AuthForm from '../../components/Auth/AuthForm';
 import InputField from '../../components/UI/InputField';
 import Checkbox from '../../components/UI/Checkbox';
-import { MailIcon, LockIcon } from '../../assets/icon';
+import useAuthStore from '../../store/authStore';
 
 function LoginPage() {
     const navigate = useNavigate();
-    const [isLoading, setIsLoading] = useState(false);
+    const { login, isLoading } = useAuthStore();
 
     const onSubmit = async (data) => {
-        setIsLoading(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            if (data.email === "example@gmail.com" && data.password === "@Example123") {
-                toast.success("Login Successful!");
-                localStorage.setItem("token", "dummy-jwt-token");
-                navigate('/admin/dashboard');
-            } else {
-                toast.error("Invalid Email Or Password!");
-            }
-        } catch (_error) {
-            toast.error("An error occurred during login.");
-        } finally {
-            setIsLoading(false);
+            await login(data);
+            toast.success("Login Successful!");
+            navigate('/admin/dashboard');
+        } catch (error) {
+            toast.error(error || "Invalid Email Or Password!");
         }
     };
 

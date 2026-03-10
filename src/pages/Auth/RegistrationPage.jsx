@@ -76,7 +76,7 @@ function RegistrationPage() {
                             icon={<UserIcon />}
                             options={[
                                 { label: 'Admin', value: 'admin' },
-                                { label: 'Cordinator', value: 'cordinator' },
+                                { label: 'Coordinator', value: 'coordinator' },
                                 { label: 'Field Officer', value: 'field officer' }
                             ]}
                             {...register('role')}

@@ -75,12 +75,7 @@ const navItems = [
     }
 ];
 
-// ── User Info ──
-const userInfo = {
-    name: 'Admin User',
-    email: 'admin@aisafety.com',
-    avatar: 'A'
-};
+// ── User Info Section (Now handled by authStore directly) ──
 
 const AdminLayoutInner = () => {
     const { breadcrumbs, setBreadcrumbs } = useBreadcrumb();
@@ -97,7 +92,6 @@ const AdminLayoutInner = () => {
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}
-                userInfo={userInfo}
                 mobileOpen={isMobileOpen}
                 setMobileOpen={setIsMobileOpen}
             />
@@ -120,7 +114,7 @@ const AdminLayoutInner = () => {
                                     </svg>
                                     <span className="absolute top-[8px] right-[8px] h-2 w-2 rounded-full border-2 border-white bg-blue-500"></span>
                                 </button>
-                                <ProfileDropdown userInfo={userInfo} />
+                                <ProfileDropdown />
                             </div>
                         </div>
                     }
