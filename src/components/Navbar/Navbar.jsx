@@ -12,72 +12,55 @@ const Navbar = ({
 }) => {
     return (
         <header
-            className={`flex flex-col  flex-shrink-0 sticky top-0 z-20 ${className}`}
+            className={`flex flex-col flex-shrink-0 sticky top-0 z-20 ${className}`}
             style={{
-                padding: "0 20px",
-                backgroundColor: "var(--color-bg-primary)",
-                borderBottom: "1px solid var(--color-border)",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.02)",
+                backgroundColor: "var(--color-bg-secondary)",
+                borderBottom: "1px solid var(--color-border-light)",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
+                height: "var(--navbar-height, 64px)",
+                justifyContent: "center",
                 ...style
             }}
         >
-            {/* Top Row: Navigation + Search + User */}
-            <div className="flex items-center justify-between px-8 h-16">
-                {children ? (
-                    children
-                ) : (
-                    <>
-                        {/* Hamburger (Mobile Only) */}
-                        <div className="md:hidden flex items-center">
-                            {showMenuButton && (
-                                <button
-                                    onClick={onMenuClick}
-                                    className="p-1.5 -ml-1.5 rounded-xl hover:bg-bg-tertiary text-text-secondary transition-colors cursor-pointer"
-                                    aria-label="Open menu"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:text-[var(--color-text-primary)] transition-colors"><line x1="5" y1="12" x2="19" y2="12"></line><line x1="5" y1="6" x2="19" y2="6"></line><line x1="5" y1="18" x2="19" y2="18"></line></svg>
-                                </button>
-                            )}
-                        </div>
+            <div className="w-full max-w-[1400px] mx-auto px-12 sm:px-24 lg:px-40">
+                {/* Top Row: Navigation + Search + User */}
+                <div className="flex items-center justify-between h-full">
+                    {children ? (
+                        children
+                    ) : (
+                        <>
+                            {/* Left section: Breadcrumbs/Logo */}
+                            <div className="flex items-center gap-4">
+                                {showMenuButton && (
+                                    <button
+                                        onClick={onMenuClick}
+                                        className="p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden cursor-pointer"
+                                        aria-label="Open menu"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                                        </svg>
+                                    </button>
+                                )}
+                                {leftContent}
+                            </div>
 
-                        {/* Breadcrumbs (Desktop Only in this row) */}
-                        <div className="hidden md:flex items-center flex-1 overflow-hidden mr-4">
-                            {leftContent}
-                        </div>
-
-                        {/* Search and Right Icons (Mobile & Desktop) */}
-                        <div className="flex-1 md:flex-none flex items-center justify-end">
-                            {rightContent}
-                        </div>
-                    </>
-                )}
-            </div>
-
-            {/* Bottom Row: Breadcrumbs (Mobile Only) */}
-            {!children && leftContent && (
-                <div
-                    className="md:hidden flex items-center overflow-x-auto no-scrollbar border-t"
-                    style={{
-                        backgroundColor: 'var(--color-bg-secondary)',
-                        borderColor:
-                            'color-mix(in srgb, var(--color-border) 60%, transparent)',
-                        paddingLeft: 'clamp(24px, 4vw, 40px)',
-                        paddingRight: 'clamp(24px, 4vw, 40px)'
-                    }}
-                >
-                    <div className="flex items-center whitespace-nowrap min-w-max py-2">
-                        {leftContent}
-                    </div>
+                            {/* Right Section: Actions + Profile */}
+                            <div className="flex items-center ml-auto">
+                                {rightContent}
+                            </div>
+                        </>
+                    )}
                 </div>
-            )}
-
+            </div>
             {/* Optional Center Content (Mobile) */}
             {centerContent && (
                 <div className="md:hidden px-6 pb-2">
                     {centerContent}
                 </div>
             )}
-
         </header>
     );
 };

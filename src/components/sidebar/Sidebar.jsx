@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import {motion} from 'framer-motion';
 import useAuthStore from '../../store/authStore';
 
 /**
@@ -85,7 +86,7 @@ const Sidebar = ({
         const isChildActive = isParentActive(item);
 
         return (
-            <div key={item.label} style={{ marginBottom: '2px' }}>
+            <div key={item.label} style={{ marginBottom: '6px', position: 'relative' }}>
                 <button
                     onClick={() => toggleMenu(item.label)}
                     style={{
@@ -94,18 +95,20 @@ const Sidebar = ({
                         gap: collapsed ? 0 : '12px',
                         justifyContent: collapsed ? 'center' : 'space-between',
                         width: '100%',
-                        padding: '8px 12px',
+                        padding: '12px 14px',
                         borderRadius: 'var(--radius-md)',
-                        fontSize: '13px',
+                        fontSize: '13.5px',
                         fontWeight: isChildActive || isOpen ? 600 : 500,
-                        color: isChildActive ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-                        background: isOpen ? 'var(--color-accent-soft)' : 'transparent',
+                        color: isChildActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                        background: isOpen ? 'var(--color-bg-hover)' : 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        transition: 'all 150ms ease',
+                        transition: 'all var(--transition-fast)',
                         fontFamily: 'var(--font-family)',
                         textAlign: 'left',
-                        outline: 'none'
+                        outline: 'none',
+                        position: 'relative',
+                        zIndex: 1
                     }}
                     onMouseEnter={e => {
                         if (!isOpen) e.currentTarget.style.background = 'var(--color-bg-hover)';
@@ -116,7 +119,7 @@ const Sidebar = ({
                 >
                     <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{
-                            opacity: isChildActive || isOpen ? 1 : 0.55,
+                            opacity: isChildActive || isOpen ? 1 : 0.6,
                             display: 'flex', alignItems: 'center',
                             color: isChildActive ? 'var(--color-primary)' : 'inherit',
                             transition: 'all 180ms ease'
@@ -125,13 +128,13 @@ const Sidebar = ({
                     </span>
                     {!collapsed && (
                         <svg
-                            xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+                            xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                            strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                             style={{
                                 transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                                 transition: 'transform 250ms ease',
-                                opacity: 0.4,
+                                opacity: 0.5,
                                 flexShrink: 0
                             }}
                         >
@@ -143,11 +146,11 @@ const Sidebar = ({
                 {/* ── Children (animated collapse) ── */}
                 <CollapsibleSection isOpen={isOpen && !collapsed}>
                     <div style={{
-                        marginLeft: '22px',
-                        paddingLeft: '14px',
-                        borderLeft: '2px solid var(--color-border)',
+                        marginLeft: '24px',
+                        paddingLeft: '12px',
+                        borderLeft: '1.5px solid var(--color-border-light)',
                         marginTop: '4px',
-                        marginBottom: '6px',
+                        marginBottom: '8px',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '2px'
@@ -163,25 +166,25 @@ const Sidebar = ({
                                         alignItems: 'center',
                                         gap: '10px',
                                         padding: '8px 12px',
-                                        borderRadius: '8px',
+                                        borderRadius: 'var(--radius-sm)',
                                         fontSize: '13px',
-                                        fontWeight: childActive ? 600 : 450,
-                                        color: childActive ? 'var(--color-primary)' : 'var(--color-text-tertiary)',
-                                        background: childActive ? 'var(--color-primary-50)' : 'transparent',
+                                        fontWeight: childActive ? 600 : 500,
+                                        color: childActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                                        background: childActive ? 'var(--color-primary-50, rgba(7, 34, 103, 0.05))' : 'transparent',
                                         textDecoration: 'none',
-                                        transition: 'all 150ms ease',
-                                        letterSpacing: '-0.005em'
+                                        transition: 'all var(--transition-fast)',
+                                        letterSpacing: '-0.01em'
                                     }}
                                     onMouseEnter={e => {
                                         if (!childActive) e.currentTarget.style.background = 'var(--color-bg-hover)';
                                     }}
                                     onMouseLeave={e => {
-                                        e.currentTarget.style.background = childActive ? 'var(--color-primary-50)' : 'transparent';
+                                        e.currentTarget.style.background = childActive ? 'var(--color-primary-50, rgba(7, 34, 103, 0.05))' : 'transparent';
                                     }}
                                 >
                                     {child.icon && (
                                         <span style={{
-                                            opacity: childActive ? 0.8 : 0.5,
+                                            opacity: childActive ? 0.9 : 0.5,
                                             display: 'flex', alignItems: 'center',
                                             transition: 'opacity 150ms ease'
                                         }}>{child.icon}</span>
@@ -201,38 +204,60 @@ const Sidebar = ({
         const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
 
         return (
-            <NavLink
-                key={item.path}
-                to={item.path}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: collapsed ? 0 : '12px',
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    padding: '8px 12px',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '13px',
-                    fontWeight: isActive ? 600 : 500,
-                    color: isActive ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-                    background: isActive ? 'var(--color-accent-soft)' : 'transparent',
-                    textDecoration: 'none',
-                    transition: 'all 150ms ease',
-                    marginBottom: '2px',
-                }}
-                onMouseEnter={e => {
-                    if (!isActive) e.currentTarget.style.background = 'var(--color-bg-hover)';
-                }}
-                onMouseLeave={e => {
-                    e.currentTarget.style.background = isActive ? 'var(--color-accent-soft)' : 'transparent';
-                }}
-            >
-                <span style={{
-                    opacity: isActive ? 1 : 0.45,
-                    display: 'flex', alignItems: 'center',
-                    transition: 'opacity 150ms ease'
-                }}>{item.icon}</span>
-                {!collapsed && item.label}
-            </NavLink>
+            <div key={item.path} style={{ position: 'relative', marginBottom: '8px' }}>
+                {/* Active Indicator Line */}
+                {isActive && (
+                    <motion.div
+                        layoutId="active-indicator"
+                        style={{
+                            position: 'absolute',
+                            left: '-32px',
+                            top: '10px',
+                            bottom: '10px',
+                            width: '4px',
+                            background: 'var(--color-primary)',
+                            borderRadius: '0 4px 4px 0',
+                            zIndex: 5
+                        }}
+                    />
+                )}
+                
+                <NavLink
+                    to={item.path}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: collapsed ? 0 : '16px',
+                        justifyContent: collapsed ? 'center' : 'flex-start',
+                        padding: '12px 24px',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '13.5px',
+                        fontWeight: isActive ? 600 : 500,
+                        color: isActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                        background: isActive ? 'var(--color-primary-50, rgba(7, 34, 103, 0.05))' : 'transparent',
+                        textDecoration: 'none',
+                        transition: 'all var(--transition-fast)',
+                        position: 'relative',
+                        zIndex: 1
+                    }}
+                    onMouseEnter={e => {
+                        if (!isActive) e.currentTarget.style.background = 'var(--color-bg-hover)';
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.background = isActive ? 'var(--color-primary-50, rgba(7, 34, 103, 0.05))' : 'transparent';
+                    }}
+                >
+                    <span style={{
+                        opacity: isActive ? 1 : 0.6,
+                        display: 'flex', alignItems: 'center',
+                        color: isActive ? 'var(--color-primary)' : 'inherit',
+                        transition: 'opacity 150ms ease'
+                    }}>{item.icon}</span>
+                    {!collapsed && (
+                        <span style={{ transition: 'transform 0.2s' }}>{item.label}</span>
+                    )}
+                </NavLink>
+            </div>
         );
     };
 
@@ -246,80 +271,101 @@ const Sidebar = ({
 
     // ── Sidebar Content ──
     const sidebarContent = (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-                {/* Logo */}
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingBottom: '20px' }} className="no-scrollbar">
+                {/* Branding Section */}
                 {logo && (
                     <div style={{
-                        height: '60px',
+                        height: 'var(--navbar-height, 64px)',
                         display: 'flex',
                         alignItems: 'center',
-                        padding: collapsed ? '0 12px' : '0 20px',
-                        borderBottom: '1px solid var(--color-border)',
-                        boxSizing: 'border-box'
+                        padding: collapsed ? '0 12px' : '0 32px',
+                        marginBottom: '24px',
+                        boxSizing: 'border-box',
+                        position: 'sticky',
+                        top: 0,
+                        background: 'var(--color-bg-secondary)',
+                        zIndex: 10
                     }}>
                         {logo}
                     </div>
                 )}
 
-                {/* Nav Items */}
+                {/* Navigation Section */}
                 <nav style={{
-                    padding: '4px 12px',
+                    padding: '0 32px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '0px'
+                    gap: '10px'
                 }}>
                     {navItems.map(item => renderNavItem(item))}
                 </nav>
             </div>
 
-            {/* Bottom User Info */}
-            {user && (
-                <div style={{
-                    padding: collapsed ? '12px 8px' : '12px 16px',
-                    borderTop: '1px solid var(--color-border)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: collapsed ? 0 : '12px',
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    background: 'transparent',
-                    cursor: 'pointer',
-                    transition: 'all 150ms ease',
-                    margin: '8px 12px 12px 12px',
-                    borderRadius: 'var(--radius-md)'
-                }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'var(--color-bg-hover)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                    <div style={{
-                        width: 32, height: 32, borderRadius: '6px',
-                        background: 'var(--color-primary)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontWeight: 800, fontSize: 13, flexShrink: 0
-                    }}>
-                        {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'U'}
-                    </div>
-                    {!collapsed && (
-                        <div style={{ overflow: 'hidden', flex: 1 }}>
-                            <div style={{
-                                fontWeight: 700, fontSize: '13px',
-                                color: 'var(--color-text-primary)',
-                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                                lineHeight: 1.2
-                            }}>
-                                {user.name || 'Admin User'}
-                            </div>
-                            <div style={{
-                                fontSize: '11px',
-                                color: 'var(--color-text-muted)',
-                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                            }}>
-                                {user.email || 'admin@aisafety.com'}
-                            </div>
+            {/* Bottom Section: Support & User */}
+            <div style={{
+                padding: '16px 12px',
+                borderTop: '1px solid var(--color-border-light)',
+                background: 'var(--color-bg-secondary)',
+                marginTop: 'auto'
+            }}>
+                {/* Optional Support Link item can go here */}
+                
+                {user && (
+                    <div 
+                        style={{
+                            padding: collapsed ? '10px 8px' : '10px 12px',
+                            borderRadius: 'var(--radius-md)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: collapsed ? 0 : '12px',
+                            justifyContent: collapsed ? 'center' : 'flex-start',
+                            background: 'var(--color-bg-hover)',
+                            cursor: 'pointer',
+                            transition: 'all var(--transition-base)',
+                            border: '1px solid var(--color-border-light)'
+                        }}
+                        onMouseEnter={e => {
+                            e.currentTarget.style.borderColor = 'var(--color-border)';
+                            e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                        }}
+                        onMouseLeave={e => {
+                            e.currentTarget.style.borderColor = 'var(--color-border-light)';
+                            e.currentTarget.style.boxShadow = 'none';
+                        }}
+                    >
+                        <div style={{
+                            width: 36, height: 36, borderRadius: 'var(--radius-sm)',
+                            background: 'var(--color-primary)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: '#fff', fontWeight: 700, fontSize: 14, flexShrink: 0,
+                            boxShadow: '0 2px 8px rgba(7, 34, 103, 0.15)'
+                        }}>
+                            {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'U'}
                         </div>
-                    )}
-                </div>
-            )}
+                        {!collapsed && (
+                            <div style={{ overflow: 'hidden', flex: 1 }}>
+                                <div style={{
+                                    fontWeight: 700, fontSize: '13px',
+                                    color: 'var(--color-text-primary)',
+                                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                                    lineHeight: 1.2
+                                }}>
+                                    {user.name || 'Admin User'}
+                                </div>
+                                <div style={{
+                                    fontSize: '11.5px',
+                                    color: 'var(--color-text-muted)',
+                                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                                    marginTop: '1px'
+                                }}>
+                                    {user.email || 'admin@aisafety.com'}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 
