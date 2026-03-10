@@ -75,6 +75,7 @@ const Navbar = ({
                                     <button
                                         onClick={onMenuClick}
                                         style={S.menuBtn}
+                                        className="nav-menu-btn"
                                         aria-label="Open menu"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -95,6 +96,13 @@ const Navbar = ({
                     )}
                 </div>
             </div>
+            {/* Hide menu button on desktop — only show on mobile ≤768px */}
+            <style>{`
+                .nav-menu-btn { display: none !important; }
+                @media (max-width: 768px) {
+                    .nav-menu-btn { display: flex !important; }
+                }
+            `}</style>
         </header>
     );
 };

@@ -34,9 +34,10 @@ const S = {
         fontFamily: 'inherit',
     }),
     logoWrap: (collapsed) => ({
-        height: 56,
+        height: 52,
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'space-between',
         padding: collapsed ? '0 12px' : '0 16px',
         marginBottom: 8,
         position: 'sticky',
@@ -46,6 +47,13 @@ const S = {
         boxSizing: 'border-box',
         borderBottom: '1px solid #F3F4F6',
     }),
+    toggleBtn: {
+        width: 28, height: 28, borderRadius: 6,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'transparent', border: '1px solid transparent',
+        cursor: 'pointer', color: '#9CA3AF', flexShrink: 0,
+        transition: 'all 120ms ease',
+    },
     nav: { padding: '4px 10px', display:'flex', flexDirection:'column', gap:1 },
     // simple item
     simpleLink: (active, collapsed) => ({
@@ -266,8 +274,29 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 style={S.aside(collapsed, mobileOpen)}
             >
                 <div style={{ flex:1, overflowY:'auto', overflowX:'hidden', paddingBottom:10 }} className="no-scrollbar">
-                    {/* Logo */}
-                    {logo && <div style={S.logoWrap(collapsed)}>{logo}</div>}
+                    {/* Logo + Toggle */}
+                    <div style={S.logoWrap(collapsed)}>
+                        {!collapsed && logo}
+                        <button
+                            onClick={onToggle}
+                            style={S.toggleBtn}
+                            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                            onMouseEnter={e => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.color = '#374151'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = '#9CA3AF'; }}
+                        >
+                            {collapsed ? (
+                                /* Hamburger icon when collapsed */
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
+                                </svg>
+                            ) : (
+                                /* Chevron-left when expanded */
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="11 17 6 12 11 7" /><polyline points="18 17 13 12 18 7" />
+                                </svg>
+                            )}
+                        </button>
+                    </div>
 
                     {/* Section Label */}
                     {!collapsed && <div style={S.sectionLabel}>Menu</div>}

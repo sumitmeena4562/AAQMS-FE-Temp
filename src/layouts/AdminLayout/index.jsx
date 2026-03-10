@@ -80,6 +80,7 @@ const AdminLayoutInner = () => {
     const { breadcrumbs, setBreadcrumbs } = useBreadcrumb();
     const location = useLocation();
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+    const [isCollapsed, setIsCollapsed] = React.useState(false);
 
     React.useEffect(() => {
         const autoCrumbs = generateBreadcrumbs(navItems, location.pathname);
@@ -91,6 +92,8 @@ const AdminLayoutInner = () => {
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}
+                collapsed={isCollapsed}
+                onToggle={() => setIsCollapsed(c => !c)}
                 mobileOpen={isMobileOpen}
                 setMobileOpen={setIsMobileOpen}
             />
