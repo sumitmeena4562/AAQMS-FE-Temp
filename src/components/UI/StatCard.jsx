@@ -28,14 +28,14 @@ const StatCard = ({ label, value, icon: Icon, trend, color = "primary" }) => {
     const style = colors[color] || colors.primary;
 
     return (
-        <div className={`flex flex-col gap-4 px-8 py-6 bg-[var(--color-bg-secondary)] rounded-[20px] border ${style.border} shadow-sm transition-all hover:shadow-md hover:-translate-y-1`}>
+        <div className={`flex flex-col gap-4 px-8 py-6 bg-bg-secondary rounded-[20px] border ${style.border} shadow-sm transition-all hover:shadow-md hover:-translate-y-1`}>
             <div className="flex items-center justify-between">
                 <div className={`p-2.5 rounded-xl ${style.bg} ${style.text}`}>
                     {Icon && <Icon className="text-[20px]" />}
                 </div>
                 {trend && (
-                    <span className={`text-[11px] font-black px-2 py-0.5 rounded-full ${trend.isPositive ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]' : 'bg-[var(--color-danger-bg)] text-[var(--color-danger)]'}`}>
-                        {trend.isPositive ? '+' : '-'}{trend.value}%
+                    <span className={`text-[11px] font-black px-2 py-0.5 rounded-full ${trend.isPositive ? 'bg-success-bg text-success' : 'bg-danger-bg text-danger'}`}>
+                        {trend.value}%
                     </span>
                 )}
             </div>

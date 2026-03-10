@@ -10,7 +10,7 @@ const AuthLayout = ({ children }) => {
                 style={{
                     flex: 1,
                     backgroundColor: 'var(--color-bg-auth-side)', /* Fixed Dark background */
-                    padding: 'var(--space-12)',
+                    padding: 'var(--spacing-12)',
                     display: 'none',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
@@ -48,7 +48,7 @@ const AuthLayout = ({ children }) => {
             </div>
 
             {/* Right Side (Form Container) */}
-            <div style={{ flex: 1, backgroundColor: 'var(--color-bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }} className="[--color-primary:var(--color-admin-primary)]">
+            <div style={{ flex: 1, backgroundColor: 'var(--color-bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
                 <div style={{ width: '100%', maxWidth: '440px' }}>
                     {children}
                 </div>

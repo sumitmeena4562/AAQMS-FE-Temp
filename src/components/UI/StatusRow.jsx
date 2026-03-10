@@ -15,27 +15,27 @@ const StatusRow = ({
 
     return (
         <div className={`flex flex-col sm:flex-row justify-between sm:items-center p-4 rounded-xl border transition-all duration-200 gap-4 sm:gap-0
-            ${status === 'alert' ? 'border-[var(--color-danger)] border-l-4 border-l-[var(--color-danger)] bg-[var(--color-bg-secondary)]' : ''}
-            ${status === 'success' ? 'border-[var(--color-border)] border-l-[1px] bg-[var(--color-success-bg)]' : ''}
-            ${status === 'pending' ? 'border-[var(--color-border)] border-l-[1px] bg-[var(--color-bg-tertiary)]' : ''}
+            ${status === 'alert' ? 'border-danger border-l-4 border-l-danger bg-bg-secondary' : ''}
+            ${status === 'success' ? 'border-border border-l-[1px] bg-success-bg' : ''}
+            ${status === 'pending' ? 'border-border border-l-[1px] bg-bg-tertiary' : ''}
         `}>
             {/* Left side: Icon + Text */}
             <div className="flex items-center gap-4">
                 {/* Icon Box */}
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0
-                    ${status === 'success' ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]' : ''}
-                    ${status === 'alert' ? 'bg-[var(--color-danger-bg)] text-[var(--color-danger)]' : ''}
-                    ${status === 'pending' ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)]' : ''}
+                    ${status === 'success' ? 'bg-success-bg text-success' : ''}
+                    ${status === 'alert' ? 'bg-danger-bg text-danger' : ''}
+                    ${status === 'pending' ? 'bg-bg-tertiary text-text-muted' : ''}
                 `}>
                     {Icon && <Icon size={18} />}
                 </div>
 
                 {/* Text Content */}
                 <div>
-                    <h4 className="m-0 text-sm font-semibold text-[var(--color-text-primary)]">
+                    <h4 className="m-0 text-sm font-semibold text-text-primary">
                         {title}
                     </h4>
-                    <p className={`m-0 text-[11px] mt-0.5 ${isAlert ? 'text-[var(--color-danger)]' : 'text-[var(--color-text-muted)]'}`}>
+                    <p className={`m-0 text-[11px] mt-0.5 ${isAlert ? 'text-danger' : 'text-text-muted'}`}>
                         {subtitle}
                     </p>
                 </div>
@@ -52,7 +52,7 @@ const StatusRow = ({
                 </Badge>
 
                 {extraText && (
-                    <p className="m-0 text-[10px] sm:text-[9px] font-medium text-[var(--color-text-muted)]">
+                    <p className="m-0 text-[10px] sm:text-[9px] font-medium text-text-muted">
                         {extraText}
                     </p>
                 )}

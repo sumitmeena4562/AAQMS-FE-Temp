@@ -4,19 +4,19 @@ const DotStatus = ({ type, text }) => {
     // Mapping types to Tailwind classes that use CSS variables defined in index.css
     const typeStyles = {
         unassigned: {
-            dot: 'bg-[var(--color-danger)]',
+            dot: 'bg-danger',
             text: 'text-[var(--color-danger)]'
         },
         assigned: {
-            dot: 'bg-[var(--color-success)]',
+            dot: 'bg-success',
             text: 'text-[var(--color-success)]'
         },
         active: {
-            dot: 'bg-[var(--color-success)]',
+            dot: 'bg-success',
             text: 'text-[var(--color-success)]'
         },
         inactive: {
-            dot: 'bg-[var(--color-text-muted)]',
+            dot: 'bg-text-muted',
             text: 'text-[var(--color-text-muted)]'
         }
     };

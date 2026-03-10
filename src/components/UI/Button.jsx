@@ -18,16 +18,16 @@ const Button = ({
     const sizes = {
         sm: "px-4 h-9 text-[12px]",
         md: "px-6 h-11 text-[13.5px]",
-        lg: "px-8 h-13 text-[15px]",
+        lg: "px-8 h-12 text-[15px]",
     };
 
-    // Variant maps for colors
+    // Variant maps for colors - Using native Tailwind theme variables
     const variants = {
-        primary: "bg-[var(--color-primary)] text-white hover:opacity-90 shadow-[var(--shadow-button)] border border-transparent",
-        secondary: "bg-[var(--color-accent)] text-white hover:opacity-90 shadow-[var(--shadow-button)] border border-transparent",
-        success: "bg-[var(--color-success)] text-white hover:opacity-90 shadow-[var(--shadow-button)] border border-transparent",
-        outline: "bg-white border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-hover)] hover:text-[var(--color-text-primary)]",
-        ghost: "bg-transparent text-[var(--color-text-secondary)] hover:bg-zinc-100 hover:text-[var(--color-text-primary)] shadow-none border-none",
+        primary: "bg-primary text-white hover:bg-primary/90 shadow-[var(--shadow-button)] border border-transparent",
+        secondary: "bg-accent text-white hover:bg-accent/90 shadow-[var(--shadow-button)] border border-transparent",
+        success: "bg-success text-white hover:bg-success/90 shadow-[var(--shadow-button)] border border-transparent",
+        outline: "bg-white border border-[var(--color-border)] text-text-secondary hover:border-[var(--color-border-hover)] hover:text-text-primary",
+        ghost: "bg-transparent text-text-secondary hover:bg-zinc-100 hover:text-text-primary shadow-none border-none",
     };
 
     return (

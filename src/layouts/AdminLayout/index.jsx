@@ -93,7 +93,7 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-[var(--color-bg-primary)] font-[var(--font-family)]">
+        <div className="flex h-screen overflow-hidden bg-bg-primary font-family">
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}

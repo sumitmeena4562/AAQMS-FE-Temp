@@ -47,7 +47,7 @@ const Navbar = ({
 
     return (
         <header style={{
-            height: '80px',
+            height: '55px',
             background: isScrolled ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
             backdropFilter: isScrolled ? 'blur(12px)' : 'none',
             WebkitBackdropFilter: isScrolled ? 'blur(12px)' : 'none',

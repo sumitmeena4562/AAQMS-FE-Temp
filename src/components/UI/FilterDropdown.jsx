@@ -45,16 +45,16 @@ const FilterDropdown = ({
                         minWidth: minWidth,
                     }}
                     className={`flex items-center justify-between gap-2 px-4 bg-white border transition-all duration-200 cursor-pointer select-none w-full rounded-full
-                        ${isOpen ? 'border-[var(--color-accent)] ring-2 ring-[var(--color-accent-soft)]' : 'border-[var(--color-border)] hover:border-[var(--color-border-hover)]'}
-                        ${value ? 'bg-[var(--color-accent-soft)] border-[var(--color-accent)]' : ''}`}
+                        ${isOpen ? 'border-accent ring-2 ring-accent-soft' : 'border-border hover:border-border-hover'}
+                        ${value ? 'bg-accent-soft border-accent' : ''}`}
                 >
                     <span className={`text-[12.5px] font-medium whitespace-nowrap overflow-hidden text-ellipsis leading-tight
-                        ${value ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}>
+                        ${value ? 'text-text-primary' : 'text-text-secondary'}`}>
                         {selectedOption ? selectedOption.label : placeholder}
                     </span>
                     <FiChevronDown
-                        className={`text-[14px] text-[var(--color-text-muted)] transition-transform duration-300 flex-shrink-0
-                            ${isOpen ? 'rotate-180 text-[var(--color-accent)]' : ''}`}
+                        className={`text-[14px] text-text-muted transition-transform duration-300 flex-shrink-0
+                            ${isOpen ? 'rotate-180 text-accent' : ''}`}
                     />
                 </button>
 
