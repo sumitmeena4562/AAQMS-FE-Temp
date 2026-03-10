@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import Card from '../../components/UI/Card';
 import {
     MdOutlineBusiness,
@@ -7,64 +6,56 @@ import {
     MdOutlinePushPin,
     MdOutlineQrCodeScanner,
     MdOutlineAssignmentLate,
-    MdOutlineVerified,
+    MdOutlineVerified
 } from 'react-icons/md';
 
 // eslint-disable-next-line no-unused-vars
-const CapabilityCard = ({ title, description, icon: Icon, index }) => {
+const CapabilityCard = ({ title, description, icon: Icon }) => {
     return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            style={{ height: '100%' }}
+        <Card
+            className="capability-card"
+            style={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+                backgroundColor: '#ffffff',
+                border: '1px solid #f1f5f9'
+            }}
         >
-            <Card
-                className="capability-card"
-                style={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '16px',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #f1f5f9'
-                }}
-            >
-                <div className="capability-icon-box" style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '12px',
-                    background: 'rgba(59, 130, 246, 0.05)',
-                    color: '#3b82f6',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <Icon size={24} />
-                </div>
+            <div className="capability-icon-box" style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '12px',
+                background: 'rgba(59, 130, 246, 0.05)',
+                color: '#3b82f6',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <Icon size={24} />
+            </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <h3 className="capability-title" style={{
-                        fontSize: '18px',
-                        fontWeight: 800,
-                        color: '#0f172a',
-                        margin: 0,
-                        letterSpacing: '-0.02em'
-                    }}>
-                        {title}
-                    </h3>
-                    <p className="capability-desc" style={{
-                        fontSize: '14px',
-                        lineHeight: 1.6,
-                        color: '#64748b',
-                        margin: 0
-                    }}>
-                        {description}
-                    </p>
-                </div>
-            </Card>
-        </motion.div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <h3 className="capability-title" style={{
+                    fontSize: '18px',
+                    fontWeight: 800,
+                    color: '#0f172a',
+                    margin: 0,
+                    letterSpacing: '-0.02em'
+                }}>
+                    {title}
+                </h3>
+                <p className="capability-desc" style={{
+                    fontSize: '14px',
+                    lineHeight: 1.6,
+                    color: '#64748b',
+                    margin: 0
+                }}>
+                    {description}
+                </p>
+            </div>
+        </Card>
     );
 };
 
@@ -104,38 +95,31 @@ const Capabilities = () => {
 
     return (
         <section className="capabilities-section" style={{
-            padding: '100px 24px',
+            padding: '80px 24px',
             background: 'rgba(248, 250, 252, 0.5)',
-            borderTop: '1px solid #f1f5f9'
+            borderTop: '1px solid var(--color-border-light)'
         }}>
             <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
                 {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="section-header"
-                    style={{ textAlign: 'left', marginBottom: '56px' }}
-                >
+                <div className="section-header" style={{ textAlign: 'left', marginBottom: '48px' }}>
                     <h2 className="section-title" style={{
-                        fontSize: 'clamp(28px, 3.5vw, 42px)',
+                        fontSize: 'clamp(24px, 3.5vw, 36px)',
                         fontWeight: 800,
-                        color: '#0f172a',
-                        marginBottom: '16px',
-                        letterSpacing: '-0.02em'
+                        color: 'var(--color-primary-dark)',
+                        marginBottom: '12px',
+                        letterSpacing: '-0.01em'
                     }}>
                         Core Capabilities
                     </h2>
                     <p className="section-subtitle" style={{
-                        fontSize: '17px',
-                        color: '#64748b',
-                        maxWidth: '600px',
-                        lineHeight: 1.6
+                        fontSize: '16px',
+                        color: 'var(--color-text-secondary)',
+                        maxWidth: '560px',
+                        lineHeight: 1.5
                     }}>
                         Enterprise-grade tools built for rigorous inventory and safety standards.
                     </p>
-                </motion.div>
+                </div>
 
                 {/* Grid */}
                 <div className="capabilities-grid" style={{
@@ -144,7 +128,9 @@ const Capabilities = () => {
                     gap: '24px'
                 }}>
                     {list.map((item, index) => (
-                        <CapabilityCard key={index} {...item} index={index} />
+                        <div key={index}>
+                            <CapabilityCard {...item} />
+                        </div>
                     ))}
                 </div>
             </div>
@@ -161,6 +147,15 @@ const Capabilities = () => {
                     }
                     .section-subtitle {
                         margin: 0 auto !important;
+                    }
+                    .capabilities-grid {
+                        grid-template-columns: 1fr !important;
+                        gap: 16px !important;
+                    }
+                    .capability-card {
+                        padding: 24px !important;
+                        align-items: center;
+                        text-align: center;
                     }
                 }
             `}} />
