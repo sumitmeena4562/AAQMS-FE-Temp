@@ -87,36 +87,37 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-bg-primary font-family">
+        <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#fff', fontFamily:'inherit' }}>
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}
                 mobileOpen={isMobileOpen}
                 setMobileOpen={setIsMobileOpen}
             />
-            <div className="flex-1 flex flex-col h-full overflow-hidden bg-bg-primary">
+            <div style={{ flex:1, display:'flex', flexDirection:'column', height:'100%', overflow:'hidden', background:'#fff' }}>
                 <Navbar
-                 style={{padding:'20px'}}
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
                     leftContent={breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
-                    className="flex-shrink-0"
                     rightContent={
-                        <div className="flex items-center gap-6 w-full md:w-auto justify-end">
-                            <div className="flex items-center gap-5 flex-shrink-0 mr-2">
-                                <button className="p-2 transition-colors relative flex items-center justify-center cursor-pointer text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                    </svg>
-                                    <span className="absolute top-[8px] right-[8px] h-2 w-2 rounded-full border-2 border-white bg-blue-500"></span>
-                                </button>
-                                <ProfileDropdown />
-                            </div>
+                        <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+                            {/* Notification Bell */}
+                            <button
+                                style={{ padding:6, background:'none', border:'none', cursor:'pointer', position:'relative', display:'flex', alignItems:'center', justifyContent:'center', color:'#9CA3AF' }}
+                                onMouseEnter={e => { e.currentTarget.style.color = '#374151'; }}
+                                onMouseLeave={e => { e.currentTarget.style.color = '#9CA3AF'; }}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                                </svg>
+                                <span style={{ position:'absolute', top:4, right:4, width:7, height:7, borderRadius:'50%', border:'2px solid #fff', background:'#3B82F6' }} />
+                            </button>
+                            <ProfileDropdown />
                         </div>
                     }
                 />
-                <main className="flex-1 overflow-y-auto px-12 sm:px-24 lg:px-40 py-10 sm:py-14 " style={{padding:'20px'}}>
-                    <div className="w-full max-w-[1400px] mx-auto" >
+                <main style={{ flex:1, overflowY:'auto', padding:20 }}>
+                    <div style={{ width:'100%', maxWidth:1400, margin:'0 auto' }}>
                         <Outlet />
                     </div>
                 </main>

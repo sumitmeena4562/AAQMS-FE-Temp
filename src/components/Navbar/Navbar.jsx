@@ -1,5 +1,56 @@
 import React from "react";
 
+const S = {
+    header: {
+        display: 'flex',
+        flexDirection: 'column',
+        flexShrink: 0,
+        position: 'sticky',
+        top: 0,
+        zIndex: 20,
+        backgroundColor: '#FAFAFA',
+        borderBottom: '1px solid #E5E7EB',
+        height: 52,
+        justifyContent: 'center',
+        boxSizing: 'border-box',
+    },
+    inner: {
+        width: '100%',
+        maxWidth: 1400,
+        margin: '0 auto',
+        padding: '0 20px',
+        boxSizing: 'border-box',
+    },
+    row: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        height: '100%',
+    },
+    left: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
+    },
+    right: {
+        display: 'flex',
+        alignItems: 'center',
+        marginLeft: 'auto',
+    },
+    menuBtn: {
+        padding: 6,
+        marginLeft: -6,
+        borderRadius: 6,
+        border: 'none',
+        background: 'transparent',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#6B7280',
+    },
+};
+
 const Navbar = ({
     leftContent,
     centerContent,
@@ -11,56 +62,39 @@ const Navbar = ({
     style
 }) => {
     return (
-        <header
-            className={`flex flex-col flex-shrink-0 sticky top-0 z-20 ${className}`}
-            style={{
-                backgroundColor: "var(--color-bg-secondary)",
-                borderBottom: "1px solid var(--color-border-light)",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.03)",
-                height: "var(--navbar-height, 64px)",
-                justifyContent: "center",
-                ...style
-            }}
-        >
-            <div className="w-full max-w-[1400px] mx-auto px-12 sm:px-24 lg:px-40">
-                {/* Top Row: Navigation + Search + User */}
-                <div className="flex items-center justify-between h-full">
+        <header style={{ ...S.header, ...style }}>
+            <div style={S.inner}>
+                <div style={S.row}>
                     {children ? (
                         children
                     ) : (
                         <>
-                            {/* Left section: Breadcrumbs/Logo */}
-                            <div className="flex items-center gap-4">
+                            {/* Left: Menu + Breadcrumbs */}
+                            <div style={S.left}>
                                 {showMenuButton && (
                                     <button
                                         onClick={onMenuClick}
-                                        className="p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors md:hidden cursor-pointer"
+                                        style={S.menuBtn}
                                         aria-label="Open menu"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="3" y1="12" x2="21" y2="12" />
+                                            <line x1="3" y1="6" x2="21" y2="6" />
+                                            <line x1="3" y1="18" x2="21" y2="18" />
                                         </svg>
                                     </button>
                                 )}
                                 {leftContent}
                             </div>
 
-                            {/* Right Section: Actions + Profile */}
-                            <div className="flex items-center ml-auto">
+                            {/* Right: Actions + Profile */}
+                            <div style={S.right}>
                                 {rightContent}
                             </div>
                         </>
                     )}
                 </div>
             </div>
-            {/* Optional Center Content (Mobile) */}
-            {centerContent && (
-                <div className="md:hidden px-6 pb-2">
-                    {centerContent}
-                </div>
-            )}
         </header>
     );
 };
