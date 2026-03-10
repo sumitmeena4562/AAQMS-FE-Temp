@@ -1,33 +1,26 @@
 import React from 'react';
 
 const DotStatus = ({ type, text }) => {
-    // Mapping types to Tailwind classes that use CSS variables defined in index.css
-    const typeStyles = {
-        unassigned: {
-            dot: 'bg-danger',
-            text: 'text-[var(--color-danger)]'
-        },
-        assigned: {
-            dot: 'bg-success',
-            text: 'text-[var(--color-success)]'
-        },
-        active: {
-            dot: 'bg-success',
-            text: 'text-[var(--color-success)]'
-        },
-        inactive: {
-            dot: 'bg-text-muted',
-            text: 'text-[var(--color-text-muted)]'
-        }
+    const styles = {
+        unassigned: { dot: '#F87171', bg: '#FEF2F2', border: '#FECACA', color: '#B91C1C' },
+        assigned:   { dot: '#94A3B8', bg: '#F8FAFC', border: '#E2E8F0', color: '#475569' },
+        active:     { dot: '#34D399', bg: '#ECFDF5', border: '#A7F3D0', color: '#065F46' },
+        inactive:   { dot: '#D1D5DB', bg: '#F9FAFB', border: '#E5E7EB', color: '#6B7280' },
     };
 
-    const style = typeStyles[type?.toLowerCase()] || typeStyles.inactive;
+    const s = styles[type?.toLowerCase()] || styles.inactive;
+    const label = text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
 
     return (
-        <div className="flex items-center gap-2">
-            <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`}></span>
-            <span className={`text-sm font-medium ${style.text}`}>{text}</span>
-        </div>
+        <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '3px 8px', borderRadius: 20,
+            background: s.bg, border: `1px solid ${s.border}`,
+            fontSize: 11, fontWeight: 600, color: s.color,
+        }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
+            {label}
+        </span>
     );
 };
 

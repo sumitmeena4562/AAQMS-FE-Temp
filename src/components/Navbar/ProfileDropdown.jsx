@@ -33,7 +33,7 @@ const ProfileDropdown = () => {
         <div className="relative" ref={dropdownRef}>
             {/* Avatar Button */}
             <button
-                className="h-9 w-9 rounded-lg bg-white flex-shrink-0 cursor-pointer transition-all hover:shadow-md focus:outline-none flex items-center justify-center p-0.5"
+                className="h-9 w-9 rounded-xl bg-white flex-shrink-0 cursor-pointer transition-all hover:shadow-md focus:outline-none flex items-center justify-center p-0.5"
                 style={{ border: '1.5px solid var(--color-border-light)' }}
                 onClick={() => setIsOpen(!isOpen)}
             >

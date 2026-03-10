@@ -2,7 +2,6 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Logo from "../../components/Branding/Logo";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import Search from "../../components/UI/Search";
 import ProfileDropdown from "../../components/Navbar/ProfileDropdown";
 
 import Navbar from "../../components/Navbar/Navbar";
@@ -104,9 +103,6 @@ const AdminLayoutInner = () => {
                     className="flex-shrink-0"
                     rightContent={
                         <div className="flex items-center gap-6 w-full md:w-auto justify-end">
-                            <div className="flex-1 md:flex-none relative max-w-[220px] sm:max-w-none md:w-80 transition-all">
-                                <Search placeholder="Search users, roles..." />
-                            </div>
                             <div className="flex items-center gap-5 flex-shrink-0 mr-2">
                                 <button className="p-2 transition-colors relative flex items-center justify-center cursor-pointer text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

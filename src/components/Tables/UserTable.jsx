@@ -1,99 +1,113 @@
 import Table from '../UI/Table';
 import DotStatus from '../UI/DotStatus';
-import Button from '../UI/Button';
-import { FiEdit2 } from 'react-icons/fi';
+import UserAvatar from '../UI/UserAvatar';
+import { FiExternalLink } from 'react-icons/fi';
 
-const UserTable = ({ data = [] }) => {
+const ROLE_STYLE = {
+    coordinator:    { bg: '#F5F3FF', color: '#6D28D9', border: '#DDD6FE' },
+    'field officer':{ bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
+    admin:          { bg: '#FFFBEB', color: '#B45309', border: '#FDE68A' },
+};
+
+const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick }) => {
     const columns = [
         {
-            header: 'EMPLOYEE NAME',
+            header: 'User',
             accessor: 'name',
             render: (_, row) => (
-                <div className="flex flex-col py-1">
-                    <span className="font-extrabold text-[15px] text-text-primary leading-snug">
-                        {row.name}
-                    </span>
-                    <span className="text-[13px] text-text-muted font-medium">
-                        {row.email}
-                    </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <UserAvatar name={row.name} size="30px" fontSize="11px" />
+                    <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', lineHeight: 1.2 }}>{row.name}</div>
+                        <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{row.email}</div>
+                    </div>
                 </div>
             )
         },
         {
-            header: 'ORGANIZATION',
+            header: 'Organization',
             accessor: 'organization',
-            render: (value) => (
-                <span className="text-[14px] font-bold text-text-secondary tracking-tight">
-                    {value || '------'}
+            render: value => (
+                <span style={{ fontSize: 13, color: value ? '#374151' : '#D1D5DB', fontStyle: value ? 'normal' : 'italic' }}>
+                    {value || 'Not assigned'}
                 </span>
             )
         },
         {
-            header: 'ROLE',
+            header: 'Role',
             accessor: 'role',
-            render: (value) => {
-                const isCoordinator = value?.toLowerCase() === 'coordinator';
+            render: value => {
+                const s = ROLE_STYLE[value?.toLowerCase()] || { bg: '#F3F4F6', color: '#374151', border: '#E5E7EB' };
                 return (
-                    <span
-                        className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest
-                        ${isCoordinator
-                                ? 'bg-bg-tertiary text-text-primary border border-border'
-                                : 'bg-bg-primary text-text-secondary border border-border'}
-                    `}
-                    >
+                    <span style={{
+                        display: 'inline-block',
+                        padding: '2px 10px',
+                        fontSize: 11, fontWeight: 600,
+                        background: s.bg, color: s.color,
+                        border: `1px solid ${s.border}`,
+                        borderRadius: 20,
+                    }}>
                         {value}
                     </span>
                 );
             }
         },
         {
-            header: 'ASSIGNMENT',
+            header: 'Assignment',
             accessor: 'assignment',
-            render: (value) => {
-                const displayValue = value?.toLowerCase() === 'unassigned' ? 'Unassigned' : 'Assigned';
-                return (
-                    <div className="scale-95 origin-left font-bold italic">
-                        <DotStatus type={value?.toLowerCase()} text={displayValue} />
-                    </div>
-                );
-            }
-        },
-        {
-            header: 'STATUS',
-            accessor: 'status',
-            render: (value) => (
-                <div className="scale-95 origin-left font-bold italic">
-                    <DotStatus
-                        type={value?.toLowerCase()}
-                        text={value ? value.charAt(0).toUpperCase() + value.slice(1) : ''}
-                    />
-                </div>
+            render: value => (
+                <DotStatus
+                    type={value?.toLowerCase() === 'assigned' ? 'assigned' : 'unassigned'}
+                    text={value}
+                />
             )
         },
         {
-            header: 'ACTIONS',
+            header: 'Status',
+            accessor: 'status',
+            render: value => (
+                <DotStatus
+                    type={value?.toLowerCase()}
+                    text={value}
+                />
+            )
+        },
+        {
+            header: '',
             accessor: 'actions',
             render: (_, row) => (
-                <Button
-                    variant="ghost"
-                    className="text-text-primary hover:bg-bg-tertiary px-5 h-[36px] rounded-full border border-transparent hover:border-border-hover transition-all"
-                    onClick={() => row.onEdit && row.onEdit(row)}
-                >
-                    <span className="text-[12px] font-black uppercase tracking-wider">Edit</span>
-                    <FiEdit2 className="w-3.5 h-3.5" />
-                </Button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+                    <button
+                        title="View profile"
+                        onClick={e => { e.stopPropagation(); onRowClick && onRowClick(row); }}
+                        style={{ padding: '4px 6px', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', borderRadius: 5 }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.color = '#374151'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#9CA3AF'; }}
+                    >
+                        <FiExternalLink size={13} />
+                    </button>
+                    <button
+                        onClick={e => { e.stopPropagation(); row.onEdit && row.onEdit(row); }}
+                        style={{ padding: '4px 10px', fontSize: 12, fontWeight: 600, color: '#4F46E5', background: 'none', border: '1px solid transparent', borderRadius: 6, cursor: 'pointer' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.border = '1px solid #C7D2FE'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.border = '1px solid transparent'; }}
+                    >
+                        Edit
+                    </button>
+                </div>
             )
         }
     ];
 
     return (
-        <div className="w-full">
-            <div className="p-8" style={{padding:'1% 2% 1% 5%'} }>
-                {/* Custom Header Injection via Table component styling if supported, 
-                    otherwise we rely on the columns definition which 'Table' component should use */}
-                <Table columns={columns} data={data} />
-            </div>
-        </div>
+        <Table
+            columns={columns}
+            data={data}
+            selectable={true}
+            selectedIds={selectedIds}
+            onSelectionChange={onSelectionChange}
+            onRowClick={onRowClick}
+        />
     );
 };
 
