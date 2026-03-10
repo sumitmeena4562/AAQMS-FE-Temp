@@ -27,16 +27,16 @@ const CapabilityCard = ({ title, description, icon: Icon, index }) => {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '16px',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #f1f5f9'
+                    backgroundColor: 'var(--color-bg-primary)',
+                    border: '1px solid var(--color-border-light)'
                 }}
             >
                 <div className="capability-icon-box" style={{
                     width: '48px',
                     height: '48px',
                     borderRadius: '12px',
-                    background: 'rgba(59, 130, 246, 0.05)',
-                    color: '#3b82f6',
+                    background: 'var(--color-primary-light)',
+                    color: 'var(--color-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -48,7 +48,7 @@ const CapabilityCard = ({ title, description, icon: Icon, index }) => {
                     <h3 className="capability-title" style={{
                         fontSize: '18px',
                         fontWeight: 800,
-                        color: '#0f172a',
+                        color: 'var(--color-text-primary)',
                         margin: 0,
                         letterSpacing: '-0.02em'
                     }}>
@@ -57,7 +57,7 @@ const CapabilityCard = ({ title, description, icon: Icon, index }) => {
                     <p className="capability-desc" style={{
                         fontSize: '14px',
                         lineHeight: 1.6,
-                        color: '#64748b',
+                        color: 'var(--color-text-secondary)',
                         margin: 0
                     }}>
                         {description}
@@ -104,9 +104,9 @@ const Capabilities = () => {
 
     return (
         <section className="capabilities-section" style={{
-            padding: '100px 24px',
-            background: 'rgba(248, 250, 252, 0.5)',
-            borderTop: '1px solid #f1f5f9'
+            padding: 'clamp(60px, 10vh, 100px) 24px',
+            background: 'var(--color-bg-secondary)',
+            borderTop: '1px solid var(--color-border-light)'
         }}>
             <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
                 {/* Section Header */}
@@ -116,20 +116,20 @@ const Capabilities = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
                     className="section-header"
-                    style={{ textAlign: 'left', marginBottom: '56px' }}
+                    style={{ textAlign: 'left', marginBottom: 'clamp(40px, 6vh, 60px)' }}
                 >
                     <h2 className="section-title" style={{
-                        fontSize: 'clamp(28px, 3.5vw, 42px)',
+                        fontSize: 'clamp(26px, 5vw, 40px)',
                         fontWeight: 800,
-                        color: '#0f172a',
+                        color: 'var(--color-text-primary)',
                         marginBottom: '16px',
                         letterSpacing: '-0.02em'
                     }}>
                         Core Capabilities
                     </h2>
                     <p className="section-subtitle" style={{
-                        fontSize: '17px',
-                        color: '#64748b',
+                        fontSize: 'clamp(15px, 2vw, 17px)',
+                        color: 'var(--color-text-secondary)',
                         maxWidth: '600px',
                         lineHeight: 1.6
                     }}>
@@ -140,7 +140,7 @@ const Capabilities = () => {
                 {/* Grid */}
                 <div className="capabilities-grid" style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                     gap: '24px'
                 }}>
                     {list.map((item, index) => (
@@ -152,15 +152,15 @@ const Capabilities = () => {
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @media (max-width: 768px) {
-                    .capabilities-section {
-                        padding: 60px 20px !important;
-                    }
                     .section-header {
                         text-align: center !important;
-                        margin-bottom: 40px !important;
                     }
                     .section-subtitle {
                         margin: 0 auto !important;
+                    }
+                    .capabilities-grid {
+                        grid-template-columns: 1fr !important;
+                        gap: 16px !important;
                     }
                 }
             `}} />

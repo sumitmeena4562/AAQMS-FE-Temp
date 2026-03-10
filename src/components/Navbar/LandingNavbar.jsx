@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../Branding/Logo';
 
 const Navbar = ({
@@ -15,8 +16,19 @@ const Navbar = ({
             setIsScrolled(window.scrollY > 20);
         };
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+        
+        // Prevent body scroll when menu is open
+        if (isMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+        
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            document.body.style.overflow = 'auto';
+        };
+    }, [isMenuOpen]);
 
     const buttonStyles = {
         outline: {
@@ -45,190 +57,260 @@ const Navbar = ({
         },
     };
 
-    return (
-        <header style={{
-            height: 'var(--navbar-height)',
-            background: isScrolled ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
-            backdropFilter: isScrolled ? 'blur(16px)' : 'none',
-            WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
-            borderBottom: isScrolled ? '1px solid var(--color-border-light)' : 'none',
-            position: sticky ? 'sticky' : 'relative',
-            top: 0,
-            zIndex: 1000,
-            width: '100%',
-            transition: 'background 0.3s ease, height 0.3s ease, border 0.3s ease'
-        }}>
-            <nav style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '0 clamp(16px, 5vw, 40px)',
-                height: '100%',
-                maxWidth: '1280px',
-                margin: '0 auto',
-            }}>
-                {/* Left — Logo */}
-                <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
-                    <Logo size="md" />
-                </div>
+    const menuVariants = {
+        closed: { 
+            opacity: 0,
+            x: '100%',
+            transition: {
+                type: 'spring',
+                stiffness: 400,
+                damping: 40
+            }
+        },
+        open: { 
+            opacity: 1,
+            x: 0,
+            transition: {
+                type: 'spring',
+                stiffness: 400,
+                damping: 40,
+                staggerChildren: 0.1,
+                delayChildren: 0.2
+            }
+        }
+    };
 
-                {/* Center — Desktop Nav Links */}
-                <div className="desktop-nav" style={{
+    const itemVariants = {
+        closed: { opacity: 0, y: 20 },
+        open: { opacity: 1, y: 0 }
+    };
+
+    return (
+        <>
+            <header style={{
+                height: 'var(--navbar-height)',
+                background: isScrolled ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
+                backdropFilter: isScrolled ? 'blur(16px)' : 'none',
+                WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
+                borderBottom: isScrolled ? '1px solid var(--color-border-light)' : 'none',
+                position: sticky ? 'sticky' : 'relative',
+                top: 0,
+                zIndex: 1000,
+                width: '100%',
+                transition: 'background 0.3s ease, height 0.3s ease, border 0.3s ease'
+            }}>
+                <nav style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '40px',
-                    justifyContent: 'center',
-                    flex: 2,
+                    justifyContent: 'space-between',
+                    padding: '0 clamp(16px, 5vw, 40px)',
+                    height: '100%',
+                    maxWidth: '1280px',
+                    margin: '0 auto',
+                    position: 'relative',
                 }}>
-                    {navLinks.map((link) => (
-                        <a
-                            key={link.label}
-                            href={link.href || '#'}
-                            onClick={(e) => {
-                                if (link.onClick) {
-                                    e.preventDefault();
-                                    link.onClick();
-                                }
-                            }}
-                            style={{
-                                fontSize: '14px',
-                                fontWeight: 600,
-                                color: 'var(--color-text-secondary)',
-                                textDecoration: 'none',
-                                cursor: 'pointer',
-                                transition: 'color 0.2s ease'
-                            }}
-                            onMouseEnter={(e) => e.target.style.color = 'var(--color-primary)'}
-                            onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
-                        >
-                            {link.label}
-                        </a>
-                    ))}
-                </div>
+                    {/* Left — Logo */}
+                    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', zIndex: 1100 }}>
+                        <Logo size="md" />
+                    </div>
 
-                {/* Right — Desktop Buttons */}
-                <div className="desktop-actions" style={{ flex: 1, display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'flex-end' }}>
-                    {buttons.map((btn) => (
-                        <button
-                            key={btn.label}
-                            onClick={btn.onClick}
-                            style={buttonStyles[btn.variant || 'outline']}
-                        >
-                            {btn.label}
-                        </button>
-                    ))}
-                </div>
+                    {/* Center — Desktop Nav Links */}
+                    <div className="desktop-nav" style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '40px',
+                        justifyContent: 'center',
+                        flex: 2,
+                    }}>
+                        {navLinks.map((link) => (
+                            <a
+                                key={link.label}
+                                href={link.href || '#'}
+                                onClick={(e) => {
+                                    if (link.onClick) {
+                                        e.preventDefault();
+                                        link.onClick();
+                                    }
+                                }}
+                                style={{
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    color: 'var(--color-text-secondary)',
+                                    textDecoration: 'none',
+                                    cursor: 'pointer',
+                                    transition: 'color 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => e.target.style.color = 'var(--color-primary)'}
+                                onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
+                            >
+                                {link.label}
+                            </a>
+                        ))}
+                    </div>
 
-                {/* Mobile Menu Toggle Button */}
-                <button
-                    className="mobile-toggle"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    style={{
-                        display: 'none',
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: '8px',
-                        color: 'var(--color-text-primary)'
-                    }}
-                >
-                    {isMenuOpen ? (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    ) : (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    )}
-                </button>
-            </nav>
+                    {/* Right — Desktop Buttons */}
+                    <div className="desktop-actions" style={{ flex: 1, display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'flex-end' }}>
+                        {buttons.map((btn) => (
+                            <button
+                                key={btn.label}
+                                onClick={btn.onClick}
+                                style={buttonStyles[btn.variant || 'outline']}
+                            >
+                                {btn.label}
+                            </button>
+                        ))}
+                    </div>
 
-            {/* Mobile Menu Drawer */}
-            <div
-                className={`mobile-menu ${isMenuOpen ? 'open' : ''}`}
-                style={{
-                    position: 'fixed',
-                    top: 'var(--navbar-height)',
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'var(--color-bg-primary)',
-                    zIndex: 999,
-                    display: 'none',
-                    flexDirection: 'column',
-                    padding: '24px',
-                    gap: '32px',
-                    transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-                    transform: isMenuOpen ? 'translateX(0)' : 'translateX(100%)',
-                    opacity: isMenuOpen ? 1 : 0,
-                    visibility: isMenuOpen ? 'visible' : 'hidden',
-                    overflowY: 'auto',
-                    borderTop: '1px solid var(--color-border-light)'
-                }}
-            >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', letterSpacing: '0.15em', opacity: 0.6 }}>MAIN NAVIGATION</span>
-                    {navLinks.map((link) => (
-                        <a
-                            key={link.label}
-                            href={link.href || '#'}
-                            onClick={(e) => {
-                                setIsMenuOpen(false);
-                                if (link.onClick) {
-                                    e.preventDefault();
-                                    link.onClick();
-                                }
-                            }}
-                            style={{
-                                fontSize: '20px',
-                                fontWeight: 700,
-                                color: 'var(--color-text-primary)',
-                                textDecoration: 'none',
-                                animation: isMenuOpen ? 'fadeInUp 0.4s ease forwards' : 'none'
-                            }}
-                        >
-                            {link.label}
-                        </a>
-                    ))}
-                </div>
+                    {/* Mobile Menu Toggle Button */}
+                    <button
+                        className="mobile-toggle"
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        style={{
+                            display: 'none',
+                            background: 'transparent',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: '8px',
+                            color: 'var(--color-text-primary)',
+                            zIndex: 2100,
+                            position: 'relative'
+                        }}
+                        aria-label="Toggle Menu"
+                    >
+                        {isMenuOpen ? (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        ) : (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        )}
+                    </button>
+                </nav>
+            </header>
 
-                <div style={{ height: '1px', background: 'var(--color-border-light)', width: '100%' }}></div>
+            {/* Mobile Menu Drawer Overlay */}
+            <AnimatePresence>
+                {isMenuOpen && (
+                    <motion.div
+                        className="mobile-menu-drawer"
+                        initial="closed"
+                        animate="open"
+                        exit="closed"
+                        variants={menuVariants}
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            right: 0,
+                            bottom: 0,
+                            left: 0,
+                            background: '#ffffff', // Explicit solid white
+                            backgroundImage: 'linear-gradient(to bottom, #ffffff, #f8faff)',
+                            zIndex: 2000,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            padding: '100px 32px 40px',
+                            gap: '48px',
+                            overflowY: 'auto',
+                            boxShadow: 'var(--shadow-premium)'
+                        }}
+                    >
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+                            <motion.span 
+                                variants={itemVariants}
+                                style={{ 
+                                    fontSize: '11px', 
+                                    fontWeight: 800, 
+                                    color: 'var(--color-text-muted)', 
+                                    letterSpacing: '0.2em', 
+                                    opacity: 0.8,
+                                    textTransform: 'uppercase'
+                                }}
+                            >
+                                Main Navigation
+                            </motion.span>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                {navLinks.map((link) => (
+                                    <motion.a
+                                        key={link.label}
+                                        variants={itemVariants}
+                                        href={link.href || '#'}
+                                        onClick={(e) => {
+                                            setIsMenuOpen(false);
+                                            if (link.onClick) {
+                                                e.preventDefault();
+                                                link.onClick();
+                                            }
+                                        }}
+                                        whileHover={{ x: 10, color: 'var(--color-primary)' }}
+                                        style={{
+                                            fontSize: '22px',
+                                            fontWeight: 800,
+                                            color: 'var(--color-text-primary)',
+                                            textDecoration: 'none',
+                                            display: 'block',
+                                            transition: 'color 0.2s ease'
+                                        }}
+                                    >
+                                        {link.label}
+                                    </motion.a>
+                                ))}
+                            </div>
+                        </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--color-text-muted)', letterSpacing: '0.15em', opacity: 0.6 }}>ACCESS PORTAL</span>
-                    {buttons.map((btn) => (
-                        <button
-                            key={btn.label}
-                            onClick={() => { btn.onClick?.(); setIsMenuOpen(false); }}
-                            style={{
-                                padding: '16px',
-                                width: '100%',
-                                textAlign: 'center',
-                                borderRadius: '14px',
-                                border: btn.variant === 'filled' ? 'none' : '1px solid var(--color-border)',
-                                background: btn.variant === 'filled' ? 'var(--color-primary)' : 'transparent',
-                                color: btn.variant === 'filled' ? 'var(--color-text-inverse)' : 'var(--color-text-primary)',
-                                fontSize: '15px',
-                                fontWeight: 700,
-                                boxShadow: btn.variant === 'filled' ? 'var(--shadow-premium)' : 'none'
-                            }}
-                        >
-                            {btn.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
+                        <div style={{ height: '1px', background: 'var(--color-border-light)', width: '100%', opacity: 0.5 }}></div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <motion.span 
+                                variants={itemVariants}
+                                style={{ 
+                                    fontSize: '11px', 
+                                    fontWeight: 800, 
+                                    color: 'var(--color-text-muted)', 
+                                    letterSpacing: '0.2em', 
+                                    opacity: 0.8,
+                                    textTransform: 'uppercase'
+                                }}
+                            >
+                                Secure Access
+                            </motion.span>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {buttons.map((btn) => (
+                                    <motion.button
+                                        key={btn.label}
+                                        variants={itemVariants}
+                                        onClick={() => { btn.onClick?.(); setIsMenuOpen(false); }}
+                                        whileTap={{ scale: 0.98 }}
+                                        style={{
+                                            padding: '18px',
+                                            width: '100%',
+                                            textAlign: 'center',
+                                            borderRadius: '16px',
+                                            border: btn.variant === 'filled' ? 'none' : '1px solid var(--color-border)',
+                                            background: btn.variant === 'filled' ? 'var(--color-primary)' : 'transparent',
+                                            color: btn.variant === 'filled' ? 'var(--color-text-inverse)' : 'var(--color-text-primary)',
+                                            fontSize: '16px',
+                                            fontWeight: 700,
+                                            boxShadow: btn.variant === 'filled' ? '0 10px 20px -10px var(--color-primary)' : 'none'
+                                        }}
+                                    >
+                                        {btn.label}
+                                    </motion.button>
+                                ))}
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <style dangerouslySetInnerHTML={{
                 __html: `
-                @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
                 @media (max-width: 991px) {
                     .desktop-nav, .desktop-actions {
                         display: none !important;
@@ -236,12 +318,9 @@ const Navbar = ({
                     .mobile-toggle {
                         display: block !important;
                     }
-                    .mobile-menu {
-                        display: flex !important;
-                    }
                 }
             `}} />
-        </header>
+        </>
     );
 };
 
