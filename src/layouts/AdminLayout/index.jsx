@@ -89,7 +89,7 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div style={{ display:'flex', height:'100vh', overflow:'hidden', background: t.color.bg, fontFamily:'inherit' }}>
+        <div style={{ display:'flex', height:'100vh', overflow:'hidden', background: t.color.bgPage, fontFamily:'inherit' }}>
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}
@@ -98,7 +98,7 @@ const AdminLayoutInner = () => {
                 mobileOpen={isMobileOpen}
                 setMobileOpen={setIsMobileOpen}
             />
-            <div style={{ flex:1, display:'flex', flexDirection:'column', height:'100%', overflow:'hidden', background: t.color.bg }}>
+            <div style={{ flex:1, display:'flex', flexDirection:'column', height:'100%', overflow:'hidden', background: t.color.bgPage }}>
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}

@@ -19,11 +19,17 @@ const StatsCard = ({ label, value, icon, iconBg = t.color.bgMuted, iconColor = t
                 minWidth: 0,
                 flex: '1 1 0',
                 cursor: 'default',
-                transition: `box-shadow ${t.transition.base}`,
+                transition: `all ${t.transition.base}`,
                 ...style,
             }}
-            onMouseEnter={e => { e.currentTarget.style.boxShadow = t.shadow.cardHover; }}
-            onMouseLeave={e => { e.currentTarget.style.boxShadow = t.shadow.card; }}
+            onMouseEnter={e => { 
+                e.currentTarget.style.boxShadow = t.shadow.cardHover;
+                e.currentTarget.style.transform = 'translateY(-4px)';
+            }}
+            onMouseLeave={e => { 
+                e.currentTarget.style.boxShadow = t.shadow.card;
+                e.currentTarget.style.transform = 'translateY(0)';
+            }}
         >
             {icon && (
                 <div

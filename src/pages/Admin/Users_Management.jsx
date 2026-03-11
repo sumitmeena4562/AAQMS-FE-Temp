@@ -293,7 +293,7 @@ export default function Users() {
             )}
 
             {/* Table */}
-            <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:8, overflow:'hidden' }}>
+            <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:12, overflow:'hidden', boxShadow: t.shadow.card, transition: `box-shadow ${t.transition.base}` }}>
                 {loading && users.length === 0 ? (
                     <TableSkeleton />
                 ) : (
