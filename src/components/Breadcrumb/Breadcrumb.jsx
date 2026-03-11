@@ -37,9 +37,9 @@ const Breadcrumb = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '12px 24px',
-                background: 'var(--color-bg-secondary)',
-                borderBottom: '1px solid var(--color-border)',
+                padding: '12px 0 12px 0', /* Removing x-padding to let parent layout manage alignment */
+                background: 'transparent',
+                borderBottom: 'none',
                 fontFamily: 'var(--font-family)',
                 fontSize: '13.5px',
                 flexWrap: 'wrap',
