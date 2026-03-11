@@ -1,24 +1,25 @@
 import React from 'react';
+import { t } from '../../theme/theme';
 
 const Badge = ({ children, color = 'primary', variant = 'solid', size = 'md' }) => {
 
     // Theme mapping for colors
     const colors = {
-        primary: { bg: 'var(--color-primary)', text: '#fff', lightBg: 'var(--color-primary-50)', lightText: 'var(--color-primary)' },
-        success: { bg: 'var(--color-success)', text: '#fff', lightBg: 'var(--color-success-lighter)', lightText: 'var(--color-success)' },
-        danger: { bg: 'var(--color-danger)', text: '#fff', lightBg: 'var(--color-danger-lighter)', lightText: 'var(--color-danger)' },
-        warning: { bg: 'var(--color-warning)', text: '#1f2937', lightBg: 'var(--color-warning-lighter)', lightText: 'var(--color-warning-dark)' },
-        neutral: { bg: 'var(--color-bg-tertiary)', text: 'var(--color-text-secondary)', lightBg: 'var(--color-bg-secondary)', lightText: 'var(--color-text-muted)' },
+        primary: { bg: t.color.primary, text: t.color.textInverse, lightBg: t.color.primaryBg, lightText: t.color.primary },
+        success: { bg: t.color.success, text: t.color.textInverse, lightBg: t.color.successBg, lightText: t.color.successDark },
+        danger:  { bg: t.color.danger, text: t.color.textInverse, lightBg: t.color.dangerBg, lightText: t.color.dangerDark },
+        warning: { bg: t.color.warning, text: t.color.textInverse, lightBg: t.color.warningBg, lightText: t.color.warningDark },
+        neutral: { bg: t.color.bgMuted, text: t.color.textSecondary, lightBg: t.color.bgHover, lightText: t.color.textMuted },
     };
 
     const c = colors[color] || colors.primary;
 
     // Size mapping
     const sizes = {
-        sm: { padding: '2px 6px', fontSize: '9px', radius: 'var(--radius-sm)' },
-        md: { padding: '4px 8px', fontSize: '10px', radius: 'var(--radius-sm)' },
-        lg: { padding: '6px 12px', fontSize: 'var(--font-size-xs)', radius: 'var(--radius-md)' },
-        pill: { padding: '6px 16px', fontSize: 'var(--font-size-xs)', radius: 'var(--radius-full)' }
+        sm: { padding: '2px 6px', fontSize: t.fontSize.xxs, radius: t.radius.xs },
+        md: { padding: '4px 9px', fontSize: t.fontSize.xs, radius: t.radius.sm },
+        lg: { padding: '6px 12px', fontSize: t.fontSize.sm, radius: t.radius.md },
+        pill: { padding: '6px 16px', fontSize: t.fontSize.sm, radius: t.radius.pill }
     };
 
     const s = sizes[size] || sizes.md;
@@ -29,13 +30,14 @@ const Badge = ({ children, color = 'primary', variant = 'solid', size = 'md' }) 
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontWeight: 700,
+            fontWeight: t.fontWeight.bold,
             textTransform: 'uppercase',
             letterSpacing: '0.05em',
             padding: s.padding,
             fontSize: s.fontSize,
             borderRadius: s.radius,
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            fontFamily: 'inherit'
         };
 
         if (variant === 'light') {

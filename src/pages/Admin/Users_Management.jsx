@@ -23,7 +23,12 @@ function getAvatar(name) {
 
 // ─── Badge components ───────────────────────────────────────────────────────────
 const ROLE_BADGE = { coordinator:{bg: t.color.coordinatorBg, color: t.color.coordinatorText, border: t.color.coordinatorBorder}, 'field officer':{bg: t.color.fieldOfficerBg, color: t.color.fieldOfficerText, border: t.color.fieldOfficerBorder}, admin:{bg: t.color.adminBg, color: t.color.adminText, border: t.color.adminBorder} };
-const STATUS_BADGE = { active:{dot: t.color.success, bg: t.color.successBg, color: t.color.successDark, border: t.color.successBorder}, inactive:{dot: t.color.textPlaceholder, bg: t.color.bgHover, color: t.color.textTertiary, border: t.color.border}, assigned:{dot:'#60A5FA', bg: t.color.infoBg, color: t.color.infoDark, border: t.color.infoBorder}, unassigned:{dot:'#FCA5A5', bg: t.color.dangerBg, color: t.color.dangerDark, border: t.color.dangerBorder} };
+const STATUS_BADGE = { 
+    active:     { dot: t.color.success, bg: t.color.successBg, color: t.color.successDark, border: t.color.successBorder }, 
+    inactive:   { dot: t.color.textPlaceholder, bg: t.color.bgMuted, color: t.color.textTertiary, border: t.color.border }, 
+    assigned:   { dot: t.color.info, bg: t.color.infoBg, color: t.color.infoDark, border: t.color.infoBorder }, 
+    unassigned: { dot: t.color.danger, bg: t.color.dangerBg, color: t.color.dangerDark, border: t.color.dangerBorder } 
+};
 
 const RoleBadge = ({role}) => { const s=ROLE_BADGE[role?.toLowerCase()]||{bg: t.color.bgMuted, color: t.color.textSecondary, border: t.color.border}; return <span style={{display:'inline-block',padding:'2px 9px',fontSize: t.fontSize.xs, fontWeight: t.fontWeight.semibold, background:s.bg, color:s.color, border:`1px solid ${s.border}`, borderRadius: t.radius.pill}}>{role}</span>; };
 const StatusBadge = ({type,text}) => { const s=STATUS_BADGE[type?.toLowerCase()]||STATUS_BADGE.inactive; return <span style={{display:'inline-flex',alignItems:'center',gap:5,padding:'2px 8px',fontSize: t.fontSize.xs, fontWeight: t.fontWeight.semibold, background:s.bg, color:s.color, border:`1px solid ${s.border}`, borderRadius: t.radius.pill}}><span style={{width:6,height:6,borderRadius: t.radius.circle, background:s.dot,flexShrink:0}}/>{text}</span>; };
@@ -41,30 +46,39 @@ function FilterDropdown({ label, value, options, onChange, allLabel = 'All' }) {
     const displayLabel = isActive ? `${label}: ${value}` : label;
     return (
         <div ref={ref} style={{ position:'relative' }}>
-            <button onClick={() => setOpen(!open)} style={{ display:'flex', alignItems:'center', gap:5, padding:'6px 10px', fontSize:12, fontWeight:500, color: isActive?'#4F46E5':'#374151', background: isActive?'#EEF2FF':'#fff', border:`1px solid ${isActive?'#C7D2FE':'#E5E7EB'}`, borderRadius:7, cursor:'pointer', whiteSpace:'nowrap' }}>
+            <button 
+                onClick={() => setOpen(!open)} 
+                style={{ 
+                    display:'flex', alignItems:'center', gap:5, padding:'6px 10px', fontSize:12, fontWeight:500, 
+                    color: isActive ? t.color.primary : t.color.textSecondary, 
+                    background: isActive ? t.color.primaryBg : t.color.bg, 
+                    border: `1px solid ${isActive ? t.color.primaryBorder : t.color.border}`, 
+                    borderRadius: 7, cursor:'pointer', whiteSpace:'nowrap' 
+                }}
+            >
                 {displayLabel}
                 <FiChevronDown size={12} style={{ transform: open?'rotate(180deg)':'rotate(0)', transition:'transform 0.15s' }} />
-                {isActive && <span onClick={(e) => { e.stopPropagation(); onChange(''); setOpen(false); }} style={{ display:'flex', alignItems:'center', marginLeft:2, color:'#818CF8', cursor:'pointer' }}><FiX size={11} /></span>}
+                {isActive && <span onClick={(e) => { e.stopPropagation(); onChange(''); setOpen(false); }} style={{ display:'flex', alignItems:'center', marginLeft:2, color: t.color.primary, cursor:'pointer' }}><FiX size={11} /></span>}
             </button>
             {open && (
-                <div style={{ position:'absolute', top:'calc(100% + 4px)', left:0, minWidth:180, background:'#fff', border:'1px solid #E5E7EB', borderRadius:8, boxShadow:'0 8px 24px rgba(0,0,0,0.1)', zIndex:50, padding:'4px 0', maxHeight:220, overflowY:'auto' }}>
-                    <div onClick={() => { onChange(''); setOpen(false); }} style={{ padding:'7px 12px', fontSize:12, fontWeight: !isActive?600:400, color: !isActive?'#4F46E5':'#374151', background: !isActive?'#EEF2FF':'transparent', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between' }}
-                        onMouseEnter={e => { if(isActive) e.currentTarget.style.background='#F9FAFB'; }}
+                <div style={{ position:'absolute', top:'calc(100% + 4px)', left:0, minWidth:180, background: t.color.bg, border: `1px solid ${t.color.border}`, borderRadius: 8, boxShadow: t.shadow.lg, zIndex: 50, padding: '4px 0', maxHeight: 220, overflowY: 'auto' }}>
+                    <div onClick={() => { onChange(''); setOpen(false); }} style={{ padding:'7px 12px', fontSize:12, fontWeight: !isActive?600:400, color: !isActive? t.color.primary : t.color.textSecondary, background: !isActive? t.color.primaryBg : 'transparent', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between' }}
+                        onMouseEnter={e => { if(isActive) e.currentTarget.style.background = t.color.bgHover; }}
                         onMouseLeave={e => { if(isActive) e.currentTarget.style.background='transparent'; }}
                     >
                         {allLabel}
-                        {!isActive && <span style={{fontSize:10,color:'#4F46E5'}}>✓</span>}
+                        {!isActive && <span style={{fontSize:10,color: t.color.primary}}>✓</span>}
                     </div>
-                    <div style={{ height:1, background:'#F3F4F6', margin:'2px 0' }} />
+                    <div style={{ height:1, background: t.color.borderLight, margin:'2px 0' }} />
                     {options.map(opt => {
                         const sel = value === opt;
                         return (
-                            <div key={opt} onClick={() => { onChange(opt); setOpen(false); }} style={{ padding:'7px 12px', fontSize:12, fontWeight: sel?600:400, color: sel?'#4F46E5':'#374151', background: sel?'#EEF2FF':'transparent', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between' }}
-                                onMouseEnter={e => { if(!sel) e.currentTarget.style.background='#F9FAFB'; }}
+                            <div key={opt} onClick={() => { onChange(opt); setOpen(false); }} style={{ padding:'7px 12px', fontSize:12, fontWeight: sel?600:400, color: sel? t.color.primary : t.color.textSecondary, background: sel? t.color.primaryBg : 'transparent', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between' }}
+                                onMouseEnter={e => { if(!sel) e.currentTarget.style.background = t.color.bgHover; }}
                                 onMouseLeave={e => { if(!sel) e.currentTarget.style.background='transparent'; }}
                             >
                                 {opt}
-                                {sel && <span style={{fontSize:10,color:'#4F46E5'}}>✓</span>}
+                                {sel && <span style={{fontSize:10,color: t.color.primary}}>✓</span>}
                             </div>
                         );
                     })}
@@ -221,14 +235,14 @@ export default function Users() {
             {/* Header */}
             <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:20 }}>
                 <div>
-                    <h1 style={{ fontSize:20, fontWeight:700, color:'#111827', margin:'0 0 3px 0', letterSpacing:'-0.3px' }}>User Management</h1>
-                    <p style={{ fontSize:12, color:'#9CA3AF', margin:0 }}>Manage platform users, roles &amp; permissions</p>
+                    <h1 style={{ fontSize:20, fontWeight:700, color: t.color.text, margin:'0 0 3px 0', letterSpacing:'-0.3px' }}>User Management</h1>
+                    <p style={{ fontSize:12, color: t.color.textPlaceholder, margin:0 }}>Manage platform users, roles &amp; permissions</p>
                 </div>
                 <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-                    <button onClick={exportCSV} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 13px', fontSize:12, fontWeight:500, color:'#374151', background:'#fff', border:'1px solid #E5E7EB', borderRadius:7, cursor:'pointer' }}>
+                    <button onClick={exportCSV} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 13px', fontSize:12, fontWeight:500, color: t.color.textSecondary, background: t.color.bg, border: `1px solid ${t.color.border}`, borderRadius:7, cursor:'pointer' }}>
                         <FiDownload size={13} /> Export
                     </button>
-                    <button onClick={handleAddUser} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 15px', fontSize:12, fontWeight:600, color:'#fff', background:'#4F46E5', border:'1px solid #4338CA', borderRadius:7, cursor:'pointer' }}>
+                    <button onClick={handleAddUser} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 15px', fontSize:12, fontWeight:600, color: t.color.textInverse, background: t.color.primary, border: `1px solid ${t.color.primaryDark}`, borderRadius:7, cursor:'pointer' }}>
                         <FiPlus size={13} /> Add User
                     </button>
                 </div>
