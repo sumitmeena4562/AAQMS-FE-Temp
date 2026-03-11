@@ -126,6 +126,7 @@ const Navbar = ({
                         {navLinks.map((link) => (
                             <a
                                 key={link.label}
+                                className="nav-link"
                                 href={link.href || '#'}
                                 onClick={(e) => {
                                     if (link.onClick) {
@@ -139,7 +140,8 @@ const Navbar = ({
                                     color: t.color.textSecondary,
                                     textDecoration: 'none',
                                     cursor: 'pointer',
-                                    transition: 'color 0.2s ease'
+                                    transition: 'color 0.2s ease',
+                                    position: 'relative'
                                 }}
                                 onMouseEnter={(e) => e.target.style.color = t.color.primary}
                                 onMouseLeave={(e) => e.target.style.color = t.color.textSecondary}
@@ -312,6 +314,20 @@ const Navbar = ({
 
             <style dangerouslySetInnerHTML={{
                 __html: `
+                .nav-link::after {
+                    content: '';
+                    position: absolute;
+                    width: 0;
+                    height: 2px;
+                    bottom: -4px;
+                    left: 50%;
+                    background-color: ${t.color.primary};
+                    transition: all 0.3s ease;
+                    transform: translateX(-50%);
+                }
+                .nav-link:hover::after {
+                    width: 100%;
+                }
                 @media (max-width: 991px) {
                     .desktop-nav, .desktop-actions {
                         display: none !important;
