@@ -1,10 +1,8 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiX } from 'react-icons/fi';
 import { t } from '../../theme/theme';
 
-/**
- * Global reusable confirmation modal.
- */
 const ConfirmModal = ({
     isOpen,
     onClose,
@@ -16,86 +14,103 @@ const ConfirmModal = ({
     danger = false,
     loading = false,
 }) => {
-    if (!isOpen) return null;
-
     return (
-        <>
-            {/* Backdrop */}
-            <div
-                onClick={onClose}
-                style={{
-                    position: 'fixed', inset: 0,
-                    background: t.color.overlayDark,
-                    backdropFilter: 'blur(2px)',
-                    zIndex: t.zIndex.overlay,
-                }}
-            />
-
-            {/* Dialog */}
-            <div style={{
-                position: 'fixed',
-                top: '50%', left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: t.layout.modalWidth, maxWidth: '90vw',
-                background: t.color.bg,
-                borderRadius: t.radius['2xl'],
-                boxShadow: t.shadow.xl,
-                zIndex: t.zIndex.modal,
-                overflow: 'hidden',
-            }}>
-                {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space.xl}px ${t.space['2xl']}px`, borderBottom: `1px solid ${t.color.borderLight}` }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        {danger && (
-                            <div style={{ width: 32, height: 32, borderRadius: t.radius.circle, background: t.color.dangerBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <FiAlertTriangle size={16} color={t.color.danger} />
-                            </div>
-                        )}
-                        <span style={{ fontSize: t.fontSize.lg, fontWeight: t.fontWeight.semibold, color: t.color.text }}>{title}</span>
-                    </div>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.color.textPlaceholder, display: 'flex', padding: 4 }}>
-                        <FiX size={16} />
-                    </button>
-                </div>
-
-                {/* Body */}
-                <div style={{ padding: `${t.space['2xl']}px ${t.space['2xl']}px ${t.space['3xl']}px`, fontSize: t.fontSize.md, color: t.color.textMuted, lineHeight: 1.6 }}>
-                    {message}
-                </div>
-
-                {/* Footer */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space.md, padding: `0 ${t.space['2xl']}px ${t.space.xl}px` }}>
-                    <button
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         onClick={onClose}
-                        disabled={loading}
                         style={{
-                            padding: `${t.space.md}px ${t.space.xl}px`, fontSize: t.fontSize.md, fontWeight: t.fontWeight.medium,
-                            color: t.color.textSecondary, background: t.color.bg,
-                            border: `1px solid ${t.color.border}`, borderRadius: t.radius.md,
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            opacity: loading ? 0.5 : 1,
+                            position: 'fixed', inset: 0,
+                            background: 'rgba(0,0,0,0.1)',
+                            backdropFilter: 'blur(4px)',
+                            zIndex: t.zIndex.overlay,
+                        }}
+                    />
+
+                    {/* Dialog */}
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        style={{
+                            position: 'fixed',
+                            top: '50%', left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: 400, maxWidth: '90vw',
+                            background: '#fff',
+                            borderRadius: 24,
+                            boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
+                            zIndex: t.zIndex.modal,
+                            overflow: 'hidden',
+                            marginLeft: -200, // Center fix for transform translate
+                            marginTop: -100 // Approximation
                         }}
                     >
-                        {cancelText}
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        disabled={loading}
-                        style={{
-                            padding: `${t.space.md}px ${t.space.xl}px`, fontSize: t.fontSize.md, fontWeight: t.fontWeight.semibold,
-                            color: t.color.textInverse,
-                            background: danger ? t.color.danger : t.color.primary,
-                            border: `1px solid ${danger ? '#DC2626' : t.color.primaryDark}`,
-                            borderRadius: t.radius.md,
-                            cursor: loading ? 'not-allowed' : 'pointer',
-                            opacity: loading ? 0.7 : 1,
-                        }}
-                    >
-                        {loading ? 'Processing...' : confirmText}
-                    </button>
-                </div>
-            </div>
-        </>
+                        {/* Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px', borderBottom: '1px solid #F1F5F9' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <div style={{ 
+                                    width: 32, height: 32, borderRadius: 10, 
+                                    background: danger ? '#FEF2F2' : t.color.primaryBg, 
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center' 
+                                }}>
+                                    <FiAlertTriangle size={16} color={danger ? t.color.danger : t.color.primary} />
+                                </div>
+                                <span style={{ fontSize: 14, fontWeight: 900, color: t.color.text }}>{title}</span>
+                            </div>
+                            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.color.textPlaceholder, display: 'flex', padding: 4 }}>
+                                <FiX size={18} />
+                            </button>
+                        </div>
+
+                        {/* Body */}
+                        <div style={{ padding: '32px', fontSize: 14, color: t.color.textSecondary, lineHeight: 1.6, fontWeight: 500 }}>
+                            {message}
+                        </div>
+
+                        {/* Footer */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, padding: '0 32px 24px' }}>
+                            <motion.button
+                                whileHover={{ background: '#f8fafc' }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={onClose}
+                                disabled={loading}
+                                style={{
+                                    padding: '10px 20px', fontSize: 12, fontWeight: 800,
+                                    color: t.color.textSecondary, background: '#fff',
+                                    border: '1px solid #E2E8F0', borderRadius: 10,
+                                    cursor: loading ? 'not-allowed' : 'pointer',
+                                }}
+                            >
+                                {cancelText}
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.02, background: danger ? t.color.dangerDark : t.color.primaryDark }}
+                                whileTap={{ scale: 0.98 }}
+                                onClick={onConfirm}
+                                disabled={loading}
+                                style={{
+                                    padding: '10px 24px', fontSize: 12, fontWeight: 900,
+                                    color: '#fff',
+                                    background: danger ? t.color.danger : t.color.primary,
+                                    border: 'none',
+                                    borderRadius: 10,
+                                    cursor: loading ? 'not-allowed' : 'pointer',
+                                    boxShadow: `0 6px 12px ${danger ? '#EF4444' : t.color.primary}20`
+                                }}
+                            >
+                                {loading ? 'PROCESSING...' : confirmText}
+                            </motion.button>
+                        </div>
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>
     );
 };
 

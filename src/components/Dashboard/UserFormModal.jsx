@@ -116,77 +116,84 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     };
 
     const fieldStyle = (hasError) => ({
-        width: '100%', padding: '12px 16px', fontSize: 14,
-        border: `1.5px solid ${hasError ? '#FCA5A5' : t.color.border}`,
+        width: '100%', padding: '12px 16px', fontSize: 13,
+        border: `1.5px solid ${hasError ? '#FCA5A5' : t.color.borderLight}`,
         borderRadius: 12, outline: 'none', color: t.color.text,
-        background: hasError ? t.color.dangerBg : '#FAFAFA',
-        transition: 'all 0.25s ease',
-        boxSizing: 'border-box'
+        background: hasError ? t.color.dangerBg : '#FFFFFF',
+        transition: 'all 0.2s ease',
+        boxSizing: 'border-box',
+        fontWeight: 600
     });
 
     const focusStyle = (e) => {
         e.target.style.borderColor = t.color.primary;
-        e.target.style.background = '#FFFFFF';
-        e.target.style.boxShadow = `0 0 0 4px ${t.color.primary}15`;
+        e.target.style.boxShadow = `0 0 0 3px ${t.color.primary}10`;
     };
 
     const blurStyle = (e, hasError) => {
-        e.target.style.borderColor = hasError ? '#FCA5A5' : t.color.border;
-        e.target.style.background = hasError ? t.color.dangerBg : '#FAFAFA';
+        e.target.style.borderColor = hasError ? '#FCA5A5' : t.color.borderLight;
         e.target.style.boxShadow = 'none';
     };
 
     const labelStyle = { 
-        fontSize: 11, fontWeight: 800, color: t.color.textMuted, 
+        fontSize: 10, fontWeight: 900, color: t.color.textPlaceholder, 
         marginBottom: 8, display: 'block', textTransform: 'uppercase', 
-        letterSpacing: '0.05em' 
+        letterSpacing: '0.08em' 
     };
 
     const sectionTitleStyle = {
         fontSize: 14, fontWeight: 800, color: t.color.primary,
-        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20,
-        paddingBottom: 8, borderBottom: `1px solid ${t.color.primary}10`
+        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24,
+        paddingBottom: 0
     };
 
     if (!isOpen) return null;
 
     return (
-        <>
-            <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(4px)', zIndex: 1000 }} />
-            
-            <AnimatePresence>
-                {isOpen && (
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    <Motion.div
+                        initial={{ opacity:0 }}
+                        animate={{ opacity:1 }}
+                        exit={{ opacity:0 }}
+                        onClick={onClose}
+                        style={{ position:'fixed', inset:0, background: 'rgba(0,0,0,0.1)', backdropFilter:'blur(4px)', zIndex: t.zIndex.overlay }}
+                    />
+                    
                     <Motion.div 
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                        transition={{ type: 'spring', damping: 30, stiffness: 250 }}
                         style={{
-                            position: 'fixed', right: 0, top: 0, height: '100vh', width: 440, maxWidth: '95vw',
-                            background: '#fff', boxShadow: '-10px 0 40px rgba(0,0,0,0.1)',
-                            zIndex: 1001, display: 'flex', flexDirection: 'column'
+                            position: 'fixed', right: 0, top: 0, height: '100%', width: 500, maxWidth: '95vw',
+                            background: '#fff', boxShadow: '-12px 0 50px rgba(0,0,0,0.06)',
+                            zIndex: t.zIndex.modal, display: 'flex', flexDirection: 'column'
                         }}
                     >
                         {/* Header */}
-                        <div style={{ padding: '28px 32px', borderBottom: `1px solid ${t.color.borderLight}`, background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(10px)', position: 'relative', overflow: 'hidden' }}>
-                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 4, background: `linear-gradient(90deg, ${t.color.primary}, ${t.color.primaryLight})` }} />
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div>
-                                    <h2 style={{ fontSize: 22, fontWeight: 900, color: t.color.text, margin: 0 }}>
-                                        {isEdit ? 'Update Member' : 'Onboard New User'}
-                                    </h2>
-                                    <p style={{ fontSize: 13, color: t.color.textSecondary, margin: '6px 0 0', opacity: 0.7, fontWeight: 500 }}>
-                                        {step === 0 ? 'Define access level' : `Configuring ${form.role}`}
-                                    </p>
-                                </div>
-                                <Motion.button 
-                                    whileHover={{ rotate: 90, background: '#f8fafc' }}
-                                    onClick={onClose} 
-                                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.color.textPlaceholder, padding: 10, borderRadius: '50%' }}
-                                >
-                                    <FiX size={20} />
-                                </Motion.button>
+                        <div style={{ 
+                            padding: '24px 32px', borderBottom: '1px solid #F1F5F9',
+                            display:'flex', alignItems:'center', justifyContent:'space-between',
+                            background: '#fff'
+                        }}>
+                            <div>
+                                <h2 style={{ fontSize: 14, fontWeight: 900, color: t.color.text, margin: 0, letterSpacing: '-0.01em' }}>
+                                    {isEdit ? 'Update Member' : 'Onboard New User'}
+                                </h2>
+                                <p style={{ fontSize: 12, color: t.color.textPlaceholder, margin: '2px 0 0', fontWeight: 600 }}>
+                                    {step === 0 ? 'Define access level' : `Configuring ${form.role}`}
+                                </p>
                             </div>
+                            <Motion.button 
+                                whileHover={{ scale: 1.1, background: '#F8FAFC' }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={onClose} 
+                                style={{ background: '#fff', border: '1px solid #E2E8F0', cursor: 'pointer', color: t.color.textPlaceholder, padding: 8, borderRadius: 12, display: 'flex' }}
+                            >
+                                <FiX size={18} />
+                            </Motion.button>
                         </div>
 
                         {/* Content */}
@@ -198,29 +205,21 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             <Motion.div
                                                 key={role.id}
                                                 onClick={() => handleRoleSelect(role.id)}
-                                                whileHover={{ scale: 1.02, x: 4 }}
+                                                whileHover={{ y: -4, borderColor: role.color, background: `${role.color}05` }}
                                                 whileTap={{ scale: 0.98 }}
                                                 style={{
-                                                    padding: '24px', borderRadius: 20, border: '1.5px solid #f1f5f9',
+                                                    padding: '28px', borderRadius: 24, border: '1.5px solid #f1f5f9',
                                                     background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 24,
-                                                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
+                                                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)',
                                                     transition: 'all 0.3s ease'
                                                 }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.borderColor = role.color;
-                                                    e.currentTarget.style.boxShadow = `0 10px 25px -5px ${role.color}15`;
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.borderColor = '#f1f5f9';
-                                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0,0,0,0.05)';
-                                                }}
                                             >
-                                                <div style={{ width: 56, height: 56, borderRadius: 18, background: `${role.color}15`, color: role.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <div style={{ width: 52, height: 52, borderRadius: 16, background: `${role.color}15`, color: role.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                     {role.icon}
                                                 </div>
                                                 <div style={{ flex: 1 }}>
-                                                    <div style={{ fontSize: 17, fontWeight: 800 }}>{role.name}</div>
-                                                    <div style={{ fontSize: 13, color: t.color.textSecondary, marginTop: 4 }}>{role.desc}</div>
+                                                    <div style={{ fontSize: 16, fontWeight: 800, color: t.color.text }}>{role.name}</div>
+                                                    <div style={{ fontSize: 13, color: t.color.textSecondary, marginTop: 4, fontWeight: 500 }}>{role.desc}</div>
                                                 </div>
                                                 <FiChevronRight size={18} color={t.color.textPlaceholder} />
                                             </Motion.div>
@@ -229,14 +228,14 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                 ) : (
                                     <Motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                                         {submitError && (
-                                            <div style={{ padding: '12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12, color: '#DC2626', fontSize: 13, marginBottom: 20, fontWeight: 600 }}>
+                                            <div style={{ padding: '12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12, color: '#DC2626', fontSize: 13, marginBottom: 24, fontWeight: 600 }}>
                                                 {submitError}
                                             </div>
                                         )}
 
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
                                             <div>
-                                                <div style={sectionTitleStyle}><FiUser size={16} /> Primary Details</div>
+                                                <div style={sectionTitleStyle}><FiUser size={16} /> Identity Parameters</div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                                                     <div>
                                                         <label style={labelStyle}>Full Name</label>
@@ -250,10 +249,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
 
                                             <div>
-                                                <div style={sectionTitleStyle}><FiShield size={16} /> Role Specific</div>
+                                                <div style={sectionTitleStyle}><FiShield size={16} /> Operational Profile</div>
                                                 {form.role === 'Coordinator' && (
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                                                             <div>
                                                                 <label style={labelStyle}>Employee ID</label>
                                                                 <input style={fieldStyle(errors.employeeId)} placeholder="EMP-9901" value={form.employeeId} onChange={e => handleChange('employeeId', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
@@ -269,30 +268,30 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                         <div>
                                                             <label style={labelStyle}>Organization</label>
                                                             <select style={fieldStyle(false)} value={form.organization} onChange={e => handleChange('organization', e.target.value)} onFocus={focusStyle} onBlur={blurStyle}>
-                                                                <option value="">Choose Org</option>
+                                                                <option value="">Choose Unit</option>
                                                                 {ORGANIZATIONS.map(o => <option key={o} value={o}>{o}</option>)}
                                                             </select>
                                                         </div>
                                                         <div>
-                                                            <label style={labelStyle}>Region</label>
+                                                            <label style={labelStyle}>Assignment Sector</label>
                                                             <input style={fieldStyle(errors.region)} placeholder="North Zone" value={form.region} onChange={e => handleChange('region', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
                                                         </div>
                                                     </div>
                                                 )}
                                                 {form.role === 'Field Officer' && (
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                                                             <div>
                                                                 <label style={labelStyle}>Employee ID</label>
                                                                 <input style={fieldStyle(errors.employeeId)} placeholder="FO-7721" value={form.employeeId} onChange={e => handleChange('employeeId', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
                                                             </div>
                                                             <div>
-                                                                <label style={labelStyle}>Personal Mobile</label>
+                                                                <label style={labelStyle}>Communication Node</label>
                                                                 <input style={fieldStyle(errors.phoneNumber)} placeholder="+91..." value={form.phoneNumber} onChange={e => handleChange('phoneNumber', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
                                                             </div>
                                                         </div>
                                                         <div>
-                                                            <label style={labelStyle}>Equipment ID</label>
+                                                            <label style={labelStyle}>Infrastructure ID</label>
                                                             <input style={fieldStyle(errors.equipmentId)} placeholder="DRONE-882" value={form.equipmentId} onChange={e => handleChange('equipmentId', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
                                                         </div>
                                                     </div>
@@ -300,10 +299,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
 
                                             <div>
-                                                <div style={sectionTitleStyle}><FiActivity size={16} /> Account Status</div>
+                                                <div style={sectionTitleStyle}><FiActivity size={16} /> Registry Status</div>
                                                 <div style={{ display: 'flex', gap: 12 }}>
                                                     {STATUS_OPTIONS.map(s => (
-                                                        <Motion.button key={s} onClick={() => handleChange('status', s)} style={{ flex: 1, padding: '14px', borderRadius: 14, fontSize: 13, fontWeight: 800, border: `2.5px solid ${form.status === s ? (s === 'active' ? '#10B981' : '#EF4444') : '#f1f5f9'}`, background: form.status === s ? (s === 'active' ? '#ECFDF5' : '#FEF2F2') : '#fff', color: form.status === s ? (s === 'active' ? '#065F46' : '#991B1B') : t.color.textPlaceholder, cursor: 'pointer', textTransform: 'uppercase' }}>{s}</Motion.button>
+                                                        <Motion.button key={s} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => handleChange('status', s)} style={{ flex: 1, padding: '12px', borderRadius: 12, fontSize: 12, fontWeight: 900, border: `2px solid ${form.status === s ? (s === 'active' ? '#10B981' : '#EF4444') : '#f1f5f9'}`, background: form.status === s ? (s === 'active' ? '#ECFDF5' : '#FFF1F2') : '#fff', color: form.status === s ? (s === 'active' ? '#059669' : '#E11D48') : t.color.textPlaceholder, cursor: 'pointer', textTransform: 'uppercase', letterSpacing:'0.05em' }}>{s}</Motion.button>
                                                     ))}
                                                 </div>
                                             </div>
@@ -314,26 +313,26 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                         </div>
 
                         {/* Footer */}
-                        <div style={{ padding: '24px 32px', borderTop: `1px solid ${t.color.borderLight}`, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(10px)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ padding: '24px 32px', borderTop: '1px solid #F1F5F9', background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             {step === 1 && !isEdit ? (
-                                <Motion.button onClick={() => setStep(0)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 800, color: t.color.textPlaceholder }}>
-                                    <FiChevronLeft size={18} /> BACK
+                                <Motion.button onClick={() => setStep(0)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 800, color: t.color.textPlaceholder }}>
+                                    <FiChevronLeft size={16} /> BACK
                                 </Motion.button>
                             ) : <div />}
                             
-                            <div style={{ display: 'flex', gap: 12 }}>
-                                <Motion.button onClick={onClose} style={{ padding: '10px 24px', borderRadius: 12, border: 'none', background: '#f1f5f9', color: t.color.textSecondary, fontWeight: 800, cursor: 'pointer', fontSize: 13, transition: 'all 0.2s ease' }}>CANCEL</Motion.button>
+                            <div style={{ display: 'flex', gap: 10 }}>
+                                <Motion.button onClick={onClose} style={{ padding: '10px 20px', borderRadius: 10, border: '1px solid #E2E8F0', background: '#fff', color: t.color.textSecondary, fontWeight: 800, cursor: 'pointer', fontSize: 12 }}>CANCEL</Motion.button>
                                 {step === 1 && (
-                                    <Motion.button whileHover={{ scale: 1.02, background: t.color.primaryDark }} whileTap={{ scale: 0.98 }} onClick={handleSubmit} disabled={loading} style={{ padding: '10px 28px', borderRadius: 12, border: 'none', background: t.color.primary, color: '#fff', fontWeight: 900, cursor: 'pointer', fontSize: 13, transition: 'all 0.2s ease' }}>
-                                        {loading ? 'SAVING...' : (isEdit ? 'UPDATE' : 'FINISH')}
+                                    <Motion.button whileHover={{ scale: 1.02, background: t.color.primaryDark }} whileTap={{ scale: 0.98 }} onClick={handleSubmit} disabled={loading} style={{ padding: '10px 24px', borderRadius: 10, border: 'none', background: t.color.primary, color: '#fff', fontWeight: 900, cursor: 'pointer', fontSize: 12, boxShadow: `0 6px 12px ${t.color.primary}15` }}>
+                                        {loading ? 'PROCESSING...' : (isEdit ? 'UPDATE' : 'COMPLETE')}
                                     </Motion.button>
                                 )}
                             </div>
                         </div>
                     </Motion.div>
-                )}
-            </AnimatePresence>
-        </>
+                </>
+            )}
+        </AnimatePresence>
     );
 };
 
