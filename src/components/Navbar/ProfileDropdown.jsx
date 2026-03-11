@@ -32,7 +32,7 @@ const ProfileDropdown = () => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    width:32, height:32, borderRadius: t.radius.lg,
+                    width:32, height:32, borderRadius: t.radius.circle,
                     background: `linear-gradient(135deg, ${t.color.primary}, #7C3AED)`,
                     border:'none', cursor:'pointer',
                     display:'flex', alignItems:'center', justifyContent:'center',
@@ -58,7 +58,7 @@ const ProfileDropdown = () => {
                     {/* User Info */}
                     <div style={{ padding: `${t.space.lg}px 14px`, display:'flex', alignItems:'center', gap:10, borderBottom: `1px solid ${t.color.borderLight}` }}>
                         <div style={{
-                            width:34, height:34, borderRadius: t.radius.lg,
+                            width:34, height:34, borderRadius: t.radius.circle,
                             background: `linear-gradient(135deg, ${t.color.primary}, #7C3AED)`,
                             display:'flex', alignItems:'center', justifyContent:'center',
                             color: t.color.textInverse, fontSize: t.fontSize.md, fontWeight: t.fontWeight.bold, flexShrink:0,
