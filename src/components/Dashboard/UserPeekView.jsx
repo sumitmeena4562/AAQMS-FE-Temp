@@ -128,20 +128,54 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                                 />
                                 <InfoRow icon={<FiClock size={16}/>} label="Last Active" value={user.lastActive || '15 mins ago'} />
                                 <InfoRow icon={<FiCalendar size={16}/>} label="Created" value={user.createdAt || '2024-03-20'} />
+
+                                {/* Activity Trend Visual */}
+                                <div style={{ marginTop: 32, padding: '20px', background: '#F8FAFC', borderRadius: 16, border: '1px solid #E2E8F0' }}>
+                                    <div style={{ display:'flex', alignItems:'center', gap: 8, marginBottom: 16 }}>
+                                        <FiActivity size={14} color={t.color.primary} />
+                                        <span style={{ fontSize: 11, fontWeight: 900, color: t.color.textMuted, textTransform:'uppercase', letterSpacing:'0.1em' }}>Weekly Activity Trend</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 60, padding: '0 4px' }}>
+                                        {[40, 65, 30, 85, 50, 95, 70].map((h, i) => (
+                                            <motion.div 
+                                                key={i}
+                                                initial={{ height: 0 }}
+                                                animate={{ height: `${h}%` }}
+                                                transition={{ delay: 0.2 + i * 0.1 }}
+                                                style={{ 
+                                                    flex: 1, 
+                                                    background: i === 5 ? t.color.primary : t.color.primaryBg, 
+                                                    borderRadius: '4px 4px 2px 2px',
+                                                }}
+                                                title={`Day ${i+1}: ${h}%`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10 }}>
+                                        {['M','T','W','T','F','S','S'].map((d, i) => (
+                                            <span key={i} style={{ fontSize: 9, fontWeight: 800, color: t.color.textPlaceholder }}>{d}</span>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Activity Feed */}
                             <div style={{ marginTop: 40 }}>
                                 <div style={{ display:'flex', alignItems:'center', gap: 8, marginBottom: 20 }}>
                                     <FiActivity size={14} color={t.color.primary} />
-                                    <span style={{ fontSize: 11, fontWeight: 900, color: t.color.textMuted, textTransform:'uppercase', letterSpacing:'0.1em' }}>Recent Activity</span>
+                                    <span style={{ fontSize: 11, fontWeight: 900, color: t.color.textMuted, textTransform:'uppercase', letterSpacing:'0.1em' }}>Activity & Security Logs</span>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingLeft: 8, borderLeft: `2px solid #f1f5f9` }}>
-                                    {[1, 2].map(i => (
+                                    {[
+                                        { title: 'Logged in from Mumbai, India', meta: '2 hours ago • Chrome on Windows (IP: 103.21.XX.XX)', iconColor: t.color.primary },
+                                        { title: 'Accessed Asset Management Module', meta: '3 hours ago • Desktop App', iconColor: t.color.primary },
+                                        { title: 'Password updated successfully', meta: 'Yesterday • Security Update', iconColor: '#059669' },
+                                        { title: 'Failed login attempt detected', meta: '2 days ago • From London, UK (Suspicious)', iconColor: '#DC2626' },
+                                    ].map((item, i) => (
                                         <div key={i} style={{ position: 'relative' }}>
-                                            <div style={{ position: 'absolute', left: -14, top: 4, width: 10, height: 10, borderRadius: '50%', background: i === 1 ? t.color.primary : '#CBD5E1', border: '2px solid #fff' }} />
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: t.color.text, lineHeight: 1.4 }}>{i === 1 ? 'Logged in from Mumbai, India' : 'Updated account password'}</div>
-                                            <div style={{ fontSize: 11, color: t.color.textPlaceholder, marginTop: 4 }}>{i === 1 ? '2 hours ago • Chrome/Windows' : 'Yesterday • Safari/macOS'}</div>
+                                            <div style={{ position: 'absolute', left: -14, top: 4, width: 10, height: 10, borderRadius: '50%', background: item.iconColor, border: '2px solid #fff', boxShadow: '0 0 0 2px #f1f5f9' }} />
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: t.color.text, lineHeight: 1.4 }}>{item.title}</div>
+                                            <div style={{ fontSize: 11, color: t.color.textPlaceholder, marginTop: 4 }}>{item.meta}</div>
                                         </div>
                                     ))}
                                 </div>

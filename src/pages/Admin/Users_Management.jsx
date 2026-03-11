@@ -9,7 +9,7 @@ import {
     FiPlus, FiSearch, FiDownload, FiTrash2,
     FiUserCheck, FiUserX, FiUsers, FiAlertCircle,
     FiCheckCircle, FiClock, FiX, FiChevronDown,
-    FiRefreshCw
+    FiRefreshCw, FiCalendar
 } from 'react-icons/fi';
 
 // ─── Avatar helper ──────────────────────────────────────────────────────────────
@@ -213,9 +213,9 @@ export default function Users() {
 
     // ── Stats Data ──
     const statsData = [
-        { label:'Total Users', value:stats.total,      icon:<FiUsers size={16}/>,       iconBg:'#EFF6FF', iconColor:'#2563EB' },
-        { label:'Active',      value:stats.active,     icon:<FiCheckCircle size={16}/>,  iconBg:'#ECFDF5', iconColor:'#059669' },
-        { label:'Inactive',    value:stats.inactive,   icon:<FiAlertCircle size={16}/>,  iconBg:'#FEF2F2', iconColor:'#DC2626' },
+        { label:'Total Users', value:stats.total,      icon:<FiUsers size={16}/>,       iconBg:'#EFF6FF', iconColor:'#2563EB', subValue: `${stats.active} Active / ${stats.inactive} Inactive` },
+        { label:'Active Users', value:stats.active,     icon:<FiCheckCircle size={16}/>,  iconBg:'#ECFDF5', iconColor:'#059669', trend: 12 },
+        { label:'Inactive',    value:stats.inactive,   icon:<FiAlertCircle size={16}/>,  iconBg:'#FEF2F2', iconColor:'#DC2626', trend: -5 },
         { label:'Unassigned',  value:stats.unassigned,  icon:<FiClock size={16}/>,        iconBg:'#FFFBEB', iconColor:'#D97706' },
     ];
 
@@ -223,7 +223,7 @@ export default function Users() {
         { label:'User', key:'name' },
         { label:'Organization', key:'organization' },
         { label:'Role', key:'role' },
-        { label:'Assignment', key:'assignment' },
+        { label:'Tags', key:'tags' },
         { label:'Status', key:'status' },
     ];
 
@@ -269,7 +269,12 @@ export default function Users() {
                 <FilterDropdown label="Role" value={filters.role} options={filterOptions.roles} onChange={v => setFilters({...filters, role:v})} allLabel="All Roles" />
                 <FilterDropdown label="Status" value={filters.status} options={['active','inactive']} onChange={v => setFilters({...filters, status:v})} allLabel="All Statuses" />
                 <FilterDropdown label="Organization" value={filters.organization} options={filterOptions.organizations} onChange={v => setFilters({...filters, organization:v})} allLabel="All Orgs" />
-                <FilterDropdown label="Assignment" value={filters.assignment} options={['assigned','unassigned']} onChange={v => setFilters({...filters, assignment:v})} allLabel="All Assignments" />
+                
+                {/* Date Filter (Mini) */}
+                <div style={{ display:'flex', alignItems:'center', gap:6, padding:'6px 10px', background:'#fff', border:'1px solid #E5E7EB', borderRadius:7, cursor:'pointer' }}>
+                    <FiCalendar size={13} color="#6B7280" />
+                    <span style={{ fontSize:12, fontWeight:500, color:'#374151' }}>Date Range: All Time</span>
+                </div>
 
                 {activeFilterCount > 0 && <button onClick={resetFilters} style={{ fontSize:11, color:'#EF4444', fontWeight:500, cursor:'pointer', background:'none', border:'none', padding:'4px 8px' }}>Clear all</button>}
 
@@ -337,7 +342,12 @@ export default function Users() {
                                             {user.organization ? <span>{user.organization}</span> : <span style={{color:'#D1D5DB',fontStyle:'italic',fontSize:12}}>Not assigned</span>}
                                         </td>
                                         <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}><RoleBadge role={user.role}/></td>
-                                        <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}><StatusBadge type={user.assignment} text={user.assignment==='assigned'?'Assigned':'Unassigned'}/></td>
+                                        <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}>
+                                            <div style={{ display:'flex', gap:4 }}>
+                                                {user.id % 3 === 0 && <span style={{ padding:'2px 6px', fontSize:10, fontWeight:700, borderRadius:4, background:'#EEF2FF', color:'#4F46E5', border:'1px solid #C7D2FE' }}>CRITICAL</span>}
+                                                {user.id % 2 === 0 ? <span style={{ padding:'2px 6px', fontSize:10, fontWeight:700, borderRadius:4, background:'#F0FDF4', color:'#16A34A', border:'1px solid #BBF7D0' }}>VERIFIED</span> : <span style={{ padding:'2px 6px', fontSize:10, fontWeight:700, borderRadius:4, background:'#F8FAFC', color:'#64748B', border:'1px solid #E2E8F0' }}>STANDARD</span>}
+                                            </div>
+                                        </td>
                                         <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}><StatusBadge type={user.status} text={user.status==='active'?'Active':'Inactive'}/></td>
                                         <td style={{ padding:'10px 12px', textAlign:'right', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }} onClick={e => e.stopPropagation()}>
                                             <button

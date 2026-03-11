@@ -4,7 +4,7 @@ import { t } from '../../theme/theme';
 /**
  * Global StatsCard — Reusable across all pages.
  */
-const StatsCard = ({ label, value, icon, iconBg = t.color.bgMuted, iconColor = t.color.textMuted, style = {} }) => {
+const StatsCard = ({ label, value, icon, iconBg = t.color.bgMuted, iconColor = t.color.textMuted, trend, subValue, style = {} }) => {
     return (
         <div
             style={{
@@ -67,9 +67,22 @@ const StatsCard = ({ label, value, icon, iconBg = t.color.bgMuted, iconColor = t
                     fontWeight: t.fontWeight.bold,
                     color: t.color.text,
                     lineHeight: 1,
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    gap: 8
                 }}>
                     {value}
+                    {trend !== undefined && (
+                        <span style={{ fontSize: 11, fontWeight: 700, color: trend > 0 ? '#059669' : '#DC2626', background: trend > 0 ? '#ECFDF5' : '#FEF2F2', padding: '2px 6px', borderRadius: 6 }}>
+                            {trend > 0 ? '+' : ''}{trend}%
+                        </span>
+                    )}
                 </div>
+                {subValue && (
+                    <div style={{ fontSize: 10, fontWeight: 700, color: t.color.textPlaceholder, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                        {subValue}
+                    </div>
+                )}
             </div>
         </div>
     );
