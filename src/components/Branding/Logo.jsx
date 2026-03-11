@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Logo = ({ collapsed = false, size = 'md' }) => {
+const Logo = ({ collapsed = false, size = 'md', inverse = false }) => {
     // Size presets for different contexts
     const sizes = {
         sm: { icon: 30, svg: 16, font: 'var(--font-size-xs)', sub: '9px', gap: 8, padding: '0' },
@@ -22,13 +22,12 @@ const Logo = ({ collapsed = false, size = 'md' }) => {
             <div style={{
                 width: s.icon,
                 height: s.icon,
-                borderRadius: 'var(--radius-full)',
-                background: 'var(--color-primary-dark)',
+                borderRadius: '8px',
+                background: 'var(--color-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                flexShrink: 0,
-                boxShadow: '0 2px 8px rgba(7, 34, 103, 0.3)',
+                flexShrink: 0
             }}>
                 <svg
                     width={s.svg}
@@ -39,16 +38,8 @@ const Logo = ({ collapsed = false, size = 'md' }) => {
                 >
                     <path
                         d="M12 2L4 6V12C4 16.42 7.4 20.74 12 22C16.6 20.74 20 16.42 20 12V6L12 2Z"
-                        fill="rgba(255,255,255,0.15)"
-                        stroke="#fff"
-                        strokeWidth="1.5"
-                    />
-                    <path
-                        d="M9 12L11 14L15 10"
                         stroke="#fff"
                         strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
                     />
                 </svg>
             </div>
@@ -59,7 +50,7 @@ const Logo = ({ collapsed = false, size = 'md' }) => {
                     <span style={{
                         fontSize: s.font,
                         fontWeight: 700,
-                        color: 'var(--color-text-primary)',
+                        color: inverse ? '#FFFFFF' : 'var(--color-text-primary)',
                         letterSpacing: '-0.01em',
                         lineHeight: 1.2,
                     }}>
@@ -68,7 +59,7 @@ const Logo = ({ collapsed = false, size = 'md' }) => {
                     <span style={{
                         fontSize: s.sub,
                         fontWeight: 500,
-                        color: 'var(--color-text-muted)',
+                        color: inverse ? 'rgba(255, 255, 255, 0.7)' : 'var(--color-text-muted)',
                         letterSpacing: '0.05em',
                         textTransform: 'uppercase',
                     }}>
