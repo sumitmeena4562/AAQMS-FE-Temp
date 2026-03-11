@@ -4,6 +4,7 @@ import UserPeekView from '../../components/Dashboard/UserPeekView';
 import UserFormModal from '../../components/Dashboard/UserFormModal';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
+import { t } from '../../theme/theme';
 import {
     FiPlus, FiSearch, FiDownload, FiTrash2,
     FiUserCheck, FiUserX, FiUsers, FiAlertCircle,
@@ -12,7 +13,7 @@ import {
 } from 'react-icons/fi';
 
 // ─── Avatar helper ──────────────────────────────────────────────────────────────
-const AVATAR_COLORS = [['#6366F1','#A855F7'],['#3B82F6','#06B6D4'],['#F43F5E','#FB923C'],['#10B981','#3B82F6'],['#F59E0B','#EF4444']];
+const AVATAR_COLORS = t.color.avatarGradients;
 function getAvatar(name) {
     if (!name) return { initials:'?', colors: AVATAR_COLORS[0] };
     let h = 0; for (let i=0;i<name.length;i++) h = name.charCodeAt(i)+((h<<5)-h);
@@ -21,11 +22,11 @@ function getAvatar(name) {
 }
 
 // ─── Badge components ───────────────────────────────────────────────────────────
-const ROLE_BADGE = { coordinator:{bg:'#F5F3FF',color:'#5B21B6',border:'#DDD6FE'},'field officer':{bg:'#EFF6FF',color:'#1E40AF',border:'#BFDBFE'},admin:{bg:'#FFF7ED',color:'#C2410C',border:'#FED7AA'} };
-const STATUS_BADGE = { active:{dot:'#10B981',bg:'#ECFDF5',color:'#065F46',border:'#A7F3D0'},inactive:{dot:'#9CA3AF',bg:'#F9FAFB',color:'#4B5563',border:'#E5E7EB'},assigned:{dot:'#60A5FA',bg:'#EFF6FF',color:'#1E40AF',border:'#BFDBFE'},unassigned:{dot:'#FCA5A5',bg:'#FEF2F2',color:'#991B1B',border:'#FECACA'} };
+const ROLE_BADGE = { coordinator:{bg: t.color.coordinatorBg, color: t.color.coordinatorText, border: t.color.coordinatorBorder}, 'field officer':{bg: t.color.fieldOfficerBg, color: t.color.fieldOfficerText, border: t.color.fieldOfficerBorder}, admin:{bg: t.color.adminBg, color: t.color.adminText, border: t.color.adminBorder} };
+const STATUS_BADGE = { active:{dot: t.color.success, bg: t.color.successBg, color: t.color.successDark, border: t.color.successBorder}, inactive:{dot: t.color.textPlaceholder, bg: t.color.bgHover, color: t.color.textTertiary, border: t.color.border}, assigned:{dot:'#60A5FA', bg: t.color.infoBg, color: t.color.infoDark, border: t.color.infoBorder}, unassigned:{dot:'#FCA5A5', bg: t.color.dangerBg, color: t.color.dangerDark, border: t.color.dangerBorder} };
 
-const RoleBadge = ({role}) => { const s=ROLE_BADGE[role?.toLowerCase()]||{bg:'#F3F4F6',color:'#374151',border:'#E5E7EB'}; return <span style={{display:'inline-block',padding:'2px 9px',fontSize:11,fontWeight:600,background:s.bg,color:s.color,border:`1px solid ${s.border}`,borderRadius:20}}>{role}</span>; };
-const StatusBadge = ({type,text}) => { const s=STATUS_BADGE[type?.toLowerCase()]||STATUS_BADGE.inactive; return <span style={{display:'inline-flex',alignItems:'center',gap:5,padding:'2px 8px',fontSize:11,fontWeight:600,background:s.bg,color:s.color,border:`1px solid ${s.border}`,borderRadius:20}}><span style={{width:6,height:6,borderRadius:'50%',background:s.dot,flexShrink:0}}/>{text}</span>; };
+const RoleBadge = ({role}) => { const s=ROLE_BADGE[role?.toLowerCase()]||{bg: t.color.bgMuted, color: t.color.textSecondary, border: t.color.border}; return <span style={{display:'inline-block',padding:'2px 9px',fontSize: t.fontSize.xs, fontWeight: t.fontWeight.semibold, background:s.bg, color:s.color, border:`1px solid ${s.border}`, borderRadius: t.radius.pill}}>{role}</span>; };
+const StatusBadge = ({type,text}) => { const s=STATUS_BADGE[type?.toLowerCase()]||STATUS_BADGE.inactive; return <span style={{display:'inline-flex',alignItems:'center',gap:5,padding:'2px 8px',fontSize: t.fontSize.xs, fontWeight: t.fontWeight.semibold, background:s.bg, color:s.color, border:`1px solid ${s.border}`, borderRadius: t.radius.pill}}><span style={{width:6,height:6,borderRadius: t.radius.circle, background:s.dot,flexShrink:0}}/>{text}</span>; };
 
 // ─── FilterDropdown ─────────────────────────────────────────────────────────────
 function FilterDropdown({ label, value, options, onChange, allLabel = 'All' }) {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { t } from '../../theme/theme';
 import { Outlet, useLocation } from 'react-router-dom';
 import Logo from "../../components/Branding/Logo";
 import Sidebar from "../../components/Sidebar/Sidebar";
@@ -88,7 +89,7 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:'#fff', fontFamily:'inherit' }}>
+        <div style={{ display:'flex', height:'100vh', overflow:'hidden', background: t.color.bg, fontFamily:'inherit' }}>
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}
@@ -97,7 +98,7 @@ const AdminLayoutInner = () => {
                 mobileOpen={isMobileOpen}
                 setMobileOpen={setIsMobileOpen}
             />
-            <div style={{ flex:1, display:'flex', flexDirection:'column', height:'100%', overflow:'hidden', background:'#fff' }}>
+            <div style={{ flex:1, display:'flex', flexDirection:'column', height:'100%', overflow:'hidden', background: t.color.bg }}>
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
@@ -106,21 +107,21 @@ const AdminLayoutInner = () => {
                         <div style={{ display:'flex', alignItems:'center', gap:14 }}>
                             {/* Notification Bell */}
                             <button
-                                style={{ padding:6, background:'none', border:'none', cursor:'pointer', position:'relative', display:'flex', alignItems:'center', justifyContent:'center', color:'#9CA3AF' }}
-                                onMouseEnter={e => { e.currentTarget.style.color = '#374151'; }}
-                                onMouseLeave={e => { e.currentTarget.style.color = '#9CA3AF'; }}
+                                style={{ padding:6, background:'none', border:'none', cursor:'pointer', position:'relative', display:'flex', alignItems:'center', justifyContent:'center', color: t.color.textPlaceholder }}
+                                onMouseEnter={e => { e.currentTarget.style.color = t.color.textSecondary; }}
+                                onMouseLeave={e => { e.currentTarget.style.color = t.color.textPlaceholder; }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
                                 </svg>
-                                <span style={{ position:'absolute', top:4, right:4, width:7, height:7, borderRadius:'50%', border:'2px solid #fff', background:'#3B82F6' }} />
+                                <span style={{ position:'absolute', top:4, right:4, width:7, height:7, borderRadius:'50%', border: `2px solid ${t.color.bg}`, background: t.color.notifDot }} />
                             </button>
                             <ProfileDropdown />
                         </div>
                     }
                 />
-                <main style={{ flex:1, overflowY:'auto', padding:20 }}>
-                    <div style={{ width:'100%', maxWidth:1400, margin:'0 auto' }}>
+                <main style={{ flex:1, overflowY:'auto', padding: t.layout.contentPadding }}>
+                    <div style={{ width:'100%', maxWidth: t.layout.maxContentWidth, margin:'0 auto' }}>
                         <Outlet />
                     </div>
                 </main>

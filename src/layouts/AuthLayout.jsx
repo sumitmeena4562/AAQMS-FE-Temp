@@ -1,5 +1,6 @@
 import React from 'react';
 import Logo from '../components/Branding/Logo';
+import { t } from '../theme/theme';
 
 const AuthLayout = ({ children }) => {
     return (
@@ -7,14 +8,14 @@ const AuthLayout = ({ children }) => {
             display: 'flex', 
             minHeight: '100vh', 
             width: '100%',
-            backgroundColor: 'var(--color-bg-primary)'
+            backgroundColor: t.color.bg
         }}>
             {/* Left Side (Hidden on Mobile) */}
             <div
                 className="auth-sidebar"
                 style={{
                     flex: 1,
-                    backgroundColor: 'var(--color-bg-auth-side)',
+                    backgroundColor: t.color.primaryDark,
                     padding: 'clamp(24px, 5vw, 64px)',
                     display: 'none',
                     flexDirection: 'column',
@@ -33,7 +34,7 @@ const AuthLayout = ({ children }) => {
                     <h1 style={{ 
                         fontSize: 'clamp(2rem, 4vw, 3.375rem)', 
                         fontWeight: 800, 
-                        color: 'var(--color-text-inverse)', 
+                        color: t.color.textInverse, 
                         lineHeight: 1.1, 
                         marginBottom: '16px', 
                         letterSpacing: '-0.03em' 
@@ -41,7 +42,7 @@ const AuthLayout = ({ children }) => {
                         Structured Safety.<br />Intelligent Monitoring.
                     </h1>
                     <p style={{ 
-                        fontSize: 'var(--font-size-lg)', 
+                        fontSize: t.fontSize.lg, 
                         color: 'rgba(255,255,255,0.6)', 
                         lineHeight: 1.5,
                         maxWidth: '480px'

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import { t } from '../../theme/theme';
 
 /* ── Animated Collapsible ── */
 const CollapsibleSection = ({ isOpen, children }) => {
@@ -8,7 +9,7 @@ const CollapsibleSection = ({ isOpen, children }) => {
     const [height, setHeight] = useState(0);
     useEffect(() => { if (ref.current) setHeight(ref.current.scrollHeight); }, [children, isOpen]);
     return (
-        <div style={{ maxHeight: isOpen ? `${height}px` : '0px', overflow:'hidden', transition:'max-height 200ms ease' }}>
+        <div style={{ maxHeight: isOpen ? `${height}px` : '0px', overflow:'hidden', transition:`max-height ${t.transition.smooth}` }}>
             <div ref={ref}>{children}</div>
         </div>
     );
@@ -17,10 +18,10 @@ const CollapsibleSection = ({ isOpen, children }) => {
 /* ── Styles ── */
 const S = {
     aside: (collapsed, mobileOpen) => ({
-        width: collapsed ? 64 : 240,
-        minWidth: collapsed ? 64 : 240,
-        background: '#FAFAFA',
-        borderRight: '1px solid #E5E7EB',
+        width: collapsed ? t.layout.sidebarCollapsed : t.layout.sidebarWidth,
+        minWidth: collapsed ? t.layout.sidebarCollapsed : t.layout.sidebarWidth,
+        background: t.color.sidebarBg,
+        borderRight: `1px solid ${t.color.sidebarBorder}`,
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
@@ -28,47 +29,46 @@ const S = {
         top: 0,
         overflowY: 'auto',
         overflowX: 'hidden',
-        transition: 'width 200ms ease, min-width 200ms ease',
-        zIndex: 1000,
+        transition: `width ${t.transition.smooth}, min-width ${t.transition.smooth}`,
+        zIndex: t.zIndex.sidebar,
         flexShrink: 0,
         fontFamily: 'inherit',
     }),
     logoWrap: (collapsed) => ({
-        height: 52,
+        height: t.layout.navbarHeight,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: collapsed ? '0 12px' : '0 16px',
-        marginBottom: 8,
+        padding: collapsed ? `0 ${t.space.lg}px` : `0 ${t.space.xl}px`,
+        marginBottom: t.space.md,
         position: 'sticky',
         top: 0,
-        background: '#FAFAFA',
+        background: t.color.sidebarBg,
         zIndex: 10,
         boxSizing: 'border-box',
-        borderBottom: '1px solid #F3F4F6',
+        borderBottom: `1px solid ${t.color.borderLight}`,
     }),
     toggleBtn: {
-        width: 28, height: 28, borderRadius: 6,
+        width: 28, height: 28, borderRadius: t.radius.sm,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         background: 'transparent', border: '1px solid transparent',
-        cursor: 'pointer', color: '#9CA3AF', flexShrink: 0,
-        transition: 'all 120ms ease',
+        cursor: 'pointer', color: t.color.textPlaceholder, flexShrink: 0,
+        transition: `all ${t.transition.fast}`,
     },
-    nav: { padding: '4px 10px', display:'flex', flexDirection:'column', gap:1 },
-    // simple item
+    nav: { padding: `${t.space.xs}px 10px`, display:'flex', flexDirection:'column', gap:1 },
     simpleLink: (active, collapsed) => ({
         display: 'flex',
         alignItems: 'center',
         gap: collapsed ? 0 : 10,
         justifyContent: collapsed ? 'center' : 'flex-start',
-        padding: collapsed ? '9px 0' : '8px 12px',
-        borderRadius: 6,
-        fontSize: 13,
-        fontWeight: active ? 600 : 450,
-        color: active ? '#4F46E5' : '#4B5563',
-        background: active ? '#EEF2FF' : 'transparent',
+        padding: collapsed ? '9px 0' : `${t.space.md}px ${t.space.lg}px`,
+        borderRadius: t.radius.sm,
+        fontSize: t.fontSize.md,
+        fontWeight: active ? t.fontWeight.semibold : 450,
+        color: active ? t.color.primary : t.color.textTertiary,
+        background: active ? t.color.primaryBg : 'transparent',
         textDecoration: 'none',
-        transition: 'all 120ms ease',
+        transition: `all ${t.transition.fast}`,
         position: 'relative',
         cursor: 'pointer',
         border: 'none',
@@ -82,24 +82,24 @@ const S = {
         opacity: active ? 1 : 0.55,
         display: 'flex',
         alignItems: 'center',
-        color: active ? '#4F46E5' : '#6B7280',
-        transition: 'all 120ms ease',
+        color: active ? t.color.primary : t.color.textMuted,
+        transition: `all ${t.transition.fast}`,
         flexShrink: 0,
     }),
     chevron: (open) => ({
         width: 14, height: 14,
         transform: open ? 'rotate(180deg)' : 'rotate(0)',
-        transition: 'transform 200ms ease',
+        transition: `transform ${t.transition.smooth}`,
         opacity: 0.4,
         flexShrink: 0,
         marginLeft: 'auto',
     }),
     childrenWrap: {
-        marginLeft: 20,
+        marginLeft: t.space['2xl'],
         paddingLeft: 10,
-        borderLeft: '1.5px solid #E5E7EB',
+        borderLeft: `1.5px solid ${t.color.border}`,
         marginTop: 2,
-        marginBottom: 4,
+        marginBottom: t.space.xs,
         display: 'flex',
         flexDirection: 'column',
         gap: 1,
@@ -107,78 +107,74 @@ const S = {
     childLink: (active) => ({
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        padding: '6px 10px',
+        gap: t.space.md,
+        padding: `${t.space.sm}px 10px`,
         borderRadius: 5,
-        fontSize: 12,
-        fontWeight: active ? 600 : 450,
-        color: active ? '#4F46E5' : '#6B7280',
-        background: active ? '#EEF2FF' : 'transparent',
+        fontSize: t.fontSize.sm,
+        fontWeight: active ? t.fontWeight.semibold : 450,
+        color: active ? t.color.primary : t.color.textMuted,
+        background: active ? t.color.primaryBg : 'transparent',
         textDecoration: 'none',
-        transition: 'all 120ms ease',
+        transition: `all ${t.transition.fast}`,
         letterSpacing: '-0.01em',
     }),
-    // section label
     sectionLabel: {
-        fontSize: 10,
-        fontWeight: 600,
-        color: '#9CA3AF',
+        fontSize: t.fontSize.xxs,
+        fontWeight: t.fontWeight.semibold,
+        color: t.color.textPlaceholder,
         textTransform: 'uppercase',
         letterSpacing: '0.08em',
-        padding: '14px 12px 6px',
+        padding: `14px ${t.space.lg}px ${t.space.sm}px`,
     },
-    // bottom
     bottom: {
         marginTop: 'auto',
         padding: '10px 10px',
-        borderTop: '1px solid #F3F4F6',
-        background: '#FAFAFA',
+        borderTop: `1px solid ${t.color.borderLight}`,
+        background: t.color.sidebarBg,
     },
     userCard: (collapsed) => ({
-        padding: collapsed ? '8px 6px' : '8px 10px',
-        borderRadius: 7,
+        padding: collapsed ? `${t.space.md}px ${t.space.sm}px` : `${t.space.md}px 10px`,
+        borderRadius: t.radius.md,
         display: 'flex',
         alignItems: 'center',
         gap: collapsed ? 0 : 10,
         justifyContent: collapsed ? 'center' : 'flex-start',
-        background: '#fff',
-        border: '1px solid #E5E7EB',
+        background: t.color.bg,
+        border: `1px solid ${t.color.border}`,
         cursor: 'pointer',
-        transition: 'all 120ms ease',
+        transition: `all ${t.transition.fast}`,
     }),
     avatar: {
-        width: 30, height: 30, borderRadius: 6,
-        background: 'linear-gradient(135deg, #4F46E5, #7C3AED)',
+        width: 30, height: 30, borderRadius: t.radius.sm,
+        background: `linear-gradient(135deg, ${t.color.primary}, #7C3AED)`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: '#fff', fontWeight: 700, fontSize: 12, flexShrink: 0,
+        color: t.color.textInverse, fontWeight: t.fontWeight.bold, fontSize: t.fontSize.sm, flexShrink: 0,
     },
     userName: {
-        fontWeight: 600, fontSize: 12,
-        color: '#111827',
+        fontWeight: t.fontWeight.semibold, fontSize: t.fontSize.sm,
+        color: t.color.text,
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         lineHeight: 1.2,
     },
     userEmail: {
         fontSize: 10.5,
-        color: '#9CA3AF',
+        color: t.color.textPlaceholder,
         whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
         marginTop: 1,
     },
-    // active bar
     activeBar: {
         position: 'absolute',
         left: -10,
         top: 8,
         bottom: 8,
         width: 3,
-        background: '#4F46E5',
+        background: t.color.primary,
         borderRadius: '0 3px 3px 0',
     },
-    // overlay
     overlay: {
         position: 'fixed',
         inset: 0,
-        background: 'rgba(0,0,0,0.3)',
+        background: t.color.overlayDark,
         backdropFilter: 'blur(2px)',
         zIndex: 999,
     },
@@ -202,8 +198,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
     useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname]);
 
-    const hoverOn = (e, isAct) => { if (!isAct) e.currentTarget.style.background = '#F3F4F6'; };
-    const hoverOff = (e, isAct) => { e.currentTarget.style.background = isAct ? '#EEF2FF' : 'transparent'; };
+    const hoverOn = (e, isAct) => { if (!isAct) e.currentTarget.style.background = t.color.bgMuted; };
+    const hoverOff = (e, isAct) => { e.currentTarget.style.background = isAct ? t.color.primaryBg : 'transparent'; };
 
     const renderSimple = (item) => {
         const act = isActive(item.path);
@@ -281,16 +277,14 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                             onClick={onToggle}
                             style={S.toggleBtn}
                             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                            onMouseEnter={e => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.borderColor = '#E5E7EB'; e.currentTarget.style.color = '#374151'; }}
-                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = '#9CA3AF'; }}
+                            onMouseEnter={e => { e.currentTarget.style.background = t.color.bgMuted; e.currentTarget.style.borderColor = t.color.border; e.currentTarget.style.color = t.color.textSecondary; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = t.color.textPlaceholder; }}
                         >
                             {collapsed ? (
-                                /* Hamburger icon when collapsed */
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
                                 </svg>
                             ) : (
-                                /* Chevron-left when expanded */
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <polyline points="11 17 6 12 11 7" /><polyline points="18 17 13 12 18 7" />
                                 </svg>
@@ -316,8 +310,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     {user && (
                         <div
                             style={S.userCard(collapsed)}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor='#C7D2FE'; e.currentTarget.style.boxShadow='0 1px 4px rgba(0,0,0,0.06)'; }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor='#E5E7EB'; e.currentTarget.style.boxShadow='none'; }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = t.color.primaryBorder; e.currentTarget.style.boxShadow = t.shadow.xs; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = t.color.border; e.currentTarget.style.boxShadow = t.shadow.none; }}
                         >
                             <div style={S.avatar}>
                                 {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'U'}
@@ -335,7 +329,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
             <style>{`
                 .sidebar-panel::-webkit-scrollbar { width: 3px; }
-                .sidebar-panel::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 9999px; }
+                .sidebar-panel::-webkit-scrollbar-thumb { background: ${t.color.borderDark}; border-radius: ${t.radius.full}px; }
                 .sidebar-panel::-webkit-scrollbar-track { background: transparent; }
                 @media (max-width: 768px) {
                     .sidebar-panel {
@@ -343,9 +337,9 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                         top: 0 !important; left: 0 !important;
                         height: 100vh !important;
                         transform: translateX(-100%);
-                        transition: transform 250ms cubic-bezier(0.4,0,0.2,1) !important;
+                        transition: transform ${t.transition.slow} !important;
                         box-shadow: 4px 0 20px rgba(0,0,0,0.08);
-                        width: 240px !important; min-width: 240px !important;
+                        width: ${t.layout.sidebarWidth}px !important; min-width: ${t.layout.sidebarWidth}px !important;
                     }
                     .sidebar-panel.sidebar-mobile-open { transform: translateX(0); }
                 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../Branding/Logo';
+import { t } from '../../theme/theme';
 
 const Navbar = ({
     navLinks = [],
@@ -35,10 +36,10 @@ const Navbar = ({
             padding: '10px 22px',
             fontSize: '13px',
             fontWeight: 700,
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
+            border: `1px solid ${t.color.border}`,
+            borderRadius: t.radius.md,
             background: 'transparent',
-            color: 'var(--color-text-primary)',
+            color: t.color.text,
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
@@ -48,9 +49,9 @@ const Navbar = ({
             fontSize: '13px',
             fontWeight: 700,
             border: 'none',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--color-primary)',
-            color: 'var(--color-text-inverse)',
+            borderRadius: t.radius.md,
+            background: t.color.primary,
+            color: t.color.textInverse,
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             whiteSpace: 'nowrap',
@@ -88,11 +89,11 @@ const Navbar = ({
     return (
         <>
             <header style={{
-                height: 'var(--navbar-height)',
+                height: t.layout.navbarHeight,
                 background: isScrolled ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
                 backdropFilter: isScrolled ? 'blur(16px)' : 'none',
                 WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
-                borderBottom: isScrolled ? '1px solid var(--color-border-light)' : 'none',
+                borderBottom: isScrolled ? `1px solid ${t.color.borderLight}` : 'none',
                 position: sticky ? 'sticky' : 'relative',
                 top: 0,
                 zIndex: 1000,
@@ -135,13 +136,13 @@ const Navbar = ({
                                 style={{
                                     fontSize: '14px',
                                     fontWeight: 600,
-                                    color: 'var(--color-text-secondary)',
+                                    color: t.color.textSecondary,
                                     textDecoration: 'none',
                                     cursor: 'pointer',
                                     transition: 'color 0.2s ease'
                                 }}
-                                onMouseEnter={(e) => e.target.style.color = 'var(--color-primary)'}
-                                onMouseLeave={(e) => e.target.style.color = 'var(--color-text-secondary)'}
+                                onMouseEnter={(e) => e.target.style.color = t.color.primary}
+                                onMouseLeave={(e) => e.target.style.color = t.color.textSecondary}
                             >
                                 {link.label}
                             </a>
@@ -171,7 +172,7 @@ const Navbar = ({
                             border: 'none',
                             cursor: 'pointer',
                             padding: '8px',
-                            color: 'var(--color-text-primary)',
+                            color: t.color.text,
                             zIndex: 2100,
                             position: 'relative'
                         }}
@@ -247,11 +248,11 @@ const Navbar = ({
                                                 link.onClick();
                                             }
                                         }}
-                                        whileHover={{ x: 10, color: 'var(--color-primary)' }}
+                                        whileHover={{ x: 10, color: t.color.primary }}
                                         style={{
                                             fontSize: '22px',
                                             fontWeight: 800,
-                                            color: 'var(--color-text-primary)',
+                                            color: t.color.text,
                                             textDecoration: 'none',
                                             display: 'block',
                                             transition: 'color 0.2s ease'
@@ -263,7 +264,7 @@ const Navbar = ({
                             </div>
                         </div>
 
-                        <div style={{ height: '1px', background: 'var(--color-border-light)', width: '100%', opacity: 0.5 }}></div>
+                        <div style={{ height: '1px', background: t.color.borderLight, width: '100%', opacity: 0.5 }}></div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                             <motion.span 
@@ -292,12 +293,12 @@ const Navbar = ({
                                             width: '100%',
                                             textAlign: 'center',
                                             borderRadius: '16px',
-                                            border: btn.variant === 'filled' ? 'none' : '1px solid var(--color-border)',
-                                            background: btn.variant === 'filled' ? 'var(--color-primary)' : 'transparent',
-                                            color: btn.variant === 'filled' ? 'var(--color-text-inverse)' : 'var(--color-text-primary)',
+                                            border: btn.variant === 'filled' ? 'none' : `1px solid ${t.color.border}`,
+                                            background: btn.variant === 'filled' ? t.color.primary : 'transparent',
+                                            color: btn.variant === 'filled' ? t.color.textInverse : t.color.text,
                                             fontSize: '16px',
                                             fontWeight: 700,
-                                            boxShadow: btn.variant === 'filled' ? '0 10px 20px -10px var(--color-primary)' : 'none'
+                                            boxShadow: btn.variant === 'filled' ? `0 10px 20px -10px ${t.color.primary}` : 'none'
                                         }}
                                     >
                                         {btn.label}

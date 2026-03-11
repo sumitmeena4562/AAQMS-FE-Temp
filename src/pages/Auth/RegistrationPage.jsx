@@ -9,6 +9,7 @@ import InputField from "../../components/UI/InputField";
 import SelectField from "../../components/UI/SelectField";
 import Checkbox from "../../components/UI/Checkbox";
 import { MailIcon, LockIcon, UserIcon } from "../../assets/icon";
+import { t } from '../../theme/theme';
 
 function RegistrationPage() {
     const navigate = useNavigate();
@@ -40,7 +41,7 @@ function RegistrationPage() {
             grid={true}
             footer={
                 <span style={{ fontWeight: 500 }}>
-                    Already have an account? <a href="/login" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none', marginLeft: '6px', borderBottom: '1.5px solid transparent', transition: 'all 0.2s ease' }} onMouseEnter={(e) => e.target.style.borderBottomColor = 'var(--color-primary)'} onMouseLeave={(e) => e.target.style.borderBottomColor = 'transparent'}>Sign in here</a>
+                    Already have an account? <a href="/login" style={{ color: t.color.primary, fontWeight: 700, textDecoration: 'none', marginLeft: '6px', borderBottom: '1.5px solid transparent', transition: 'all 0.2s ease' }} onMouseEnter={(e) => e.target.style.borderBottomColor = t.color.primary} onMouseLeave={(e) => e.target.style.borderBottomColor = 'transparent'}>Sign in here</a>
                 </span>
             }
         >
@@ -115,9 +116,9 @@ function RegistrationPage() {
                     >
                         <Checkbox
                             label={
-                                <span style={{ fontSize: 'var(--font-size-sm)' }}>
+                                <span style={{ fontSize: t.fontSize.sm }}>
                                     I accept the{' '}
-                                    <a href="#" style={{ color: 'var(--color-primary, var(--color-text-primary))', fontWeight: 600, textDecoration: 'none' }}>
+                                    <a href="#" style={{ color: t.color.primary, fontWeight: 600, textDecoration: 'none' }}>
                                         Terms and Conditions
                                     </a>
                                 </span>
@@ -129,7 +130,7 @@ function RegistrationPage() {
                         <motion.p
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
-                            style={{ color: 'var(--color-danger)', fontSize: '12px', marginTop: '-4px', marginBottom: '16px', gridColumn: '1 / -1' }}
+                            style={{ color: t.color.danger, fontSize: '12px', marginTop: '-4px', marginBottom: '16px', gridColumn: '1 / -1' }}
                         >
                             {errors.termsAccepted.message}
                         </motion.p>

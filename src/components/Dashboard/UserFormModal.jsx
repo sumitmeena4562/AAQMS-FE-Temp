@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiX, FiUser, FiMail, FiBriefcase, FiShield, FiMapPin } from 'react-icons/fi';
+import { t } from '../../theme/theme';
 
 const ROLE_OPTIONS = ['Admin', 'Coordinator', 'Field Officer'];
 const STATUS_OPTIONS = ['active', 'inactive'];
@@ -66,34 +67,34 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     if (!isOpen) return null;
 
     const fieldStyle = (hasError) => ({
-        width: '100%', padding: '9px 12px', fontSize: 13,
-        border: `1px solid ${hasError ? '#FCA5A5' : '#E5E7EB'}`,
-        borderRadius: 7, outline: 'none', color: '#111827',
-        background: hasError ? '#FEF2F2' : '#fff',
+        width: '100%', padding: '9px 12px', fontSize: t.fontSize.md,
+        border: `1px solid ${hasError ? '#FCA5A5' : t.color.border}`,
+        borderRadius: t.radius.md, outline: 'none', color: t.color.text,
+        background: hasError ? t.color.dangerBg : t.color.bg,
         boxSizing: 'border-box',
     });
 
-    const labelStyle = { fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 5, display: 'block' };
-    const errorStyle = { fontSize: 11, color: '#EF4444', marginTop: 3 };
+    const labelStyle = { fontSize: t.fontSize.sm, fontWeight: t.fontWeight.semibold, color: t.color.textSecondary, marginBottom: 5, display: 'block' };
+    const errorStyle = { fontSize: t.fontSize.xs, color: t.color.danger, marginTop: 3 };
 
     return (
         <>
             {/* Backdrop */}
-            <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(2px)', zIndex: 9998 }} />
+            <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: t.color.overlay, backdropFilter: 'blur(2px)', zIndex: t.zIndex.overlay }} />
 
             {/* Drawer */}
             <div style={{
-                position: 'fixed', right: 0, top: 0, height: '100vh', width: 440, maxWidth: '95vw',
-                background: '#fff', boxShadow: '-8px 0 30px rgba(0,0,0,0.1)',
-                zIndex: 9999, display: 'flex', flexDirection: 'column',
+                position: 'fixed', right: 0, top: 0, height: '100vh', width: t.layout.formDrawerWidth, maxWidth: '95vw',
+                background: t.color.bg, boxShadow: t.shadow.drawer,
+                zIndex: t.zIndex.modal, display: 'flex', flexDirection: 'column',
                 animation: 'slideIn 0.2s ease',
             }}>
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F3F4F6', flexShrink: 0 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#111827' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space.xl}px ${t.space['2xl']}px`, borderBottom: `1px solid ${t.color.borderLight}`, flexShrink: 0 }}>
+                    <span style={{ fontSize: t.fontSize.xl, fontWeight: t.fontWeight.bold, color: t.color.text }}>
                         {isEdit ? 'Edit User' : 'Add New User'}
                     </span>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', display: 'flex', padding: 4 }}>
+                    <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.color.textPlaceholder, display: 'flex', padding: 4 }}>
                         <FiX size={18} />
                     </button>
                 </div>
@@ -101,7 +102,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 {/* Form */}
                 <div style={{ flex: 1, overflowY: 'auto', padding: '20px 20px 100px' }}>
                     {submitError && (
-                        <div style={{ padding: '10px 12px', marginBottom: 16, background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 7, fontSize: 12, color: '#DC2626', fontWeight: 500 }}>
+                        <div style={{ padding: '10px 12px', marginBottom: t.space.xl, background: t.color.dangerBg, border: `1px solid ${t.color.dangerBorder}`, borderRadius: t.radius.md, fontSize: t.fontSize.sm, color: '#DC2626', fontWeight: t.fontWeight.medium }}>
                             {submitError}
                         </div>
                     )}
@@ -110,7 +111,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                     <div style={{ marginBottom: 16 }}>
                         <label style={labelStyle}>Full Name *</label>
                         <div style={{ position: 'relative' }}>
-                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', display: 'flex' }}><FiUser size={14} /></span>
+                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: t.color.textPlaceholder, display: 'flex' }}><FiUser size={14} /></span>
                             <input
                                 style={{ ...fieldStyle(errors.name), paddingLeft: 32 }}
                                 placeholder="Enter full name"
@@ -125,7 +126,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                     <div style={{ marginBottom: 16 }}>
                         <label style={labelStyle}>Email Address *</label>
                         <div style={{ position: 'relative' }}>
-                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', display: 'flex' }}><FiMail size={14} /></span>
+                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: t.color.textPlaceholder, display: 'flex' }}><FiMail size={14} /></span>
                             <input
                                 style={{ ...fieldStyle(errors.email), paddingLeft: 32 }}
                                 placeholder="Enter email address"
@@ -141,7 +142,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                     <div style={{ marginBottom: 16 }}>
                         <label style={labelStyle}>Organization</label>
                         <div style={{ position: 'relative' }}>
-                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', display: 'flex' }}><FiBriefcase size={14} /></span>
+                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: t.color.textPlaceholder, display: 'flex' }}><FiBriefcase size={14} /></span>
                             <input
                                 style={{ ...fieldStyle(false), paddingLeft: 32 }}
                                 placeholder="Enter organization name"
@@ -155,7 +156,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                     <div style={{ marginBottom: 16 }}>
                         <label style={labelStyle}>Role *</label>
                         <div style={{ position: 'relative' }}>
-                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', display: 'flex' }}><FiShield size={14} /></span>
+                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: t.color.textPlaceholder, display: 'flex' }}><FiShield size={14} /></span>
                             <select
                                 style={{ ...fieldStyle(errors.role), paddingLeft: 32, appearance: 'none', cursor: 'pointer' }}
                                 value={form.role}
@@ -171,7 +172,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                     <div style={{ marginBottom: 16 }}>
                         <label style={labelStyle}>Assignment</label>
                         <div style={{ position: 'relative' }}>
-                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', display: 'flex' }}><FiMapPin size={14} /></span>
+                            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: t.color.textPlaceholder, display: 'flex' }}><FiMapPin size={14} /></span>
                             <select
                                 style={{ ...fieldStyle(false), paddingLeft: 32, appearance: 'none', cursor: 'pointer' }}
                                 value={form.assignment}
@@ -193,9 +194,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                     style={{
                                         flex: 1, padding: '9px 0', fontSize: 13, fontWeight: 600,
                                         borderRadius: 7, cursor: 'pointer', textTransform: 'capitalize',
-                                        border: `1px solid ${form.status === s ? (s === 'active' ? '#A7F3D0' : '#FECACA') : '#E5E7EB'}`,
-                                        background: form.status === s ? (s === 'active' ? '#ECFDF5' : '#FEF2F2') : '#fff',
-                                        color: form.status === s ? (s === 'active' ? '#065F46' : '#991B1B') : '#6B7280',
+                                        border: `1px solid ${form.status === s ? (s === 'active' ? t.color.successBorder : t.color.dangerBorder) : t.color.border}`,
+                                        background: form.status === s ? (s === 'active' ? t.color.successBg : t.color.dangerBg) : t.color.bg,
+                                        color: form.status === s ? (s === 'active' ? t.color.successDark : t.color.dangerDark) : t.color.textMuted,
                                     }}
                                 >
                                     {s}
@@ -208,15 +209,15 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 {/* Footer */}
                 <div style={{
                     position: 'absolute', bottom: 0, left: 0, right: 0,
-                    padding: '14px 20px',
-                    background: '#fff',
-                    borderTop: '1px solid #F3F4F6',
-                    display: 'flex', justifyContent: 'flex-end', gap: 8,
+                    padding: `14px ${t.space['2xl']}px`,
+                    background: t.color.bg,
+                    borderTop: `1px solid ${t.color.borderLight}`,
+                    display: 'flex', justifyContent: 'flex-end', gap: t.space.md,
                 }}>
                     <button
                         onClick={onClose}
                         disabled={loading}
-                        style={{ padding: '9px 18px', fontSize: 13, fontWeight: 500, color: '#374151', background: '#fff', border: '1px solid #E5E7EB', borderRadius: 7, cursor: 'pointer' }}
+                        style={{ padding: '9px 18px', fontSize: t.fontSize.md, fontWeight: t.fontWeight.medium, color: t.color.textSecondary, background: t.color.bg, border: `1px solid ${t.color.border}`, borderRadius: t.radius.md, cursor: 'pointer' }}
                     >
                         Cancel
                     </button>
@@ -224,9 +225,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                         onClick={handleSubmit}
                         disabled={loading}
                         style={{
-                            padding: '9px 20px', fontSize: 13, fontWeight: 600,
-                            color: '#fff', background: '#4F46E5', border: '1px solid #4338CA',
-                            borderRadius: 7, cursor: loading ? 'not-allowed' : 'pointer',
+                            padding: '9px 20px', fontSize: t.fontSize.md, fontWeight: t.fontWeight.semibold,
+                            color: t.color.textInverse, background: t.color.primary, border: `1px solid ${t.color.primaryDark}`,
+                            borderRadius: t.radius.md, cursor: loading ? 'not-allowed' : 'pointer',
                             opacity: loading ? 0.7 : 1,
                         }}
                     >

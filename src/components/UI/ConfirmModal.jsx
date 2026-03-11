@@ -1,18 +1,9 @@
 import React from 'react';
 import { FiAlertTriangle, FiX } from 'react-icons/fi';
+import { t } from '../../theme/theme';
 
 /**
  * Global reusable confirmation modal.
- * 
- * @param {boolean}  isOpen        - show/hide
- * @param {Function} onClose       - cancel handler
- * @param {Function} onConfirm     - confirm handler
- * @param {string}   title         - e.g. "Delete User"
- * @param {string}   message       - e.g. "Are you sure? This cannot be undone."
- * @param {string}   confirmText   - button label (default: "Confirm")
- * @param {string}   cancelText    - button label (default: "Cancel")
- * @param {boolean}  danger        - red styling (default: false)
- * @param {boolean}  loading       - disable buttons while processing
  */
 const ConfirmModal = ({
     isOpen,
@@ -34,9 +25,9 @@ const ConfirmModal = ({
                 onClick={onClose}
                 style={{
                     position: 'fixed', inset: 0,
-                    background: 'rgba(0,0,0,0.3)',
+                    background: t.color.overlayDark,
                     backdropFilter: 'blur(2px)',
-                    zIndex: 9998,
+                    zIndex: t.zIndex.overlay,
                 }}
             />
 
@@ -45,42 +36,42 @@ const ConfirmModal = ({
                 position: 'fixed',
                 top: '50%', left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: 400, maxWidth: '90vw',
-                background: '#fff',
-                borderRadius: 12,
-                boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-                zIndex: 9999,
+                width: t.layout.modalWidth, maxWidth: '90vw',
+                background: t.color.bg,
+                borderRadius: t.radius['2xl'],
+                boxShadow: t.shadow.xl,
+                zIndex: t.zIndex.modal,
                 overflow: 'hidden',
             }}>
                 {/* Header */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid #F3F4F6' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${t.space.xl}px ${t.space['2xl']}px`, borderBottom: `1px solid ${t.color.borderLight}` }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         {danger && (
-                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <FiAlertTriangle size={16} color="#EF4444" />
+                            <div style={{ width: 32, height: 32, borderRadius: t.radius.circle, background: t.color.dangerBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <FiAlertTriangle size={16} color={t.color.danger} />
                             </div>
                         )}
-                        <span style={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>{title}</span>
+                        <span style={{ fontSize: t.fontSize.lg, fontWeight: t.fontWeight.semibold, color: t.color.text }}>{title}</span>
                     </div>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', display: 'flex', padding: 4 }}>
+                    <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.color.textPlaceholder, display: 'flex', padding: 4 }}>
                         <FiX size={16} />
                     </button>
                 </div>
 
                 {/* Body */}
-                <div style={{ padding: '20px 20px 24px', fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>
+                <div style={{ padding: `${t.space['2xl']}px ${t.space['2xl']}px ${t.space['3xl']}px`, fontSize: t.fontSize.md, color: t.color.textMuted, lineHeight: 1.6 }}>
                     {message}
                 </div>
 
                 {/* Footer */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '0 20px 16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: t.space.md, padding: `0 ${t.space['2xl']}px ${t.space.xl}px` }}>
                     <button
                         onClick={onClose}
                         disabled={loading}
                         style={{
-                            padding: '8px 16px', fontSize: 13, fontWeight: 500,
-                            color: '#374151', background: '#fff',
-                            border: '1px solid #E5E7EB', borderRadius: 7,
+                            padding: `${t.space.md}px ${t.space.xl}px`, fontSize: t.fontSize.md, fontWeight: t.fontWeight.medium,
+                            color: t.color.textSecondary, background: t.color.bg,
+                            border: `1px solid ${t.color.border}`, borderRadius: t.radius.md,
                             cursor: loading ? 'not-allowed' : 'pointer',
                             opacity: loading ? 0.5 : 1,
                         }}
@@ -91,11 +82,11 @@ const ConfirmModal = ({
                         onClick={onConfirm}
                         disabled={loading}
                         style={{
-                            padding: '8px 16px', fontSize: 13, fontWeight: 600,
-                            color: '#fff',
-                            background: danger ? '#EF4444' : '#4F46E5',
-                            border: `1px solid ${danger ? '#DC2626' : '#4338CA'}`,
-                            borderRadius: 7,
+                            padding: `${t.space.md}px ${t.space.xl}px`, fontSize: t.fontSize.md, fontWeight: t.fontWeight.semibold,
+                            color: t.color.textInverse,
+                            background: danger ? t.color.danger : t.color.primary,
+                            border: `1px solid ${danger ? '#DC2626' : t.color.primaryDark}`,
+                            borderRadius: t.radius.md,
                             cursor: loading ? 'not-allowed' : 'pointer',
                             opacity: loading ? 0.7 : 1,
                         }}

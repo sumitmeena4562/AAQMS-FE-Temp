@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Card from '../../components/UI/Card';
-import StatusRow from '../../components/UI/StatusRow';
+import { t } from '../../theme/theme';
 
 // Icon components for StatusRow
 const CheckIcon = ({ size = 18 }) => (
@@ -15,6 +15,57 @@ const AlertIcon = ({ size = 18 }) => (
 const PendingIcon = ({ size = 18 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
 );
+
+const LocalStatusRow = ({ title, subtitle, icon: Icon, status, statusText, extraText, isAlert }) => {
+    const statusColors = {
+        success: { color: t.color.success, bg: t.color.successBg },
+        alert: { color: t.color.danger, bg: `${t.color.danger}10` },
+        pending: { color: t.color.warning, bg: `${t.color.warning}10` }
+    };
+    
+    const config = statusColors[status] || statusColors.success;
+
+    return (
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px',
+            background: t.color.bg,
+            borderRadius: t.radius.sm,
+            border: `1px solid ${t.color.borderLight}`,
+            boxShadow: t.shadow.sm
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: t.radius.xs || '6px',
+                    background: config.bg,
+                    color: config.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <Icon size={18} />
+                </div>
+                <div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: t.color.primaryDark }}>{title}</div>
+                    <div style={{ fontSize: '11px', color: t.color.textSecondary }}>{subtitle}</div>
+                </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+                <div style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    color: config.color,
+                    letterSpacing: '0.05em'
+                }}>{statusText}</div>
+                {extraText && <div style={{ fontSize: '10px', color: t.color.textTertiary }}>{extraText}</div>}
+            </div>
+        </div>
+    );
+};
 
 const Hero = () => {
     // Entrance Variants
@@ -75,8 +126,8 @@ const Hero = () => {
                         right: '10%',
                         width: '400px',
                         height: '400px',
-                        borderRadius: '50%',
-                        background: 'radial-gradient(circle, var(--color-primary-light) 0%, transparent 70%)',
+                        borderRadius: t.radius.circle,
+                        background: `radial-gradient(circle, ${t.color.primaryLight} 0%, transparent 70%)`,
                         filter: 'blur(60px)',
                         opacity: 0.15,
                         zIndex: 0
@@ -90,16 +141,16 @@ const Hero = () => {
                         alignItems: 'center',
                         gap: '8px',
                         padding: '6px 16px',
-                        background: '#fff',
-                        borderRadius: 'var(--radius-full)',
-                        border: '1px solid #e2e8f0',
+                        background: t.color.bg,
+                        borderRadius: t.radius.pill,
+                        border: `1px solid ${t.color.border}`,
                         marginBottom: '24px',
                         fontSize: '12px',
                         fontWeight: 700,
-                        color: '#64748b',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+                        color: t.color.textSecondary,
+                        boxShadow: t.shadow.sm
                     }}>
-                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3b82f6', boxShadow: '0 0 10px #3b82f6' }}></div>
+                        <div style={{ width: '8px', height: '8px', borderRadius: t.radius.circle, background: t.color.primary, boxShadow: `0 0 10px ${t.color.primary}` }}></div>
                         Enterprise Version 4.0 Live
                     </motion.div>
 
@@ -110,13 +161,13 @@ const Hero = () => {
                             fontSize: 'clamp(2.5rem, 6vw, 4rem)',
                             fontWeight: 800,
                             lineHeight: 1.05,
-                            color: '#0f172a',
+                            color: t.color.primaryDark,
                             marginBottom: '24px',
                             letterSpacing: '-0.03em',
                             maxWidth: '16ch'
                         }}
                     >
-                        AI-Enabled Safety Audits & <span style={{ color: '#3b82f6' }}>Inventory Verification.</span>
+                        AI-Enabled Safety Audits & <span style={{ color: t.color.primary }}>Inventory Verification.</span>
                     </motion.h1>
 
                     <motion.p
@@ -124,7 +175,7 @@ const Hero = () => {
                         className="hero-paragraph"
                         style={{
                             fontSize: '18px',
-                            color: '#475569',
+                            color: t.color.textSecondary,
                             lineHeight: 1.6,
                             marginBottom: '40px',
                             maxWidth: '520px'
@@ -135,34 +186,34 @@ const Hero = () => {
 
                     <motion.div variants={itemVariants} className="hero-buttons" style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
                         <motion.button
-                            whileHover={{ scale: 1.02, backgroundColor: '#071221' }}
+                            whileHover={{ scale: 1.02, backgroundColor: t.color.primaryDark }}
                             whileTap={{ scale: 0.98 }}
                             className="cta-button primary"
                             style={{
                                 padding: '14px 28px',
-                                background: '#0f172a',
-                                color: '#fff',
+                                background: t.color.primary,
+                                color: t.color.textInverse,
                                 border: 'none',
-                                borderRadius: '12px',
+                                borderRadius: t.radius.md,
                                 fontSize: '15px',
                                 fontWeight: 700,
                                 cursor: 'pointer',
-                                boxShadow: '0 10px 15px -3px rgba(15, 23, 42, 0.2)'
+                                boxShadow: t.shadow.md
                             }}
                         >
                             Request Demo
                         </motion.button>
 
                         <motion.button
-                            whileHover={{ scale: 1.02, borderColor: '#cbd5e1' }}
+                            whileHover={{ scale: 1.02, borderColor: t.color.borderDark }}
                             whileTap={{ scale: 0.98 }}
                             className="cta-button secondary"
                             style={{
                                 padding: '14px 28px',
-                                background: '#fff',
-                                color: '#0f172a',
-                                border: '1px solid #e2e8f0',
-                                borderRadius: '12px',
+                                background: t.color.bg,
+                                color: t.color.primaryDark,
+                                border: `1px solid ${t.color.border}`,
+                                borderRadius: t.radius.md,
                                 fontSize: '15px',
                                 fontWeight: 700,
                                 cursor: 'pointer',
@@ -203,7 +254,7 @@ const Hero = () => {
                     >
                         {/* Header */}
                         <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', gap: '12px', flexWrap: 'wrap' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', fontWeight: 800, color: '#64748b', letterSpacing: '0.1em' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', fontWeight: 800, color: t.color.textTertiary, letterSpacing: '0.1em' }}>
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                     <rect x="3" y="3" width="7" height="7"></rect>
                                     <rect x="14" y="3" width="7" height="7"></rect>
@@ -215,23 +266,23 @@ const Hero = () => {
                             <motion.div
                                 animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
                                 transition={{ duration: 2, repeat: Infinity }}
-                                style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10px', fontWeight: 700, color: '#059669', background: '#ecfdf5', padding: '6px 12px', borderRadius: '100px' }}
+                                style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10px', fontWeight: 700, color: t.color.successDark, background: t.color.successBg, padding: '6px 12px', borderRadius: t.radius.pill }}
                             >
-                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 8px #10b981' }}></div>
+                                <div style={{ width: '6px', height: '6px', borderRadius: t.radius.circle, background: t.color.success, boxShadow: `0 0 8px ${t.color.success}` }}></div>
                                 Live Feed
                             </motion.div>
                         </div>
 
                         {/* List Items */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
-                            <StatusRow
+                            <LocalStatusRow
                                 title="Zone 101"
                                 subtitle="Fire Safety Equipment"
                                 icon={CheckIcon}
                                 status="success"
                                 statusText="VERIFIED"
                             />
-                            <StatusRow
+                            <LocalStatusRow
                                 title="Zone 102"
                                 subtitle="Critical Asset Missing"
                                 icon={AlertIcon}

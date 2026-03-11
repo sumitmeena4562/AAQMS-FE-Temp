@@ -14,6 +14,7 @@ import {
     MdKeyboardArrowDown,
     MdOutlineVerified
 } from 'react-icons/md';
+import { t } from '../../theme/theme';
 
 // eslint-disable-next-line no-unused-vars
 const FieldFeature = ({ icon: Icon, title, description }) => (
@@ -21,9 +22,9 @@ const FieldFeature = ({ icon: Icon, title, description }) => (
         <div style={{
             minWidth: '48px',
             height: '48px',
-            borderRadius: '12px',
-            background: '#eff6ff',
-            color: '#3b82f6',
+            borderRadius: t.radius.md,
+            background: `${t.color.primary}10`,
+            color: t.color.primary,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
@@ -31,8 +32,8 @@ const FieldFeature = ({ icon: Icon, title, description }) => (
             <Icon size={24} />
         </div>
         <div>
-            <h4 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '8px' }}>{title}</h4>
-            <p style={{ fontSize: '14px', lineHeight: 1.5, color: 'var(--color-text-secondary)', maxWidth: '380px' }}>{description}</p>
+            <h4 style={{ fontSize: '16px', fontWeight: 700, color: t.color.primaryDark, marginBottom: '8px' }}>{title}</h4>
+            <p style={{ fontSize: '14px', lineHeight: 1.5, color: t.color.textSecondary, maxWidth: '380px' }}>{description}</p>
         </div>
     </div>
 );
@@ -41,7 +42,7 @@ const FieldApp = () => {
     return (
         <section className="field-app-section" style={{
             padding: '100px 24px',
-            background: '#fff',
+            background: t.color.bg,
             position: 'relative',
             overflow: 'hidden'
         }}>
@@ -52,7 +53,7 @@ const FieldApp = () => {
                     <h2 style={{
                         fontSize: 'clamp(28px, 4vw, 42px)',
                         fontWeight: 800,
-                        color: 'var(--color-primary-dark)',
+                        color: t.color.primaryDark,
                         marginBottom: '20px',
                         letterSpacing: '-0.02em'
                     }}>
@@ -60,7 +61,7 @@ const FieldApp = () => {
                     </h2>
                     <p style={{
                         fontSize: '17px',
-                        color: 'var(--color-text-secondary)',
+                        color: t.color.textSecondary,
                         lineHeight: 1.6,
                         marginBottom: '48px',
                         maxWidth: '500px'
@@ -99,7 +100,7 @@ const FieldApp = () => {
                         position: 'absolute',
                         width: '80%',
                         height: '80%',
-                        background: 'var(--color-primary)',
+                        background: t.color.primary,
                         filter: 'blur(100px)',
                         opacity: 0.1,
                         top: '10%',
@@ -111,12 +112,12 @@ const FieldApp = () => {
                     <div style={{
                         width: '300px',
                         height: '600px',
-                        background: '#071221',
+                        background: t.color.primaryDark,
                         borderRadius: '40px',
-                        border: '8px solid #1a2433',
+                        border: `8px solid ${t.color.primaryDark}80`,
                         position: 'relative',
                         zIndex: 1,
-                        boxShadow: '0 50px 100px -20px rgba(7, 18, 33, 0.5)',
+                        boxShadow: t.shadow.premium,
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column'
@@ -136,16 +137,16 @@ const FieldApp = () => {
                         }}></div>
 
                         {/* App Header */}
-                        <div style={{ padding: '40px 20px 20px', background: '#071221' }}>
+                        <div style={{ padding: '40px 20px 20px', background: t.color.primaryDark }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                                <MdMenu color="#fff" size={24} />
-                                <span style={{ color: '#fff', fontSize: '12px', fontWeight: 800, letterSpacing: '0.1em' }}>SAFETY AI</span>
-                                <MdNotificationsNone color="#fff" size={24} />
+                                <MdMenu color={t.color.bg} size={24} />
+                                <span style={{ color: t.color.bg, fontSize: '12px', fontWeight: 800, letterSpacing: '0.1em' }}>SAFETY AI</span>
+                                <MdNotificationsNone color={t.color.bg} size={24} />
                             </div>
 
                             <div style={{ marginBottom: '4px' }}>
-                                <span style={{ color: '#94a3b8', fontSize: '10px' }}>Current Location</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#fff', fontSize: '18px', fontWeight: 700 }}>
+                                <span style={{ color: t.color.textTertiary, fontSize: '10px' }}>Current Location</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: t.color.bg, fontSize: '18px', fontWeight: 700 }}>
                                     Warehouse B <MdKeyboardArrowDown />
                                 </div>
                             </div>
@@ -154,7 +155,7 @@ const FieldApp = () => {
                         {/* App Content Area */}
                         <div style={{
                             flex: 1,
-                            background: '#f8fafc',
+                            background: t.color.bgSecondary,
                             borderTopLeftRadius: '24px',
                             borderTopRightRadius: '24px',
                             padding: '20px',
@@ -165,35 +166,35 @@ const FieldApp = () => {
                             <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', letterSpacing: '0.05em' }}>TODAY'S TASKS</span>
 
                             {/* App Task Cards */}
-                            <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                <div style={{ width: '40px', height: '40px', backgroundColor: '#eff6ff', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
+                            <div style={{ background: t.color.bg, padding: '16px', borderRadius: t.radius.md, display: 'flex', alignItems: 'center', gap: '12px', boxShadow: t.shadow.sm }}>
+                                <div style={{ width: '40px', height: '40px', backgroundColor: `${t.color.primary}10`, borderRadius: t.radius.sm, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color.primary }}>
                                     <MdOutlineQrCodeScanner size={20} />
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>Verify Shelf 4A</div>
-                                    <div style={{ fontSize: '11px', color: '#64748b' }}>24 items • Due 2pm</div>
+                                    <div style={{ fontSize: '13px', fontWeight: 700, color: t.color.primaryDark }}>Verify Shelf 4A</div>
+                                    <div style={{ fontSize: '11px', color: t.color.textSecondary }}>24 items • Due 2pm</div>
                                 </div>
-                                <button style={{ background: '#071221', color: '#fff', border: 'none', padding: '6px 14px', borderRadius: '8px', fontSize: '10px', fontWeight: 600 }}>Start</button>
+                                <button style={{ background: t.color.primaryDark, color: t.color.textInverse, border: 'none', padding: '6px 14px', borderRadius: t.radius.sm, fontSize: '10px', fontWeight: 600 }}>Start</button>
                             </div>
 
-                            <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                <div style={{ width: '40px', height: '40px', backgroundColor: '#fff7ed', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f97316' }}>
+                            <div style={{ background: t.color.bg, padding: '16px', borderRadius: t.radius.md, display: 'flex', alignItems: 'center', gap: '12px', boxShadow: t.shadow.sm }}>
+                                <div style={{ width: '40px', height: '40px', backgroundColor: `${t.color.warning}15`, borderRadius: t.radius.sm, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color.warning }}>
                                     <MdHistory size={20} />
                                 </div>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>Hazard Check</div>
-                                    <div style={{ fontSize: '11px', color: '#64748b' }}>Zone 3 • Due 4pm</div>
+                                    <div style={{ fontSize: '13px', fontWeight: 700, color: t.color.primaryDark }}>Hazard Check</div>
+                                    <div style={{ fontSize: '11px', color: t.color.textSecondary }}>Zone 3 • Due 4pm</div>
                                 </div>
-                                <button style={{ background: '#f1f5f9', color: '#475569', border: 'none', padding: '6px 14px', borderRadius: '8px', fontSize: '10px', fontWeight: 600 }}>View</button>
+                                <button style={{ background: t.color.bgSecondary, color: t.color.textSecondary, border: 'none', padding: '6px 14px', borderRadius: t.radius.sm, fontSize: '10px', fontWeight: 600 }}>View</button>
                             </div>
 
                             <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', letterSpacing: '0.05em', marginTop: '10px' }}>QUICK ACTIONS</span>
 
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                <div style={{ background: '#fff', height: '60px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                                <div style={{ background: t.color.bg, height: '60px', borderRadius: t.radius.md, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color.textTertiary, boxShadow: t.shadow.sm }}>
                                     <MdOutlineQrCodeScanner size={24} />
                                 </div>
-                                <div style={{ background: '#fff', height: '60px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                                <div style={{ background: t.color.bg, height: '60px', borderRadius: t.radius.md, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color.textTertiary, boxShadow: t.shadow.sm }}>
                                     <MdOutlinePhotoCamera size={24} />
                                 </div>
                             </div>
@@ -202,32 +203,32 @@ const FieldApp = () => {
                         {/* App Bottom Nav */}
                         <div style={{
                             height: '60px',
-                            background: '#fff',
-                            borderTop: '1px solid #f1f5f9',
+                            background: t.color.bg,
+                            borderTop: `1px solid ${t.color.borderLight}`,
                             display: 'flex',
                             justifyContent: 'space-around',
                             alignItems: 'center',
                             padding: '0 10px',
                             position: 'relative'
                         }}>
-                            <MdHome size={22} color="#94a3b8" />
-                            <MdMap size={22} color="#94a3b8" />
+                            <MdHome size={22} color={t.color.textTertiary} />
+                            <MdMap size={22} color={t.color.textTertiary} />
                             <div style={{
                                 width: '44px',
                                 height: '44px',
-                                background: '#071221',
-                                borderRadius: '50%',
+                                background: t.color.primaryDark,
+                                borderRadius: t.radius.circle,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 marginTop: '-30px',
-                                border: '4px solid #fff',
-                                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+                                border: `4px solid ${t.color.bg}`,
+                                boxShadow: t.shadow.md
                             }}>
-                                <MdAdd size={24} color="#fff" />
+                                <MdAdd size={24} color={t.color.bg} />
                             </div>
-                            <MdHistory size={22} color="#94a3b8" />
-                            <MdSettings size={22} color="#94a3b8" />
+                            <MdHistory size={22} color={t.color.textTertiary} />
+                            <MdSettings size={22} color={t.color.textTertiary} />
                         </div>
                     </div>
 
@@ -236,21 +237,21 @@ const FieldApp = () => {
                         position: 'absolute',
                         right: '-20px',
                         top: '150px',
-                        background: '#fff',
+                        background: t.color.bg,
                         padding: '12px',
-                        borderRadius: '16px',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                        borderRadius: t.radius.md,
+                        boxShadow: t.shadow.md,
                         zIndex: 10,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '10px'
                     }}>
-                        <div style={{ width: '32px', height: '32px', background: '#ecfdf5', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
+                        <div style={{ width: '32px', height: '32px', background: `${t.color.success}10`, borderRadius: t.radius.sm, display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color.success }}>
                             <MdOutlineVerified size={18} />
                         </div>
                         <div>
-                            <div style={{ fontSize: '12px', fontWeight: 800, color: '#1e293b' }}>Audit Sync</div>
-                            <div style={{ fontSize: '10px', color: '#64748b' }}>100% Complete</div>
+                            <div style={{ fontSize: '12px', fontWeight: 800, color: t.color.primaryDark }}>Audit Sync</div>
+                            <div style={{ fontSize: '10px', color: t.color.textSecondary }}>100% Complete</div>
                         </div>
                     </div>
                 </div>

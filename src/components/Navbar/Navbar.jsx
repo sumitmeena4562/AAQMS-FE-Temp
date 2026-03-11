@@ -1,4 +1,5 @@
 import React from "react";
+import { t } from '../../theme/theme';
 
 const S = {
     header: {
@@ -8,17 +9,17 @@ const S = {
         position: 'sticky',
         top: 0,
         zIndex: 20,
-        backgroundColor: '#FAFAFA',
-        borderBottom: '1px solid #E5E7EB',
-        height: 52,
+        backgroundColor: t.color.navbarBg,
+        borderBottom: `1px solid ${t.color.navbarBorder}`,
+        height: t.layout.navbarHeight,
         justifyContent: 'center',
         boxSizing: 'border-box',
     },
     inner: {
         width: '100%',
-        maxWidth: 1400,
+        maxWidth: t.layout.maxContentWidth,
         margin: '0 auto',
-        padding: '0 20px',
+        padding: `0 ${t.layout.contentPadding}px`,
         boxSizing: 'border-box',
     },
     row: {
@@ -38,16 +39,16 @@ const S = {
         marginLeft: 'auto',
     },
     menuBtn: {
-        padding: 6,
+        padding: t.space.sm,
         marginLeft: -6,
-        borderRadius: 6,
+        borderRadius: t.radius.sm,
         border: 'none',
         background: 'transparent',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#6B7280',
+        color: t.color.textMuted,
     },
 };
 

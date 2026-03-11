@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LandingNavbar from '../../components/Navbar/LandingNavbar';
 import Footer from '../../components/Navbar/Footer';
+import { t } from '../../theme/theme';
 
 // Lazy load sections
 const Hero = lazy(() => import('./Hero'));
@@ -50,7 +51,7 @@ const LandingPage = () => {
     ];
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--color-bg-primary)', overflowX: 'clip' }}>
+        <div style={{ minHeight: '100vh', background: t.color.bg, overflowX: 'clip' }}>
             {/* Navbar */}
             <LandingNavbar
                 navLinks={navLinks}
@@ -66,32 +67,32 @@ const LandingPage = () => {
                 </div>
 
                 {/* Role Features Section */}
-                <div id="roles" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="roles" style={{ scrollMarginTop: t.layout.navbarHeight }}>
                     <RoleFeatures />
                 </div>
 
                 {/* Core Capabilities Section */}
-                <div id="capabilities" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="capabilities" style={{ scrollMarginTop: t.layout.navbarHeight }}>
                     <Capabilities />
                 </div>
 
                 {/* Site Planning Section */}
-                <div id="planning" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="planning" style={{ scrollMarginTop: t.layout.navbarHeight }}>
                     <SitePlanning />
                 </div>
 
                 {/* Workflow Section */}
-                <div id="workflow" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="workflow" style={{ scrollMarginTop: t.layout.navbarHeight }}>
                     <Workflow />
                 </div>
 
                 {/* Field App Section */}
-                <div id="mobile" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="mobile" style={{ scrollMarginTop: t.layout.navbarHeight }}>
                     <FieldApp />
                 </div>
 
                 {/* Analytics Section */}
-                <div id="analytics" style={{ scrollMarginTop: 'var(--navbar-height)', marginBottom: '60px' }}>
+                <div id="analytics" style={{ scrollMarginTop: t.layout.navbarHeight, marginBottom: '60px' }}>
                     <Analytics />
                 </div>
 

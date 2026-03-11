@@ -9,6 +9,7 @@ import {
     MdOutlineAssignmentLate,
     MdOutlineVerified,
 } from 'react-icons/md';
+import { t } from '../../theme/theme';
 
 // eslint-disable-next-line no-unused-vars
 const CapabilityCard = ({ title, description, icon: Icon, index }) => {
@@ -27,16 +28,16 @@ const CapabilityCard = ({ title, description, icon: Icon, index }) => {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '16px',
-                    backgroundColor: 'var(--color-bg-primary)',
-                    border: '1px solid var(--color-border-light)'
+                    backgroundColor: t.color.bg,
+                    border: `1px solid ${t.color.borderLight}`
                 }}
             >
                 <div className="capability-icon-box" style={{
                     width: '48px',
                     height: '48px',
-                    borderRadius: '12px',
-                    background: 'var(--color-primary-light)',
-                    color: 'var(--color-primary)',
+                    borderRadius: t.radius.md,
+                    background: `${t.color.primary}10`,
+                    color: t.color.primary,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -48,7 +49,7 @@ const CapabilityCard = ({ title, description, icon: Icon, index }) => {
                     <h3 className="capability-title" style={{
                         fontSize: '18px',
                         fontWeight: 800,
-                        color: 'var(--color-text-primary)',
+                        color: t.color.text,
                         margin: 0,
                         letterSpacing: '-0.02em'
                     }}>
@@ -57,7 +58,7 @@ const CapabilityCard = ({ title, description, icon: Icon, index }) => {
                     <p className="capability-desc" style={{
                         fontSize: '14px',
                         lineHeight: 1.6,
-                        color: 'var(--color-text-secondary)',
+                        color: t.color.textSecondary,
                         margin: 0
                     }}>
                         {description}
@@ -105,8 +106,8 @@ const Capabilities = () => {
     return (
         <section className="capabilities-section" style={{
             padding: 'clamp(60px, 10vh, 100px) 24px',
-            background: 'var(--color-bg-secondary)',
-            borderTop: '1px solid var(--color-border-light)'
+            background: t.color.bgSecondary,
+            borderTop: `1px solid ${t.color.borderLight}`
         }}>
             <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
                 {/* Section Header */}
@@ -121,7 +122,7 @@ const Capabilities = () => {
                     <h2 className="section-title" style={{
                         fontSize: 'clamp(26px, 5vw, 40px)',
                         fontWeight: 800,
-                        color: 'var(--color-text-primary)',
+                        color: t.color.text,
                         marginBottom: '16px',
                         letterSpacing: '-0.02em'
                     }}>
@@ -129,7 +130,7 @@ const Capabilities = () => {
                     </h2>
                     <p className="section-subtitle" style={{
                         fontSize: 'clamp(15px, 2vw, 17px)',
-                        color: 'var(--color-text-secondary)',
+                        color: t.color.textSecondary,
                         maxWidth: '600px',
                         lineHeight: 1.6
                     }}>

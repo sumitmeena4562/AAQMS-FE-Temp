@@ -2,13 +2,14 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Card from '../../components/UI/Card';
 import { MdOutlineShield, MdOutlineMap, MdQrCodeScanner } from 'react-icons/md';
+import { t } from '../../theme/theme';
 
 // eslint-disable-next-line no-unused-vars
 const FeatureCard = ({ title, description, icon: Icon, colorTheme, index }) => {
     const themes = {
-        primary: { bg: 'rgba(7, 34, 103, 0.05)', color: '#072267' },
-        secondary: { bg: 'rgba(59, 130, 246, 0.05)', color: '#3b82f6' },
-        success: { bg: 'rgba(16, 185, 129, 0.05)', color: '#10b981' }
+        primary: { bg: `${t.color.primary}10`, color: t.color.primary },
+        secondary: { bg: `${t.color.info}10`, color: t.color.info },
+        success: { bg: `${t.color.success}10`, color: t.color.success }
     };
 
     const theme = themes[colorTheme] || themes.primary;
@@ -28,13 +29,13 @@ const FeatureCard = ({ title, description, icon: Icon, colorTheme, index }) => {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '24px',
-                    border: `1px solid ${theme.bg.replace('0.05', '0.2')}`
+                    border: `1px solid ${theme.color}30`
                 }}
             >
                 <div className="feature-icon-box" style={{
                     width: '56px',
                     height: '56px',
-                    borderRadius: '14px',
+                    borderRadius: t.radius.md,
                     background: theme.bg,
                     color: theme.color,
                     display: 'flex',
@@ -48,7 +49,7 @@ const FeatureCard = ({ title, description, icon: Icon, colorTheme, index }) => {
                     <h3 className="feature-title" style={{
                         fontSize: '20px',
                         fontWeight: 800,
-                        color: '#0f172a',
+                        color: t.color.primaryDark,
                         margin: 0,
                         letterSpacing: '-0.01em'
                     }}>
@@ -57,7 +58,7 @@ const FeatureCard = ({ title, description, icon: Icon, colorTheme, index }) => {
                     <p className="feature-desc" style={{
                         fontSize: '15px',
                         lineHeight: 1.6,
-                        color: '#475569',
+                        color: t.color.textSecondary,
                         margin: 0
                     }}>
                         {description}
@@ -93,8 +94,8 @@ const RoleFeatures = () => {
     return (
         <section className="role-features-section" style={{
             padding: 'clamp(60px, 10vh, 100px) 24px',
-            background: 'var(--color-bg-primary)',
-            borderTop: '1px solid var(--color-border-light)'
+            background: t.color.bg,
+            borderTop: `1px solid ${t.color.borderLight}`
         }}>
             <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
                 {/* Section Header */}
@@ -109,7 +110,7 @@ const RoleFeatures = () => {
                     <h2 className="section-title" style={{
                         fontSize: 'clamp(26px, 5vw, 42px)',
                         fontWeight: 800,
-                        color: 'var(--color-text-primary)',
+                        color: t.color.primaryDark,
                         marginBottom: '16px',
                         letterSpacing: '-0.02em'
                     }}>
@@ -117,7 +118,7 @@ const RoleFeatures = () => {
                     </h2>
                     <p className="section-subtitle" style={{
                         fontSize: 'clamp(15px, 2vw, 17px)',
-                        color: 'var(--color-text-secondary)',
+                        color: t.color.textSecondary,
                         maxWidth: '600px',
                         margin: '0 auto',
                         lineHeight: 1.6

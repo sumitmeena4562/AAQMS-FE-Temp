@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import { t } from '../../theme/theme';
 
 const ProfileDropdown = () => {
     const navigate = useNavigate();
@@ -31,16 +32,16 @@ const ProfileDropdown = () => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    width:32, height:32, borderRadius:8,
-                    background:'linear-gradient(135deg, #4F46E5, #7C3AED)',
+                    width:32, height:32, borderRadius: t.radius.lg,
+                    background: `linear-gradient(135deg, ${t.color.primary}, #7C3AED)`,
                     border:'none', cursor:'pointer',
                     display:'flex', alignItems:'center', justifyContent:'center',
-                    color:'#fff', fontSize:12, fontWeight:700,
-                    transition:'box-shadow 0.15s',
-                    boxShadow: isOpen ? '0 0 0 3px rgba(79,70,229,0.2)' : 'none',
+                    color: t.color.textInverse, fontSize: t.fontSize.sm, fontWeight: t.fontWeight.bold,
+                    transition: `box-shadow ${t.transition.base}`,
+                    boxShadow: isOpen ? '0 0 0 3px rgba(79,70,229,0.2)' : t.shadow.none,
                 }}
                 onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.2)'; }}
-                onMouseLeave={e => { if (!isOpen) e.currentTarget.style.boxShadow = 'none'; }}
+                onMouseLeave={e => { if (!isOpen) e.currentTarget.style.boxShadow = t.shadow.none; }}
             >
                 {name.charAt(0).toUpperCase()}
             </button>
@@ -49,41 +50,41 @@ const ProfileDropdown = () => {
             {isOpen && (
                 <div style={{
                     position:'absolute', right:0, top:'calc(100% + 8px)',
-                    width:220, background:'#fff',
-                    border:'1px solid #E5E7EB', borderRadius:10,
-                    boxShadow:'0 10px 30px rgba(0,0,0,0.1)',
-                    zIndex:50, overflow:'hidden',
+                    width:220, background: t.color.bg,
+                    border: `1px solid ${t.color.border}`, borderRadius: t.radius.xl,
+                    boxShadow: t.shadow.md,
+                    zIndex: t.zIndex.dropdown, overflow:'hidden',
                 }}>
                     {/* User Info */}
-                    <div style={{ padding:'12px 14px', display:'flex', alignItems:'center', gap:10, borderBottom:'1px solid #F3F4F6' }}>
+                    <div style={{ padding: `${t.space.lg}px 14px`, display:'flex', alignItems:'center', gap:10, borderBottom: `1px solid ${t.color.borderLight}` }}>
                         <div style={{
-                            width:34, height:34, borderRadius:8,
-                            background:'linear-gradient(135deg, #4F46E5, #7C3AED)',
+                            width:34, height:34, borderRadius: t.radius.lg,
+                            background: `linear-gradient(135deg, ${t.color.primary}, #7C3AED)`,
                             display:'flex', alignItems:'center', justifyContent:'center',
-                            color:'#fff', fontSize:13, fontWeight:700, flexShrink:0,
+                            color: t.color.textInverse, fontSize: t.fontSize.md, fontWeight: t.fontWeight.bold, flexShrink:0,
                         }}>
                             {name.charAt(0).toUpperCase()}
                         </div>
                         <div style={{ overflow:'hidden' }}>
-                            <div style={{ fontSize:13, fontWeight:600, color:'#111827', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', lineHeight:1.2 }}>{name}</div>
-                            <div style={{ fontSize:11, color:'#9CA3AF', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', marginTop:1 }}>{email}</div>
+                            <div style={{ fontSize: t.fontSize.md, fontWeight: t.fontWeight.semibold, color: t.color.text, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', lineHeight:1.2 }}>{name}</div>
+                            <div style={{ fontSize: t.fontSize.xs, color: t.color.textPlaceholder, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', marginTop:1 }}>{email}</div>
                         </div>
                     </div>
 
                     {/* Menu Items */}
-                    <div style={{ padding:'4px 0' }}>
+                    <div style={{ padding: `${t.space.xs}px 0` }}>
                         {menuItems.map((item, i) => (
                             <a
                                 key={i}
                                 href="#"
                                 style={{
                                     display:'flex', alignItems:'center', gap:10,
-                                    padding:'8px 14px', fontSize:12, fontWeight:500,
-                                    color:'#4B5563', textDecoration:'none',
-                                    transition:'all 0.1s',
+                                    padding: `${t.space.md}px 14px`, fontSize: t.fontSize.sm, fontWeight: t.fontWeight.medium,
+                                    color: t.color.textTertiary, textDecoration:'none',
+                                    transition: `all 0.1s`,
                                 }}
-                                onMouseEnter={e => { e.currentTarget.style.background='#F9FAFB'; e.currentTarget.style.color='#111827'; }}
-                                onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#4B5563'; }}
+                                onMouseEnter={e => { e.currentTarget.style.background = t.color.bgHover; e.currentTarget.style.color = t.color.text; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = t.color.textTertiary; }}
                             >
                                 <span style={{ opacity:0.5, display:'flex', alignItems:'center' }}>{item.icon}</span>
                                 {item.label}
@@ -92,18 +93,18 @@ const ProfileDropdown = () => {
                     </div>
 
                     {/* Logout */}
-                    <div style={{ borderTop:'1px solid #F3F4F6', padding:'4px 0' }}>
+                    <div style={{ borderTop: `1px solid ${t.color.borderLight}`, padding: `${t.space.xs}px 0` }}>
                         <a
                             href="#"
                             onClick={handleLogout}
                             style={{
                                 display:'flex', alignItems:'center', gap:10,
-                                padding:'8px 14px', fontSize:12, fontWeight:600,
-                                color:'#EF4444', textDecoration:'none',
-                                transition:'all 0.1s',
+                                padding: `${t.space.md}px 14px`, fontSize: t.fontSize.sm, fontWeight: t.fontWeight.semibold,
+                                color: t.color.danger, textDecoration:'none',
+                                transition: 'all 0.1s',
                             }}
-                            onMouseEnter={e => { e.currentTarget.style.background='#FEF2F2'; }}
-                            onMouseLeave={e => { e.currentTarget.style.background='transparent'; }}
+                            onMouseEnter={e => { e.currentTarget.style.background = t.color.dangerBg; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
                         >
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                             Log out
