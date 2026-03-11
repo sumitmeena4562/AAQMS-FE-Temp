@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Logo from "../../components/Branding/Logo";
 import Sidebar from "../../components/Sidebar/Sidebar";
+import Navbar from "../../components/nav/Navbar";
 
 // ── Nav Items Configuration ──
 // Items with `children` will show collapsible sub-menus.
@@ -82,21 +83,35 @@ const userInfo = {
 
 const AdminLayout = () => {
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'var(--font-family)' }}>
+        // {/* Adminlayout */ }
+        < div className="flex h-screen font-sans" >
+
             {/* Sidebar */}
-            <Sidebar
+            < Sidebar
                 navItems={navItems}
-                logo={<Logo />}
+                logo={< Logo />}
                 userInfo={userInfo}
             />
 
             {/* Main Content */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', overflow: 'hidden' }}>
-                <main style={{ flex: 1, overflowY: 'auto', background: 'var(--color-bg-primary)' }}>
-                    <Outlet />
-                </main>
-            </div>
-        </div>
+            < div className="flex flex-col flex-1 overflow-hidden" >
+
+                {/* Navbar */}
+                < Navbar />
+
+                {/* Page Container */}
+                < main className="flex-1 overflow-y-auto bg-gray-50" >
+
+                    {/* Dashboard Page */}
+                    < div className="max-w-7xl mx-auto p-8" >
+                        <Outlet />
+                    </div >
+
+                </main >
+
+            </div >
+
+        </div >
     );
 };
 
