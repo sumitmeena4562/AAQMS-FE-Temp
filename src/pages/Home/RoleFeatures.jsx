@@ -29,7 +29,8 @@ const FeatureCard = ({ title, description, icon: Icon, colorTheme, index }) => {
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '24px',
-                    border: `1px solid ${theme.color}30`
+                    border: `1px solid ${theme.color}30`,
+                    shadow: t.shadow.card
                 }}
             >
                 <div className="feature-icon-box" style={{

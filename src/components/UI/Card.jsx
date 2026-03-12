@@ -1,4 +1,5 @@
 import React from 'react';
+import t from '../../theme/theme';
 
 const Card = ({
     children,
@@ -17,8 +18,8 @@ const Card = ({
         borderRadius: borderRadius,
         padding: padding,
         boxShadow: isHovered && hoverEffect
-            ? 'var(--shadow-premium)'
-            : 'var(--shadow-pro)',
+            ? t.shadow.cardHover
+            : t.shadow.card,
         border: '1px solid var(--color-border-light)',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: isHovered && hoverEffect ? 'translateY(-4px)' : 'translateY(0)',
