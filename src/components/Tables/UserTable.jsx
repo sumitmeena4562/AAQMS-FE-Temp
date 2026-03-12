@@ -1,25 +1,27 @@
+import React from 'react';
 import Table from '../UI/Table';
 import DotStatus from '../UI/DotStatus';
 import UserAvatar from '../UI/UserAvatar';
-import { FiExternalLink } from 'react-icons/fi';
+import { FiExternalLink, FiEdit2 } from 'react-icons/fi';
+import { t } from '../../theme/theme';
 
 const ROLE_STYLE = {
-    coordinator:    { bg: '#F5F3FF', color: '#6D28D9', border: '#DDD6FE' },
-    'field officer':{ bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
-    admin:          { bg: '#FFFBEB', color: '#B45309', border: '#FDE68A' },
+    coordinator:    { bg: t.color.coordinatorBg, color: t.color.coordinatorText, border: t.color.coordinatorBorder },
+    'field officer':{ bg: t.color.fieldOfficerBg, color: t.color.fieldOfficerText, border: t.color.fieldOfficerBorder },
+    admin:          { bg: t.color.adminBg, color: t.color.adminText, border: t.color.adminBorder },
 };
 
-const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick }) => {
+const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick, onEdit }) => {
     const columns = [
         {
             header: 'User',
             accessor: 'name',
             render: (_, row) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <UserAvatar name={row.name} size="30px" fontSize="11px" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: t.space.lg }}>
+                    <UserAvatar name={row.name} size="32px" fontSize={t.fontSize.xxs} weight={900} />
                     <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', lineHeight: 1.2 }}>{row.name}</div>
-                        <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{row.email}</div>
+                        <div style={{ fontSize: t.fontSize.md, fontWeight: 700, color: t.color.text, lineHeight: 1.2 }}>{row.name}</div>
+                        <div style={{ fontSize: t.fontSize.xs, color: t.color.textPlaceholder, marginTop: 2, fontWeight: 500 }}>{row.email}</div>
                     </div>
                 </div>
             )
@@ -28,7 +30,7 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick 
             header: 'Organization',
             accessor: 'organization',
             render: value => (
-                <span style={{ fontSize: 13, color: value ? '#374151' : '#D1D5DB', fontStyle: value ? 'normal' : 'italic' }}>
+                <span style={{ fontSize: t.fontSize.md, color: value ? t.color.textSecondary : t.color.textPlaceholder, fontStyle: value ? 'normal' : 'italic', fontWeight: 500 }}>
                     {value || 'Not assigned'}
                 </span>
             )
@@ -37,15 +39,17 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick 
             header: 'Role',
             accessor: 'role',
             render: value => {
-                const s = ROLE_STYLE[value?.toLowerCase()] || { bg: '#F3F4F6', color: '#374151', border: '#E5E7EB' };
+                const s = ROLE_STYLE[value?.toLowerCase()] || { bg: t.color.bgMuted, color: t.color.textSecondary, border: t.color.border };
                 return (
                     <span style={{
                         display: 'inline-block',
                         padding: '2px 10px',
-                        fontSize: 11, fontWeight: 600,
+                        fontSize: t.fontSize.xxs, fontWeight: 800,
                         background: s.bg, color: s.color,
                         border: `1px solid ${s.border}`,
-                        borderRadius: 20,
+                        borderRadius: t.radius.pill,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.02em'
                     }}>
                         {value}
                     </span>
@@ -53,45 +57,69 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick 
             }
         },
         {
-            header: 'Assignment',
-            accessor: 'assignment',
-            render: value => (
+            header: 'Status',
+            accessor: 'status',
+            render: (value) => (
                 <DotStatus
-                    type={value?.toLowerCase() === 'assigned' ? 'assigned' : 'unassigned'}
+                    type={value?.toLowerCase() === 'active' ? 'active' : 'inactive'}
                     text={value}
                 />
             )
         },
         {
-            header: 'Status',
-            accessor: 'status',
-            render: value => (
-                <DotStatus
-                    type={value?.toLowerCase()}
-                    text={value}
-                />
+            header: 'Operations',
+            accessor: 'assignment',
+            render: (value) => (
+                <div style={{ display: 'flex', gap: 4 }}>
+                   <span style={{ 
+                       padding:'2px 8px', 
+                       fontSize: t.fontSize.xxs, 
+                       fontWeight: 800, 
+                       borderRadius: t.radius.sm, 
+                       background: value === 'assigned' ? t.color.successBg : t.color.bgMuted, 
+                       color: value === 'assigned' ? t.color.success : t.color.textMuted,
+                       textTransform: 'uppercase',
+                       letterSpacing: '0.04em',
+                       border: `1px solid ${value === 'assigned' ? t.color.successBorder : t.color.border}`
+                   }}>
+                       {value || 'Standby'}
+                   </span>
+                </div>
             )
         },
         {
             header: '',
             accessor: 'actions',
             render: (_, row) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: t.space.sm, justifyContent: 'flex-end' }}>
                     <button
                         title="View profile"
                         onClick={e => { e.stopPropagation(); onRowClick && onRowClick(row); }}
-                        style={{ padding: '4px 6px', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', borderRadius: 5 }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.color = '#374151'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#9CA3AF'; }}
+                        style={{ padding: '6px', background: 'transparent', border: 'none', cursor: 'pointer', color: t.color.textPlaceholder, borderRadius: t.radius.lg, display: 'flex' }}
+                        onMouseEnter={e => { e.currentTarget.style.background = t.color.bgHover; e.currentTarget.style.color = t.color.text; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = t.color.textPlaceholder; }}
                     >
-                        <FiExternalLink size={13} />
+                        <FiExternalLink size={14} />
                     </button>
                     <button
-                        onClick={e => { e.stopPropagation(); row.onEdit && row.onEdit(row); }}
-                        style={{ padding: '4px 10px', fontSize: 12, fontWeight: 600, color: '#4F46E5', background: 'none', border: '1px solid transparent', borderRadius: 6, cursor: 'pointer' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.border = '1px solid #C7D2FE'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.border = '1px solid transparent'; }}
+                        onClick={e => { e.stopPropagation(); onEdit && onEdit(row); }}
+                        style={{ 
+                            padding: '6px 12px', 
+                            fontSize: t.fontSize.sm, 
+                            fontWeight: 700, 
+                            color: t.color.primary, 
+                            background: 'transparent', 
+                            border: `1px solid ${t.color.border}`, 
+                            borderRadius: t.radius.lg, 
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 6
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = t.color.primaryBg; e.currentTarget.style.borderColor = t.color.primaryBorder; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = t.color.border; }}
                     >
+                        <FiEdit2 size={12} />
                         Edit
                     </button>
                 </div>
@@ -112,3 +140,4 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick 
 };
 
 export default UserTable;
+

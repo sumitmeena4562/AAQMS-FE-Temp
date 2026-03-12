@@ -99,9 +99,9 @@ const Hero = () => {
                 style={{
                     maxWidth: '1280px',
                     margin: '0 auto',
-                    padding: 'clamp(40px, 8vh, 100px) 24px',
+                    padding: '120px 24px',
                     display: 'grid',
-                    gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)',
+                    gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)',
                     gap: 'clamp(24px, 4vw, 60px)',
                     alignItems: 'center',
                     position: 'relative'
@@ -178,7 +178,7 @@ const Hero = () => {
                             color: t.color.textSecondary,
                             lineHeight: 1.6,
                             marginBottom: '40px',
-                            maxWidth: '520px'
+                            maxWidth: '540px'
                         }}
                     >
                         Orchestrate complex operations with integrated Drone Maps and AI-assisted inventory comparison. Ensure asset accountability at scale.

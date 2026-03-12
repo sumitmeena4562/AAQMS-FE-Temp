@@ -127,7 +127,7 @@ const radius = {
     lg:   8,
     xl:   10,
     '2xl':12,
-    pill:  20,
+    pill:  24,
     full:  9999,
     circle:'50%',
 };

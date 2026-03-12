@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
 import UserFormModal from '../../components/Dashboard/UserFormModal';
@@ -11,116 +12,118 @@ import {
     FiCheckCircle, FiClock, FiX, FiChevronDown,
     FiRefreshCw, FiCalendar
 } from 'react-icons/fi';
+import UserTable from '../../components/Tables/UserTable';
 
-// ─── Avatar helper ──────────────────────────────────────────────────────────────
-const AVATAR_COLORS = t.color.avatarGradients;
-function getAvatar(name) {
-    if (!name) return { initials:'?', colors: AVATAR_COLORS[0] };
-    let h = 0; for (let i=0;i<name.length;i++) h = name.charCodeAt(i)+((h<<5)-h);
-    const p = name.split(' ');
-    return { initials: (p.length>=2?`${p[0][0]}${p[1][0]}`:name.slice(0,2)).toUpperCase(), colors: AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length] };
-}
+// ─── Local UI Components ───────────────────────────────────────────────────────
 
-// ─── Badge components ───────────────────────────────────────────────────────────
-const ROLE_BADGE = { coordinator:{bg: t.color.coordinatorBg, color: t.color.coordinatorText, border: t.color.coordinatorBorder}, 'field officer':{bg: t.color.fieldOfficerBg, color: t.color.fieldOfficerText, border: t.color.fieldOfficerBorder}, admin:{bg: t.color.adminBg, color: t.color.adminText, border: t.color.adminBorder} };
-const STATUS_BADGE = { 
-    active:     { dot: t.color.success, bg: t.color.successBg, color: t.color.successDark, border: t.color.successBorder }, 
-    inactive:   { dot: t.color.textPlaceholder, bg: t.color.bgMuted, color: t.color.textTertiary, border: t.color.border }, 
-    assigned:   { dot: t.color.info, bg: t.color.infoBg, color: t.color.infoDark, border: t.color.infoBorder }, 
-    unassigned: { dot: t.color.danger, bg: t.color.dangerBg, color: t.color.dangerDark, border: t.color.dangerBorder } 
-};
+const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All' }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef(null);
 
-const RoleBadge = ({role}) => { const s=ROLE_BADGE[role?.toLowerCase()]||{bg: t.color.bgMuted, color: t.color.textSecondary, border: t.color.border}; return <span style={{display:'inline-block',padding:'2px 9px',fontSize: t.fontSize.xs, fontWeight: t.fontWeight.semibold, background:s.bg, color:s.color, border:`1px solid ${s.border}`, borderRadius: t.radius.pill}}>{role}</span>; };
-const StatusBadge = ({type,text}) => { const s=STATUS_BADGE[type?.toLowerCase()]||STATUS_BADGE.inactive; return <span style={{display:'inline-flex',alignItems:'center',gap:5,padding:'2px 8px',fontSize: t.fontSize.xs, fontWeight: t.fontWeight.semibold, background:s.bg, color:s.color, border:`1px solid ${s.border}`, borderRadius: t.radius.pill}}><span style={{width:6,height:6,borderRadius: t.radius.circle, background:s.dot,flexShrink:0}}/>{text}</span>; };
-
-// ─── FilterDropdown ─────────────────────────────────────────────────────────────
-function FilterDropdown({ label, value, options, onChange, allLabel = 'All' }) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef(null);
     useEffect(() => {
-        const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-        document.addEventListener('mousedown', h);
-        return () => document.removeEventListener('mousedown', h);
+        const handleClickOutside = (e) => {
+            if (containerRef.current && !containerRef.current.contains(e.target)) setIsOpen(false);
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
-    const isActive = value && value !== '';
-    const displayLabel = isActive ? `${label}: ${value}` : label;
+
     return (
-        <div ref={ref} style={{ position:'relative' }}>
+        <div ref={containerRef} style={{ position: 'relative' }}>
             <button 
-                onClick={() => setOpen(!open)} 
+                onClick={() => setIsOpen(!isOpen)}
                 style={{ 
-                    display:'flex', alignItems:'center', gap:5, padding:'6px 10px', fontSize:12, fontWeight:500, 
-                    color: isActive ? t.color.primary : t.color.textSecondary, 
-                    background: isActive ? t.color.primaryBg : t.color.bg, 
-                    border: `1px solid ${isActive ? t.color.primaryBorder : t.color.border}`, 
-                    borderRadius: 7, cursor:'pointer', whiteSpace:'nowrap' 
+                    display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px', 
+                    background: '#fff', border: `1px solid ${isOpen ? t.color.primary : '#E5E7EB'}`, 
+                    borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s ease',
+                    boxShadow: isOpen ? `0 0 0 3px ${t.color.primary}10` : 'none'
                 }}
             >
-                {displayLabel}
-                <FiChevronDown size={12} style={{ transform: open?'rotate(180deg)':'rotate(0)', transition:'transform 0.15s' }} />
-                {isActive && <span onClick={(e) => { e.stopPropagation(); onChange(''); setOpen(false); }} style={{ display:'flex', alignItems:'center', marginLeft:2, color: t.color.primary, cursor:'pointer' }}><FiX size={11} /></span>}
+                <span style={{ fontSize: 11, fontWeight: 800, color: t.color.textPlaceholder, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}:</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: t.color.text }}>{value || allLabel}</span>
+                <FiChevronDown size={14} style={{ color: t.color.textPlaceholder, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </button>
-            {open && (
-                <div style={{ position:'absolute', top:'calc(100% + 4px)', left:0, minWidth:180, background: t.color.bg, border: `1px solid ${t.color.border}`, borderRadius: 8, boxShadow: t.shadow.lg, zIndex: 50, padding: '4px 0', maxHeight: 220, overflowY: 'auto' }}>
-                    <div onClick={() => { onChange(''); setOpen(false); }} style={{ padding:'7px 12px', fontSize:12, fontWeight: !isActive?600:400, color: !isActive? t.color.primary : t.color.textSecondary, background: !isActive? t.color.primaryBg : 'transparent', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between' }}
-                        onMouseEnter={e => { if(isActive) e.currentTarget.style.background = t.color.bgHover; }}
-                        onMouseLeave={e => { if(isActive) e.currentTarget.style.background='transparent'; }}
+
+            <AnimatePresence>
+                {isOpen && (
+                    <Motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        style={{ 
+                            position: 'absolute', top: '120%', left: 0, minWidth: 160, 
+                            background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)',
+                            border: `1px solid ${t.color.borderLight}`, borderRadius: 12, 
+                            boxShadow: t.shadow.xl, zIndex: 100, overflow: 'hidden', padding: 4
+                        }}
                     >
-                        {allLabel}
-                        {!isActive && <span style={{fontSize:10,color: t.color.primary}}>✓</span>}
-                    </div>
-                    <div style={{ height:1, background: t.color.borderLight, margin:'2px 0' }} />
-                    {options.map(opt => {
-                        const sel = value === opt;
-                        return (
-                            <div key={opt} onClick={() => { onChange(opt); setOpen(false); }} style={{ padding:'7px 12px', fontSize:12, fontWeight: sel?600:400, color: sel? t.color.primary : t.color.textSecondary, background: sel? t.color.primaryBg : 'transparent', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between' }}
-                                onMouseEnter={e => { if(!sel) e.currentTarget.style.background = t.color.bgHover; }}
-                                onMouseLeave={e => { if(!sel) e.currentTarget.style.background='transparent'; }}
+                        <button 
+                            onClick={() => { onChange(''); setIsOpen(false); }}
+                            style={{ 
+                                width: '100%', padding: '8px 12px', textAlign: 'left', border: 'none', 
+                                background: !value ? t.color.primaryBg : 'transparent', 
+                                color: !value ? t.color.primary : t.color.text,
+                                fontSize: 13, fontWeight: 600, borderRadius: 8, cursor: 'pointer'
+                            }}
+                        >
+                            {allLabel}
+                        </button>
+                        {options.map(opt => (
+                            <button 
+                                key={opt}
+                                onClick={() => { onChange(opt); setIsOpen(false); }}
+                                style={{ 
+                                    width: '100%', padding: '8px 12px', textAlign: 'left', border: 'none', 
+                                    background: value === opt ? t.color.primaryBg : 'transparent', 
+                                    color: value === opt ? t.color.primary : t.color.text,
+                                    fontSize: 13, fontWeight: 600, borderRadius: 8, cursor: 'pointer'
+                                }}
                             >
                                 {opt}
-                                {sel && <span style={{fontSize:10,color: t.color.primary}}>✓</span>}
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
+                            </button>
+                        ))}
+                    </Motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
-}
+};
 
-// ─── Toast ──────────────────────────────────────────────────────────────────────
-function Toast({ message, type = 'success', onClose }) {
-    useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, []);
+const Toast = ({ message, type = 'success', onClose }) => {
+    useEffect(() => {
+        const timer = setTimeout(onClose, 3000);
+        return () => clearTimeout(timer);
+    }, [onClose]);
+
     return (
-        <div style={{ position:'fixed', top:20, right:20, zIndex:10000, padding:'10px 16px', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)', display:'flex', alignItems:'center', gap:8, fontSize:13, fontWeight:500, background: type==='success'?'#065F46':'#991B1B', color:'#fff', animation:'slideDown 0.2s ease' }}>
-            {type==='success' ? <FiCheckCircle size={15}/> : <FiAlertCircle size={15}/>}
+        <Motion.div
+            initial={{ opacity: 0, y: -20, x: '-50%' }}
+            animate={{ opacity: 1, y: 20, x: '-50%' }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            style={{ 
+                position: 'fixed', top: 0, left: '50%', zIndex: 2000,
+                padding: '12px 24px', borderRadius: 100,
+                background: type === 'success' ? '#059669' : '#DC2626',
+                color: '#fff', fontSize: 13, fontWeight: 700, 
+                display: 'flex', alignItems: 'center', gap: 10,
+                boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+            }}
+        >
+            {type === 'success' ? <FiCheckCircle size={16} /> : <FiAlertCircle size={16} />}
             {message}
-            <button onClick={onClose} style={{ background:'none', border:'none', color:'rgba(255,255,255,0.7)', cursor:'pointer', display:'flex', marginLeft:4 }}><FiX size={13}/></button>
-        </div>
+        </Motion.div>
     );
-}
+};
 
-// ─── Loading Skeleton ───────────────────────────────────────────────────────────
-function TableSkeleton() {
-    return (
-        <div style={{ padding:20 }}>
-            {[1,2,3,4,5].map(i => (
-                <div key={i} style={{ display:'flex', gap:16, alignItems:'center', padding:'14px 0', borderBottom:'1px solid #F3F4F6' }}>
-                    <div style={{ width:13, height:13, borderRadius:3, background:'#F3F4F6' }} />
-                    <div style={{ width:30, height:30, borderRadius:'50%', background:'#F3F4F6' }} />
-                    <div style={{ flex:1 }}>
-                        <div style={{ width:`${50+i*10}%`, height:12, borderRadius:4, background:'#F3F4F6', marginBottom:4 }} />
-                        <div style={{ width:'40%', height:10, borderRadius:4, background:'#F9FAFB' }} />
-                    </div>
-                    <div style={{ width:60, height:20, borderRadius:10, background:'#F3F4F6' }} />
-                    <div style={{ width:70, height:20, borderRadius:10, background:'#F3F4F6' }} />
-                </div>
-            ))}
-        </div>
-    );
-}
+const TableSkeleton = () => (
+    <div style={{ padding: 20 }}>
+        {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} style={{ height: 60, background: '#f8fafc', borderRadius: 12, marginBottom: 12, animation: 'pulse 2s infinite' }} />
+        ))}
+    </div>
+);
 
-// ─── Main ───────────────────────────────────────────────────────────────────────
 export default function Users() {
     const store = useUserStore();
     const {
@@ -223,7 +226,6 @@ export default function Users() {
         { label:'User', key:'name' },
         { label:'Organization', key:'organization' },
         { label:'Role', key:'role' },
-        { label:'Tags', key:'tags' },
         { label:'Status', key:'status' },
     ];
 
@@ -285,92 +287,74 @@ export default function Users() {
             </div>
 
             {/* Bulk Bar */}
-            {selectedIds.length > 0 && (
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'9px 12px', marginBottom:10, background:'#EEF2FF', border:'1px solid #C7D2FE', borderRadius:7 }}>
-                    <span style={{ fontSize:12, fontWeight:600, color:'#4338CA' }}>{selectedIds.length} selected</span>
-                    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                        <button style={{ display:'flex', alignItems:'center', gap:5, padding:'4px 10px', fontSize:11, fontWeight:600, color:'#065F46', background:'#D1FAE5', border:'none', borderRadius:5, cursor:'pointer' }} onClick={handleBulkActivate}><FiUserCheck size={12}/> Activate</button>
-                        <button style={{ display:'flex', alignItems:'center', gap:5, padding:'4px 10px', fontSize:11, fontWeight:600, color:'#92400E', background:'#FEF3C7', border:'none', borderRadius:5, cursor:'pointer' }} onClick={handleBulkDeactivate}><FiUserX size={12}/> Deactivate</button>
-                        <button style={{ display:'flex', alignItems:'center', gap:5, padding:'4px 10px', fontSize:11, fontWeight:600, color:'#991B1B', background:'#FEE2E2', border:'none', borderRadius:5, cursor:'pointer' }} onClick={() => setBulkDeleteOpen(true)}><FiTrash2 size={12}/> Delete</button>
-                        <button style={{ fontSize:11, color:'#6B7280', background:'none', border:'none', cursor:'pointer', marginLeft:4 }} onClick={clearSelection}>Cancel</button>
-                    </div>
-                </div>
-            )}
+            <AnimatePresence>
+                {selectedIds.length > 0 && (
+                    <Motion.div 
+                        initial={{ opacity: 0, y: -10, height: 0 }}
+                        animate={{ opacity: 1, y: 0, height: 'auto' }}
+                        exit={{ opacity: 0, y: -10, height: 0 }}
+                        style={{ overflow: 'hidden' }}
+                    >
+                        <div style={{ 
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                            padding: '12px 16px', marginBottom: 16, 
+                            background: 'rgba(7, 34, 103, 0.05)', 
+                            backdropFilter: 'blur(8px)',
+                            border: `1px solid rgba(7, 34, 103, 0.1)`, 
+                            borderRadius: 16,
+                            boxShadow: '0 4px 12px rgba(7, 34, 103, 0.05)'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <div style={{ width: 24, height: 24, borderRadius: '50%', background: t.color.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
+                                    {selectedIds.length}
+                                </div>
+                                <span style={{ fontSize: 13, fontWeight: 700, color: t.color.primary }}>Users Selected</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', fontSize: 12, fontWeight: 700, color: t.color.success, background: t.color.successBg, border: `1px solid ${t.color.successBorder}`, borderRadius: 10, cursor: 'pointer', transition: 'all 0.2s' }} onClick={handleBulkActivate}><FiUserCheck size={14}/> Activate</button>
+                                <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', fontSize: 12, fontWeight: 700, color: t.color.warning, background: t.color.warningBg, border: `1px solid ${t.color.warningBorder}`, borderRadius: 10, cursor: 'pointer', transition: 'all 0.2s' }} onClick={handleBulkDeactivate}><FiUserX size={14}/> Deactivate</button>
+                                <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', fontSize: 12, fontWeight: 700, color: t.color.danger, background: t.color.dangerBg, border: `1px solid ${t.color.dangerBorder}`, borderRadius: 10, cursor: 'pointer', transition: 'all 0.2s' }} onClick={() => setBulkDeleteOpen(true)}><FiTrash2 size={14}/> Delete</button>
+                                <div style={{ width: 1, height: 20, background: 'rgba(7, 34, 103, 0.1)', margin: '0 4px' }} />
+                                <button style={{ fontSize: 12, fontWeight: 700, color: t.color.textPlaceholder, background: 'none', border: 'none', cursor: 'pointer', padding: '0 8px' }} onClick={clearSelection}>Cancel</button>
+                            </div>
+                        </div>
+                    </Motion.div>
+                )}
+            </AnimatePresence>
 
-            {/* Table */}
-            <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:12, overflow:'hidden', boxShadow: t.shadow.card, transition: `box-shadow ${t.transition.base}` }}>
-                {loading && users.length === 0 ? (
+            {/* Table Area */}
+            <div style={{ 
+                background: 'rgba(255, 255, 255, 0.9)', 
+                backdropFilter: 'blur(10px)',
+                border: `1px solid ${t.color.border}`, 
+                borderRadius: 24, 
+                overflow: 'hidden', 
+                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.04)', 
+                minHeight: 400 
+            }}>
+                {loading ? (
                     <TableSkeleton />
                 ) : (
-                    <table style={{ width:'100%', borderCollapse:'collapse', minWidth:700 }}>
-                        <thead style={{ background:'#F9FAFB', borderBottom:'1px solid #E5E7EB' }}>
-                            <tr>
-                                <th style={{ padding:'9px 10px', width:36 }}>
-                                    <input type="checkbox" style={{ width:13, height:13, cursor:'pointer', accentColor:'#4F46E5' }} checked={sortedUsers.length>0 && selectedIds.length===sortedUsers.length} onChange={() => toggleSelectAll(sortedUsers.map(u=>u.id))}/>
-                                </th>
-                                {colHeaders.map(h => (
-                                    <th key={h.key} style={{ padding:'9px 12px', fontSize:11, fontWeight:600, color:'#6B7280', textTransform:'uppercase', letterSpacing:'0.06em', textAlign:'left', cursor:'pointer', userSelect:'none' }} onClick={() => handleSort(h.key)}>
-                                        {h.label}<SortIcon col={h.key}/>
-                                    </th>
-                                ))}
-                                <th style={{ padding:'9px 12px', fontSize:11, fontWeight:600, color:'#6B7280', textTransform:'uppercase', letterSpacing:'0.06em', textAlign:'right' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sortedUsers.map(user => {
-                                const {initials,colors} = getAvatar(user.name);
-                                const isSel = selectedIds.includes(user.id);
-                                return (
-                                    <tr key={user.id} style={{ background: isSel?'#EEF2FF':'transparent', cursor:'pointer' }}
-                                        onClick={() => { setPeekUser(user); setIsPeekOpen(true); }}
-                                        onMouseEnter={e => { if(!isSel) e.currentTarget.style.background='#F9FAFB'; }}
-                                        onMouseLeave={e => { e.currentTarget.style.background = isSel?'#EEF2FF':'transparent'; }}
-                                    >
-                                        <td style={{ padding:'10px 10px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }} onClick={e => e.stopPropagation()}>
-                                            <input type="checkbox" style={{ width:13, height:13, cursor:'pointer', accentColor:'#4F46E5' }} checked={isSel} onChange={() => toggleSelectRow(user.id)}/>
-                                        </td>
-                                        <td style={{ padding:'10px 12px', fontSize:13, color:'#374151', whiteSpace:'nowrap', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}>
-                                            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                                                <div style={{ width:30,height:30,borderRadius:'50%',flexShrink:0,background:`linear-gradient(135deg,${colors[0]},${colors[1]})`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:'#fff' }}>{initials}</div>
-                                                <div>
-                                                    <div style={{ fontSize:13, fontWeight:600, color:'#111827', lineHeight:1.2 }}>{user.name}</div>
-                                                    <div style={{ fontSize:11, color:'#9CA3AF', marginTop:1 }}>{user.email}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td style={{ padding:'10px 12px', fontSize:13, color:'#374151', whiteSpace:'nowrap', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}>
-                                            {user.organization ? <span>{user.organization}</span> : <span style={{color:'#D1D5DB',fontStyle:'italic',fontSize:12}}>Not assigned</span>}
-                                        </td>
-                                        <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}><RoleBadge role={user.role}/></td>
-                                        <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}>
-                                            <div style={{ display:'flex', gap:4 }}>
-                                                {user.id % 3 === 0 && <span style={{ padding:'2px 6px', fontSize:10, fontWeight:700, borderRadius:4, background:'#EEF2FF', color:'#4F46E5', border:'1px solid #C7D2FE' }}>CRITICAL</span>}
-                                                {user.id % 2 === 0 ? <span style={{ padding:'2px 6px', fontSize:10, fontWeight:700, borderRadius:4, background:'#F0FDF4', color:'#16A34A', border:'1px solid #BBF7D0' }}>VERIFIED</span> : <span style={{ padding:'2px 6px', fontSize:10, fontWeight:700, borderRadius:4, background:'#F8FAFC', color:'#64748B', border:'1px solid #E2E8F0' }}>STANDARD</span>}
-                                            </div>
-                                        </td>
-                                        <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}><StatusBadge type={user.status} text={user.status==='active'?'Active':'Inactive'}/></td>
-                                        <td style={{ padding:'10px 12px', textAlign:'right', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }} onClick={e => e.stopPropagation()}>
-                                            <button
-                                                onClick={() => { setPeekUser(user); setIsPeekOpen(true); }}
-                                                style={{ padding:'4px 9px', fontSize:11, fontWeight:600, color:'#4F46E5', background:'none', border:'1px solid transparent', borderRadius:5, cursor:'pointer' }}
-                                                onMouseEnter={e => { e.currentTarget.style.background='#EEF2FF'; e.currentTarget.style.borderColor='#C7D2FE'; }}
-                                                onMouseLeave={e => { e.currentTarget.style.background='none'; e.currentTarget.style.borderColor='transparent'; }}
-                                            >View</button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                )}
-
-                {!loading && sortedUsers.length === 0 && (
-                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'56px 20px', textAlign:'center' }}>
-                        <div style={{ width:44, height:44, background:'#F3F4F6', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}><FiUsers size={20} color="#9CA3AF"/></div>
-                        <div style={{ fontSize:14, fontWeight:600, color:'#111827', marginBottom:4 }}>No users found</div>
-                        <div style={{ fontSize:12, color:'#6B7280', marginBottom:14 }}>Try adjusting your search or filters</div>
-                        <button onClick={resetFilters} style={{ fontSize:12, fontWeight:600, color:'#4F46E5', background:'none', border:'1px solid #C7D2FE', borderRadius:6, padding:'5px 14px', cursor:'pointer' }}>Reset filters</button>
-                    </div>
+                    <>
+                        <UserTable 
+                            data={sortedUsers}
+                            selectedIds={selectedIds}
+                            onSelectionChange={() => {}} 
+                            onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
+                            onEdit={handleEditUser}
+                            toggleSelectAll={() => toggleSelectAll(sortedUsers.map(u=>u.id))}
+                            toggleSelectRow={toggleSelectRow}
+                        />
+                        
+                        {sortedUsers.length === 0 && (
+                            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'56px 20px', textAlign:'center' }}>
+                                <div style={{ width:44, height:44, background:'#F3F4F6', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}><FiUsers size={20} color="#9CA3AF"/></div>
+                                <div style={{ fontSize:14, fontWeight:600, color:'#111827', marginBottom:4 }}>No users found</div>
+                                <div style={{ fontSize:12, color:'#6B7280', marginBottom:14 }}>Try adjusting your search or filters</div>
+                                <button onClick={resetFilters} style={{ fontSize:12, fontWeight:600, color:'#4F46E5', background:'none', border:'1px solid #C7D2FE', borderRadius:6, padding:'5px 14px', cursor:'pointer' }}>Reset filters</button>
+                            </div>
+                        )}
+                    </>
                 )}
 
                 {sortedUsers.length > 0 && (

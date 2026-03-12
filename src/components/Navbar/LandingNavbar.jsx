@@ -97,14 +97,13 @@ const Navbar = ({
                 position: sticky ? 'sticky' : 'relative',
                 top: 0,
                 zIndex: 1000,
-                width: '100%',
+                padding: '0 24px',
                 transition: 'background 0.3s ease, height 0.3s ease, border 0.3s ease'
             }}>
                 <nav style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '0 clamp(16px, 5vw, 40px)',
                     height: '100%',
                     maxWidth: '1280px',
                     margin: '0 auto',
