@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route , Navigate } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout"
 import Dashboard from "../pages/Admin/Dashboard";
 import Organizations from "../pages/Admin/Organizations";
@@ -6,7 +6,7 @@ import RiskAlerts from "../pages/Admin/RiskAlerts";
 import Reports from "../pages/Admin/Reports";
 import Users from "../pages/Admin/Users_Management";
 import Settings from "../pages/Admin/Settings";
-import { Navigate } from "react-router-dom";
+
 import Coordinator from "../pages/Admin/Coordinator";
 
 const AdminRoutes = () => {
