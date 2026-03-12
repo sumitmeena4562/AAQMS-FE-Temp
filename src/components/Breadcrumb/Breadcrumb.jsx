@@ -9,19 +9,6 @@ const Breadcrumb = ({ items = [], className = "" }) => {
     return (
         <nav
             aria-label="Breadcrumb"
-<<<<<<< HEAD
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 0 12px 0', /* Removing x-padding to let parent layout manage alignment */
-                background: 'transparent',
-                borderBottom: 'none',
-                fontFamily: 'var(--font-family)',
-                fontSize: '13.5px',
-                flexWrap: 'wrap',
-                ...style
-=======
             style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
@@ -30,7 +17,6 @@ const Breadcrumb = ({ items = [], className = "" }) => {
                 whiteSpace: 'nowrap',
                 fontFamily: 'inherit',
                 ...className
->>>>>>> 086dd5f40a42a94895bc433159a0f290b0202da4
             }}
             className="no-scrollbar"
         >
