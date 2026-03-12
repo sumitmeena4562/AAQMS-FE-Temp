@@ -35,7 +35,7 @@ const OrganizationCard = ({ org }) => {
         </div>
 
         {/* Stats Section - Line added here using border-t */}
-        <div className="grid grid-cols-3 gap-1 mt-6 border-t border-gray-100 !pt-4 !px-12 !py-14">
+        <div className="grid grid-cols-4 gap-1 mt-6 border-t border-gray-100 !pt-4 !px-12 !py-14">
           <div className="flex flex-col">
             <p className="text-[10px] text-gray-400 uppercase tracking-widest truncate">
               Coordi....
