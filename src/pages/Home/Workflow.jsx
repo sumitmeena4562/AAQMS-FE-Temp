@@ -6,6 +6,7 @@ import {
     MdOutlinePsychology,
     MdOutlineFactCheck
 } from 'react-icons/md';
+import { t } from '../../theme/theme';
 
 // eslint-disable-next-line no-unused-vars
 const WorkflowStep = ({ number, title, description, icon: Icon, isLast }) => (
@@ -18,7 +19,7 @@ const WorkflowStep = ({ number, title, description, icon: Icon, isLast }) => (
                 left: 'calc(50% + 40px)',
                 width: 'calc(100% - 80px)',
                 height: '2px',
-                background: 'linear-gradient(to right, var(--color-primary-light), var(--color-border))',
+                background: `linear-gradient(to right, ${t.color.primaryLight}, ${t.color.border})`,
                 zIndex: 0
             }}></div>
         )}
@@ -27,17 +28,17 @@ const WorkflowStep = ({ number, title, description, icon: Icon, isLast }) => (
         <div style={{
             width: '64px',
             height: '64px',
-            borderRadius: '50%',
-            background: '#fff',
-            border: '2px solid var(--color-primary)',
+            borderRadius: t.radius.circle,
+            background: t.color.bg,
+            border: `2px solid ${t.color.primary}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'var(--color-primary)',
+            color: t.color.primary,
             marginBottom: '20px',
             position: 'relative',
             zIndex: 1,
-            boxShadow: '0 8px 16px rgba(7, 34, 103, 0.1)'
+            boxShadow: t.shadow.md
         }}>
             <Icon size={28} />
             <div style={{
@@ -46,22 +47,22 @@ const WorkflowStep = ({ number, title, description, icon: Icon, isLast }) => (
                 right: '-5px',
                 width: '24px',
                 height: '24px',
-                borderRadius: '50%',
-                background: 'var(--color-primary)',
-                color: '#fff',
+                borderRadius: t.radius.circle,
+                background: t.color.primary,
+                color: t.color.textInverse,
                 fontSize: '12px',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '2px solid #fff'
+                border: `2px solid ${t.color.bg}`
             }}>
                 {number}
             </div>
         </div>
 
-        <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-primary-dark)', marginBottom: '10px' }}>{title}</h4>
-        <p style={{ fontSize: '13px', lineHeight: 1.5, color: 'var(--color-text-secondary)', maxWidth: '200px' }}>{description}</p>
+        <h4 style={{ fontSize: '16px', fontWeight: 800, color: t.color.primaryDark, marginBottom: '10px' }}>{title}</h4>
+        <p style={{ fontSize: '13px', lineHeight: 1.5, color: t.color.textSecondary, maxWidth: '200px' }}>{description}</p>
     </div>
 );
 
@@ -102,17 +103,17 @@ const Workflow = () => {
     return (
         <section className="workflow-section" style={{
             padding: '100px 24px',
-            background: 'var(--color-bg-primary)',
-            borderTop: '1px solid var(--color-border-light)'
+            background: t.color.bg,
+            borderTop: `1px solid ${t.color.borderLight}`
         }}>
             <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
                 {/* Section Header */}
                 <div style={{ textAlign: 'center', marginBottom: '80px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-primary)', letterSpacing: '0.1em', marginBottom: '12px' }}>OPERATIONAL FLOW</div>
+                    <div style={{ fontSize: '12px', fontWeight: 800, color: t.color.primary, letterSpacing: '0.1em', marginBottom: '12px' }}>OPERATIONAL FLOW</div>
                     <h2 style={{
                         fontSize: 'clamp(28px, 4vw, 42px)',
                         fontWeight: 800,
-                        color: 'var(--color-primary-dark)',
+                        color: t.color.primaryDark,
                         marginBottom: '20px',
                         letterSpacing: '-0.02em'
                     }}>
@@ -120,7 +121,7 @@ const Workflow = () => {
                     </h2>
                     <p style={{
                         fontSize: '17px',
-                        color: 'var(--color-text-secondary)',
+                        color: t.color.textSecondary,
                         lineHeight: 1.6,
                         maxWidth: '650px',
                         margin: '0 auto'

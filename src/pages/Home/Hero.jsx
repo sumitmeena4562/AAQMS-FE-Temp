@@ -1,6 +1,7 @@
 import React from 'react';
-import Card from '../../components/ui/Card';
-import StatusRow from '../../components/ui/StatusRow';
+import { motion } from 'framer-motion';
+import Card from '../../components/UI/Card';
+import { t } from '../../theme/theme';
 
 // Icon components for StatusRow
 const CheckIcon = ({ size = 18 }) => (
@@ -15,124 +16,246 @@ const PendingIcon = ({ size = 18 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
 );
 
-const Hero = () => {
+const LocalStatusRow = ({ title, subtitle, icon: Icon, status, statusText, extraText, isAlert }) => {
+    const statusColors = {
+        success: { color: t.color.success, bg: t.color.successBg },
+        alert: { color: t.color.danger, bg: `${t.color.danger}10` },
+        pending: { color: t.color.warning, bg: `${t.color.warning}10` }
+    };
+    
+    const config = statusColors[status] || statusColors.success;
+
     return (
-        <section className="hero-section" style={{ position: 'relative' }}>
-            <div className="hero-grid" style={{
-                maxWidth: '1280px',
-                margin: '0 auto',
-                padding: 'clamp(32px, 6vh, 80px) 24px',
-                display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)',
-                gap: 'clamp(24px, 4vw, 60px)',
-                alignItems: 'center',
-                position: 'relative'
-            }}>
-                {/* Background decorative blob */}
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px',
+            background: t.color.bg,
+            borderRadius: t.radius.sm,
+            border: `1px solid ${t.color.borderLight}`,
+            boxShadow: t.shadow.sm
+        }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
                     width: '32px',
-                    height: '16px',
-                    borderRadius: '50%',
-                    background: 'var(--color-border-dark)',
-                    opacity: 0.2,
-                    zIndex: 0
-                }}></div>
+                    height: '32px',
+                    borderRadius: t.radius.xs || '6px',
+                    background: config.bg,
+                    color: config.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}>
+                    <Icon size={18} />
+                </div>
+                <div>
+                    <div style={{ fontSize: '13px', fontWeight: 700, color: t.color.primaryDark }}>{title}</div>
+                    <div style={{ fontSize: '11px', color: t.color.textSecondary }}>{subtitle}</div>
+                </div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+                <div style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    color: config.color,
+                    letterSpacing: '0.05em'
+                }}>{statusText}</div>
+                {extraText && <div style={{ fontSize: '10px', color: t.color.textTertiary }}>{extraText}</div>}
+            </div>
+        </div>
+    );
+};
+
+const Hero = () => {
+    // Entrance Variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.15,
+                delayChildren: 0.3
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+        }
+    };
+
+    return (
+        <section className="hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
+            <motion.div
+                className="hero-grid"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                style={{
+                    maxWidth: '1280px',
+                    margin: '0 auto',
+                    padding: 'clamp(40px, 8vh, 100px) 24px',
+                    display: 'grid',
+                    gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 0.8fr)',
+                    gap: 'clamp(24px, 4vw, 60px)',
+                    alignItems: 'center',
+                    position: 'relative'
+                }}
+            >
+                {/* Background decorative blob */}
+                <motion.div
+                    animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.1, 0.2, 0.1],
+                        x: [0, 20, 0],
+                        y: [0, -20, 0]
+                    }}
+                    transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }}
+                    style={{
+                        position: 'absolute',
+                        top: '20%',
+                        right: '10%',
+                        width: '400px',
+                        height: '400px',
+                        borderRadius: t.radius.circle,
+                        background: `radial-gradient(circle, ${t.color.primaryLight} 0%, transparent 70%)`,
+                        filter: 'blur(60px)',
+                        opacity: 0.15,
+                        zIndex: 0
+                    }}
+                ></motion.div>
 
                 {/* Left side: Typography */}
                 <div style={{ zIndex: 10 }}>
-                    <div className="hero-pill" style={{
+                    <motion.div variants={itemVariants} className="hero-pill" style={{
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '8px',
-                        padding: '5px 14px',
-                        background: '#fff',
-                        borderRadius: 'var(--radius-full)',
-                        border: '1px solid var(--color-border)',
-                        marginBottom: '20px',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                        color: 'var(--color-text-secondary)',
-                        boxShadow: 'var(--shadow-sm)'
+                        padding: '6px 16px',
+                        background: t.color.bg,
+                        borderRadius: t.radius.pill,
+                        border: `1px solid ${t.color.border}`,
+                        marginBottom: '24px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: t.color.textSecondary,
+                        boxShadow: t.shadow.sm
                     }}>
-                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-primary-light)' }}></div>
+                        <div style={{ width: '8px', height: '8px', borderRadius: t.radius.circle, background: t.color.primary, boxShadow: `0 0 10px ${t.color.primary}` }}></div>
                         Enterprise Version 4.0 Live
-                    </div>
+                    </motion.div>
 
-                    <h1 className="hero-heading" style={{
-                        fontSize: 'clamp(1.75rem, 5vw, 3.2rem)',
-                        fontWeight: 800,
-                        lineHeight: 1.15,
-                        color: 'var(--color-primary-dark)',
-                        marginBottom: '20px',
-                        letterSpacing: '-0.02em',
-                        maxWidth: '15ch'
-                    }}>
-                        AI-Enabled Safety Audits & <span style={{ color: 'var(--color-info)' }}>Inventory Verification.</span>
-                    </h1>
+                    <motion.h1
+                        variants={itemVariants}
+                        className="hero-heading"
+                        style={{
+                            fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+                            fontWeight: 800,
+                            lineHeight: 1.05,
+                            color: t.color.primaryDark,
+                            marginBottom: '24px',
+                            letterSpacing: '-0.03em',
+                            maxWidth: '16ch'
+                        }}
+                    >
+                        AI-Enabled Safety Audits & <span style={{ color: t.color.primary }}>Inventory Verification.</span>
+                    </motion.h1>
 
-                    <p className="hero-paragraph" style={{
-                        fontSize: '15px',
-                        color: 'var(--color-text-tertiary)',
-                        lineHeight: 1.6,
-                        marginBottom: '28px',
-                        maxWidth: '500px'
-                    }}>
-                        Orchestrate complex operations with integrated Drone Maps and AI-assisted inventory comparison. Ensure asset accountability and regulatory compliance at scale.
-                    </p>
+                    <motion.p
+                        variants={itemVariants}
+                        className="hero-paragraph"
+                        style={{
+                            fontSize: '18px',
+                            color: t.color.textSecondary,
+                            lineHeight: 1.6,
+                            marginBottom: '40px',
+                            maxWidth: '520px'
+                        }}
+                    >
+                        Orchestrate complex operations with integrated Drone Maps and AI-assisted inventory comparison. Ensure asset accountability at scale.
+                    </motion.p>
 
-                    <div className="hero-buttons" style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-                        <button className="cta-button primary" style={{
-                            padding: '11px 22px',
-                            background: 'var(--color-primary-dark)',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 'var(--radius-md)',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            boxShadow: '0 4px 12px rgba(7, 34, 103, 0.2)'
-                        }}>
+                    <motion.div variants={itemVariants} className="hero-buttons" style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                        <motion.button
+                            whileHover={{ scale: 1.02, backgroundColor: t.color.primaryDark }}
+                            whileTap={{ scale: 0.98 }}
+                            className="cta-button primary"
+                            style={{
+                                padding: '14px 28px',
+                                background: t.color.primary,
+                                color: t.color.textInverse,
+                                border: 'none',
+                                borderRadius: t.radius.md,
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                boxShadow: t.shadow.md
+                            }}
+                        >
                             Request Demo
-                        </button>
+                        </motion.button>
 
-                        <button className="cta-button secondary" style={{
-                            padding: '11px 22px',
-                            background: '#fff',
-                            color: 'var(--color-text-primary)',
-                            border: '1px solid var(--color-border)',
-                            borderRadius: 'var(--radius-md)',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                        }}>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <motion.button
+                            whileHover={{ scale: 1.02, borderColor: t.color.borderDark }}
+                            whileTap={{ scale: 0.98 }}
+                            className="cta-button secondary"
+                            style={{
+                                padding: '14px 28px',
+                                background: t.color.bg,
+                                color: t.color.primaryDark,
+                                border: `1px solid ${t.color.border}`,
+                                borderRadius: t.radius.md,
+                                fontSize: '15px',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '10px'
+                            }}
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <circle cx="12" cy="12" r="10"></circle>
                                 <polygon points="10 8 16 12 10 16 10 8"></polygon>
                             </svg>
                             View Capabilities
-                        </button>
-                    </div>
+                        </motion.button>
+                    </motion.div>
                 </div>
 
                 {/* Right side: App UI Map Monitor */}
-                <div className="hero-card-container" style={{ zIndex: 10 }}>
+                <motion.div
+                    variants={itemVariants}
+                    animate={{
+                        y: [0, -15, 0],
+                        rotate: [0, 1, 0]
+                    }}
+                    transition={{
+                        duration: 6,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }}
+                    className="hero-card-container"
+                    style={{ zIndex: 10 }}
+                >
                     <Card
-                        padding="20px"
-                        borderRadius="20px"
+                        padding="32px"
+                        borderRadius="24px"
                         style={{ width: '100%', maxWidth: '100%' }}
                         hoverEffect={false}
                     >
                         {/* Header */}
-                        <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '12px', flexWrap: 'wrap' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: 'var(--font-size-xs)', fontWeight: 800, color: 'var(--color-text-secondary)', letterSpacing: '0.08em' }}>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', gap: '12px', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', fontWeight: 800, color: t.color.textTertiary, letterSpacing: '0.1em' }}>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                     <rect x="3" y="3" width="7" height="7"></rect>
                                     <rect x="14" y="3" width="7" height="7"></rect>
                                     <rect x="14" y="14" width="7" height="7"></rect>
@@ -140,22 +263,26 @@ const Hero = () => {
                                 </svg>
                                 ZONE MAP MONITOR
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '10px', fontWeight: 600, color: 'var(--color-text-tertiary)', background: 'var(--color-bg-primary)', padding: '4px 10px', borderRadius: ' var(--radius-full)' }}>
-                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 8px var(--color-success)' }}></div>
+                            <motion.div
+                                animate={{ scale: [1, 1.1, 1], opacity: [0.8, 1, 0.8] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10px', fontWeight: 700, color: t.color.successDark, background: t.color.successBg, padding: '6px 12px', borderRadius: t.radius.pill }}
+                            >
+                                <div style={{ width: '6px', height: '6px', borderRadius: t.radius.circle, background: t.color.success, boxShadow: `0 0 8px ${t.color.success}` }}></div>
                                 Live Feed
-                            </div>
+                            </motion.div>
                         </div>
 
-                        {/* List Items using StatusRow for best-in-class responsiveness */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-                            <StatusRow
+                        {/* List Items */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
+                            <LocalStatusRow
                                 title="Zone 101"
                                 subtitle="Fire Safety Equipment"
                                 icon={CheckIcon}
                                 status="success"
                                 statusText="VERIFIED"
                             />
-                            <StatusRow
+                            <LocalStatusRow
                                 title="Zone 102"
                                 subtitle="Critical Asset Missing"
                                 icon={AlertIcon}
@@ -164,21 +291,14 @@ const Hero = () => {
                                 extraText="1 Asset Unaccounted"
                                 isAlert
                             />
-                            <StatusRow
-                                title="Zone 103"
-                                subtitle="Scheduled: 14:00"
-                                icon={PendingIcon}
-                                status="pending"
-                                statusText="PENDING"
-                            />
                         </div>
 
                         {/* Map Image Block */}
                         <div style={{
                             width: '100%',
-                            height: 'clamp(140px, 20vh, 180px)',
-                            borderRadius: '14px',
-                            background: 'linear-gradient(135deg, #4daebb 0%, #2f8c9d 100%)',
+                            height: '200px',
+                            borderRadius: '16px',
+                            background: 'linear-gradient(135deg, #072267 0%, #0f172a 100%)',
                             position: 'relative',
                             overflow: 'hidden',
                             border: '1px solid rgba(255,255,255,0.1)'
@@ -186,31 +306,47 @@ const Hero = () => {
                             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '100%', background: 'repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255,255,255,0.05) 20px), repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255,255,255,0.05) 20px)' }}></div>
 
                             {/* Map Points */}
-                            <div style={{ position: 'absolute', top: '30%', left: '30%', width: '10px', height: '10px', borderRadius: '50%', background: '#fff', border: '2px solid var(--color-success)', boxShadow: '0 0 10px rgba(5,150,105,0.4)' }}></div>
-                            <div style={{ position: 'absolute', top: '60%', left: '55%', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--color-danger)', border: '2px solid #fff', boxShadow: '0 0 10px rgba(239,68,68,0.5)' }}></div>
-                            <div style={{ position: 'absolute', top: '70%', left: '75%', width: '8px', height: '8px', borderRadius: '50%', background: '#fff', opacity: 0.8 }}></div>
+                            <motion.div
+                                animate={{ scale: [1, 1.5, 1], opacity: [0.4, 0.8, 0.4] }}
+                                transition={{ duration: 3, repeat: Infinity }}
+                                style={{ position: 'absolute', top: '30%', left: '30%', width: '12px', height: '12px', borderRadius: '50%', background: '#10b981', boxShadow: '0 0 15px #10b981' }}
+                            ></motion.div>
+                            <motion.div
+                                animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.7, 0.3] }}
+                                transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+                                style={{ position: 'absolute', top: '60%', left: '55%', width: '14px', height: '14px', borderRadius: '50%', background: '#ef4444', boxShadow: '0 0 20px #ef4444' }}
+                            ></motion.div>
                         </div>
                     </Card>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
             {/* Inline styles for media queries */}
             <style dangerouslySetInnerHTML={{
                 __html: `
+                @media (max-width: 1200px) {
+                    .hero-grid {
+                        grid-template-columns: 1fr 1fr !important;
+                        gap: 32px !important;
+                    }
+                }
                 @media (max-width: 1024px) {
                     .hero-grid {
                         grid-template-columns: 1fr !important;
                         text-align: center;
                         padding-top: 40px !important;
+                        padding-bottom: 60px !important;
                     }
                     .hero-heading {
                         margin-left: auto;
                         margin-right: auto;
                         max-width: 100% !important;
+                        font-size: clamp(2.2rem, 8vw, 3.2rem) !important;
                     }
                     .hero-paragraph {
                         margin-left: auto;
                         margin-right: auto;
+                        font-size: 16px !important;
                     }
                     .hero-buttons {
                         justify-content: center;
@@ -219,21 +355,23 @@ const Hero = () => {
                         margin-left: auto;
                         margin-right: auto;
                     }
+                    .hero-card-container {
+                        max-width: 500px;
+                        margin: 40px auto 0;
+                    }
                 }
-
                 @media (max-width: 640px) {
                     .hero-heading {
-                        font-size: 2.2rem !important;
-                    }
-                    .cta-button {
-                        width: 100%;
+                        font-size: 2rem !important;
+                        letter-spacing: -0.02em !important;
                     }
                     .hero-buttons {
                         flex-direction: column;
+                        width: 100%;
                     }
-                    .card-header {
-                        flex-direction: column;
-                        align-items: flex-start !important;
+                    .cta-button {
+                        width: 100%;
+                        justify-content: center;
                     }
                 }
             `}} />

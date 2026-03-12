@@ -1,190 +1,256 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import useAuthStore from '../../store/authStore';
+import { t } from '../../theme/theme';
 
-/**
- * Sidebar Component — Global, Reusable, Fully Responsive
- *
- * Props:
- * @param {Array} navItems - Navigation items array. Each item can have children for sub-menus.
- *   Format: [{ label, path, icon, children: [{ label, path, icon }] }]
- * @param {React.ReactNode} logo - Logo component to render at the top
- * @param {Object} userInfo - User info for bottom section { name, email, avatar }
- * @param {boolean} collapsed - Whether sidebar is collapsed (icon-only mode)
- * @param {Function} onToggle - Callback when sidebar toggle is clicked
- */
-
-/* ── Animated Collapsible Wrapper ── */
+/* ── Animated Collapsible ── */
 const CollapsibleSection = ({ isOpen, children }) => {
     const ref = useRef(null);
     const [height, setHeight] = useState(0);
-
-    useEffect(() => {
-        if (ref.current) {
-            setHeight(ref.current.scrollHeight);
-        }
-    }, [children, isOpen]);
-
+    useEffect(() => { if (ref.current) setHeight(ref.current.scrollHeight); }, [children, isOpen]);
     return (
-        <div style={{
-            maxHeight: isOpen ? `${height}px` : '0px',
-            overflow: 'hidden',
-            transition: 'max-height 250ms ease',
-        }}>
-            <div ref={ref}>
-                {children}
-            </div>
+        <div style={{ maxHeight: isOpen ? `${height}px` : '0px', overflow:'hidden', transition:`max-height ${t.transition.smooth}` }}>
+            <div ref={ref}>{children}</div>
         </div>
     );
 };
 
-const Sidebar = ({
-    navItems = [],
-    logo,
-    userInfo,
-    collapsed = false,
-    onToggle
-}) => {
+/* ── Styles ── */
+const S = {
+    aside: (collapsed, mobileOpen) => ({
+        width: collapsed ? t.layout.sidebarCollapsed : t.layout.sidebarWidth,
+        minWidth: collapsed ? t.layout.sidebarCollapsed : t.layout.sidebarWidth,
+        background: t.color.sidebarBg,
+        borderRight: `1px solid ${t.color.sidebarBorder}`,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        position: 'sticky',
+        top: 0,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        transition: `width ${t.transition.smooth}, min-width ${t.transition.smooth}`,
+        zIndex: t.zIndex.sidebar,
+        flexShrink: 0,
+        fontFamily: 'inherit',
+    }),
+    logoWrap: (collapsed) => ({
+        height: t.layout.navbarHeight,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: collapsed ? `0 ${t.space.lg}px` : `0 ${t.space.xl}px`,
+        marginBottom: t.space.md,
+        position: 'sticky',
+        top: 0,
+        background: t.color.sidebarBg,
+        zIndex: 10,
+        boxSizing: 'border-box',
+        borderBottom: `1px solid ${t.color.borderLight}`,
+    }),
+    toggleBtn: {
+        width: 28, height: 28, borderRadius: t.radius.sm,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'transparent', border: '1px solid transparent',
+        cursor: 'pointer', color: t.color.textPlaceholder, flexShrink: 0,
+        transition: `all ${t.transition.fast}`,
+    },
+    nav: { padding: `${t.space.xs}px 10px`, display:'flex', flexDirection:'column', gap:1 },
+    simpleLink: (active, collapsed) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: collapsed ? 0 : 10,
+        justifyContent: collapsed ? 'center' : 'flex-start',
+        padding: collapsed ? '9px 0' : `${t.space.md}px ${t.space.lg}px`,
+        borderRadius: t.radius.sm,
+        fontSize: t.fontSize.md,
+        fontWeight: active ? t.fontWeight.semibold : 450,
+        color: active ? t.color.primary : t.color.textTertiary,
+        background: active ? t.color.primaryBg : 'transparent',
+        textDecoration: 'none',
+        transition: `all ${t.transition.fast}`,
+        position: 'relative',
+        cursor: 'pointer',
+        border: 'none',
+        width: '100%',
+        textAlign: 'left',
+        fontFamily: 'inherit',
+        outline: 'none',
+        letterSpacing: '-0.01em',
+    }),
+    icon: (active) => ({
+        opacity: active ? 1 : 0.55,
+        display: 'flex',
+        alignItems: 'center',
+        color: active ? t.color.primary : t.color.textMuted,
+        transition: `all ${t.transition.fast}`,
+        flexShrink: 0,
+    }),
+    chevron: (open) => ({
+        width: 14, height: 14,
+        transform: open ? 'rotate(180deg)' : 'rotate(0)',
+        transition: `transform ${t.transition.smooth}`,
+        opacity: 0.4,
+        flexShrink: 0,
+        marginLeft: 'auto',
+    }),
+    childrenWrap: {
+        marginLeft: t.space['2xl'],
+        paddingLeft: 10,
+        borderLeft: `1.5px solid ${t.color.border}`,
+        marginTop: 2,
+        marginBottom: t.space.xs,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1,
+    },
+    childLink: (active) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: t.space.md,
+        padding: `${t.space.sm}px 10px`,
+        borderRadius: 5,
+        fontSize: t.fontSize.sm,
+        fontWeight: active ? t.fontWeight.semibold : 450,
+        color: active ? t.color.primary : t.color.textMuted,
+        background: active ? t.color.primaryBg : 'transparent',
+        textDecoration: 'none',
+        transition: `all ${t.transition.fast}`,
+        letterSpacing: '-0.01em',
+    }),
+    sectionLabel: {
+        fontSize: t.fontSize.xxs,
+        fontWeight: t.fontWeight.semibold,
+        color: t.color.textPlaceholder,
+        textTransform: 'uppercase',
+        letterSpacing: '0.08em',
+        padding: `14px ${t.space.lg}px ${t.space.sm}px`,
+    },
+    bottom: {
+        marginTop: 'auto',
+        padding: '10px 10px',
+        borderTop: `1px solid ${t.color.borderLight}`,
+        background: t.color.sidebarBg,
+    },
+    userCard: (collapsed) => ({
+        padding: collapsed ? `${t.space.md}px ${t.space.sm}px` : `${t.space.md}px 10px`,
+        borderRadius: t.radius.md,
+        display: 'flex',
+        alignItems: 'center',
+        gap: collapsed ? 0 : 10,
+        justifyContent: collapsed ? 'center' : 'flex-start',
+        background: t.color.bg,
+        border: `1px solid ${t.color.border}`,
+        cursor: 'pointer',
+        transition: `all ${t.transition.fast}`,
+    }),
+    avatar: {
+        width: 30, height: 30, borderRadius: t.radius.sm,
+        background: `linear-gradient(135deg, ${t.color.primary}, #7C3AED)`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: t.color.textInverse, fontWeight: t.fontWeight.bold, fontSize: t.fontSize.sm, flexShrink: 0,
+    },
+    userName: {
+        fontWeight: t.fontWeight.semibold, fontSize: t.fontSize.sm,
+        color: t.color.text,
+        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        lineHeight: 1.2,
+    },
+    userEmail: {
+        fontSize: 10.5,
+        color: t.color.textPlaceholder,
+        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        marginTop: 1,
+    },
+    activeBar: {
+        position: 'absolute',
+        left: -10,
+        top: 8,
+        bottom: 8,
+        width: 3,
+        background: t.color.primary,
+        borderRadius: '0 3px 3px 0',
+    },
+    overlay: {
+        position: 'fixed',
+        inset: 0,
+        background: t.color.overlayDark,
+        backdropFilter: 'blur(2px)',
+        zIndex: 999,
+    },
+};
+
+const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, setMobileOpen, onToggle }) => {
+    const { user } = useAuthStore();
     const location = useLocation();
     const [openMenus, setOpenMenus] = useState({});
-    const [mobileOpen, setMobileOpen] = useState(false);
 
-    // Toggle sub-menu open/close
-    const toggleMenu = (label) => {
-        setOpenMenus(prev => ({ ...prev, [label]: !prev[label] }));
-    };
+    const toggleMenu = (label) => setOpenMenus(p => ({ ...p, [label]: !p[label] }));
 
-    // Check if a parent or any of its children is active
-    const isParentActive = (item) => {
-        if (item.children) {
-            return item.children.some(child =>
-                location.pathname === child.path || location.pathname.startsWith(child.path + '/')
-            );
-        }
-        return location.pathname === item.path || location.pathname.startsWith(item.path + '/');
-    };
+    const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
+    const isParentActive = (item) => item.children ? item.children.some(c => isActive(c.path)) : isActive(item.path);
 
-    // Auto-open parent menu if its child is active
     useEffect(() => {
         navItems.forEach(item => {
-            if (item.children && isParentActive(item)) {
-                setOpenMenus(prev => ({ ...prev, [item.label]: true }));
-            }
+            if (item.children && isParentActive(item)) setOpenMenus(p => ({ ...p, [item.label]: true }));
         });
     }, [location.pathname]);
 
-    // Close mobile sidebar on route change
-    useEffect(() => {
-        setMobileOpen(false);
-    }, [location.pathname]);
+    useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname]);
 
-    // ── Render nav item with children (collapsible) ──
-    const renderParentItem = (item) => {
-        const isOpen = openMenus[item.label];
-        const isChildActive = isParentActive(item);
+    const hoverOn = (e, isAct) => { if (!isAct) e.currentTarget.style.background = t.color.bgMuted; };
+    const hoverOff = (e, isAct) => { e.currentTarget.style.background = isAct ? t.color.primaryBg : 'transparent'; };
 
+    const renderSimple = (item) => {
+        const act = isActive(item.path);
         return (
-            <div key={item.label} style={{ marginBottom: '2px' }}>
+            <div key={item.path} style={{ position:'relative', marginBottom:1 }}>
+                {act && <div style={S.activeBar} />}
+                <NavLink
+                    to={item.path}
+                    style={S.simpleLink(act, collapsed)}
+                    onMouseEnter={e => hoverOn(e, act)}
+                    onMouseLeave={e => hoverOff(e, act)}
+                >
+                    <span style={S.icon(act)}>{item.icon}</span>
+                    {!collapsed && <span>{item.label}</span>}
+                </NavLink>
+            </div>
+        );
+    };
+
+    const renderParent = (item) => {
+        const isOpen = openMenus[item.label];
+        const childActive = isParentActive(item);
+        return (
+            <div key={item.label} style={{ marginBottom:1 }}>
                 <button
                     onClick={() => toggleMenu(item.label)}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: collapsed ? 0 : '12px',
-                        justifyContent: collapsed ? 'center' : 'space-between',
-                        width: '100%',
-                        padding: '10px 14px',
-                        borderRadius: '10px',
-                        fontSize: '13.5px',
-                        fontWeight: isChildActive || isOpen ? 600 : 500,
-                        color: isChildActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                        background: isOpen ? 'var(--color-primary-50)' : 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'all 180ms ease',
-                        letterSpacing: '-0.01em',
-                        fontFamily: 'var(--font-family)',
-                        textAlign: 'left',
-                        outline: 'none'
-                    }}
-                    onMouseEnter={e => {
-                        if (!isOpen) e.currentTarget.style.background = 'var(--color-bg-hover)';
-                    }}
-                    onMouseLeave={e => {
-                        if (!isOpen) e.currentTarget.style.background = 'transparent';
-                    }}
+                    style={S.simpleLink(childActive || isOpen, collapsed)}
+                    onMouseEnter={e => hoverOn(e, childActive || isOpen)}
+                    onMouseLeave={e => hoverOff(e, childActive || isOpen)}
                 >
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{
-                            opacity: isChildActive || isOpen ? 1 : 0.55,
-                            display: 'flex', alignItems: 'center',
-                            color: isChildActive ? 'var(--color-primary)' : 'inherit',
-                            transition: 'all 180ms ease'
-                        }}>{item.icon}</span>
-                        {!collapsed && item.label}
-                    </span>
+                    <span style={S.icon(childActive)}>{item.icon}</span>
+                    {!collapsed && <span style={{flex:1}}>{item.label}</span>}
                     {!collapsed && (
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                            style={{
-                                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                                transition: 'transform 250ms ease',
-                                opacity: 0.4,
-                                flexShrink: 0
-                            }}
-                        >
-                            <polyline points="6 9 12 15 18 9"></polyline>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={S.chevron(isOpen)}>
+                            <polyline points="6 9 12 15 18 9" />
                         </svg>
                     )}
                 </button>
-
-                {/* ── Children (animated collapse) ── */}
                 <CollapsibleSection isOpen={isOpen && !collapsed}>
-                    <div style={{
-                        marginLeft: '22px',
-                        paddingLeft: '14px',
-                        borderLeft: '2px solid var(--color-border)',
-                        marginTop: '4px',
-                        marginBottom: '6px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '2px'
-                    }}>
+                    <div style={S.childrenWrap}>
                         {item.children.map(child => {
-                            const childActive = location.pathname === child.path || location.pathname.startsWith(child.path + '/');
+                            const cAct = isActive(child.path);
                             return (
                                 <NavLink
                                     key={child.path}
                                     to={child.path}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '10px',
-                                        padding: '8px 12px',
-                                        borderRadius: '8px',
-                                        fontSize: '13px',
-                                        fontWeight: childActive ? 600 : 450,
-                                        color: childActive ? 'var(--color-primary)' : 'var(--color-text-tertiary)',
-                                        background: childActive ? 'var(--color-primary-50)' : 'transparent',
-                                        textDecoration: 'none',
-                                        transition: 'all 150ms ease',
-                                        letterSpacing: '-0.005em'
-                                    }}
-                                    onMouseEnter={e => {
-                                        if (!childActive) e.currentTarget.style.background = 'var(--color-bg-hover)';
-                                    }}
-                                    onMouseLeave={e => {
-                                        e.currentTarget.style.background = childActive ? 'var(--color-primary-50)' : 'transparent';
-                                    }}
+                                    style={S.childLink(cAct)}
+                                    onMouseEnter={e => hoverOn(e, cAct)}
+                                    onMouseLeave={e => hoverOff(e, cAct)}
                                 >
-                                    {child.icon && (
-                                        <span style={{
-                                            opacity: childActive ? 0.8 : 0.5,
-                                            display: 'flex', alignItems: 'center',
-                                            transition: 'opacity 150ms ease'
-                                        }}>{child.icon}</span>
-                                    )}
+                                    {child.icon && <span style={S.icon(cAct)}>{child.icon}</span>}
                                     {child.label}
                                 </NavLink>
                             );
@@ -195,235 +261,87 @@ const Sidebar = ({
         );
     };
 
-    // ── Render simple nav item (no children) ──
-    const renderSimpleItem = (item) => {
-        const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
-
-        return (
-            <NavLink
-                key={item.path}
-                to={item.path}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: collapsed ? 0 : '12px',
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    padding: '10px 14px',
-                    borderRadius: '10px',
-                    fontSize: '13.5px',
-                    fontWeight: isActive ? 600 : 500,
-                    color: isActive ? '#FFFFFF' : 'var(--color-text-secondary)',
-                    background: isActive ? 'var(--color-accent-light)' : 'transparent',
-                    textDecoration: 'none',
-                    transition: 'all 180ms ease',
-                    letterSpacing: '-0.01em',
-                    marginBottom: '2px',
-                    boxShadow: isActive ? '0 2px 8px rgba(59, 130, 246, 0.25)' : 'none'
-                }}
-                onMouseEnter={e => {
-                    if (!isActive) e.currentTarget.style.background = 'var(--color-bg-hover)';
-                }}
-                onMouseLeave={e => {
-                    e.currentTarget.style.background = isActive ? 'var(--color-accent-light)' : 'transparent';
-                }}
-            >
-                <span style={{
-                    opacity: isActive ? 1 : 0.55,
-                    display: 'flex', alignItems: 'center',
-                    transition: 'opacity 180ms ease'
-                }}>{item.icon}</span>
-                {!collapsed && item.label}
-            </NavLink>
-        );
-    };
-
-    // ── Render nav item (routes to correct renderer) ──
-    const renderNavItem = (item) => {
-        if (item.children && item.children.length > 0) {
-            return renderParentItem(item);
-        }
-        return renderSimpleItem(item);
-    };
-
-    // ── Sidebar Content ──
-    const sidebarContent = (
+    return (
         <>
-            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-                {/* Logo */}
-                {logo && (
-                    <div style={{
-                        padding: collapsed ? '20px 8px' : '24px 20px 16px 20px',
-                        borderBottom: '1px solid var(--color-border-light)',
-                        marginBottom: '8px'
-                    }}>
-                        {logo}
-                    </div>
-                )}
+            {mobileOpen && <div onClick={() => setMobileOpen(false)} style={S.overlay} />}
 
-                {/* Nav Items */}
-                <nav style={{
-                    padding: '4px 12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0px'
-                }}>
-                    {navItems.map(item => renderNavItem(item))}
-                </nav>
-            </div>
-
-            {/* Bottom User Info */}
-            {userInfo && (
-                <div style={{
-                    padding: collapsed ? '14px 8px' : '14px 20px',
-                    borderTop: '1px solid var(--color-border)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: collapsed ? 0 : '12px',
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    background: 'var(--color-bg-primary)',
-                    cursor: 'pointer',
-                    transition: 'background 150ms ease'
-                }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'var(--color-bg-hover)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'var(--color-bg-primary)'}
-                >
-                    <div style={{
-                        width: 36, height: 36, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, var(--color-success), #34D399)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontWeight: 700, fontSize: 14, flexShrink: 0,
-                        boxShadow: '0 2px 6px rgba(5, 150, 105, 0.25)'
-                    }}>
-                        {userInfo.avatar || userInfo.name?.charAt(0)?.toUpperCase() || 'U'}
+            <aside
+                className={`sidebar-panel ${mobileOpen ? 'sidebar-mobile-open' : ''}`}
+                style={S.aside(collapsed, mobileOpen)}
+            >
+                <div style={{ flex:1, overflowY:'auto', overflowX:'hidden', paddingBottom:10 }} className="no-scrollbar">
+                    {/* Logo + Toggle */}
+                    <div style={S.logoWrap(collapsed)}>
+                        {!collapsed && logo}
+                        <button
+                            onClick={onToggle}
+                            style={S.toggleBtn}
+                            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                            onMouseEnter={e => { e.currentTarget.style.background = t.color.bgMuted; e.currentTarget.style.borderColor = t.color.border; e.currentTarget.style.color = t.color.textSecondary; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = t.color.textPlaceholder; }}
+                        >
+                            {collapsed ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="11 17 6 12 11 7" /><polyline points="18 17 13 12 18 7" />
+                                </svg>
+                            )}
+                        </button>
                     </div>
-                    {!collapsed && (
-                        <div style={{ overflow: 'hidden', flex: 1 }}>
-                            <div style={{
-                                fontWeight: 600, fontSize: 13,
-                                color: 'var(--color-text-primary)',
-                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                            }}>
-                                {userInfo.name}
+
+                    {/* Section Label */}
+                    {!collapsed && <div style={S.sectionLabel}>Menu</div>}
+
+                    {/* Navigation */}
+                    <nav style={S.nav}>
+                        {navItems.map(item =>
+                            item.children && item.children.length > 0
+                                ? renderParent(item)
+                                : renderSimple(item)
+                        )}
+                    </nav>
+                </div>
+
+                {/* User Card */}
+                <div style={S.bottom}>
+                    {user && (
+                        <div
+                            style={S.userCard(collapsed)}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = t.color.primaryBorder; e.currentTarget.style.boxShadow = t.shadow.xs; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = t.color.border; e.currentTarget.style.boxShadow = t.shadow.none; }}
+                        >
+                            <div style={S.avatar}>
+                                {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'U'}
                             </div>
-                            <div style={{
-                                fontSize: 11,
-                                color: 'var(--color-text-muted)',
-                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                            }}>
-                                {userInfo.email}
-                            </div>
+                            {!collapsed && (
+                                <div style={{ overflow:'hidden', flex:1 }}>
+                                    <div style={S.userName}>{user.name || 'Admin User'}</div>
+                                    <div style={S.userEmail}>{user.email || 'admin@aisafety.com'}</div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
-            )}
-        </>
-    );
-
-    return (
-        <>
-            {/* ── Mobile Hamburger ── */}
-            <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="sidebar-mobile-toggle"
-                aria-label="Toggle sidebar"
-                style={{
-                    position: 'fixed',
-                    top: '14px',
-                    left: '14px',
-                    zIndex: 1001,
-                    width: 42, height: 42,
-                    borderRadius: '12px',
-                    background: '#FFFFFF',
-                    border: '1px solid var(--color-border)',
-                    boxShadow: 'var(--shadow-md)',
-                    display: 'none',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--color-text-secondary)',
-                    transition: 'all 150ms ease'
-                }}
-            >
-                {mobileOpen ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                )}
-            </button>
-
-            {/* ── Mobile Overlay ── */}
-            {mobileOpen && (
-                <div
-                    onClick={() => setMobileOpen(false)}
-                    className="sidebar-mobile-overlay"
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0, 0, 0, 0.35)',
-                        backdropFilter: 'blur(2px)',
-                        zIndex: 999,
-                        display: 'none'
-                    }}
-                />
-            )}
-
-            {/* ── Sidebar ── */}
-            <aside
-                className={`sidebar-panel ${mobileOpen ? 'sidebar-mobile-open' : ''}`}
-                style={{
-                    width: collapsed ? '72px' : 'var(--sidebar-width)',
-                    minWidth: collapsed ? '72px' : 'var(--sidebar-width)',
-                    background: 'var(--color-bg-secondary)',
-                    borderRight: '1px solid var(--color-border)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    height: '100vh',
-                    position: 'sticky',
-                    top: 0,
-                    overflowY: 'auto',
-                    overflowX: 'hidden',
-                    transition: 'width 200ms ease, min-width 200ms ease',
-                    zIndex: 1000,
-                    flexShrink: 0
-                }}
-            >
-                {sidebarContent}
             </aside>
 
-            {/* ── Responsive Styles ── */}
             <style>{`
-                .sidebar-panel::-webkit-scrollbar {
-                    width: 4px;
-                }
-                .sidebar-panel::-webkit-scrollbar-thumb {
-                    background: var(--color-border);
-                    border-radius: 9999px;
-                }
-                .sidebar-panel::-webkit-scrollbar-track {
-                    background: transparent;
-                }
+                .sidebar-panel::-webkit-scrollbar { width: 3px; }
+                .sidebar-panel::-webkit-scrollbar-thumb { background: ${t.color.borderDark}; border-radius: ${t.radius.full}px; }
+                .sidebar-panel::-webkit-scrollbar-track { background: transparent; }
                 @media (max-width: 768px) {
-                    .sidebar-mobile-toggle {
-                        display: flex !important;
-                    }
-                    .sidebar-mobile-overlay {
-                        display: block !important;
-                    }
                     .sidebar-panel {
                         position: fixed !important;
-                        top: 0 !important;
-                        left: 0 !important;
+                        top: 0 !important; left: 0 !important;
                         height: 100vh !important;
                         transform: translateX(-100%);
-                        transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1) !important;
-                        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.12);
-                        width: var(--sidebar-width) !important;
-                        min-width: var(--sidebar-width) !important;
+                        transition: transform ${t.transition.slow} !important;
+                        box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+                        width: ${t.layout.sidebarWidth}px !important; min-width: ${t.layout.sidebarWidth}px !important;
                     }
-                    .sidebar-panel.sidebar-mobile-open {
-                        transform: translateX(0);
-                    }
+                    .sidebar-panel.sidebar-mobile-open { transform: translateX(0); }
                 }
             `}</style>
         </>

@@ -1,38 +1,15 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
+import { FiChevronRight, FiHome } from "react-icons/fi";
+import { t } from "../../theme/theme";
 
-/**
- * Breadcrumb Component — Global, Reusable
- *
- * Props:
- * @param {Array} items - Breadcrumb trail array
- *   Format: [{ label: 'Dashboard', path: '/admin/dashboard' }, { label: 'Zones' }]
- *   Last item (no path) = current page (bold, no link)
- * @param {string} separator - Separator character (default: '›')
- * @param {Object} style - Extra custom styles for container
- * @param {string} className - Extra CSS classes
- *
- * Usage:
- *   <Breadcrumb items={[
- *       { label: 'Dashboard', path: '/admin/dashboard' },
- *       { label: 'Organizations', path: '/admin/organizations' },
- *       { label: 'Acme Logistics Hub', path: '/admin/organizations/1' },
- *       { label: 'Zones' }  // last item = current page
- *   ]} />
- */
-
-const Breadcrumb = ({
-    items = [],
-    separator = '›',
-    style = {},
-    className = ''
-}) => {
+const Breadcrumb = ({ items = [], className = "" }) => {
     if (!items.length) return null;
 
     return (
         <nav
-            className={className}
             aria-label="Breadcrumb"
+<<<<<<< HEAD
             style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -44,51 +21,60 @@ const Breadcrumb = ({
                 fontSize: '13.5px',
                 flexWrap: 'wrap',
                 ...style
+=======
+            style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 8, 
+                overflowX: 'auto', 
+                whiteSpace: 'nowrap',
+                fontFamily: 'inherit',
+                ...className
+>>>>>>> 086dd5f40a42a94895bc433159a0f290b0202da4
             }}
+            className="no-scrollbar"
         >
             {items.map((item, index) => {
                 const isLast = index === items.length - 1;
+                const isFirst = index === 0;
 
                 return (
                     <React.Fragment key={index}>
-                        {/* Separator (skip before first item) */}
-                        {index > 0 && (
-                            <span style={{
-                                color: 'var(--color-text-muted)',
-                                fontSize: '14px',
-                                userSelect: 'none',
-                                opacity: 0.6
-                            }}>
-                                {separator}
-                            </span>
-                        )}
-
-                        {/* Breadcrumb Item */}
-                        {isLast || !item.path ? (
-                            // Current page — bold, no link
-                            <span style={{
-                                fontWeight: 600,
-                                color: 'var(--color-text-primary)',
-                                letterSpacing: '-0.01em'
+                        {/* Item */}
+                        {isLast ? (
+                            <span style={{ 
+                                padding: '4px 0', 
+                                color: t.color.primary, 
+                                fontWeight: 800, 
+                                fontSize: 13,
+                                letterSpacing: '-0.2px'
                             }}>
                                 {item.label}
                             </span>
                         ) : (
-                            // Clickable link
                             <Link
                                 to={item.path}
                                 style={{
-                                    fontWeight: 450,
-                                    color: 'var(--color-text-tertiary)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 6,
                                     textDecoration: 'none',
-                                    transition: 'color 150ms ease',
-                                    letterSpacing: '-0.01em'
+                                    fontSize: 13,
+                                    fontWeight: 600,
+                                    color: t.color.textPlaceholder,
+                                    transition: `color ${t.transition.fast}`,
                                 }}
-                                onMouseEnter={e => e.currentTarget.style.color = 'var(--color-accent)'}
-                                onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-tertiary)'}
+                                onMouseEnter={e => e.currentTarget.style.color = t.color.textSecondary}
+                                onMouseLeave={e => e.currentTarget.style.color = t.color.textPlaceholder}
                             >
+                                {isFirst && <FiHome size={14} style={{ marginBottom: 1 }} />}
                                 {item.label}
                             </Link>
+                        )}
+
+                        {/* Modern Separator */}
+                        {!isLast && (
+                            <FiChevronRight size={14} color={t.color.borderDark} style={{ opacity: 0.6 }} />
                         )}
                     </React.Fragment>
                 );

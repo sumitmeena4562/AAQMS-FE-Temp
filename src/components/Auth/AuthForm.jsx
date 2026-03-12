@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import AuthLayout from "../../layouts/AuthLayout";
-import Button from "../../components/ui/Button";
+import Button from "../../components/UI/Button";
 
 const containerVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -56,38 +56,49 @@ function AuthForm({
                 variants={containerVariants}
                 style={{
                     backgroundColor: 'var(--color-bg-secondary)',
-                    padding: '32px 28px',
+                    padding: 'clamp(24px, 5vw, 40px) clamp(20px, 4vw, 32px)',
                     borderRadius: 'var(--radius-card)',
-                    boxShadow: 'var(--shadow-premium)',
+                    boxShadow: '0 20px 40px -20px rgba(0,0,0,0.1)',
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '20px',
-                    border: '1px solid var(--color-border-subtle, rgba(255,255,255,0.05))'
+                    gap: '24px',
+                    border: '1px solid var(--color-border-light)'
                 }}
             >
                 <div style={{ textAlign: 'center', marginBottom: '8px' }}>
                     <motion.h2
                         variants={itemVariants}
-                        style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}
+                        style={{ 
+                            fontSize: 'clamp(24px, 4vw, 32px)', 
+                            fontWeight: 800, 
+                            color: 'var(--color-text-primary)', 
+                            letterSpacing: '-0.03em', 
+                            lineHeight: 1.1,
+                            marginBottom: '10px'
+                        }}
                     >
                         {title}
                     </motion.h2>
                     <motion.p
                         variants={itemVariants}
-                        style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: '6px' }}
+                        style={{ 
+                            fontSize: 'clamp(14px, 2vw, 15px)', 
+                            color: 'var(--color-text-secondary)',
+                            fontWeight: 500
+                        }}
                     >
                         {subtitle}
                     </motion.p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '20px' } : { display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--spacing-4)', marginBottom: 'var(--spacing-4)' } : { display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {renderedChildren}
                     </div>
 
                     <motion.div variants={itemVariants} style={{ marginTop: '24px' }}>
-                        <Button type="submit" variant="dark" fullWidth disabled={isLoading}>
+                        <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
                             {isLoading ? loadingText : submitText}
                         </Button>
                     </motion.div>
@@ -95,12 +106,23 @@ function AuthForm({
 
                 <motion.div
                     variants={itemVariants}
-                    style={{ textAlign: 'center', marginTop: '16px', fontSize: '12px', color: 'var(--color-text-muted)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                    style={{ 
+                        textAlign: 'center', 
+                        fontSize: '11px', 
+                        color: 'var(--color-text-muted)', 
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '6px',
+                        letterSpacing: '0.02em',
+                        fontWeight: 600,
+                        textTransform: 'uppercase'
+                    }}
                 >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                     </svg>
-                    Secure Enterprise-grade Authentication
+                    Enterprise Security Active
                 </motion.div>
             </motion.div>
 
@@ -109,7 +131,13 @@ function AuthForm({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.8 }}
-                    style={{ textAlign: 'center', marginTop: '24px', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}
+                    style={{ 
+                        textAlign: 'center', 
+                        marginTop: '32px', 
+                        fontSize: '14px', 
+                        color: 'var(--color-text-secondary)',
+                        fontWeight: 500 
+                    }}
                 >
                     {footer}
                 </motion.div>

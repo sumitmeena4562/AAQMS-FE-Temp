@@ -11,6 +11,8 @@ const Registration = lazy(() => import('../pages/Auth/RegistrationPage'));
 const AdminRoutes = lazy(() => import('./AdminRoutes'));
 const CoordinatorRoutes = lazy(() => import('./CoordinatorRoutes'));
 const FieldOfficerRoutes = lazy(() => import('./FieldOfficerRoutes'));
+const ProtectedRoute = lazy(() => import('./ProtectedRoute'));
+const NotFound = lazy(() => import('../pages/NotFound'));
 
 // Simple Loading Fallback
 const PageLoader = () => (
@@ -38,10 +40,15 @@ const AppRoutes = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/registration" element={<Registration />} />
 
-                    {/* Role-Based Access */}
-                    <Route path="/admin/*" element={<AdminRoutes />} />
-                    <Route path="/coordinator/*" element={<CoordinatorRoutes />} />
-                    <Route path="/field-officer/*" element={<FieldOfficerRoutes />} />
+                    {/* Role-Based Access (Protected) */}
+                    <Route element={<ProtectedRoute />}>
+                        <Route path="/admin/*" element={<AdminRoutes />} />
+                        <Route path="/coordinator/*" element={<CoordinatorRoutes />} />
+                        <Route path="/field-officer/*" element={<FieldOfficerRoutes />} />
+                    </Route>
+
+                    {/* Catch-all 404 */}
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </Suspense>
 

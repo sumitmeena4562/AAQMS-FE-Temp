@@ -1,5 +1,6 @@
 import React from 'react';
-import Card from '../../components/ui/Card';
+import Card from '../../components/UI/Card';
+import { t } from '../../theme/theme';
 import {
     MdOutlineTrendingUp,
     MdOutlineAssignmentLate,
@@ -25,11 +26,11 @@ const StatCard = ({ label, value, trend, icon: Icon, color }) => (
             }}>
                 <Icon size={20} />
             </div>
-            {trend && <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-success)' }}>{trend}</span>}
+            {trend && <span style={{ fontSize: '12px', fontWeight: 700, color: t.color.success }}>{trend}</span>}
         </div>
         <div>
-            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>{label}</div>
-            <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-primary-dark)' }}>{value}</div>
+            <div style={{ fontSize: '13px', color: t.color.textSecondary, marginBottom: '4px' }}>{label}</div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: t.color.primaryDark }}>{value}</div>
         </div>
     </Card>
 );
@@ -38,19 +39,19 @@ const Analytics = () => {
     return (
         <section className="analytics-section" style={{
             padding: '100px 24px',
-            background: '#fff',
-            borderTop: '1px solid var(--color-border-light)'
+            background: t.color.bg,
+            borderTop: `1px solid ${t.color.borderLight}`
         }}>
             <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.2fr)', gap: '60px', alignItems: 'center' }} className="analytics-grid">
 
                 {/* Left Side: Text */}
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-info)', letterSpacing: '0.1em', marginBottom: '12px' }}>REPORTING & COMPLIANCE</div>
+                    <div style={{ fontSize: '12px', fontWeight: 800, color: t.color.primary, letterSpacing: '0.1em', marginBottom: '12px' }}>REPORTING & COMPLIANCE</div>
 
                     <h2 style={{
                         fontSize: 'clamp(28px, 4vw, 42px)',
                         fontWeight: 800,
-                        color: 'var(--color-primary-dark)',
+                        color: t.color.primaryDark,
                         marginBottom: '20px',
                         letterSpacing: '-0.02em'
                     }}>
@@ -59,7 +60,7 @@ const Analytics = () => {
 
                     <p style={{
                         fontSize: '17px',
-                        color: 'var(--color-text-secondary)',
+                        color: t.color.textSecondary,
                         lineHeight: 1.6,
                         marginBottom: '32px',
                         maxWidth: '520px'
@@ -73,8 +74,8 @@ const Analytics = () => {
                             "Tamper-proof audit trails for regulatory submission.",
                             "Historical data comparison for maintenance trends."
                         ].map((item, idx) => (
-                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', color: 'var(--color-text-primary)', fontWeight: 500 }}>
-                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-info)' }}></div>
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', color: t.color.text, fontWeight: 500 }}>
+                                <div style={{ width: '6px', height: '6px', borderRadius: t.radius.circle, background: t.color.primary }}></div>
                                 {item}
                             </div>
                         ))}
@@ -84,8 +85,8 @@ const Analytics = () => {
                 {/* Right Side: Visual Dashboard Snippet */}
                 <div style={{ position: 'relative' }}>
                     <Card style={{
-                        background: 'var(--color-bg-primary)',
-                        border: '1px solid var(--color-border)',
+                        background: t.color.bg,
+                        border: `1px solid ${t.color.border}`,
                         padding: '24px',
                         display: 'flex',
                         flexDirection: 'column',
@@ -93,11 +94,11 @@ const Analytics = () => {
                     }}>
                         {/* Header Snippet */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-primary-dark)' }}>Compliance Overview</h4>
+                            <h4 style={{ fontSize: '16px', fontWeight: 800, color: t.color.primaryDark }}>Compliance Overview</h4>
                             <div style={{ display: 'flex', gap: '8px' }}>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-success)' }}></div>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-warning)' }}></div>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-border-dark)' }}></div>
+                                <div style={{ width: '8px', height: '8px', borderRadius: t.radius.circle, background: t.color.success }}></div>
+                                <div style={{ width: '8px', height: '8px', borderRadius: t.radius.circle, background: t.color.warning }}></div>
+                                <div style={{ width: '8px', height: '8px', borderRadius: t.radius.circle, background: t.color.border }}></div>
                             </div>
                         </div>
 
@@ -121,9 +122,9 @@ const Analytics = () => {
                         {/* Chart Area Stub */}
                         <div style={{
                             height: '160px',
-                            background: '#fff',
-                            borderRadius: '16px',
-                            border: '1px solid var(--color-border-light)',
+                            background: t.color.bg,
+                            borderRadius: t.radius.md,
+                            border: `1px solid ${t.color.borderLight}`,
                             display: 'flex',
                             alignItems: 'flex-end',
                             padding: '16px',
@@ -133,7 +134,7 @@ const Analytics = () => {
                                 <div key={i} style={{
                                     flex: 1,
                                     height: `${h}%`,
-                                    background: i === 7 ? 'var(--color-primary)' : 'var(--color-primary-light)',
+                                    background: i === 7 ? t.color.primary : t.color.primaryLight,
                                     opacity: i === 7 ? 1 : 0.3,
                                     borderRadius: '4px'
                                 }}></div>
@@ -142,8 +143,8 @@ const Analytics = () => {
 
                         {/* Action buttons */}
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                            <button style={{ padding: '8px 16px', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>History</button>
-                            <button style={{ padding: '8px 16px', fontSize: '12px', fontWeight: 600, color: '#fff', background: 'var(--color-primary)', border: 'none', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <button style={{ padding: '8px 16px', fontSize: '12px', fontWeight: 600, color: t.color.textSecondary, background: t.color.bg, border: `1px solid ${t.color.border}`, borderRadius: t.radius.sm }}>History</button>
+                            <button style={{ padding: '8px 16px', fontSize: '12px', fontWeight: 600, color: t.color.textInverse, background: t.color.primary, border: 'none', borderRadius: t.radius.sm, display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <MdOutlineAutoGraph /> Generate Report
                             </button>
                         </div>
@@ -154,17 +155,17 @@ const Analytics = () => {
                         position: 'absolute',
                         bottom: '-20px',
                         left: '-20px',
-                        background: '#fff',
+                        background: t.color.bg,
                         padding: '12px 20px',
-                        borderRadius: '12px',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                        borderRadius: t.radius.md,
+                        boxShadow: t.shadow.md,
                         display: 'flex',
                         alignItems: 'center',
                         gap: '10px',
                         zIndex: 10
                     }}>
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 10px var(--color-success)' }}></div>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-primary-dark)' }}>Live Sync Active</span>
+                        <div style={{ width: '10px', height: '10px', borderRadius: t.radius.circle, background: t.color.success, boxShadow: `0 0 10px ${t.color.success}` }}></div>
+                        <span style={{ fontSize: '13px', fontWeight: 700, color: t.color.primaryDark }}>Live Sync Active</span>
                     </div>
                 </div>
             </div>

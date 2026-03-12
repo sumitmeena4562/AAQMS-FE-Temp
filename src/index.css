@@ -1,127 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-/* ── Google Font ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-/* ============================================
-   AAQMS — Global Theme (Exact Design Match)
-   ============================================ */
-
-:root {
-    /* ── Brand Colors (Deep Indigo) ── */
+@theme {
+    /* ── Pro Palette (High Contrast) ── */
     --color-primary: #072267;
-    --color-primary-light: #4F46E5;
-    --color-primary-dark: #072267;
-    --color-primary-50: #EEF2FF;
-    --color-primary-100: #E0E7FF;
+    --color-accent: #0070F3;
+    --color-accent-soft: #F0F7FF;
+    --color-brand-blue: #072267;
 
-    /* ── Accent Blue ── */
-    --color-accent: #2563EB;
-    --color-accent-light: #3B82F6;
-    --color-accent-dark: #1E40AF;
-    --color-accent-bright: #0066FF;
-    /* Added for specific text highlighting */
-
-    /* ── Success (Green) ── */
-    --color-success: #059669;
-    --color-success-light: #D1FAE5;
-    --color-success-lighter: #ECFDF5;
-    --color-success-dark: #065F46;
-
-    /* ── Warning (Orange/Amber) ── */
-    --color-warning: #EA580C;
-    --color-warning-light: #FFEDD5;
-    --color-warning-lighter: #FFF7ED;
-    --color-warning-dark: #9A3412;
-
-    /* ── Danger (Red) ── */
+    /* ── Status Colors (Minimalist Vibrant) ── */
+    --color-success: #10B981;
+    --color-success-bg: #ECFDF5;
     --color-danger: #EF4444;
-    --color-danger-light: #FEE2E2;
-    --color-danger-lighter: #FEF2F2;
-    --color-danger-dark: #DC2626;
-    --color-danger-darker: #B91C1C;
-
-    /* ── Info (Blue) ── */
-    --color-info: #2563EB;
-    --color-info-light: #DBEAFE;
-    --color-info-lighter: #EFF6FF;
-    --color-info-dark: #1E40AF;
-
-    /* ── Purple (for special badges) ── */
-    --color-purple: #9333EA;
-
-    /* ── Yellow (for tags/labels) ── */
-    --color-yellow-light: #FEF9C3;
-    --color-yellow-lighter: #FEFCE8;
-    --color-yellow-dark: #CA8A04;
+    --color-danger-bg: #FEF2F2;
+    --color-warning: #F59E0B;
+    --color-warning-bg: #FFFBEB;
+    --color-info: #3B82F6;
+    --color-info-bg: #EFF6FF;
 
     /* ── Backgrounds ── */
-    --color-bg-primary: #F9FAFB;
+    --color-bg-primary: #FAFAFA;
     --color-bg-secondary: #FFFFFF;
-    --color-bg-tertiary: #F3F4F6;
-    --color-bg-sidebar: #111827;
-    --color-bg-hover: #F3F4F6;
+    --color-bg-tertiary: #F1F3F5;
+    --color-bg-hover: #F9FAFB;
+    --color-bg-sidebar: #FFFFFF;
 
     /* ── Text ── */
-    --color-text-primary: #111827;
-    --color-text-secondary: #4B5563;
-    --color-text-tertiary: #6B7280;
-    --color-text-muted: #9CA3AF;
-    --color-text-inverse: #FFFFFF;
+    --color-text-primary: #000000;
+    --color-text-secondary: #666666;
+    --color-text-muted: #A1A1AA;
 
-    /* ── Borders ── */
-    --color-border: #E5E7EB;
-    --color-border-light: #F3F4F6;
-    --color-border-dark: #D1D5DB;
-    --color-border-focus: var(--color-primary);
+    /* ── Borders & Shadows (Minimalist) ── */
+    --color-border: #EAEAEA;
+    --color-border-hover: #D1D1D1;
+    --shadow-pro: 0 4px 12px rgba(0, 0, 0, 0.03);
+    --shadow-button: 0 2px 4px rgba(0, 0, 0, 0.02);
 
-    /* ── Shadows ── */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+    /* ── Strict Spacing Scale (8px Base) ── */
+    --spacing-1: 4px;
+    --spacing-2: 8px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
+    --spacing-12: 48px;
+    --spacing-16: 64px;
 
-    /* ── Premium High-Density Assets ── */
-    --shadow-premium: 0 10px 32px rgba(0, 0, 0, 0.19);
-    --shadow-premium-hover: 0 16px 48px rgba(0, 0, 0, 0.24);
-    --radius-card: 24px;
-    --space-card: 32px;
-    --space-card-md: 40px;
-
-    /* ── Spacing ── */
-    --space-xs: 0.25rem;
-    --space-sm: 0.5rem;
-    --space-md: 1rem;
-    --space-lg: 1.5rem;
-    --space-xl: 2rem;
-    --space-2xl: 3rem;
-
-    /* ── Border Radius ── */
-    --radius-sm: 0.375rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 0.75rem;
-    --radius-xl: 1rem;
+    /* ── Standard Radii ── */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-card: 20px;
     --radius-full: 9999px;
 
-    /* ── Font Sizes ── */
+    /* ── Typography Scale ── */
     --font-size-xs: 0.75rem;
-    --font-size-sm: 0.875rem;
-    --font-size-base: 1rem;
+    --font-size-sm: 0.8125rem;
+    --font-size-base: 0.9375rem;
     --font-size-lg: 1.125rem;
-    --font-size-xl: 1.25rem;
-    --font-size-2xl: 1.5rem;
-    --font-size-3xl: 1.875rem;
-    --font-size-4xl: 2.25rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 2rem;
+    --font-size-3xl: 2.5rem;
+    --font-size-4xl: 3.375rem;
+
+    --font-family-inter: 'Inter', -apple-system, system-ui, sans-serif;
+
+    /* ── Extended Design Tokens ── */
+    --color-primary-dark: #072267;
+    --color-primary-light: #4F46E5;
+    --color-text-tertiary: #6B7280;
+    --color-text-inverse: #FFFFFF;
+    --color-bg-auth-side: #072267;
+    --color-border-light: #F3F4F6;
+    --color-border-dark: #D1D5DB;
+    --shadow-premium: 0 10px 32px rgba(0, 0, 0, 0.08);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+    /* ── Role-specific colors ── */
+    --color-coordinator-bg: #F3E8FF;
+    --color-coordinator-text: #9333EA;
+    --color-field-bg: #DBEAFE;
+    --color-field-text: #2563EB;
+    --color-unassigned-text: #EF4444;
+
+    /* ── Badge & StatusRow Help ── */
+    --color-primary-50: #F5F8FF;
+    --color-success-lighter: #E6FBF2;
+    --color-danger-lighter: #FFF1F1;
+    --color-warning-lighter: #FFF9E9;
+    --color-warning-dark: #B45309;
 
     /* ── Transitions ── */
     --transition-fast: 150ms ease;
-    --transition-normal: 250ms ease;
+    --transition-base: 250ms ease;
 
-    /* ── Layout ── */
+    /* ── Layout Dimensions ── */
     --sidebar-width: 260px;
-    --navbar-height: 52px;
+    --navbar-height: 80px;
 
-    /* ── Font ── */
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* ── Font Family ── */
+    --font-family: 'Inter', -apple-system, system-ui, sans-serif;
 }
 
 /* ============================================
@@ -141,7 +119,6 @@ html {
 
 body {
     font-family: var(--font-family);
-    font-family: 'Inter', sans-serif;
     font-size: var(--font-size-base);
     background: var(--color-bg-primary);
     color: var(--color-text-primary);
@@ -171,4 +148,14 @@ a {
 ::-webkit-scrollbar-thumb {
     background: var(--color-text-muted);
     border-radius: var(--radius-full);
+}
+
+/* ── Scrollbar Hide Utility ── */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }

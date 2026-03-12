@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import FieldLayout from "../layouts/FieldLayout/FieldLayout";
-import Dashboard from "../pages/fieldOfficer/Dashboard";
+import Dashboard from "../pages/FieldOfficer/Dashboard";
 
 const FieldOfficerRoutes = () => {
     return (
