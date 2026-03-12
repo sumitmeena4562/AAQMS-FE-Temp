@@ -4,27 +4,34 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import AuthLayout from "../../layouts/AuthLayout";
 import Button from "../../components/UI/Button";
+import { t } from '../../theme/theme';
 
 const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 30, scale: 0.98 },
     visible: {
         opacity: 1,
         y: 0,
+        scale: 1,
         transition: {
-            duration: 0.6,
+            duration: 0.8,
+            ease: [0.16, 1, 0.3, 1], // Custom spring-like ease
             staggerChildren: 0.1
         }
     }
 };
 
 const itemVariants = {
-    hidden: { opacity: 0, x: -10 },
-    visible: { opacity: 1, x: 0 }
+    hidden: { opacity: 0, y: 15 },
+    visible: { 
+        opacity: 1, 
+        y: 0,
+        transition: { duration: 0.5, ease: "easeOut" }
+    }
 };
 
 /**
  * Reusable AuthForm component for Login and Registration
- * Simplifies the UI structure while keeping premium animations.
+ * Implements a premium glassmorphic card with sophisticated typography.
  */
 function AuthForm({
     title,
@@ -42,8 +49,6 @@ function AuthForm({
         resolver: zodResolver(schema)
     });
 
-    // We pass register and errors to children via a render prop pattern or cloning
-    // But for "beginner-friendly" simplicity, we'll just pass them to children if they are a function
     const renderedChildren = typeof children === 'function'
         ? children({ register, errors, itemVariants })
         : children;
@@ -55,27 +60,35 @@ function AuthForm({
                 animate="visible"
                 variants={containerVariants}
                 style={{
-                    backgroundColor: 'var(--color-bg-secondary)',
-                    padding: 'clamp(24px, 5vw, 40px) clamp(20px, 4vw, 32px)',
-                    borderRadius: 'var(--radius-card)',
-                    boxShadow: '0 20px 40px -20px rgba(0,0,0,0.1)',
+                    backgroundColor: t.color.bg,
+                    padding: 'clamp(24px, 4vw, 36px) clamp(20px, 4vw, 32px)',
+                    borderRadius: '20px', // Using 20px as per premium look but could use t.radius.pill if it fits
+                    boxShadow: t.shadow.xl,
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '24px',
-                    border: '1px solid var(--color-border-light)'
+                    border: `1px solid ${t.color.borderLight}`,
+                    position: 'relative',
+                    overflow: 'hidden'
                 }}
             >
-                <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+                {/* Subtle top highlight inner reflection */}
+                <div style={{
+                    position: 'absolute', top: 0, left: '10%', right: '10%', height: '1px',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)'
+                }} />
+
+                <div style={{ textAlign: 'center', marginBottom: '0px' }}>
                     <motion.h2
                         variants={itemVariants}
                         style={{ 
-                            fontSize: 'clamp(24px, 4vw, 32px)', 
+                            fontSize: 'clamp(22px, 3.5vw, 28px)', 
                             fontWeight: 800, 
-                            color: 'var(--color-text-primary)', 
+                            color: t.color.textPrimary, 
                             letterSpacing: '-0.03em', 
                             lineHeight: 1.1,
-                            marginBottom: '10px'
+                            marginBottom: '8px'
                         }}
                     >
                         {title}
@@ -83,9 +96,11 @@ function AuthForm({
                     <motion.p
                         variants={itemVariants}
                         style={{ 
-                            fontSize: 'clamp(14px, 2vw, 15px)', 
-                            color: 'var(--color-text-secondary)',
-                            fontWeight: 500
+                            fontSize: '13px', 
+                            color: t.color.textSecondary,
+                            fontWeight: 500,
+                            lineHeight: 1.5,
+                            padding: '0 5%'
                         }}
                     >
                         {subtitle}
@@ -93,12 +108,26 @@ function AuthForm({
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--spacing-4)', marginBottom: 'var(--spacing-4)' } : { display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '20px' } : { display: 'flex', flexDirection: 'column', gap: '14px' }}>
                         {renderedChildren}
                     </div>
 
                     <motion.div variants={itemVariants} style={{ marginTop: '24px' }}>
-                        <Button type="submit" variant="primary" size="lg" className="w-full" disabled={isLoading}>
+                        <Button 
+                            type="submit" 
+                            variant="primary" 
+                            size="lg" 
+                            className="w-full" 
+                            disabled={isLoading}
+                            style={{ 
+                                height: '44px', 
+                                fontSize: '14px', 
+                                fontWeight: 700,
+                                letterSpacing: '0.01em',
+                                borderRadius: '12px',
+                                boxShadow: `0 6px 16px -4px ${t.color.primary}50`
+                            }}
+                        >
                             {isLoading ? loadingText : submitText}
                         </Button>
                     </motion.div>
@@ -109,17 +138,18 @@ function AuthForm({
                     style={{ 
                         textAlign: 'center', 
                         fontSize: '11px', 
-                        color: 'var(--color-text-muted)', 
+                        color: t.color.textPlaceholder, 
                         display: 'flex', 
                         justifyContent: 'center', 
                         alignItems: 'center', 
                         gap: '6px',
-                        letterSpacing: '0.02em',
-                        fontWeight: 600,
-                        textTransform: 'uppercase'
+                        letterSpacing: '0.05em',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        marginTop: '8px'
                     }}
                 >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: t.color.success }}>
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                     </svg>
                     Enterprise Security Active
@@ -128,15 +158,17 @@ function AuthForm({
 
             {footer && (
                 <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8, duration: 0.6 }}
                     style={{ 
                         textAlign: 'center', 
                         marginTop: '32px', 
                         fontSize: '14px', 
-                        color: 'var(--color-text-secondary)',
-                        fontWeight: 500 
+                        color: t.color.textSecondary,
+                        fontWeight: 500,
+                        position: 'relative',
+                        zIndex: 10
                     }}
                 >
                     {footer}

@@ -11,6 +11,7 @@ const Registration = lazy(() => import('../pages/Auth/RegistrationPage'));
 const AdminRoutes = lazy(() => import('./AdminRoutes'));
 const CoordinatorRoutes = lazy(() => import('./CoordinatorRoutes'));
 const FieldOfficerRoutes = lazy(() => import('./FieldOfficerRoutes'));
+const GuestRoute = lazy(() => import('./GuestRoute'));
 const ProtectedRoute = lazy(() => import('./ProtectedRoute'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
@@ -37,8 +38,12 @@ const AppRoutes = () => {
                 <Routes>
                     {/* Public Access */}
                     <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/registration" element={<Registration />} />
+                    
+                    {/* Guest Access (Redirects if already logged in) */}
+                    <Route element={<GuestRoute />}>
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/registration" element={<Registration />} />
+                    </Route>
 
                     {/* Role-Based Access (Protected) */}
                     <Route element={<ProtectedRoute />}>

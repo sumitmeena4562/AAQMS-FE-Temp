@@ -16,12 +16,12 @@ function LoginPage() {
     const { login, isLoading } = useAuthStore();
 
     const onSubmit = async (data) => {
-        try {
-            await login(data);
-            toast.success("Login Successful!");
+        const result = await login(data);
+        if (result.success) {
+            toast.success(`Welcome back, ${result.user.name}!`);
             navigate('/admin/dashboard');
-        } catch (error) {
-            toast.error(error || "Invalid Email Or Password!");
+        } else {
+            toast.error(result.error || "Authentication failed. Please try again.");
         }
     };
 
