@@ -119,7 +119,7 @@ const AdminLayoutInner = () => {
                         </div>
                     }
                 />
-                <main style={{ flex:1, overflowY:'auto', padding: t.layout.contentPadding }}>
+                <main style={{ flex:1, overflowY:'auto', padding: 0 }}>
                     <div style={{ width:'100%', maxWidth: t.layout.maxContentWidth, margin:'0 auto' }}>
                         <Outlet />
                     </div>
