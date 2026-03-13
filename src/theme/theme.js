@@ -29,7 +29,7 @@ const color = {
 
     // Backgrounds
     bg:             '#FFFFFF',
-    bgPage:         '#f3f8ffff',
+    bgPage:         '#f3f3f3',
     bgHover:        '#F9FAFB',
     bgMuted:        '#F3F4F6',
     bgDark:         '#F9FAFB',

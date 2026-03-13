@@ -30,12 +30,10 @@ const Breadcrumb = ({ items = [], className = "" }) => {
                         {isLast ? (
                             <span style={{ 
                                 padding: '4px 0', 
-                                color: t.color.text, 
-                                fontWeight: 750, 
+                                color: t.color.primary, 
+                                fontWeight: 800, 
                                 fontSize: 13,
-                                letterSpacing: '-0.02em',
-                                display: 'flex',
-                                alignItems: 'center',
+                                letterSpacing: '-0.2px'
                             }}>
                                 {item.label}
                             </span>
@@ -47,38 +45,22 @@ const Breadcrumb = ({ items = [], className = "" }) => {
                                     alignItems: 'center',
                                     gap: 6,
                                     textDecoration: 'none',
-                                    fontSize: 12.5,
-                                    fontWeight: 550,
-                                    color: t.color.textMuted,
-                                    transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    letterSpacing: '-0.01em',
+                                    fontSize: 13,
+                                    fontWeight: 600,
+                                    color: t.color.textPlaceholder,
+                                    transition: `color ${t.transition.fast}`,
                                 }}
-                                className="breadcrumb-link"
-                                onMouseEnter={e => {
-                                    e.currentTarget.style.color = t.color.primary;
-                                    e.currentTarget.style.transform = 'translateY(-1px)';
-                                }}
-                                onMouseLeave={e => {
-                                    e.currentTarget.style.color = t.color.textMuted;
-                                    e.currentTarget.style.transform = 'translateY(0)';
-                                }}
+                                onMouseEnter={e => e.currentTarget.style.color = t.color.textSecondary}
+                                onMouseLeave={e => e.currentTarget.style.color = t.color.textPlaceholder}
                             >
-                                {isFirst && <FiHome size={13} style={{ marginBottom: 1.5, opacity: 0.8 }} />}
+                                {isFirst && <FiHome size={14} style={{ marginBottom: 1 }} />}
                                 {item.label}
                             </Link>
                         )}
 
-                        {/* Minimalist Separator */}
+                        {/* Modern Separator */}
                         {!isLast && (
-                            <FiChevronRight 
-                                size={12} 
-                                style={{ 
-                                    color: t.color.textPlaceholder, 
-                                    opacity: 0.5, 
-                                    margin: '0 2px',
-                                    flexShrink: 0
-                                }} 
-                            />
+                            <FiChevronRight size={14} color={t.color.borderDark} style={{ opacity: 0.6 }} />
                         )}
                     </React.Fragment>
                 );

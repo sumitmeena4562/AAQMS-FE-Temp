@@ -5,15 +5,14 @@ import Logo from "../../components/Branding/Logo";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import ProfileDropdown from "../../components/Navbar/ProfileDropdown";
 
-import Navbar, { NavSearch, NavIconButton } from "../../components/Navbar/Navbar";
+import Navbar from "../../components/Navbar/Navbar";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 import { BreadcrumbProvider, useBreadcrumb, generateBreadcrumbs } from "../../context/BreadcrumbContext";
-import useUserStore from "../../store/userStore";
 
 import { 
     FiBriefcase, FiUsers, FiAlertTriangle, 
     FiSettings, FiMap, FiLayers, FiTarget, 
-    FiBox, FiUser, FiHome, FiBarChart2, FiBell
+    FiBox, FiUser, FiGrid, FiHome, FiBarChart2
 } from 'react-icons/fi';
 
 // ── Nav Items Configuration ──
@@ -83,10 +82,6 @@ const AdminLayoutInner = () => {
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
     const [isCollapsed, setIsCollapsed] = React.useState(false);
 
-    // ── Store Integration ──
-    const userStore = useUserStore();
-    const isUserPage = location.pathname === '/admin/users';
-
     React.useEffect(() => {
         const autoCrumbs = generateBreadcrumbs(navItems, location.pathname);
         setBreadcrumbs(autoCrumbs);
@@ -106,40 +101,29 @@ const AdminLayoutInner = () => {
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
-                    // Dynamic Slot Injection: High-Fidelity Composition
                     leftContent={breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
-                    centerContent={
-                        <NavSearch 
-                            placeholder={isUserPage ? "Search users by name or email..." : "Type / to search everywhere..."} 
-                            value={isUserPage ? userStore.search : ""}
-                            onChange={(val) => isUserPage ? userStore.setSearch(val) : console.log("Global Search:", val)}
-                        />
-                    }
                     rightContent={
-                        <div style={{ display:'flex', alignItems:'center', gap: 16 }}>
-                            <NavIconButton icon={FiBell} onClick={() => console.log('Notifications')} />
+                        <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+                            {/* Notification Bell */}
+                            <button
+                                style={{ padding:6, background:'none', border:'none', cursor:'pointer', position:'relative', display:'flex', alignItems:'center', justifyContent:'center', color: t.color.textPlaceholder }}
+                                onMouseEnter={e => { e.currentTarget.style.color = t.color.textSecondary; }}
+                                onMouseLeave={e => { e.currentTarget.style.color = t.color.textPlaceholder; }}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                                </svg>
+                                <span style={{ position:'absolute', top:4, right:4, width:7, height:7, borderRadius:'50%', border: `2px solid ${t.color.bg}`, background: t.color.notifDot }} />
+                            </button>
                             <ProfileDropdown />
                         </div>
                     }
                 />
-                <main className="admin-main-content">
+                <main style={{ flex:1, overflowY:'auto', padding: t.layout.contentPadding }}>
                     <div style={{ width:'100%', maxWidth: t.layout.maxContentWidth, margin:'0 auto' }}>
                         <Outlet />
                     </div>
                 </main>
-                <style>{`
-                    .admin-main-content {
-                        flex: 1;
-                        overflow-y: auto;
-                        padding: ${t.layout.contentPadding}px;
-                        transition: padding 0.3s ease;
-                    }
-                    @media (max-width: 768px) {
-                        .admin-main-content {
-                            padding: 12px;
-                        }
-                    }
-                `}</style>
             </div>
         </div>
     );

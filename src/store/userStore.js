@@ -133,12 +133,10 @@ const useUserStore = create((set, get) => ({
     },
 
     clearSelection: () => set({ selectedIds: [] }),
-    setSelectedIds: (selectedIds) => set({ selectedIds }),
 
     resetFilters: () => set({
         search: '',
         filters: { organization: '', role: '', status: '', assignment: '' },
-        selectedIds: [],
     }),
 
     clearError: () => set({ error: null }),
