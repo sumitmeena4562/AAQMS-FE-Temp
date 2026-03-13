@@ -130,7 +130,7 @@ export default function Users() {
         users, stats, filterOptions, loading,
         search, filters, sortKey, sortDir, selectedIds,
         fetchUsers, createUser, updateUser, deleteUser, bulkAction, exportCSV,
-        setSearch, setFilters, handleSort, toggleSelectAll, toggleSelectRow,
+        setSearch, setFilters, handleSort, setSelectedIds,
         clearSelection, resetFilters,
     } = store;
 
@@ -255,18 +255,6 @@ export default function Users() {
 
             {/* Toolbar */}
             <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12, flexWrap:'wrap' }}>
-                <div style={{ position:'relative', width:260, flexShrink:0 }}>
-                    <span style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#9CA3AF', pointerEvents:'none', display:'flex' }}><FiSearch size={13}/></span>
-                    <input
-                        style={{ width:'100%', paddingLeft:32, paddingRight:28, paddingTop:7, paddingBottom:7, fontSize:13, background:'#fff', border:'1px solid #E5E7EB', borderRadius:7, outline:'none', boxSizing:'border-box', color:'#111827' }}
-                        placeholder="Search users..."
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                    />
-                    {search && <button onClick={() => setSearch('')} style={{ position:'absolute', right:8, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#9CA3AF', display:'flex', padding:2 }}><FiX size={12}/></button>}
-                </div>
-
-                <div style={{ width:1, height:24, background:'#E5E7EB' }} />
 
                 <FilterDropdown label="Role" value={filters.role} options={filterOptions.roles} onChange={v => setFilters({...filters, role:v})} allLabel="All Roles" />
                 <FilterDropdown label="Status" value={filters.status} options={['active','inactive']} onChange={v => setFilters({...filters, status:v})} allLabel="All Statuses" />
@@ -339,11 +327,9 @@ export default function Users() {
                         <UserTable 
                             data={sortedUsers}
                             selectedIds={selectedIds}
-                            onSelectionChange={() => {}} 
+                            onSelectionChange={setSelectedIds} 
                             onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
                             onEdit={handleEditUser}
-                            toggleSelectAll={() => toggleSelectAll(sortedUsers.map(u=>u.id))}
-                            toggleSelectRow={toggleSelectRow}
                         />
                         
                         {sortedUsers.length === 0 && (

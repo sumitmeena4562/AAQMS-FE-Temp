@@ -5,8 +5,10 @@ import {
     FiChevronRight, FiChevronLeft, FiCpu, FiGrid, FiActivity, FiLayers
 } from 'react-icons/fi';
 import { t } from '../../theme/theme';
+import useUserStore from '../../store/userStore';
 
 const ROLE_DETAILS = [
+// ... (existing role detail constants)
     { 
         id: 'Coordinator', 
         name: 'Coordinator', 
@@ -32,9 +34,9 @@ const ROLE_DETAILS = [
 
 const STATUS_OPTIONS = ['active', 'inactive'];
 const DESIGNATIONS = ['Regional Manager', 'Senior Coordinator', 'Operations Lead', 'Compliance Officer'];
-const ORGANIZATIONS = ['EcoTest Solutions', 'Urban Green Tech', 'PureAir Monitoring', 'Global Eco Labs'];
 
 const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false }) => {
+    const store = useUserStore();
     const isEdit = !!user;
     const [step, setStep] = useState(0);
     const [form, setForm] = useState({ 
@@ -279,7 +281,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                         <label style={labelStyle}>Affiliated Organization</label>
                                                         <select style={fieldStyle(false)} value={form.organization} onChange={e => handleChange('organization', e.target.value)} onFocus={focusStyle} onBlur={blurStyle}>
                                                             <option value="">Choose Unit</option>
-                                                            {ORGANIZATIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                                                            {store.filterOptions.organizations.map(o => <option key={o} value={o}>{o}</option>)}
                                                         </select>
                                                     </div>
                                                     
