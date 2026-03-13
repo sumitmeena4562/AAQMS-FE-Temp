@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import {
     MdOutlineFileUpload,
@@ -7,7 +7,6 @@ import {
     MdOutlinePsychology,
     MdOutlineFactCheck
 } from 'react-icons/md';
-import { t } from '../../theme/theme';
 
 const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
     const cardRef = useRef(null);
@@ -35,14 +34,7 @@ const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1, ease: [0.23, 1, 0.32, 1], delay: index * 0.1 }}
-            style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: isEven ? 'flex-start' : 'flex-end',
-                marginBottom: '80px',
-                position: 'relative',
-                zIndex: 2
-            }}
+            className={`w-full flex ${isEven ? 'justify-start' : 'justify-end'} mb-20 relative z-10`}
         >
             <motion.div
                 ref={cardRef}
@@ -52,106 +44,44 @@ const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
                     rotateX,
                     rotateY,
                     transformStyle: 'preserve-3d',
-                    width: 'clamp(280px, 35vw, 380px)',
-                    padding: '32px',
-                    borderRadius: '28px',
-                    background: 'rgba(255, 255, 255, 0.85)',
-                    backdropFilter: 'blur(16px)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                    boxShadow: `
-                        0 10px 30px -10px rgba(7, 34, 103, 0.15),
-                        0 20px 60px -15px rgba(7, 34, 103, 0.1),
-                        inset 0 0 0 1px rgba(255, 255, 255, 0.4)
-                    `,
-                    position: 'relative',
-                    cursor: 'pointer',
-                    overflow: 'hidden'
                 }}
+                className="w-full max-w-[380px] p-8 rounded-[32px] bg-white/80 backdrop-blur-2xl border border-white/40 shadow-2xl transition-shadow hover:shadow-primary/10 relative cursor-pointer overflow-hidden group ring-1 ring-slate-100/50"
             >
                 {/* Grain Texture Overlay */}
-                <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    opacity: 0.05,
-                    pointerEvents: 'none',
-                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                }} />
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />
 
                 {/* Internal Glow Follower */}
                 <motion.div
                     style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: `radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(0, 112, 243, 0.1) 0%, transparent 70%)`,
-                        borderRadius: '28px',
-                        zIndex: 0,
-                        pointerEvents: 'none'
+                        background: `radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--color-primary-rgb), 0.1) 0%, transparent 70%)`,
                     }}
-                    className="card-glow"
+                    className="absolute inset-0 rounded-[32px] z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 />
 
-                <div style={{ transform: 'translateZ(40px)', position: 'relative', zIndex: 1 }}>
+                <div style={{ transform: 'translateZ(50px)' }} className="relative z-10">
                     <motion.div 
                         initial={{ scale: 0.5, opacity: 0 }}
                         whileInView={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 10, delay: (index * 0.1) + 0.3 }}
-                        style={{
-                            width: '56px',
-                            height: '56px',
-                            borderRadius: '16px',
-                            background: `linear-gradient(135deg, ${t.color.primaryLight}, ${t.color.primary})`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            marginBottom: '20px',
-                            boxShadow: '0 8px 16px rgba(0, 112, 243, 0.25)'
-                        }}
+                        transition={{ type: "spring", stiffness: 200, damping: 12, delay: (index * 0.1) + 0.3 }}
+                        className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-light to-primary flex items-center justify-center text-white mb-6 shadow-lg shadow-primary/25"
                     >
-                        <Icon size={28} />
+                        <Icon className="text-3xl" />
                     </motion.div>
                     
-                    <div style={{
-                        position: 'absolute',
-                        top: '-10px',
-                        right: '-10px',
-                        fontSize: '100px',
-                        fontWeight: 950,
-                        color: 'rgba(7, 34, 103, 0.04)',
-                        userSelect: 'none',
-                        zIndex: -1,
-                        lineHeight: 1
-                    }}>
+                    <div className="absolute -top-3 -right-3 text-8xl font-black text-primary/[0.03] select-none z-[-1] leading-none transition-transform group-hover:scale-110 duration-700">
                         0{number}
                     </div>
 
-                    <h4 style={{ 
-                        fontSize: '22px', 
-                        fontWeight: 900, 
-                        color: t.color.primaryDark, 
-                        marginBottom: '12px',
-                        letterSpacing: '-0.02em'
-                    }}>
+                    <h4 className="text-2xl font-black text-slate-900 mb-3 tracking-tight leading-tight group-hover:text-primary transition-colors">
                         {title}
                     </h4>
-                    <p style={{ 
-                        fontSize: '15px', 
-                        lineHeight: 1.6, 
-                        color: t.color.textTertiary,
-                        fontWeight: 400
-                    }}>
+                    <p className="text-[15px] leading-relaxed text-slate-500 font-medium">
                         {description}
                     </p>
                 </div>
 
                 <style dangerouslySetInnerHTML={{ __html: `
-                    .card-glow {
+                    .group:hover {
                         --mouse-x: ${mouseXSpring.get() * 100 + 50}%;
                         --mouse-y: ${mouseYSpring.get() * 100 + 50}%;
                     }
@@ -179,146 +109,69 @@ const Workflow = () => {
     ];
 
     return (
-        <section ref={containerRef} className="workflow-section" style={{
-            padding: '120px 24px',
-            background: '#ffffff',
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
+        <section id="workflow" ref={containerRef} className="py-16 px-6 bg-white relative overflow-hidden border-t border-slate-100">
             {/* Ambient Lighting Leaks */}
-            <div style={{
-                position: 'absolute',
-                top: '-20%',
-                left: '-10%',
-                width: '600px',
-                height: '600px',
-                background: `radial-gradient(circle, ${t.color.primaryLight}08 0%, transparent 70%)`,
-                filter: 'blur(100px)',
-                zIndex: 0
-            }} />
-            <div style={{
-                position: 'absolute',
-                bottom: '-20%',
-                right: '-10%',
-                width: '600px',
-                height: '600px',
-                background: `radial-gradient(circle, ${t.color.primary}05 0%, transparent 70%)`,
-                filter: 'blur(100px)',
-                zIndex: 0
-            }} />
+            <div className="absolute -top-[20%] -left-[10%] w-[600px] h-[600px] bg-primary-light/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute -bottom-[20%] -right-[10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
             {/* Tech Grid Pattern */}
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundImage: `radial-gradient(${t.color.primaryLight}15 1px, transparent 1px)`,
-                backgroundSize: '32px 32px',
-                opacity: 0.4,
-                zIndex: 0
-            }} />
+            <div className="absolute inset-0 opacity-[0.4] z-0" 
+                 style={{ backgroundImage: 'radial-gradient(rgba(var(--color-primary-light-rgb), 0.15) 1px, transparent 1px)', backgroundSize: '32px 32px' }} 
+            />
 
             {/* Progress Hub (Sticky Side Nav) */}
-            <div style={{
-                position: 'fixed',
-                right: '40px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                zIndex: 100,
-                pointerEvents: 'none'
-            }} className="progress-hub">
+            <div className="fixed right-10 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-[100] pointer-events-none hidden xl:flex">
                 {steps.map((_, i) => (
                     <motion.div
                         key={i}
-                        style={{
-                            width: '4px',
-                            height: '40px',
-                            background: '#e0e0e0',
-                            borderRadius: '2px',
-                            overflow: 'hidden',
-                            position: 'relative'
-                        }}
+                        className="w-1 h-10 bg-slate-100 rounded-full overflow-hidden relative"
                     >
                         <motion.div
                             style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                background: t.color.primary,
                                 scaleY: useTransform(scrollYProgress, [i/steps.length, (i+1)/steps.length], [0, 1]),
                                 originY: 0
                             }}
+                            className="absolute inset-0 bg-primary"
                         />
                     </motion.div>
                 ))}
             </div>
 
-            <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative' }}>
+            <div className="max-w-5xl mx-auto relative z-10">
                 {/* Header */}
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    style={{ textAlign: 'center', marginBottom: '80px' }}
+                    className="text-center mb-12"
                 >
                     <motion.span 
                         animate={{ opacity: [0.6, 1, 0.6] }}
                         transition={{ duration: 4, repeat: Infinity }}
-                        style={{ 
-                            fontSize: '11px', 
-                            fontWeight: 900, 
-                            color: t.color.primaryLight, 
-                            letterSpacing: '0.3em', 
-                            textTransform: 'uppercase',
-                            display: 'block',
-                            marginBottom: '16px'
-                        }}
+                        className="text-[10px] font-black text-primary-light tracking-[0.3em] uppercase block mb-4"
                     >
-                        THE PROCESS
+                        The Process
                     </motion.span>
-                    <h2 style={{
-                        fontSize: 'clamp(32px, 6vw, 52px)',
-                        fontWeight: 950,
-                        color: t.color.primaryDark,
-                        letterSpacing: '-0.04em',
-                        lineHeight: 1.1,
-                        marginBottom: '20px'
-                    }}>
+                    <h2 className="text-[clamp(1.75rem,4vw,2.5rem)] font-black text-slate-900 tracking-tighter leading-none mb-6">
                         Efficiency Unleashed
                     </h2>
                 </motion.div>
 
                 {/* SVG Snake Path */}
-                <div style={{
-                    position: 'absolute',
-                    top: '200px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '100%',
-                    height: 'calc(100% - 300px)',
-                    zIndex: 1,
-                    pointerEvents: 'none'
-                }} className="path-container">
+                <div className="absolute top-48 left-1/2 -translate-x-1/2 w-full h-[calc(100%-300px)] z-0 pointer-events-none hidden lg:block">
                     <svg width="100%" height="100%" viewBox="0 0 1000 1200" fill="none" preserveAspectRatio="none">
                         <path
                             d="M 250 0 C 250 150 750 150 750 300 C 750 450 250 450 250 600 C 250 750 750 750 750 900 C 750 1050 500 1050 500 1200"
-                            stroke="#07226708"
+                            stroke="rgba(var(--color-primary-rgb), 0.03)"
                             strokeWidth="3"
                             strokeDasharray="8 8"
                         />
                         <motion.path
                             d="M 250 0 C 250 150 750 150 750 300 C 750 450 250 450 250 600 C 250 750 750 750 750 900 C 750 1050 500 1050 500 1200"
-                            stroke={t.color.primaryLight}
+                            stroke="currentColor"
                             strokeWidth="3"
                             style={{ pathLength }}
-                            filter="drop-shadow(0 0 6px rgba(0, 112, 243, 0.4))"
+                            className="text-primary-light filter drop-shadow-[0_0_8px_rgba(var(--color-primary-light-rgb),0.5)]"
                         />
                         
                         {/* Pulsing Nodes on Path */}
@@ -328,19 +181,18 @@ const Workflow = () => {
                                 cx={i % 2 === 0 ? 750 : 250}
                                 cy={yPos}
                                 r="6"
-                                fill={t.color.primaryLight}
+                                className="fill-primary-light shadow-[0_0_10px_rgba(var(--color-primary-light-rgb),1)]"
                                 initial={{ scale: 0 }}
                                 whileInView={{ scale: [0, 1.5, 1] }}
                                 animate={{ opacity: [0.4, 1, 0.4] }}
                                 transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
-                                style={{ filter: 'drop-shadow(0 0 4px #0070F3)' }}
                             />
                         ))}
                     </svg>
                 </div>
 
                 {/* Staggered Cards */}
-                <div style={{ position: 'relative', zIndex: 2 }}>
+                <div className="relative z-10">
                     {steps.map((step, index) => (
                         <MasterpieceCard
                             key={index}
@@ -350,12 +202,6 @@ const Workflow = () => {
                     ))}
                 </div>
             </div>
-
-            <style dangerouslySetInnerHTML={{ __html: `
-                @media (max-width: 1024px) {
-                    .path-container, .progress-hub { display: none; }
-                }
-            `}} />
         </section>
     );
 };

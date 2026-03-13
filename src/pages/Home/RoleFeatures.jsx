@@ -2,14 +2,27 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Card from '../../components/UI/Card';
 import { MdOutlineShield, MdOutlineMap, MdQrCodeScanner } from 'react-icons/md';
-import { t } from '../../theme/theme';
 
-// eslint-disable-next-line no-unused-vars
 const FeatureCard = ({ title, description, icon: Icon, colorTheme, index }) => {
     const themes = {
-        primary: { bg: `${t.color.primary}10`, color: t.color.primary },
-        secondary: { bg: `${t.color.info}10`, color: t.color.info },
-        success: { bg: `${t.color.success}10`, color: t.color.success }
+        primary: { 
+            bg: 'bg-primary/10', 
+            color: 'text-primary', 
+            border: 'hover:border-primary/40',
+            shadow: 'shadow-primary/5'
+        },
+        secondary: { 
+            bg: 'bg-sky-50', 
+            color: 'text-sky-600', 
+            border: 'hover:border-sky-400/40',
+            shadow: 'shadow-sky-500/5'
+        },
+        success: { 
+            bg: 'bg-emerald-50', 
+            color: 'text-emerald-600', 
+            border: 'hover:border-emerald-400/40',
+            shadow: 'shadow-emerald-500/5'
+        }
     };
 
     const theme = themes[colorTheme] || themes.primary;
@@ -19,52 +32,30 @@ const FeatureCard = ({ title, description, icon: Icon, colorTheme, index }) => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            style={{ height: '100%' }}
+            transition={{ duration: 0.6, delay: index * 0.1, ease: [0.21, 1, 0.36, 1] }}
+            className="h-full"
         >
             <Card
-                className="role-feature-card"
-                style={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '24px',
-                    border: `1px solid ${theme.color}30`,
-                    shadow: t.shadow.card
-                }}
+                className={`h-full flex flex-col gap-6 transition-all duration-500 border-slate-100 ${theme.border} group`}
+                hoverEffect={true}
             >
-                <div className="feature-icon-box" style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: t.radius.md,
-                    background: theme.bg,
-                    color: theme.color,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <Icon size={28} />
+                {/* Icon Box */}
+                <div className={`w-14 h-14 rounded-2xl ${theme.bg} ${theme.color} flex items-center justify-center shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500`}>
+                    <Icon className="text-[28px]" />
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <h3 className="feature-title" style={{
-                        fontSize: '20px',
-                        fontWeight: 800,
-                        color: t.color.primaryDark,
-                        margin: 0,
-                        letterSpacing: '-0.01em'
-                    }}>
+                {/* Content */}
+                <div className="flex flex-col gap-3">
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight leading-none group-hover:text-primary transition-colors">
                         {title}
                     </h3>
-                    <p className="feature-desc" style={{
-                        fontSize: '15px',
-                        lineHeight: 1.6,
-                        color: t.color.textSecondary,
-                        margin: 0
-                    }}>
+                    <p className="text-[15px] leading-relaxed text-slate-500 font-medium">
                         {description}
                     </p>
                 </div>
+                
+                {/* Decorative background element */}
+                <div className={`absolute -bottom-6 -right-6 w-20 h-20 ${theme.bg} rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
             </Card>
         </motion.div>
     );
@@ -93,65 +84,31 @@ const RoleFeatures = () => {
     ];
 
     return (
-        <section className="role-features-section" style={{
-            padding: 'clamp(60px, 10vh, 100px) 24px',
-            background: t.color.bg,
-            borderTop: `1px solid ${t.color.borderLight}`
-        }}>
-            <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+        <section id="roles" className="py-16 px-6 bg-white border-t border-slate-100 relative overflow-hidden">
+            <div className="max-w-7xl mx-auto">
                 {/* Section Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    className="section-header"
-                    style={{ textAlign: 'center', marginBottom: 'clamp(40px, 8vh, 80px)' }}
+                    transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+                    className="text-center mb-12"
                 >
-                    <h2 className="section-title" style={{
-                        fontSize: 'clamp(26px, 5vw, 42px)',
-                        fontWeight: 800,
-                        color: t.color.primaryDark,
-                        marginBottom: '16px',
-                        letterSpacing: '-0.02em'
-                    }}>
-                        Orchestrated Safety Operations
+                    <h2 className="text-[clamp(1.7rem,4vw,2.4rem)] font-black text-slate-900 mb-5 tracking-tighter leading-none">
+                        Orchestrated Safety <span className="text-primary">Operations</span>
                     </h2>
-                    <p className="section-subtitle" style={{
-                        fontSize: 'clamp(15px, 2vw, 17px)',
-                        color: t.color.textSecondary,
-                        maxWidth: '600px',
-                        margin: '0 auto',
-                        lineHeight: 1.6
-                    }}>
+                    <p className="text-base text-slate-500 max-w-xl mx-auto leading-relaxed font-medium">
                         Seamless coordination between administration, planning, and field execution.
                     </p>
                 </motion.div>
 
                 {/* Features Grid */}
-                <div className="features-grid" style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                    gap: '24px'
-                }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                     {features.map((feature, index) => (
                         <FeatureCard key={index} {...feature} index={index} />
                     ))}
                 </div>
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @media (max-width: 768px) {
-                    .features-grid {
-                        grid-template-columns: 1fr !important;
-                        gap: 16px !important;
-                    }
-                    .section-header {
-                        text-align: center !important;
-                    }
-                }
-            `}} />
         </section>
     );
 };

@@ -10,103 +10,45 @@ import {
     FaLinkedinIn,
     FaGithub
 } from 'react-icons/fa6';
-import { t } from '../../theme/theme';
 
 const FooterLink = ({ href, children }) => (
     <a
         href={href}
-        style={{
-            color: t.color.textSecondary,
-            textDecoration: 'none',
-            fontSize: '14px',
-            transition: 'color 0.2s ease',
-            display: 'block',
-            marginBottom: '10px'
-        }}
-        onMouseEnter={(e) => e.target.style.color = t.color.primary}
-        onMouseLeave={(e) => e.target.style.color = t.color.textSecondary}
+        className="text-sm text-slate-500 hover:text-primary transition-colors duration-200 block mb-2 font-medium"
     >
         {children}
     </a>
 );
 
-// eslint-disable-next-line no-unused-vars
 const SocialIcon = ({ icon: Icon, href }) => (
     <a
         href={href}
-        style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: t.radius.sm,
-            background: t.color.bg,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: t.color.primaryDark,
-            transition: 'all 0.2s ease',
-            border: `1px solid ${t.color.borderLight}`
-        }}
-        onMouseEnter={(e) => {
-            e.currentTarget.style.background = t.color.primary;
-            e.currentTarget.style.color = t.color.textInverse;
-            e.currentTarget.style.transform = 'translateY(-2px)';
-        }}
-        onMouseLeave={(e) => {
-            e.currentTarget.style.background = t.color.bg;
-            e.currentTarget.style.color = t.color.primaryDark;
-            e.currentTarget.style.transform = 'translateY(0)';
-        }}
+        className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white hover:border-primary hover:-translate-y-1 transition-all duration-300 shadow-sm"
     >
-        <Icon size={18} />
+        <Icon className="text-lg" />
     </a>
 );
 
 const Footer = () => {
     return (
-        <footer style={{
-            background: t.color.bgSecondary,
-            padding: '80px 24px 40px',
-            borderTop: `1px solid ${t.color.borderLight}`,
-            position: 'relative',
-            zIndex: 10
-        }}>
-            <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '1.2fr 0.8fr 0.8fr 1fr',
-                    gap: '60px',
-                    marginBottom: '60px'
-                }} className="footer-grid">
+        <footer className="bg-slate-50/50 py-20 px-6 border-t border-slate-100 relative z-10 overflow-hidden">
+            <div className="max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-20 mb-16">
 
                     {/* Brand Info */}
-                    <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
-                            <div style={{
-                                width: '32px',
-                                height: '32px',
-                                background: t.color.primary,
-                                borderRadius: t.radius.sm,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: t.color.textInverse
-                            }}>
-                                <MdSecurity size={20} />
+                    <div className="flex flex-col items-start">
+                        <div className="flex items-center gap-3 mb-6 group cursor-default">
+                            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:rotate-12 transition-transform duration-500">
+                                <MdSecurity className="text-xl" />
                             </div>
-                            <span style={{ fontSize: '20px', fontWeight: 800, color: t.color.primaryDark, letterSpacing: '-0.5px' }}>
+                            <span className="text-xl font-black text-slate-900 tracking-tighter">
                                 SAFETY AI
                             </span>
                         </div>
-                        <p style={{
-                            fontSize: '14px',
-                            color: t.color.textSecondary,
-                            lineHeight: 1.6,
-                            marginBottom: '24px',
-                            maxWidth: '280px'
-                        }}>
+                        <p className="text-sm text-slate-500 leading-relaxed mb-8 max-w-[280px] font-medium">
                             Next-generation AI-driven safety management suite. Digitizing audits for unmatched field compliance.
                         </p>
-                        <div style={{ display: 'flex', gap: '12px' }}>
+                        <div className="flex gap-3">
                             <SocialIcon icon={FaLinkedinIn} href="#" />
                             <SocialIcon icon={FaXTwitter} href="#" />
                             <SocialIcon icon={FaGithub} href="#" />
@@ -115,79 +57,65 @@ const Footer = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 style={{ fontSize: '15px', fontWeight: 700, color: t.color.primaryDark, marginBottom: '24px' }}>Platform</h4>
-                        <FooterLink href="#capabilities">Capabilities</FooterLink>
-                        <FooterLink href="#planning">Visual Planning</FooterLink>
-                        <FooterLink href="#workflow">Workflow</FooterLink>
-                        <FooterLink href="#mobile">Mobile App</FooterLink>
+                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Platform</h4>
+                        <div className="flex flex-col">
+                            <FooterLink href="#capabilities">Capabilities</FooterLink>
+                            <FooterLink href="#planning">Visual Planning</FooterLink>
+                            <FooterLink href="#workflow">Workflow</FooterLink>
+                            <FooterLink href="#mobile">Mobile App</FooterLink>
+                        </div>
                     </div>
 
                     {/* Company */}
                     <div>
-                        <h4 style={{ fontSize: '15px', fontWeight: 700, color: t.color.primaryDark, marginBottom: '24px' }}>Company</h4>
-                        <FooterLink href="#">About Us</FooterLink>
-                        <FooterLink href="#">Our Mission</FooterLink>
-                        <FooterLink href="#">Compliance Hub</FooterLink>
-                        <FooterLink href="#analytics">Reporting</FooterLink>
+                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Company</h4>
+                        <div className="flex flex-col">
+                            <FooterLink href="#">About Us</FooterLink>
+                            <FooterLink href="#">Our Mission</FooterLink>
+                            <FooterLink href="#">Compliance Hub</FooterLink>
+                            <FooterLink href="#analytics">Reporting</FooterLink>
+                        </div>
                     </div>
 
                     {/* Contact */}
                     <div>
-                        <h4 style={{ fontSize: '15px', fontWeight: 700, color: t.color.primaryDark, marginBottom: '24px' }}>Contact</h4>
-                        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                            <MdEmail size={20} color={t.color.primary} />
-                            <span style={{ fontSize: '14px', color: t.color.textSecondary }}>support@safetyai.com</span>
-                        </div>
-                        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                            <MdPhone size={20} color={t.color.primary} />
-                            <span style={{ fontSize: '14px', color: t.color.textSecondary }}>+91 (800) 123-4567</span>
-                        </div>
-                        <div style={{ display: 'flex', gap: '12px' }}>
-                            <MdLocationOn size={20} color={t.color.primary} />
-                            <span style={{ fontSize: '14px', color: t.color.textSecondary, lineHeight: 1.5 }}>
-                                Cyber Park, Zone 4,<br />Tech Hub, Mumbai
-                            </span>
+                        <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">Contact</h4>
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 group">
+                                <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary shrink-0 group-hover:scale-110 transition-transform">
+                                    <MdEmail className="text-lg" />
+                                </div>
+                                <span className="text-sm text-slate-500 font-medium">support@safetyai.com</span>
+                            </div>
+                            <div className="flex items-center gap-3 group">
+                                <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary shrink-0 group-hover:scale-110 transition-transform">
+                                    <MdPhone className="text-lg" />
+                                </div>
+                                <span className="text-sm text-slate-500 font-medium">+91 (800) 123-4567</span>
+                            </div>
+                            <div className="flex items-start gap-3 group">
+                                <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary shrink-0 group-hover:scale-110 transition-transform mt-0.5">
+                                    <MdLocationOn className="text-lg" />
+                                </div>
+                                <span className="text-sm text-slate-500 font-medium leading-relaxed">
+                                    Cyber Park, Zone 4,<br />Tech Hub, Mumbai
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Bottom Bar */}
-                <div style={{
-                    paddingTop: '32px',
-                    borderTop: `1px solid ${t.color.borderLight}`,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }} className="footer-bottom">
-                    <div style={{ fontSize: '13px', color: t.color.textSecondary }}>
+                <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="text-[13px] text-slate-400 font-medium">
                         © {new Date().getFullYear()} AAQMS Safety Management. All rights reserved.
                     </div>
-                    <div style={{ display: 'flex', gap: '24px' }}>
-                        <a href="#" style={{ fontSize: '13px', color: t.color.textSecondary, textDecoration: 'none' }}>Privacy Policy</a>
-                        <a href="#" style={{ fontSize: '13px', color: t.color.textSecondary, textDecoration: 'none' }}>Terms of Service</a>
+                    <div className="flex gap-8">
+                        <a href="#" className="text-[13px] text-slate-400 hover:text-primary transition-colors font-medium">Privacy Policy</a>
+                        <a href="#" className="text-[13px] text-slate-400 hover:text-primary transition-colors font-medium">Terms of Service</a>
                     </div>
                 </div>
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @media (max-width: 1024px) {
-                    .footer-grid {
-                        grid-template-columns: 1fr 1fr !important;
-                        gap: 40px !important;
-                    }
-                }
-                @media (max-width: 640px) {
-                    .footer-grid {
-                        grid-template-columns: 1fr !important;
-                    }
-                    .footer-bottom {
-                        flex-direction: column;
-                        gap: 20px;
-                        text-align: center;
-                    }
-                }
-            `}} />
         </footer>
     );
 };

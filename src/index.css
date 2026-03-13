@@ -1,7 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
+@config "../tailwind.config.js";
 
 @theme {
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
     /* ── Pro Palette (High Contrast) ── */
     --color-primary: #072267;
     --color-accent: #0070F3;
@@ -103,12 +106,28 @@
 }
 
 /* ============================================
-   Base Reset
+   Base Reset & Layout Fixes
    ============================================ */
 
+/* Force critical utilities if JIT fails */
+.mx-auto { margin-left: auto !important; margin-right: auto !important; }
+.px-6 { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+
+.hero-grid {
+    width: 100%;
+    max-width: 1280px; /* 7xl */
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+@media (max-width: 1024px) {
+    .hero-grid {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
 * {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
 }
 

@@ -9,9 +9,7 @@ import {
     MdOutlineAssignmentLate,
     MdOutlineVerified,
 } from 'react-icons/md';
-import { t } from '../../theme/theme';
 
-// eslint-disable-next-line no-unused-vars
 const CapabilityCard = ({ title, description, icon: Icon, index }) => {
     return (
         <motion.div
@@ -19,81 +17,42 @@ const CapabilityCard = ({ title, description, icon: Icon, index }) => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.7, delay: index * 0.1, ease: [0.21, 1, 0.36, 1] }}
-            style={{ height: '100%' }}
+            className="h-full"
         >
-            <motion.div
-                whileHover={{ y: -10, transition: { duration: 0.3 } }}
-                style={{ height: '100%' }}
+            <Card
+                className="h-full flex flex-col gap-6 group hover:border-primary/30 transition-all duration-500"
+                hoverEffect={true}
             >
-                <Card
-                    className="capability-card"
-                    style={{
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '20px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                        backdropFilter: 'blur(12px)',
-                        WebkitBackdropFilter: 'blur(12px)',
-                        border: `1px solid rgba(255, 255, 255, 0.3)`,
-                        boxShadow: `0 10px 30px -10px ${t.color.primary}15`,
-                        transition: 'all 0.3s ease',
-                        position: 'relative',
-                        overflow: 'hidden'
-                    }}
+                {/* Decorative Background Glow */}
+                <div className="absolute -top-5 -right-5 w-20 h-20 bg-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/10 transition-colors" />
+
+                {/* Icon Box */}
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary flex items-center justify-center shadow-inner border border-primary/10 relative z-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                    <Icon className="text-[28px]" />
+                </div>
+
+                {/* Text Content */}
+                <div className="flex flex-col gap-3 relative z-10">
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight leading-tight group-hover:text-primary transition-colors">
+                        {title}
+                    </h3>
+                    <p className="text-[15px] leading-relaxed text-slate-500 font-medium">
+                        {description}
+                    </p>
+                </div>
+
+                {/* Hover indicator */}
+                <motion.div 
+                    className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                    initial={{ x: -10 }}
+                    whileHover={{ x: 0 }}
                 >
-                    {/* Decorative Background Glow */}
-                    <div style={{
-                        position: 'absolute',
-                        top: '-20px',
-                        right: '-20px',
-                        width: '80px',
-                        height: '80px',
-                        background: `${t.color.primary}05`,
-                        borderRadius: '50%',
-                        filter: 'blur(30px)',
-                        pointerEvents: 'none'
-                    }} />
-
-                    <div className="capability-icon-box" style={{
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '16px',
-                        background: `linear-gradient(135deg, ${t.color.primary}15, ${t.color.primary}05)`,
-                        color: t.color.primary,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: `inset 0 0 0 1px ${t.color.primary}10`,
-                        position: 'relative',
-                        zIndex: 1
-                    }}>
-                        <Icon size={28} />
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative', zIndex: 1 }}>
-                        <h3 className="capability-title" style={{
-                            fontSize: '20px',
-                            fontWeight: 850,
-                            color: t.color.primaryDark,
-                            margin: 0,
-                            letterSpacing: '-0.02em',
-                            lineHeight: 1.2
-                        }}>
-                            {title}
-                        </h3>
-                        <p className="capability-desc" style={{
-                            fontSize: '15px',
-                            lineHeight: 1.6,
-                            color: t.color.textSecondary,
-                            margin: 0,
-                            fontWeight: 450
-                        }}>
-                            {description}
-                        </p>
-                    </div>
-                </Card>
-            </motion.div>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-primary/40">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </motion.div>
+            </Card>
         </motion.div>
     );
 };
@@ -133,83 +92,35 @@ const Capabilities = () => {
     ];
 
     return (
-        <section className="capabilities-section" style={{
-            padding: '120px 24px',
-            background: t.color.bgSecondary,
-            borderTop: `1px solid ${t.color.borderLight}`
-        }}>
-            <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+        <section id="capabilities" className="py-16 px-6 bg-slate-50/50 border-t border-slate-100 overflow-hidden">
+            <div className="max-w-7xl mx-auto">
                 {/* Section Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
-                    className="section-header"
-                    style={{ textAlign: 'left', marginBottom: 'clamp(48px, 8vh, 72px)' }}
+                    className="mb-12"
                 >
-                    <div style={{ 
-                        fontSize: '11px', 
-                        fontWeight: 900, 
-                        color: t.color.primaryLight, 
-                        letterSpacing: '0.25em', 
-                        textTransform: 'uppercase',
-                        marginBottom: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
-                    }}>
-                        <div style={{ width: '40px', height: '1px', background: t.color.primaryLight, opacity: 0.3 }}></div>
+                    <div className="flex items-center gap-4 text-[11px] font-black text-primary tracking-widest uppercase mb-4">
+                        <div className="w-10 h-px bg-primary/30"></div>
                         Key Expertise
                     </div>
-                    <h2 className="section-title" style={{
-                        fontSize: 'clamp(32px, 6vw, 48px)',
-                        fontWeight: 950,
-                        color: t.color.primaryDark,
-                        marginBottom: '20px',
-                        letterSpacing: '-0.03em',
-                        lineHeight: 1.1
-                    }}>
-                        Core <span style={{ color: t.color.primaryLight }}>Capabilities.</span>
+                    <h2 className="text-[clamp(1.75rem,4vw,2.5rem)] font-black text-slate-900 mb-5 tracking-tight leading-none">
+                        Core <span className="text-primary">Capabilities.</span>
                     </h2>
-                    <p className="section-subtitle" style={{
-                        fontSize: 'clamp(16px, 2.5vw, 19px)',
-                        color: t.color.textTertiary,
-                        maxWidth: '640px',
-                        lineHeight: 1.6,
-                        fontWeight: 450
-                    }}>
+                    <p className="text-base text-slate-500 max-w-xl leading-relaxed font-medium">
                         Enterprise-grade tools built for rigorous inventory and safety standards, delivering precision at every touchpoint.
                     </p>
                 </motion.div>
 
                 {/* Grid */}
-                <div className="capabilities-grid" style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                    gap: '24px'
-                }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                     {list.map((item, index) => (
                         <CapabilityCard key={index} {...item} index={index} />
                     ))}
                 </div>
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @media (max-width: 768px) {
-                    .section-header {
-                        text-align: center !important;
-                    }
-                    .section-subtitle {
-                        margin: 0 auto !important;
-                    }
-                    .capabilities-grid {
-                        grid-template-columns: 1fr !important;
-                        gap: 16px !important;
-                    }
-                }
-            `}} />
         </section>
     );
 };

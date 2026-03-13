@@ -1,25 +1,12 @@
-import { t } from '../../theme/theme';
+import React from 'react';
 import { motion } from 'framer-motion';
 import Card from '../../components/UI/Card';
 
 const CTA = () => {
     return (
-        <section className="cta-section" style={{
-            padding: '120px 24px',
-            background: t.color.primaryDark,
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
+        <section id="contact" className="py-16 px-6 bg-[#071121] relative overflow-hidden">
             {/* Complex Multi-layered Background */}
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: `radial-gradient(circle at 10% 10%, ${t.color.primaryLight}15 0%, transparent 40%), radial-gradient(circle at 90% 90%, ${t.color.primaryLight}15 0%, transparent 40%)`,
-                zIndex: 0
-            }}></div>
+            <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_10%_10%,_rgba(var(--color-primary-light-rgb),0.15)_0%,_transparent_40%),_radial-gradient(circle_at_90%_90%,_rgba(var(--color-primary-light-rgb),0.15)_0%,_transparent_40%)]" />
 
             <motion.div
                 animate={{ 
@@ -27,97 +14,41 @@ const CTA = () => {
                     opacity: [0.3, 0.5, 0.3]
                 }}
                 transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                style={{
-                    position: 'absolute',
-                    top: '20%',
-                    right: '10%',
-                    width: '500px',
-                    height: '500px',
-                    background: `radial-gradient(circle, ${t.color.primaryLight}10 0%, transparent 70%)`,
-                    borderRadius: '50%',
-                    filter: 'blur(80px)',
-                    zIndex: 0
-                }}
-            ></motion.div>
+                className="absolute top-1/5 right-[10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[80px] z-0"
+            />
 
-            <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
-                <Card style={{
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    backdropFilter: 'blur(20px)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    padding: 'clamp(48px, 8vw, 80px) 24px',
-                    borderRadius: '40px',
-                    textAlign: 'center',
-                    boxShadow: '0 40px 100px -20px rgba(0,0,0,0.5)'
-                }}>
+            <div className="max-w-5xl mx-auto relative z-10">
+                <Card 
+                    className="bg-white/5 backdrop-blur-3xl border-white/10 py-12 md:py-16 px-6 md:px-12 rounded-[32px] text-center shadow-2xl ring-1 ring-white/10"
+                    hoverEffect={false}
+                >
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.8 }}
+                        transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
                     >
-                        <h2 style={{
-                            fontSize: 'clamp(32px, 6vw, 56px)',
-                            fontWeight: 950,
-                            color: '#fff',
-                            marginBottom: '24px',
-                            letterSpacing: '-0.04em',
-                            lineHeight: 1
-                        }}>
+                        <h2 className="text-[clamp(1.75rem,5vw,2.5rem)] font-black text-white mb-6 tracking-tighter leading-[1.05]">
                             Ready to Modernize Your <br />
-                            <span style={{ 
-                                background: `linear-gradient(to right, ${t.color.primaryLight}, #60a5fa)`,
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent'
-                            }}>Safety Operations?</span>
+                            <span className="bg-gradient-to-r from-primary-light to-blue-400 bg-clip-text text-transparent">Safety Operations?</span>
                         </h2>
                         
-                        <p style={{
-                            fontSize: 'clamp(17px, 2.5vw, 20px)',
-                            color: 'rgba(255,255,255,0.7)',
-                            marginBottom: '48px',
-                            lineHeight: 1.6,
-                            maxWidth: '700px',
-                            margin: '0 auto 48px',
-                            fontWeight: 450
-                        }}>
+                        <p className="text-base md:text-lg text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed font-semibold">
                             Join industry leaders who trust our AI-enabled platform for precision auditing and global inventory accountability.
                         </p>
 
-                        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <div className="flex flex-col sm:flex-row gap-5 justify-center">
                             <motion.button 
-                                whileHover={{ scale: 1.05, boxShadow: `0 20px 40px -10px ${t.color.primaryLight}40` }}
+                                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px -10px rgba(var(--color-primary-light-rgb), 0.4)" }}
                                 whileTap={{ scale: 0.95 }}
-                                style={{
-                                    padding: '18px 40px',
-                                    background: '#fff',
-                                    color: t.color.primaryDark,
-                                    border: 'none',
-                                    borderRadius: '16px',
-                                    fontSize: '16px',
-                                    fontWeight: 850,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    letterSpacing: '-0.01em'
-                                }}
+                                className="px-10 py-5 bg-white text-slate-900 rounded-2xl text-base font-black tracking-tight hover:bg-slate-50 transition-all cursor-pointer"
                             >
                                 Get Started Now
                             </motion.button>
                             <motion.button 
-                                whileHover={{ scale: 1.05, background: 'rgba(255,255,255,0.08)' }}
+                                whileHover={{ scale: 1.05, background: "rgba(255,255,255,0.08)" }}
                                 whileTap={{ scale: 0.95 }}
-                                style={{
-                                    padding: '18px 40px',
-                                    background: 'transparent',
-                                    color: '#fff',
-                                    border: '1px solid rgba(255,255,255,0.2)',
-                                    borderRadius: '16px',
-                                    fontSize: '16px',
-                                    fontWeight: 850,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    letterSpacing: '-0.01em'
-                                }}
+                                className="px-10 py-5 bg-transparent text-white border border-white/20 rounded-2xl text-base font-black tracking-tight transition-all cursor-pointer"
                             >
                                 Talk to an Expert
                             </motion.button>

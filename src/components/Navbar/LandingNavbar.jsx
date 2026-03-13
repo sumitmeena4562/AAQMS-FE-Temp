@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../Branding/Logo';
-import { t } from '../../theme/theme';
 
-const Navbar = ({
+const LandingNavbar = ({
     navLinks = [],
     buttons = [],
     sticky = true,
@@ -12,13 +11,12 @@ const Navbar = ({
     const [isScrolled, setIsScrolled] = useState(false);
 
     // Track scroll for background change
-    React.useEffect(() => {
+    useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 20);
         };
         window.addEventListener('scroll', handleScroll);
         
-        // Prevent body scroll when menu is open
         if (isMenuOpen) {
             document.body.style.overflow = 'hidden';
         } else {
@@ -31,101 +29,60 @@ const Navbar = ({
         };
     }, [isMenuOpen]);
 
-    const buttonStyles = {
-        outline: {
-            padding: '10px 22px',
-            fontSize: '13px',
-            fontWeight: 700,
-            border: `1px solid ${t.color.border}`,
-            borderRadius: t.radius.md,
-            background: 'transparent',
-            color: t.color.text,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            whiteSpace: 'nowrap',
-        },
-        filled: {
-            padding: '10px 22px',
-            fontSize: '13px',
-            fontWeight: 700,
-            border: 'none',
-            borderRadius: t.radius.md,
-            background: t.color.primary,
-            color: t.color.textInverse,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            whiteSpace: 'nowrap',
-        },
-    };
-
     const menuVariants = {
         closed: { 
             opacity: 0,
-            x: '100%',
-            transition: {
-                type: 'spring',
-                stiffness: 400,
-                damping: 40
-            }
+            y: -20,
+            transition: { type: 'spring', stiffness: 400, damping: 40 }
         },
         open: { 
             opacity: 1,
-            x: 0,
-            transition: {
-                type: 'spring',
-                stiffness: 400,
+            y: 0,
+            transition: { 
+                type: 'spring', 
+                stiffness: 400, 
                 damping: 40,
                 staggerChildren: 0.1,
-                delayChildren: 0.2
+                delayChildren: 0.1
             }
         }
     };
 
     const itemVariants = {
-        closed: { opacity: 0, y: 20 },
-        open: { opacity: 1, y: 0 }
+        closed: { opacity: 0, x: -20 },
+        open: { opacity: 1, x: 0 }
     };
 
     return (
         <>
-            <header style={{
-                height: t.layout.navbarHeight,
-                background: isScrolled ? 'rgba(255, 255, 255, 0.85)' : 'transparent',
-                backdropFilter: isScrolled ? 'blur(16px)' : 'none',
-                WebkitBackdropFilter: isScrolled ? 'blur(16px)' : 'none',
-                borderBottom: isScrolled ? `1px solid ${t.color.borderLight}` : 'none',
-                position: sticky ? 'sticky' : 'relative',
-                top: 0,
-                zIndex: 1000,
-                padding: '0 24px',
-                transition: 'background 0.3s ease, height 0.3s ease, border 0.3s ease'
-            }}>
-                <nav style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    height: '100%',
-                    maxWidth: '1280px',
-                    margin: '0 auto',
-                    position: 'relative',
-                }}>
+            <motion.header 
+                initial={{ y: -100 }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                className={`
+                    ${sticky ? 'sticky' : 'relative'} top-0 left-0 right-0 z-50 px-6 transition-all duration-500
+                    ${isScrolled 
+                        ? 'h-16 py-2 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]' 
+                        : 'h-20 py-4 bg-transparent border-b border-transparent'}
+                `}
+            >
+                <nav className="flex items-center justify-between h-full max-w-7xl mx-auto overflow-visible">
                     {/* Left — Logo */}
-                    <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-start', zIndex: 1100 }}>
-                        <Logo size="md" />
+                    <div className="flex-1 flex justify-start z-[60]">
+                        <motion.div 
+                            whileHover={{ scale: 1.05 }} 
+                            whileTap={{ scale: 0.95 }}
+                            className="cursor-pointer"
+                        >
+                            <Logo size="md" />
+                        </motion.div>
                     </div>
 
                     {/* Center — Desktop Nav Links */}
-                    <div className="desktop-nav" style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '40px',
-                        justifyContent: 'center',
-                        flex: 2,
-                    }}>
+                    <div className="hidden lg:flex items-center justify-center gap-10 flex-[2]">
                         {navLinks.map((link) => (
-                            <a
+                            <motion.a
                                 key={link.label}
-                                className="nav-link"
                                 href={link.href || '#'}
                                 onClick={(e) => {
                                     if (link.onClick) {
@@ -133,110 +90,75 @@ const Navbar = ({
                                         link.onClick();
                                     }
                                 }}
-                                style={{
-                                    fontSize: '14px',
-                                    fontWeight: 600,
-                                    color: t.color.textSecondary,
-                                    textDecoration: 'none',
-                                    cursor: 'pointer',
-                                    transition: 'color 0.2s ease',
-                                    position: 'relative'
-                                }}
-                                onMouseEnter={(e) => e.target.style.color = t.color.primary}
-                                onMouseLeave={(e) => e.target.style.color = t.color.textSecondary}
+                                whileHover={{ y: -2 }}
+                                className="relative text-[13px] font-bold tracking-tight text-slate-500 hover:text-primary transition-colors duration-300 group"
                             >
                                 {link.label}
-                            </a>
+                                <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
+                            </motion.a>
                         ))}
                     </div>
 
                     {/* Right — Desktop Buttons */}
-                    <div className="desktop-actions" style={{ flex: 1, display: 'flex', gap: '12px', alignItems: 'center', justifyContent: 'flex-end' }}>
+                    <div className="hidden lg:flex items-center justify-end gap-3 flex-1">
                         {buttons.map((btn) => (
-                            <button
+                            <motion.button
                                 key={btn.label}
                                 onClick={btn.onClick}
-                                style={buttonStyles[btn.variant || 'outline']}
+                                whileHover={{ 
+                                    scale: 1.05,
+                                    boxShadow: btn.variant === 'filled' ? '0 10px 20px -5px rgba(var(--color-primary-rgb), 0.3)' : 'none'
+                                }}
+                                whileTap={{ scale: 0.95 }}
+                                className={`
+                                    px-6 py-2.5 text-[12px] font-black uppercase tracking-widest border rounded-xl transition-all duration-300
+                                    ${btn.variant === 'filled' 
+                                        ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' 
+                                        : 'bg-white/50 backdrop-blur-md border-slate-200 text-slate-900 hover:bg-white/80'}
+                                `}
                             >
                                 {btn.label}
-                            </button>
+                            </motion.button>
                         ))}
                     </div>
 
                     {/* Mobile Menu Toggle Button */}
-                    <button
-                        className="mobile-toggle"
+                    <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        className="lg:hidden relative z-[60] p-2 bg-white/50 backdrop-blur-md border border-slate-200 rounded-xl text-slate-900 shadow-sm"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        style={{
-                            display: 'none',
-                            background: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '8px',
-                            color: t.color.text,
-                            zIndex: 2100,
-                            position: 'relative'
-                        }}
-                        aria-label="Toggle Menu"
                     >
-                        {isMenuOpen ? (
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        ) : (
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="3" y1="12" x2="21" y2="12"></line>
-                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                <line x1="3" y1="18" x2="21" y2="18"></line>
-                            </svg>
-                        )}
-                    </button>
+                        <div className="w-6 h-6 flex flex-col items-center justify-center gap-1.5">
+                            <motion.span 
+                                animate={isMenuOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
+                                className="w-full h-0.5 bg-current rounded-full" 
+                            />
+                            <motion.span 
+                                animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
+                                className="w-full h-0.5 bg-current rounded-full" 
+                            />
+                            <motion.span 
+                                animate={isMenuOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
+                                className="w-full h-0.5 bg-current rounded-full" 
+                            />
+                        </div>
+                    </motion.button>
                 </nav>
-            </header>
+            </motion.header>
 
-            {/* Mobile Menu Drawer Overlay */}
+            {/* Mobile Menu Drawer */}
             <AnimatePresence>
                 {isMenuOpen && (
                     <motion.div
-                        className="mobile-menu-drawer"
                         initial="closed"
                         animate="open"
                         exit="closed"
                         variants={menuVariants}
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            right: 0,
-                            bottom: 0,
-                            left: 0,
-                            background: '#ffffff', // Explicit solid white
-                            backgroundImage: 'linear-gradient(to bottom, #ffffff, #f8faff)',
-                            zIndex: 2000,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            padding: '100px 32px 40px',
-                            gap: '48px',
-                            overflowY: 'auto',
-                            boxShadow: 'var(--shadow-premium)'
-                        }}
+                        className="fixed inset-0 z-[55] flex flex-col bg-white/95 backdrop-blur-2xl p-8 pt-28 gap-12 lg:hidden"
                     >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
-                            <motion.span 
-                                variants={itemVariants}
-                                style={{ 
-                                    fontSize: '11px', 
-                                    fontWeight: 800, 
-                                    color: 'var(--color-text-muted)', 
-                                    letterSpacing: '0.2em', 
-                                    opacity: 0.8,
-                                    textTransform: 'uppercase'
-                                }}
-                            >
-                                Main Navigation
-                            </motion.span>
-                            
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                        <div className="flex flex-col gap-8">
+                            <div className="text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">Navigation</div>
+                            <div className="flex flex-col gap-6">
                                 {navLinks.map((link) => (
                                     <motion.a
                                         key={link.label}
@@ -249,58 +171,33 @@ const Navbar = ({
                                                 link.onClick();
                                             }
                                         }}
-                                        whileHover={{ x: 10, color: t.color.primary }}
-                                        style={{
-                                            fontSize: '22px',
-                                            fontWeight: 800,
-                                            color: t.color.text,
-                                            textDecoration: 'none',
-                                            display: 'block',
-                                            transition: 'color 0.2s ease'
-                                        }}
+                                        whileHover={{ x: 10 }}
+                                        className="text-2xl font-black text-slate-900 flex items-center gap-4 transition-colors hover:text-primary group"
                                     >
+                                        <span className="w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                                         {link.label}
                                     </motion.a>
                                 ))}
                             </div>
                         </div>
 
-                        <div style={{ height: '1px', background: t.color.borderLight, width: '100%', opacity: 0.5 }}></div>
+                        <div className="h-px bg-slate-100 w-full" />
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                            <motion.span 
-                                variants={itemVariants}
-                                style={{ 
-                                    fontSize: '11px', 
-                                    fontWeight: 800, 
-                                    color: 'var(--color-text-muted)', 
-                                    letterSpacing: '0.2em', 
-                                    opacity: 0.8,
-                                    textTransform: 'uppercase'
-                                }}
-                            >
-                                Secure Access
-                            </motion.span>
-                            
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="flex flex-col gap-8">
+                            <div className="text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">Account</div>
+                            <div className="flex flex-col gap-4">
                                 {buttons.map((btn) => (
                                     <motion.button
                                         key={btn.label}
                                         variants={itemVariants}
                                         onClick={() => { btn.onClick?.(); setIsMenuOpen(false); }}
                                         whileTap={{ scale: 0.98 }}
-                                        style={{
-                                            padding: '18px',
-                                            width: '100%',
-                                            textAlign: 'center',
-                                            borderRadius: '16px',
-                                            border: btn.variant === 'filled' ? 'none' : `1px solid ${t.color.border}`,
-                                            background: btn.variant === 'filled' ? t.color.primary : 'transparent',
-                                            color: btn.variant === 'filled' ? t.color.textInverse : t.color.text,
-                                            fontSize: '16px',
-                                            fontWeight: 700,
-                                            boxShadow: btn.variant === 'filled' ? `0 10px 20px -10px ${t.color.primary}` : 'none'
-                                        }}
+                                        className={`
+                                            w-full py-5 text-[14px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all
+                                            ${btn.variant === 'filled' 
+                                                ? 'bg-primary text-white shadow-primary/20' 
+                                                : 'bg-white border border-slate-200 text-slate-900'}
+                                        `}
                                     >
                                         {btn.label}
                                     </motion.button>
@@ -310,34 +207,8 @@ const Navbar = ({
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                .nav-link::after {
-                    content: '';
-                    position: absolute;
-                    width: 0;
-                    height: 2px;
-                    bottom: -4px;
-                    left: 50%;
-                    background-color: ${t.color.primary};
-                    transition: all 0.3s ease;
-                    transform: translateX(-50%);
-                }
-                .nav-link:hover::after {
-                    width: 100%;
-                }
-                @media (max-width: 991px) {
-                    .desktop-nav, .desktop-actions {
-                        display: none !important;
-                    }
-                    .mobile-toggle {
-                        display: block !important;
-                    }
-                }
-            `}} />
         </>
     );
 };
 
-export default Navbar;
+export default LandingNavbar;

@@ -14,7 +14,6 @@ import {
     MdKeyboardArrowDown,
     MdOutlineVerified
 } from 'react-icons/md';
-import { t } from '../../theme/theme';
 import { motion } from 'framer-motion';
 
 const FieldFeature = ({ icon: Icon, title, description, index }) => (
@@ -23,97 +22,173 @@ const FieldFeature = ({ icon: Icon, title, description, index }) => (
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.4 + (index * 0.1) }}
-        style={{ display: 'flex', gap: '20px', marginBottom: '32px' }}
+        className="flex gap-5 mb-8 group"
     >
-        <div style={{
-            minWidth: '56px',
-            height: '56px',
-            borderRadius: '16px',
-            background: `linear-gradient(135deg, ${t.color.primary}15, ${t.color.primary}05)`,
-            color: t.color.primary,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: `inset 0 0 0 1px ${t.color.primary}10`,
-            position: 'relative'
-        }}>
-            <Icon size={26} />
+        <div className="min-w-[56px] h-14 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 text-primary flex items-center justify-center border border-primary/10 shadow-lg shadow-primary/5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shrink-0">
+            <Icon className="text-[26px]" />
         </div>
         <div>
-            <h4 style={{ fontSize: '18px', fontWeight: 850, color: t.color.primaryDark, marginBottom: '8px', letterSpacing: '-0.01em' }}>{title}</h4>
-            <p style={{ fontSize: '15px', lineHeight: 1.6, color: t.color.textSecondary, maxWidth: '400px', fontWeight: 450 }}>{description}</p>
+            <h4 className="text-lg font-black text-slate-900 mb-2 tracking-tight group-hover:text-primary transition-colors">{title}</h4>
+            <p className="text-[15px] leading-relaxed text-slate-500 max-w-sm font-medium">{description}</p>
         </div>
     </motion.div>
 );
 
+const MobileMockup = () => (
+    <div className="relative flex justify-center perspective-lg">
+        {/* Shadow Decoration */}
+        <div className="absolute inset-0 w-[80%] h-[80%] bg-primary filter blur-[100px] opacity-10 top-[10%] left-[10%] z-0" />
+
+        {/* Phone Frame */}
+        <motion.div 
+            initial={{ opacity: 0, y: 50, rotateX: 10 }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: [0.21, 1, 0.36, 1] }}
+            className="w-[300px] h-[600px] bg-slate-900 rounded-[48px] p-2.5 relative z-10 shadow-2xl border border-white/10 ring-1 ring-slate-800 flex flex-col group"
+        >
+            {/* Internal Bezel */}
+            <div className="flex-1 bg-slate-950 rounded-[38px] relative overflow-hidden flex flex-col">
+                {/* Phone Notch */}
+                <div className="w-28 h-6 bg-slate-950 absolute top-0 left-1/2 -translate-x-1/2 rounded-b-2xl z-20" />
+
+                {/* App Header */}
+                <div className="pt-8 pb-5 px-5 bg-gradient-to-b from-slate-900 to-slate-950">
+                    <div className="flex justify-between items-center mb-6">
+                        <MdMenu className="text-slate-400 text-xl" />
+                        <span className="text-white text-[10px] font-black tracking-[0.2em] uppercase">Asset AI</span>
+                        <MdNotificationsNone className="text-slate-400 text-xl" />
+                    </div>
+
+                    <div className="mb-1">
+                        <span className="text-slate-500 text-[9px] font-bold tracking-wider uppercase">Current Site</span>
+                        <div className="flex items-center gap-1.5 text-white text-base font-black">
+                            Warehouse B <MdKeyboardArrowDown className="text-primary text-lg" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* App Content Area */}
+                <div className="flex-1 bg-slate-50 rounded-t-[28px] p-5 flex flex-col gap-4 shadow-inner overflow-hidden">
+                    <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">Assigned Audits</span>
+
+                    {/* App Task Cards */}
+                    <motion.div 
+                        whileHover={{ scale: 1.02, x: 5 }}
+                        className="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-slate-100 cursor-pointer"
+                    >
+                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
+                            <MdOutlineQrCodeScanner className="text-xl" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="text-[13px] font-black text-slate-800 truncate">Shelf 4A Audit</div>
+                            <div className="text-[10px] text-slate-400 font-bold">24 items • High</div>
+                        </div>
+                        <div className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tighter shrink-0">Go</div>
+                    </motion.div>
+
+                    <motion.div 
+                        whileHover={{ scale: 1.02, x: 5 }}
+                        className="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-slate-100 opacity-80"
+                    >
+                        <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500 shrink-0">
+                            <MdHistory className="text-xl" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="text-[13px] font-black text-slate-800 truncate">Zone 3 Safety</div>
+                            <div className="text-[10px] text-slate-400 font-bold">Hazard • 4pm</div>
+                        </div>
+                        <div className="bg-slate-100 text-slate-400 px-2 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-tighter shrink-0">Later</div>
+                    </motion.div>
+
+                    <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase mt-2">Quick Utilities</span>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <motion.div whileHover={{ scale: 1.05 }} className="bg-white h-16 rounded-2xl flex flex-col items-center justify-center gap-1.5 text-slate-400 shadow-sm border border-slate-100 cursor-pointer group/item">
+                            <MdOutlineQrCodeScanner className="text-xl text-primary transition-transform group-hover/item:scale-110" />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Scan</span>
+                        </motion.div>
+                        <motion.div whileHover={{ scale: 1.05 }} className="bg-white h-16 rounded-2xl flex flex-col items-center justify-center gap-1.5 text-slate-400 shadow-sm border border-slate-100 cursor-pointer group/item">
+                            <MdOutlinePhotoCamera className="text-xl text-primary transition-transform group-hover/item:scale-110" />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Snap</span>
+                        </motion.div>
+                    </div>
+
+                    {/* Scanning Line Animation in Mockup */}
+                    <motion.div 
+                        animate={{ top: ["0%", "100%", "0%"] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-x-0 h-px bg-primary/20 pointer-events-none z-10"
+                        style={{ top: '40%' }}
+                    />
+                </div>
+
+                {/* App Bottom Nav */}
+                <div className="h-16 bg-white border-t border-slate-100 flex justify-around items-center px-2 pb-2 relative z-20">
+                    <MdHome className="text-xl text-primary" />
+                    <MdMap className="text-xl text-slate-300" />
+                    <div className="relative">
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-12 h-12 bg-primary rounded-full flex items-center justify-center border-4 border-white shadow-lg shadow-primary/20 text-white cursor-pointer active:scale-95 transition-transform">
+                            <MdAdd className="text-2xl" />
+                        </div>
+                    </div>
+                    <MdHistory className="text-xl text-slate-300" />
+                    <MdSettings className="text-xl text-slate-300" />
+                </div>
+            </div>
+        </motion.div>
+
+        {/* Floating Verified Badge */}
+        <motion.div 
+            initial={{ x: 30, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 1, duration: 0.8 }}
+            className="absolute -right-8 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-xl z-20 flex items-center gap-4 border border-white/50 ring-1 ring-slate-100 group cursor-default"
+        >
+            <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform"
+            >
+                <MdOutlineVerified className="text-xl" />
+            </motion.div>
+            <div>
+                <div className="text-[13px] font-black text-slate-900 leading-none mb-1">Audit Live</div>
+                <div className="text-[10px] text-emerald-500 font-black uppercase tracking-widest leading-none">100% Synced</div>
+            </div>
+        </motion.div>
+    </div>
+);
+
 const FieldApp = () => {
     return (
-        <section className="field-app-section" style={{
-            padding: '120px 24px',
-            background: `linear-gradient(to bottom, ${t.color.bgSecondary}, ${t.color.bg})`,
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
-            {/* Background Decorative Mesh/Gradient */}
-            <div style={{
-                position: 'absolute',
-                bottom: '-20%',
-                left: '-10%',
-                width: '600px',
-                height: '600px',
-                background: `radial-gradient(circle, ${t.color.primary}05 0%, transparent 70%)`,
-                filter: 'blur(100px)',
-                zIndex: 0
-            }} />
+        <section id="mobile" className="py-16 px-6 bg-gradient-to-b from-slate-50 to-white relative overflow-hidden">
+            {/* Background Decorative Mesh */}
+            <div className="absolute -bottom-[20%] -left-[10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
-            <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 1fr)', gap: '80px', alignItems: 'center', position: 'relative', zIndex: 1 }} className="field-app-grid">
-
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center relative z-10">
                 {/* Left Side: Content */}
                 <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
-                    style={{ zIndex: 10 }}
                 >
-                    <div style={{ 
-                        fontSize: '11px', 
-                        fontWeight: 900, 
-                        color: t.color.primaryLight, 
-                        letterSpacing: '0.25em', 
-                        textTransform: 'uppercase',
-                        marginBottom: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
-                    }}>
-                        <div style={{ width: '40px', height: '1px', background: t.color.primaryLight, opacity: 0.3 }}></div>
+                    <div className="flex items-center gap-4 text-[10px] font-black text-primary tracking-widest uppercase mb-4">
+                        <div className="w-10 h-px bg-primary/30"></div>
                         Next-Gen Inspection
                     </div>
 
-                    <h2 style={{
-                        fontSize: 'clamp(32px, 5vw, 48px)',
-                        fontWeight: 950,
-                        color: t.color.primaryDark,
-                        marginBottom: '24px',
-                        letterSpacing: '-0.03em',
-                        lineHeight: 1.1
-                    }}>
-                        Field Inspections in Your <span style={{ color: t.color.primary }}>Pocket.</span>
+                    <h2 className="text-[clamp(1.75rem,4vw,2.4rem)] font-black text-slate-900 mb-6 tracking-tighter leading-[1.05]">
+                        Field Inspections in Your <span className="text-primary">Pocket.</span>
                     </h2>
 
-                    <p style={{
-                        fontSize: '18px',
-                        color: t.color.textSecondary,
-                        lineHeight: 1.6,
-                        marginBottom: '48px',
-                        maxWidth: '540px',
-                        fontWeight: 450
-                    }}>
+                    <p className="text-base text-slate-500 leading-relaxed mb-10 max-w-xl font-medium">
                         Equip your workforce with a powerful, intuitive mobile interface designed for the rigorous demands of real-world environment audits.
                     </p>
 
-                    <div className="features-list">
+                    <div className="flex flex-col gap-2">
                         {[
                             { icon: MdOutlineAssignmentInd, title: "Personal ID Login", description: "Secure, individual access ensures accountability for every action taken." },
                             { icon: MdOutlineQrCodeScanner, title: "QR Scan Capability", description: "Lightning-fast scanning to verify asset presence and pull up specs instantly." },
@@ -126,251 +201,8 @@ const FieldApp = () => {
                 </motion.div>
 
                 {/* Right Side: Mobile Mockup */}
-                <div style={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
-                    {/* Shadow Decoration */}
-                    <div style={{
-                        position: 'absolute',
-                        width: '80%',
-                        height: '80%',
-                        background: t.color.primary,
-                        filter: 'blur(100px)',
-                        opacity: 0.1,
-                        top: '10%',
-                        left: '10%',
-                        zIndex: 0
-                    }}></div>
-
-                {/* Right Side: Mobile Mockup */}
-                <div style={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
-                    {/* Shadow Decoration */}
-                    <div style={{
-                        position: 'absolute',
-                        width: '80%',
-                        height: '80%',
-                        background: t.color.primary,
-                        filter: 'blur(100px)',
-                        opacity: 0.1,
-                        top: '10%',
-                        left: '10%',
-                        zIndex: 0
-                    }}></div>
-
-                    {/* Phone Frame */}
-                    <motion.div 
-                        initial={{ opacity: 0, y: 50 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, ease: [0.21, 1, 0.36, 1] }}
-                        style={{
-                            width: '320px',
-                            height: '640px',
-                            background: t.color.primaryDark,
-                            borderRadius: '48px',
-                            padding: '12px',
-                            position: 'relative',
-                            zIndex: 1,
-                            boxShadow: '0 50px 100px -20px rgba(7, 34, 103, 0.3), 0 30px 60px -30px rgba(0, 0, 0, 0.5)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        {/* Internal Bezel */}
-                        <div style={{
-                            flex: 1,
-                            background: '#1a2433',
-                            borderRadius: '38px',
-                            position: 'relative',
-                            overflow: 'hidden',
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}>
-                            {/* Phone Notch */}
-                            <div style={{
-                                width: '120px',
-                                height: '24px',
-                                background: '#1a2433',
-                                position: 'absolute',
-                                top: 0,
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                borderBottomLeftRadius: '16px',
-                                borderBottomRightRadius: '16px',
-                                zIndex: 10
-                            }}></div>
-
-                            {/* App Header */}
-                            <div style={{ padding: '40px 20px 24px', background: 'linear-gradient(to bottom, #111827, #1a2433)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                                    <MdMenu color="#94a3b8" size={24} />
-                                    <span style={{ color: '#fff', fontSize: '11px', fontWeight: 900, letterSpacing: '0.2em' }}>ASSET AI</span>
-                                    <MdNotificationsNone color="#94a3b8" size={24} />
-                                </div>
-
-                                <div style={{ marginBottom: '4px' }}>
-                                    <span style={{ color: '#64748b', fontSize: '10px', fontWeight: 700, letterSpacing: '0.02em' }}>CURRENT SITE</span>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '18px', fontWeight: 800 }}>
-                                        Warehouse B <MdKeyboardArrowDown color={t.color.primaryLight} />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* App Content Area */}
-                            <div style={{
-                                flex: 1,
-                                background: '#f8fafc',
-                                borderTopLeftRadius: '28px',
-                                borderTopRightRadius: '28px',
-                                padding: '24px 20px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '18px',
-                                boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.05)'
-                            }}>
-                                <span style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', letterSpacing: '0.1em' }}>ASSIGNED AUDITS</span>
-
-                                {/* App Task Cards */}
-                                <motion.div 
-                                    whileHover={{ scale: 1.02 }}
-                                    style={{ background: '#fff', padding: '18px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '14px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', border: '1px solid #f1f5f9' }}
-                                >
-                                    <div style={{ width: '44px', height: '44px', backgroundColor: `${t.color.primary}10`, borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: t.color.primary }}>
-                                        <MdOutlineQrCodeScanner size={22} />
-                                    </div>
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ fontSize: '14px', fontWeight: 850, color: '#1e293b' }}>Shelf 4A Audit</div>
-                                        <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 500 }}>24 items • High Priority</div>
-                                    </div>
-                                    <div style={{ background: t.color.primaryDark, color: '#fff', padding: '6px 14px', borderRadius: '10px', fontSize: '10px', fontWeight: 800 }}>GO</div>
-                                </motion.div>
-
-                                <motion.div 
-                                    whileHover={{ scale: 1.02 }}
-                                    style={{ background: '#fff', padding: '18px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '14px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', border: '1px solid #f1f5f9' }}
-                                >
-                                    <div style={{ width: '44px', height: '44px', backgroundColor: '#fff7ed', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f97316' }}>
-                                        <MdHistory size={22} />
-                                    </div>
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ fontSize: '14px', fontWeight: 850, color: '#1e293b' }}>Zone 3 Safety</div>
-                                        <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 500 }}>Hazard Check • 4pm</div>
-                                    </div>
-                                    <div style={{ background: '#f1f5f9', color: '#64748b', padding: '6px 14px', borderRadius: '10px', fontSize: '10px', fontWeight: 800 }}>LATER</div>
-                                </motion.div>
-
-                                <span style={{ fontSize: '11px', fontWeight: 900, color: '#64748b', letterSpacing: '0.1em', marginTop: '10px' }}>QUICK UTILITIES</span>
-
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                                    <motion.div whileHover={{ scale: 1.05 }} style={{ background: '#fff', height: '70px', borderRadius: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#64748b', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', border: '1px solid #f1f5f9' }}>
-                                        <MdOutlineQrCodeScanner size={24} color={t.color.primary} />
-                                        <span style={{ fontSize: '10px', fontWeight: 800 }}>SCAN</span>
-                                    </motion.div>
-                                    <motion.div whileHover={{ scale: 1.05 }} style={{ background: '#fff', height: '70px', borderRadius: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '6px', color: '#64748b', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', border: '1px solid #f1f5f9' }}>
-                                        <MdOutlinePhotoCamera size={24} color={t.color.primary} />
-                                        <span style={{ fontSize: '10px', fontWeight: 800 }}>CAMERA</span>
-                                    </motion.div>
-                                </div>
-                            </div>
-
-                            {/* App Bottom Nav */}
-                            <div style={{
-                                height: '70px',
-                                background: '#fff',
-                                borderTop: '1px solid #f1f5f9',
-                                display: 'flex',
-                                justifyContent: 'space-around',
-                                alignItems: 'center',
-                                padding: '0 10px 10px',
-                                position: 'relative'
-                            }}>
-                                <MdHome size={24} color={t.color.primary} />
-                                <MdMap size={24} color="#94a3b8" />
-                                <div style={{
-                                    width: '52px',
-                                    height: '52px',
-                                    background: t.color.primary,
-                                    borderRadius: '50%',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    marginTop: '-40px',
-                                    border: '6px solid #fff',
-                                    boxShadow: '0 10px 20px rgba(7, 34, 103, 0.2)'
-                                }}>
-                                    <MdAdd size={28} color="#fff" />
-                                </div>
-                                <MdHistory size={24} color="#94a3b8" />
-                                <MdSettings size={24} color="#94a3b8" />
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Floating Decorative Elements */}
-                    <motion.div 
-                        initial={{ x: 30, opacity: 0 }}
-                        whileInView={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 1, duration: 0.8 }}
-                        className="floating-badge" 
-                        style={{
-                            position: 'absolute',
-                            right: '-30px',
-                            top: '160px',
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            backdropFilter: 'blur(20px)',
-                            padding: '16px 20px',
-                            borderRadius: '20px',
-                            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)',
-                            zIndex: 10,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '14px',
-                            border: '1px solid rgba(255, 255, 255, 0.5)'
-                        }}
-                    >
-                        <motion.div 
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                            style={{ 
-                                width: '36px', 
-                                height: '36px', 
-                                background: `linear-gradient(135deg, ${t.color.success}, #059669)`, 
-                                borderRadius: '12px', 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                justifyContent: 'center', 
-                                color: '#fff',
-                                boxShadow: `0 8px 16px ${t.color.success}40`
-                            }}
-                        >
-                            <MdOutlineVerified size={20} />
-                        </motion.div>
-                        <div>
-                            <div style={{ fontSize: '13px', fontWeight: 900, color: t.color.primaryDark }}>Audit Live</div>
-                            <div style={{ fontSize: '11px', color: t.color.success, fontWeight: 700 }}>100% Synced</div>
-                        </div>
-                    </motion.div>
-                </div>
-                </div>
+                <MobileMockup />
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @media (max-width: 1024px) {
-                    .field-app-grid {
-                        grid-template-columns: 1fr !important;
-                        gap: 60px !important;
-                        text-align: center;
-                    }
-                    .features-list {
-                        display: inline-block;
-                        text-align: left;
-                        margin: 0 auto;
-                    }
-                    .section-subtitle {
-                        margin: 0 auto !important;
-                    }
-                }
-            `}} />
         </section>
     );
 };
