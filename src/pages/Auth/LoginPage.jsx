@@ -9,7 +9,6 @@ import InputField from '../../components/UI/InputField';
 import Checkbox from '../../components/UI/Checkbox';
 import useAuthStore from '../../store/authStore';
 import { MailIcon, LockIcon } from '../../assets/icon';
-import { t } from '../../theme/theme';
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -35,8 +34,14 @@ function LoginPage() {
             submitText="Sign In"
             loadingText="Signing in..."
             footer={
-                <span style={{ fontWeight: 500 }}>
-                    Don't have access? <a href="/registration" style={{ color: t.color.primary, fontWeight: 700, textDecoration: 'none', marginLeft: '6px', borderBottom: '1.5px solid transparent', transition: 'all 0.2s ease' }} onMouseEnter={(e) => e.target.style.borderBottomColor = t.color.primary} onMouseLeave={(e) => e.target.style.borderBottomColor = 'transparent'}>Register Here</a>
+                <span className="font-semibold text-slate-500">
+                    Don't have access? 
+                    <a 
+                        href="/registration" 
+                        className="text-primary font-black ml-1.5 border-b-2 border-transparent hover:border-primary transition-all duration-300"
+                    >
+                        Register Here
+                    </a>
                 </span>
             }
         >
@@ -66,13 +71,16 @@ function LoginPage() {
 
                     <motion.div
                         variants={itemVariants}
-                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}
+                        className="flex justify-between items-center mb-1"
                     >
                         <Checkbox
                             label="Remember me"
                             {...register('rememberMe')}
                         />
-                        <a href="/forgot-password" style={{ color: t.color.text, fontSize: t.fontSize.sm, fontWeight: 600, textDecoration: 'none' }}>
+                        <a 
+                            href="/forgot-password" 
+                            className="text-slate-500 text-xs font-black hover:text-primary transition-colors"
+                        >
                             Forgot password?
                         </a>
                     </motion.div>

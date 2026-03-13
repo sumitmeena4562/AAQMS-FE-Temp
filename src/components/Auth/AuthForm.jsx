@@ -4,17 +4,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import AuthLayout from "../../layouts/AuthLayout";
 import Button from "../../components/UI/Button";
-import { t } from '../../theme/theme';
 
 const containerVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.98 },
+    hidden: { opacity: 0, scale: 0.95 },
     visible: {
         opacity: 1,
-        y: 0,
         scale: 1,
         transition: {
             duration: 0.8,
-            ease: [0.16, 1, 0.3, 1], // Custom spring-like ease
+            ease: [0.21, 1, 0.36, 1],
             staggerChildren: 0.1
         }
     }
@@ -25,13 +23,13 @@ const itemVariants = {
     visible: { 
         opacity: 1, 
         y: 0,
-        transition: { duration: 0.5, ease: "easeOut" }
+        transition: { duration: 0.5, ease: [0.21, 1, 0.36, 1] }
     }
 };
 
 /**
  * Reusable AuthForm component for Login and Registration
- * Implements a premium glassmorphic card with sophisticated typography.
+ * Implements a premium glassmorphic card with sophisticated architecture.
  */
 function AuthForm({
     title,
@@ -59,101 +57,61 @@ function AuthForm({
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
-                style={{
-                    backgroundColor: t.color.bg,
-                    padding: 'clamp(24px, 4vw, 36px) clamp(20px, 4vw, 32px)',
-                    borderRadius: '20px', // Using 20px as per premium look but could use t.radius.pill if it fits
-                    boxShadow: t.shadow.xl,
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '24px',
-                    border: `1px solid ${t.color.borderLight}`,
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}
+                className="bg-white/80 backdrop-blur-2xl p-8 md:p-10 rounded-[32px] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-slate-200/50"
             >
-                {/* Subtle top highlight inner reflection */}
-                <div style={{
-                    position: 'absolute', top: 0, left: '10%', right: '10%', height: '1px',
-                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)'
-                }} />
+                {/* Grain Texture Overlay */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />
 
-                <div style={{ textAlign: 'center', marginBottom: '0px' }}>
+                {/* Subtle top highlight */}
+                <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+
+                <div className="text-center mb-10 relative z-10">
                     <motion.h2
                         variants={itemVariants}
-                        style={{ 
-                            fontSize: 'clamp(22px, 3.5vw, 28px)', 
-                            fontWeight: 800, 
-                            color: t.color.textPrimary, 
-                            letterSpacing: '-0.03em', 
-                            lineHeight: 1.1,
-                            marginBottom: '8px'
-                        }}
+                        className="text-[clamp(1.5rem,4vw,1.8rem)] font-black text-slate-900 tracking-tight leading-none mb-3"
                     >
                         {title}
                     </motion.h2>
                     <motion.p
                         variants={itemVariants}
-                        style={{ 
-                            fontSize: '13px', 
-                            color: t.color.textSecondary,
-                            fontWeight: 500,
-                            lineHeight: 1.5,
-                            padding: '0 5%'
-                        }}
+                        className="text-sm text-slate-500 font-medium leading-relaxed max-w-[280px] mx-auto"
                     >
                         {subtitle}
                     </motion.p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginBottom: '20px' } : { display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <form onSubmit={handleSubmit(onSubmit)} className="relative z-10">
+                    <div className={grid ? "grid grid-cols-1 sm:grid-cols-2 gap-4" : "flex flex-col gap-4"}>
                         {renderedChildren}
                     </div>
 
-                    <motion.div variants={itemVariants} style={{ marginTop: '24px' }}>
+                    <motion.div variants={itemVariants} className="mt-8">
                         <Button 
                             type="submit" 
                             variant="primary" 
                             size="lg" 
-                            className="w-full" 
+                            className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20 transition-all active:scale-95" 
                             disabled={isLoading}
-                            style={{ 
-                                height: '44px', 
-                                fontSize: '14px', 
-                                fontWeight: 700,
-                                letterSpacing: '0.01em',
-                                borderRadius: '12px',
-                                boxShadow: `0 6px 16px -4px ${t.color.primary}50`
-                            }}
                         >
                             {isLoading ? loadingText : submitText}
                         </Button>
                     </motion.div>
                 </form>
 
+                {/* Trust Badge */}
                 <motion.div
                     variants={itemVariants}
-                    style={{ 
-                        textAlign: 'center', 
-                        fontSize: '11px', 
-                        color: t.color.textPlaceholder, 
-                        display: 'flex', 
-                        justifyContent: 'center', 
-                        alignItems: 'center', 
-                        gap: '6px',
-                        letterSpacing: '0.05em',
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        marginTop: '8px'
-                    }}
+                    className="mt-8 flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest relative z-10"
                 >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: t.color.success }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                     </svg>
-                    Enterprise Security Active
+                    Enterprise Grade Security
                 </motion.div>
+
+                {/* Floating Decoration Blobs (Internal) */}
+                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
             </motion.div>
 
             {footer && (
@@ -161,15 +119,7 @@ function AuthForm({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.6 }}
-                    style={{ 
-                        textAlign: 'center', 
-                        marginTop: '32px', 
-                        fontSize: '14px', 
-                        color: t.color.textSecondary,
-                        fontWeight: 500,
-                        position: 'relative',
-                        zIndex: 10
-                    }}
+                    className="text-center mt-8 text-sm text-slate-500 font-medium relative z-10"
                 >
                     {footer}
                 </motion.div>
