@@ -149,9 +149,9 @@ a {
     text-decoration: none;
 }
 
+/* Removing aggressive global focus outline to avoid UI noise */
 :focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    outline: none;
 }
 
 /* ── Scrollbar ── */

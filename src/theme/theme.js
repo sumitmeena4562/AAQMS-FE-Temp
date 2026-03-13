@@ -191,7 +191,7 @@ const layout = {
 
 // ── Z-Index Scale ───────────────────────────────────────────────────────────────
 const zIndex = {
-    dropdown:  50,
+    dropdown:  2000,
     sidebar:   1000,
     overlay:   9998,
     modal:     9999,

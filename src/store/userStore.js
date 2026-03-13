@@ -11,7 +11,7 @@ const useUserStore = create((set, get) => ({
 
     // ── UI State ──
     search: '',
-    filters: { organization: '', role: '', status: '', assignment: '' },
+    filters: { organization: '', role: '', status: '', assignment: '', timeRange: 'all', region: '', verified: '' },
     sortKey: 'name',
     sortDir: 'asc',
     selectedIds: [],
@@ -24,7 +24,7 @@ const useUserStore = create((set, get) => ({
             const { search, filters } = get();
             const users = await userService.getUsers(filters, search);
             const stats = await userService.getUserStats();
-            const filterOptions = await userService.getFilterOptions();
+            const filterOptions = await userService.getFilterOptions(filters);
             set({ users, stats, filterOptions, loading: false });
         } catch (err) {
             set({ error: err.message, loading: false });
@@ -136,10 +136,14 @@ const useUserStore = create((set, get) => ({
 
     resetFilters: () => set({
         search: '',
-        filters: { organization: '', role: '', status: '', assignment: '' },
+        filters: { 
+            organization: '', role: '', status: '', assignment: '', 
+            timeRange: 'all', region: '', verified: '' 
+        },
     }),
 
     clearError: () => set({ error: null }),
+    setSelectedIds: (selectedIds) => set({ selectedIds }),
 }));
 
 export default useUserStore;

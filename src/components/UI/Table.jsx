@@ -1,81 +1,106 @@
 import React from 'react';
 
-const S = {
-    wrapper:    { width: '100%', overflowX: 'auto' },
-    table:      { width: '100%', borderCollapse: 'collapse', minWidth: 700 },
-    thead:      { backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' },
-    th:         { padding: '10px 14px', fontSize: 11, fontWeight: 600, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap', textAlign: 'left' },
-    thCheck:    { padding: '10px 14px', width: 36 },
-    tr:         (selected, clickable) => ({
-        borderBottom: '1px solid #F3F4F6',
-        backgroundColor: selected ? '#EEF2FF' : 'transparent',
-        cursor: clickable ? 'pointer' : 'default',
-        transition: 'background 0.1s',
-    }),
-    td:         { padding: '11px 14px', fontSize: 13, color: '#374151', whiteSpace: 'nowrap', verticalAlign: 'middle' },
-    tdCheck:    { padding: '11px 14px', verticalAlign: 'middle', width: 36 },
-    checkbox:   { width: 14, height: 14, cursor: 'pointer', accentColor: '#4F46E5' },
-};
-
-const Table = ({ columns, data, onRowClick, selectable = false, selectedIds = [], onSelectionChange }) => {
+/**
+ * Highly reusable Table component using Tailwind CSS.
+ */
+const Table = ({ 
+    columns = [], 
+    data = [], 
+    onRowClick, 
+    selectable = false, 
+    selectedIds = [], 
+    onSelectionChange,
+    className = "",
+    emptyMessage = "No data found"
+}) => {
     const handleToggleAll = () => {
-        onSelectionChange(selectedIds.length === data.length ? [] : data.map(i => i.id));
+        if (onSelectionChange) {
+            onSelectionChange(selectedIds.length === data.length ? [] : data.map(i => i.id));
+        }
     };
+
     const handleToggleRow = (e, id) => {
         e.stopPropagation();
-        onSelectionChange(selectedIds.includes(id) ? selectedIds.filter(i => i !== id) : [...selectedIds, id]);
+        if (onSelectionChange) {
+            onSelectionChange(selectedIds.includes(id) ? selectedIds.filter(i => i !== id) : [...selectedIds, id]);
+        }
     };
 
     return (
-        <div style={S.wrapper}>
-            <table style={S.table}>
-                <thead style={S.thead}>
-                    <tr>
+        <div className={`w-full overflow-x-auto no-scrollbar ${className}`}>
+            <table className="w-full border-collapse min-w-[800px]">
+                <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200">
                         {selectable && (
-                            <th style={S.thCheck}>
-                                <input
-                                    type="checkbox"
-                                    style={S.checkbox}
-                                    checked={data.length > 0 && selectedIds.length === data.length}
-                                    onChange={handleToggleAll}
-                                />
+                            <th className="px-5 py-4 w-10 text-left">
+                                <div className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer transition-all"
+                                        checked={data.length > 0 && selectedIds.length === data.length}
+                                        onChange={handleToggleAll}
+                                    />
+                                </div>
                             </th>
                         )}
                         {columns.map((col, i) => (
-                            <th key={i} style={S.th}>{col.header}</th>
+                            <th 
+                                key={i} 
+                                className="px-5 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-left whitespace-nowrap"
+                            >
+                                {col.header}
+                            </th>
                         ))}
                     </tr>
                 </thead>
-                <tbody>
-                    {data.map((row, ri) => {
-                        const isSelected = selectedIds.includes(row.id);
-                        return (
-                            <tr
-                                key={row.id || ri}
-                                style={S.tr(isSelected, !!onRowClick)}
-                                onClick={() => onRowClick && onRowClick(row)}
-                                onMouseEnter={e => { if (!isSelected) e.currentTarget.style.backgroundColor = '#F9FAFB'; }}
-                                onMouseLeave={e => { e.currentTarget.style.backgroundColor = isSelected ? '#EEF2FF' : 'transparent'; }}
-                            >
-                                {selectable && (
-                                    <td style={S.tdCheck}>
-                                        <input
-                                            type="checkbox"
-                                            style={S.checkbox}
-                                            checked={isSelected}
-                                            onChange={e => handleToggleRow(e, row.id)}
-                                            onClick={e => e.stopPropagation()}
-                                        />
-                                    </td>
-                                )}
-                                {columns.map((col, ci) => (
-                                    <td key={ci} style={S.td}>
-                                        {col.render ? col.render(row[col.accessor], row) : row[col.accessor]}
-                                    </td>
-                                ))}
-                            </tr>
-                        );
-                    })}
+                <tbody className="divide-y divide-slate-100 bg-white">
+                    {data.length > 0 ? (
+                        data.map((row, ri) => {
+                            const isSelected = selectedIds.includes(row.id);
+                            const isClickable = !!onRowClick;
+                            
+                            return (
+                                <tr
+                                    key={row.id || ri}
+                                    onClick={() => onRowClick && onRowClick(row)}
+                                    className={`
+                                        group transition-colors duration-200
+                                        ${isSelected ? 'bg-primary/[0.03]' : 'hover:bg-slate-50/80'}
+                                        ${isClickable ? 'cursor-pointer' : 'cursor-default'}
+                                    `}
+                                >
+                                    {selectable && (
+                                        <td className="px-5 py-3 w-10 relative">
+                                            {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />}
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer transition-all"
+                                                    checked={isSelected}
+                                                    onChange={e => handleToggleRow(e, row.id)}
+                                                    onClick={e => e.stopPropagation()}
+                                                />
+                                            </div>
+                                        </td>
+                                    )}
+                                    {columns.map((col, ci) => (
+                                        <td 
+                                            key={ci} 
+                                            className="px-5 py-3 text-[13px] font-medium text-slate-600 vertical-middle"
+                                        >
+                                            {col.render ? col.render(row[col.accessor], row) : (row[col.accessor] || '-')}
+                                        </td>
+                                    ))}
+                                </tr>
+                            );
+                        })
+                    ) : (
+                        <tr>
+                            <td colSpan={columns.length + (selectable ? 1 : 0)} className="py-20 text-center">
+                                <p className="text-slate-400 font-bold text-sm tracking-tight">{emptyMessage}</p>
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
         </div>

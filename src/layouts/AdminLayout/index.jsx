@@ -4,6 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Logo from "../../components/Branding/Logo";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import ProfileDropdown from "../../components/Navbar/ProfileDropdown";
+import NotificationCenter from "../../components/Navbar/NotificationCenter";
 import Navbar from "../../components/Navbar/Navbar";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 import { BreadcrumbProvider, useBreadcrumb, generateBreadcrumbs } from "../../context/BreadcrumbContext";
@@ -11,8 +12,10 @@ import { BreadcrumbProvider, useBreadcrumb, generateBreadcrumbs } from "../../co
 import { 
     FiBriefcase, FiUsers, FiAlertTriangle, 
     FiSettings, FiMap, FiLayers, FiTarget, 
-    FiBox, FiUser, FiHome, FiBarChart2
+    FiBox, FiUser, FiHome, FiBarChart2,
+    FiSearch, FiX
 } from 'react-icons/fi';
+import useUserStore from '../../store/userStore';
 
 // ── Nav Items Configuration ──
 const navItems = [
@@ -51,6 +54,7 @@ const AdminLayoutInner = () => {
     const location = useLocation();
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
     const [isCollapsed, setIsCollapsed] = React.useState(false);
+    const { search, setSearch } = useUserStore();
 
     React.useEffect(() => {
         const autoCrumbs = generateBreadcrumbs(navItems, location.pathname);
@@ -74,15 +78,32 @@ const AdminLayoutInner = () => {
                     onMenuClick={() => setIsMobileOpen(true)}
                     leftContent={breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
                     rightContent={
-                        <div className="flex items-center gap-4">
-                            {/* Notification Bell */}
-                            <button className="p-2 rounded-xl text-slate-400 hover:text-slate-900 transition-colors relative">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-                                </svg>
-                                <span className="absolute top-2 right-2 w-2 h-2 rounded-full border-2 border-white bg-blue-500" />
-                            </button>
-                            <ProfileDropdown />
+                        <div className="flex items-center gap-6">
+                            {/* Global Search Bar */}
+                            <div className="relative group hidden sm:block">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none">
+                                    <FiSearch size={16} />
+                                </span>
+                                <input
+                                    className="pl-11 pr-10 py-2.5 bg-slate-100/50 border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-white focus:border-transparent focus:shadow-[0_12px_40px_rgba(7,34,103,0.1)] w-[240px] focus:w-[320px]"
+                                    placeholder="Search anything..."
+                                    value={search}
+                                    onChange={e => setSearch(e.target.value)}
+                                />
+                                {search && (
+                                    <button 
+                                        onClick={() => setSearch('')} 
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                                    >
+                                        <FiX size={14}/>
+                                    </button>
+                                )}
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <NotificationCenter />
+                                <ProfileDropdown />
+                            </div>
                         </div>
                     }
                 />

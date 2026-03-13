@@ -1,111 +1,70 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { t } from '../../theme/theme';
 
 /**
  * Global StatsCard — Reusable across all pages.
- */const StatsCard = ({ label, value, icon, iconBg = t.color.bgMuted, iconColor = t.color.textMuted, trend, subValue, style = {} }) => {
+ */
+const StatsCard = ({ 
+    label, 
+    value, 
+    icon, 
+    iconBg = 'bg-slate-100', 
+    iconColor = 'text-slate-600', 
+    trend, 
+    subValue, 
+    className = "" 
+}) => {
     return (
-        <motion.div
-            whileHover={{ y: -5, boxShadow: t.shadow.cardHover }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 16,
-                padding: '24px 28px',
-                background: '#fff',
-                border: `1px solid #EDEDED`,
-                borderRadius: t.radius['2xl'],
-                boxShadow: t.shadow.card,
-                minWidth: 0,
-                flex: '1 1 0',
-                cursor: 'default',
-                position: 'relative',
-                ...style,
-            }}
+        <div
+            className={`flex items-center gap-4 p-5 bg-white border border-slate-100 rounded-2xl cursor-default relative overflow-hidden group 
+                transition-all duration-300 hover:-translate-y-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.13)] hover:shadow-[0_20px_50px_rgba(7,34,103,0.20)] ${className}`}
         >
+            {/* Subtle Gradient Hover Effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
             {/* Icon Container */}
-            <div
-                style={{
-                    width: 54,
-                    height: 54,
-                    borderRadius: '50%',
-                    background: iconBg,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: iconColor,
-                    flexShrink: 0,
-                    border: `1px solid rgba(0,0,0,0.03)`
-                }}
-            >
-                {icon && React.cloneElement(icon, { size: 22 })}
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-black/5 transition-transform group-hover:scale-110 duration-300 ${iconBg} ${iconColor}`}>
+                {icon && React.cloneElement(icon, { size: 20 })}
             </div>
 
             {/* Content Container */}
-            <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{
-                    fontSize: 10,
-                    fontWeight: 600,
-                    color: '#8A92A6',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                    marginBottom: 2,
-                    fontFamily: 'Segoe UI, system-ui, sans-serif'
-                }}>
+            <div className="min-w-0 flex-1 relative z-10">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 font-sans">
                     {label}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                    <div style={{
-                        fontSize: 28,
-                        fontWeight: 700,
-                        color: '#1A202C',
-                        lineHeight: 1,
-                        fontFamily: 'Segoe UI, system-ui, sans-serif'
-                    }}>
+                <div className="flex items-baseline gap-2">
+                    <div className="text-2xl font-black text-slate-900 leading-none font-sans tracking-tight">
                         {value}
                     </div>
                     {trend !== undefined && (
-                        <div style={{ 
-                            fontSize: 11, 
-                            fontWeight: 700, 
-                            color: trend > 0 ? t.color.success : t.color.danger,
-                        }}>
+                        <div className={`text-[11px] font-extrabold flex items-center ${trend > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                             {trend > 0 ? '↑' : '↓'}{Math.abs(trend)}%
                         </div>
                     )}
                 </div>
                 {subValue && (
-                    <div style={{ 
-                        fontSize: 11, 
-                        fontWeight: 500, 
-                        color: t.color.textMuted, 
-                        marginTop: 4
-                    }}>
+                    <div className="text-[11px] font-semibold text-slate-500 mt-1 truncate">
                         {subValue}
                     </div>
                 )}
             </div>
-        </motion.div>
+        </div>
     );
 };
-
-
 
 /**
  * StatsRow — A responsive grid row of StatsCards.
  */
-export const StatsRow = ({ items = [], gap = 16, style = {} }) => {
+export const StatsRow = ({ items = [], columns = 4, className = "" }) => {
+    const gridCols = {
+        1: 'grid-cols-1',
+        2: 'grid-cols-1 sm:grid-cols-2',
+        3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+        4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+    }[columns] || 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+
     return (
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${items.length}, 1fr)`,
-            gap,
-            ...style,
-        }}>
+        <div className={`grid gap-4 w-full ${gridCols} ${className}`}>
             {items.map((item, i) => (
                 <StatsCard key={i} {...item} />
             ))}
@@ -114,4 +73,3 @@ export const StatsRow = ({ items = [], gap = 16, style = {} }) => {
 };
 
 export default StatsCard;
-
