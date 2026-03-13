@@ -188,10 +188,10 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                             {!collapsed && (
                                 <div className="overflow-hidden flex-1">
                                     <p className="text-[#111827] text-[13px] font-semibold truncate leading-tight group-hover:text-[#072267] transition-colors">
-                                        {user.name || 'Admin User'}
+                                        {user.name || 'System User'}
                                     </p>
                                     <p className="text-slate-400 text-[10px] font-medium truncate mt-0.5">
-                                        {user.email || 'admin@aisafety.com'}
+                                        {user.email || 'user@system.com'}
                                     </p>
                                 </div>
                             )}
