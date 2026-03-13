@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Card from '../../components/UI/Card';
 
@@ -81,8 +81,6 @@ const Hero = () => {
     const layer1Y = useTransform(springY, (val) => val * 0.5);
     const layer2X = useTransform(springX, (val) => val * 1.2);
     const layer2Y = useTransform(springY, (val) => val * 1.2);
-    const layer3X = useTransform(springX, (val) => val * -0.8);
-    const layer3Y = useTransform(springY, (val) => val * -0.8);
 
     const containerVariants = {
         hidden: { opacity: 0 },

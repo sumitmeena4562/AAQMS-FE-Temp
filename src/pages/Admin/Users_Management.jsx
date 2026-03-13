@@ -5,12 +5,11 @@ import UserPeekView from '../../components/Dashboard/UserPeekView';
 import UserFormModal from '../../components/Dashboard/UserFormModal';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
-import { t } from '../../theme/theme';
 import {
     FiPlus, FiSearch, FiDownload, FiTrash2,
     FiUserCheck, FiUserX, FiUsers, FiAlertCircle,
     FiCheckCircle, FiClock, FiX, FiChevronDown,
-    FiRefreshCw, FiCalendar
+    FiRefreshCw, FiCalendar, FiFilter
 } from 'react-icons/fi';
 import UserTable from '../../components/Tables/UserTable';
 
@@ -29,43 +28,29 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
     }, []);
 
     return (
-        <div ref={containerRef} style={{ position: 'relative' }}>
+        <div ref={containerRef} className="relative">
             <button 
                 onClick={() => setIsOpen(!isOpen)}
-                style={{ 
-                    display: 'flex', alignItems: 'center', gap: 8, padding: '7px 12px', 
-                    background: '#fff', border: `1px solid ${isOpen ? t.color.primary : '#E5E7EB'}`, 
-                    borderRadius: 8, cursor: 'pointer', transition: 'all 0.2s ease',
-                    boxShadow: isOpen ? `0 0 0 3px ${t.color.primary}10` : 'none'
-                }}
+                className={`flex items-center gap-2 px-3 py-1.5 bg-white border rounded-xl cursor-pointer transition-all duration-300 group
+                    ${isOpen ? 'border-primary ring-4 ring-primary/10 shadow-lg' : 'border-slate-200 hover:border-slate-300 shadow-sm'}`}
             >
-                <span style={{ fontSize: 11, fontWeight: 800, color: t.color.textPlaceholder, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}:</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: t.color.text }}>{value || allLabel}</span>
-                <FiChevronDown size={14} style={{ color: t.color.textPlaceholder, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}:</span>
+                <span className="text-sm font-bold text-slate-700">{value || allLabel}</span>
+                <FiChevronDown className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : ''}`} size={14} />
             </button>
 
             <AnimatePresence>
                 {isOpen && (
                     <Motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        style={{ 
-                            position: 'absolute', top: '120%', left: 0, minWidth: 160, 
-                            background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)',
-                            border: `1px solid ${t.color.borderLight}`, borderRadius: 12, 
-                            boxShadow: t.shadow.xl, zIndex: 100, overflow: 'hidden', padding: 4
-                        }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute top-full left-0 mt-2 min-w-[180px] bg-white/90 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-2xl z-[100] overflow-hidden p-1.5 ring-1 ring-black/5"
                     >
                         <button 
                             onClick={() => { onChange(''); setIsOpen(false); }}
-                            style={{ 
-                                width: '100%', padding: '8px 12px', textAlign: 'left', border: 'none', 
-                                background: !value ? t.color.primaryBg : 'transparent', 
-                                color: !value ? t.color.primary : t.color.text,
-                                fontSize: 13, fontWeight: 600, borderRadius: 8, cursor: 'pointer'
-                            }}
+                            className={`w-full px-3 py-2 text-left rounded-xl transition-colors text-sm font-bold
+                                ${!value ? 'bg-primary/10 text-primary' : 'hover:bg-slate-50 text-slate-600'}`}
                         >
                             {allLabel}
                         </button>
@@ -73,12 +58,8 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                             <button 
                                 key={opt}
                                 onClick={() => { onChange(opt); setIsOpen(false); }}
-                                style={{ 
-                                    width: '100%', padding: '8px 12px', textAlign: 'left', border: 'none', 
-                                    background: value === opt ? t.color.primaryBg : 'transparent', 
-                                    color: value === opt ? t.color.primary : t.color.text,
-                                    fontSize: 13, fontWeight: 600, borderRadius: 8, cursor: 'pointer'
-                                }}
+                                className={`w-full px-3 py-2 text-left rounded-xl transition-colors text-sm font-bold mt-0.5
+                                    ${value === opt ? 'bg-primary/10 text-primary' : 'hover:bg-slate-50 text-slate-600'}`}
                             >
                                 {opt}
                             </button>
@@ -100,26 +81,20 @@ const Toast = ({ message, type = 'success', onClose }) => {
         <Motion.div
             initial={{ opacity: 0, y: -20, x: '-50%' }}
             animate={{ opacity: 1, y: 20, x: '-50%' }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            style={{ 
-                position: 'fixed', top: 0, left: '50%', zIndex: 2000,
-                padding: '12px 24px', borderRadius: 100,
-                background: type === 'success' ? '#059669' : '#DC2626',
-                color: '#fff', fontSize: 13, fontWeight: 700, 
-                display: 'flex', alignItems: 'center', gap: 10,
-                boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
-            }}
+            exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+            className={`fixed top-0 left-1/2 z-[2000] px-6 py-3 rounded-full text-white text-sm font-black shadow-2xl flex items-center gap-3 backdrop-blur-md border border-white/20
+                ${type === 'success' ? 'bg-emerald-600/90' : 'bg-rose-600/90'}`}
         >
-            {type === 'success' ? <FiCheckCircle size={16} /> : <FiAlertCircle size={16} />}
+            {type === 'success' ? <FiCheckCircle size={18} /> : <FiAlertCircle size={18} />}
             {message}
         </Motion.div>
     );
 };
 
 const TableSkeleton = () => (
-    <div style={{ padding: 20 }}>
+    <div className="p-6 space-y-4">
         {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} style={{ height: 60, background: '#f8fafc', borderRadius: 12, marginBottom: 12, animation: 'pulse 2s infinite' }} />
+            <div key={i} className="h-16 bg-slate-100/50 rounded-2xl animate-pulse ring-1 ring-slate-200/50" />
         ))}
     </div>
 );
@@ -130,7 +105,7 @@ export default function Users() {
         users, stats, filterOptions, loading,
         search, filters, sortKey, sortDir, selectedIds,
         fetchUsers, createUser, updateUser, deleteUser, bulkAction, exportCSV,
-        setSearch, setFilters, handleSort, toggleSelectAll, toggleSelectRow,
+        setSearch, setFilters, toggleSelectAll, toggleSelectRow,
         clearSelection, resetFilters,
     } = store;
 
@@ -152,7 +127,6 @@ export default function Users() {
         return () => clearTimeout(t);
     }, [search]);
 
-    // ── Sort & filter users client-side (already filtered from service) ──
     const sortedUsers = useMemo(() => {
         const list = [...users];
         list.sort((a, b) => {
@@ -165,7 +139,6 @@ export default function Users() {
 
     const activeFilterCount = Object.values(filters).filter(v => v && v !== '').length;
 
-    // ── Handlers ──
     const showToast = (message, type='success') => setToast({ message, type });
 
     const handleAddUser = () => { setEditingUser(null); setIsFormOpen(true); };
@@ -208,134 +181,179 @@ export default function Users() {
         if (res?.success) showToast(`${selectedIds.length} users deactivated`);
     };
 
-    // ── Sort Icon ──
-    const SortIcon = ({col}) => {
-        if(sortKey!==col) return <span style={{opacity:0.3,marginLeft:3,fontSize:10}}>↕</span>;
-        return <span style={{marginLeft:3,fontSize:10,color:'#4F46E5'}}>{sortDir==='asc'?'↑':'↓'}</span>;
+    const statsData = [
+        { label:'Total Users', value:stats.total,      icon:<FiUsers size={16}/>,       iconBg:'#f0f9ff', iconColor:'#0369a1', subValue: `${stats.active} Active / ${stats.inactive} Inactive` },
+        { label:'Active Users', value:stats.active,     icon:<FiCheckCircle size={16}/>,  iconBg:'#ecfdf5', iconColor:'#059669', trend: 12 },
+        { label:'Inactive',    value:stats.inactive,   icon:<FiAlertCircle size={16}/>,  iconBg:'#fff1f2', iconColor:'#e11d48', trend: -5 },
+        { label:'Unassigned',  value:stats.unassigned,  icon:<FiClock size={16}/>,        iconBg:'#fffbeb', iconColor:'#d97706' },
+    ];
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
     };
 
-    // ── Stats Data ──
-    const statsData = [
-        { label:'Total Users', value:stats.total,      icon:<FiUsers size={16}/>,       iconBg:'#EFF6FF', iconColor:'#2563EB', subValue: `${stats.active} Active / ${stats.inactive} Inactive` },
-        { label:'Active Users', value:stats.active,     icon:<FiCheckCircle size={16}/>,  iconBg:'#ECFDF5', iconColor:'#059669', trend: 12 },
-        { label:'Inactive',    value:stats.inactive,   icon:<FiAlertCircle size={16}/>,  iconBg:'#FEF2F2', iconColor:'#DC2626', trend: -5 },
-        { label:'Unassigned',  value:stats.unassigned,  icon:<FiClock size={16}/>,        iconBg:'#FFFBEB', iconColor:'#D97706' },
-    ];
-
-    const colHeaders = [
-        { label:'User', key:'name' },
-        { label:'Organization', key:'organization' },
-        { label:'Role', key:'role' },
-        { label:'Status', key:'status' },
-    ];
+    const itemVariants = {
+        hidden: { opacity: 0, y: 15 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: { duration: 0.5, ease: [0.21, 1, 0.36, 1] }
+        }
+    };
 
     return (
-        <div style={{ width:'100%' }}>
+        <Motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+            className="w-full space-y-6 pb-12"
+        >
             {/* Toast */}
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
-            {/* Header */}
-            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:20 }}>
+            {/* Header Section */}
+            <Motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 style={{ fontSize:20, fontWeight:700, color: t.color.text, margin:'0 0 3px 0', letterSpacing:'-0.3px' }}>User Management</h1>
-                    <p style={{ fontSize:12, color: t.color.textPlaceholder, margin:0 }}>Manage platform users, roles &amp; permissions</p>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none mb-2">User Management</h1>
+                    <p className="text-sm font-semibold text-slate-500 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        Manage platform users, roles & enterprise permissions
+                    </p>
                 </div>
-                <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-                    <button onClick={exportCSV} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 13px', fontSize:12, fontWeight:500, color: t.color.textSecondary, background: t.color.bg, border: `1px solid ${t.color.border}`, borderRadius:7, cursor:'pointer' }}>
-                        <FiDownload size={13} /> Export
+                <div className="flex items-center gap-3">
+                    <button 
+                        onClick={exportCSV} 
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 bg-white border border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 shadow-sm active:scale-95"
+                    >
+                        <FiDownload size={16} /> Export
                     </button>
-                    <button onClick={handleAddUser} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 15px', fontSize:12, fontWeight:600, color: t.color.textInverse, background: t.color.primary, border: `1px solid ${t.color.primaryDark}`, borderRadius:7, cursor:'pointer' }}>
-                        <FiPlus size={13} /> Add User
+                    <button 
+                        onClick={handleAddUser} 
+                        className="flex items-center gap-2 px-6 py-2.5 text-sm font-black text-white bg-primary rounded-2xl shadow-xl shadow-primary/20 hover:bg-primary/90 hover:-translate-y-0.5 transition-all duration-300 active:scale-95"
+                    >
+                        <FiPlus size={18} /> Add New User
                     </button>
                 </div>
-            </div>
+            </Motion.div>
 
-            {/* Stats */}
-            <StatsRow items={statsData} gap={12} style={{ marginBottom:16 }} />
+            {/* Stats Section */}
+            <Motion.div variants={itemVariants}>
+                <StatsRow items={statsData} gap={16} />
+            </Motion.div>
 
-            {/* Toolbar */}
-            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12, flexWrap:'wrap' }}>
-                <div style={{ position:'relative', width:260, flexShrink:0 }}>
-                    <span style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#9CA3AF', pointerEvents:'none', display:'flex' }}><FiSearch size={13}/></span>
+            {/* Toolbar Section */}
+            <Motion.div variants={itemVariants} className="bg-white/50 backdrop-blur-md border border-slate-200/50 p-3 rounded-[24px] shadow-sm flex flex-col lg:flex-row items-center gap-4">
+                {/* Search Bar */}
+                <div className="relative flex-1 w-full lg:max-w-xs group">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
+                        <FiSearch size={16} />
+                    </span>
                     <input
-                        style={{ width:'100%', paddingLeft:32, paddingRight:28, paddingTop:7, paddingBottom:7, fontSize:13, background:'#fff', border:'1px solid #E5E7EB', borderRadius:7, outline:'none', boxSizing:'border-box', color:'#111827' }}
-                        placeholder="Search users..."
+                        className="w-full pl-11 pr-10 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 outline-none transition-all duration-300 focus:border-primary focus:ring-4 focus:ring-primary/5 group-hover:border-slate-300"
+                        placeholder="Search for users..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                     />
-                    {search && <button onClick={() => setSearch('')} style={{ position:'absolute', right:8, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#9CA3AF', display:'flex', padding:2 }}><FiX size={12}/></button>}
+                    {search && (
+                        <button 
+                            onClick={() => setSearch('')} 
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                        >
+                            <FiX size={14}/>
+                        </button>
+                    )}
                 </div>
 
-                <div style={{ width:1, height:24, background:'#E5E7EB' }} />
+                <div className="hidden lg:block w-px h-8 bg-slate-200 mx-1" />
 
-                <FilterDropdown label="Role" value={filters.role} options={filterOptions.roles} onChange={v => setFilters({...filters, role:v})} allLabel="All Roles" />
-                <FilterDropdown label="Status" value={filters.status} options={['active','inactive']} onChange={v => setFilters({...filters, status:v})} allLabel="All Statuses" />
-                <FilterDropdown label="Organization" value={filters.organization} options={filterOptions.organizations} onChange={v => setFilters({...filters, organization:v})} allLabel="All Orgs" />
-                
-                {/* Date Filter (Mini) */}
-                <div style={{ display:'flex', alignItems:'center', gap:6, padding:'6px 10px', background:'#fff', border:'1px solid #E5E7EB', borderRadius:7, cursor:'pointer' }}>
-                    <FiCalendar size={13} color="#6B7280" />
-                    <span style={{ fontSize:12, fontWeight:500, color:'#374151' }}>Date Range: All Time</span>
+                {/* Filters Row */}
+                <div className="flex flex-wrap items-center gap-3 flex-1">
+                    <FilterDropdown label="Role" value={filters.role} options={filterOptions.roles} onChange={v => setFilters({...filters, role:v})} allLabel="All Roles" />
+                    <FilterDropdown label="Status" value={filters.status} options={['active','inactive']} onChange={v => setFilters({...filters, status:v})} allLabel="All Statuses" />
+                    <FilterDropdown label="Organization" value={filters.organization} options={filterOptions.organizations} onChange={v => setFilters({...filters, organization:v})} allLabel="All Orgs" />
+                    
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 rounded-xl cursor-default shadow-sm group hover:border-slate-300 transition-colors duration-300">
+                        <FiCalendar className="text-slate-400" size={14} />
+                        <span className="text-sm font-bold text-slate-700">Date: All Time</span>
+                    </div>
+
+                    {activeFilterCount > 0 && (
+                        <button 
+                            onClick={resetFilters} 
+                            className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-600 px-2 py-1 transition-colors"
+                        >
+                            Clear Filters
+                        </button>
+                    )}
                 </div>
 
-                {activeFilterCount > 0 && <button onClick={resetFilters} style={{ fontSize:11, color:'#EF4444', fontWeight:500, cursor:'pointer', background:'none', border:'none', padding:'4px 8px' }}>Clear all</button>}
-
-                <div style={{ display:'flex', alignItems:'center', gap:8, marginLeft:'auto' }}>
-                    <button onClick={fetchUsers} title="Refresh" style={{ display:'flex', alignItems:'center', padding:'7px 10px', fontSize:12, fontWeight:500, color:'#374151', background:'#fff', border:'1px solid #E5E7EB', borderRadius:7, cursor:'pointer' }}><FiRefreshCw size={13} /></button>
-                    <span style={{ fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}><strong style={{color:'#111827'}}>{sortedUsers.length}</strong> / {stats.total} users</span>
+                <div className="flex items-center gap-3 whitespace-nowrap">
+                    <button 
+                        onClick={fetchUsers} 
+                        title="Refresh Data"
+                        className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-primary hover:border-primary transition-all duration-300 shadow-sm active:scale-90"
+                    >
+                        <FiRefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+                    </button>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+                        <strong className="text-slate-900">{sortedUsers.length}</strong> / {stats.total} Users
+                    </span>
                 </div>
-            </div>
+            </Motion.div>
 
-            {/* Bulk Bar */}
+            {/* Bulk Actions Bar */}
             <AnimatePresence>
                 {selectedIds.length > 0 && (
                     <Motion.div 
-                        initial={{ opacity: 0, y: -10, height: 0 }}
+                        initial={{ opacity: 0, y: 10, height: 0 }}
                         animate={{ opacity: 1, y: 0, height: 'auto' }}
-                        exit={{ opacity: 0, y: -10, height: 0 }}
-                        style={{ overflow: 'hidden' }}
+                        exit={{ opacity: 0, y: 10, height: 0 }}
+                        className="overflow-hidden"
                     >
-                        <div style={{ 
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                            padding: '12px 16px', marginBottom: 16, 
-                            background: 'rgba(7, 34, 103, 0.05)', 
-                            backdropFilter: 'blur(8px)',
-                            border: `1px solid rgba(7, 34, 103, 0.1)`, 
-                            borderRadius: 16,
-                            boxShadow: '0 4px 12px rgba(7, 34, 103, 0.05)'
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <div style={{ width: 24, height: 24, borderRadius: '50%', background: t.color.primary, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800 }}>
+                        <div className="flex items-center justify-between px-6 py-4 bg-primary/5 backdrop-blur-md border border-primary/20 rounded-[28px] shadow-sm mb-4 ring-1 ring-primary/10">
+                            <div className="flex items-center gap-4">
+                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-black shadow-lg shadow-primary/20 animate-bounce">
                                     {selectedIds.length}
                                 </div>
-                                <span style={{ fontSize: 13, fontWeight: 700, color: t.color.primary }}>Users Selected</span>
+                                <div>
+                                    <span className="text-sm font-black text-primary tracking-tight block">Users Selected</span>
+                                    <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Perform bulk action on selection</span>
+                                </div>
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', fontSize: 12, fontWeight: 700, color: t.color.success, background: t.color.successBg, border: `1px solid ${t.color.successBorder}`, borderRadius: 10, cursor: 'pointer', transition: 'all 0.2s' }} onClick={handleBulkActivate}><FiUserCheck size={14}/> Activate</button>
-                                <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', fontSize: 12, fontWeight: 700, color: t.color.warning, background: t.color.warningBg, border: `1px solid ${t.color.warningBorder}`, borderRadius: 10, cursor: 'pointer', transition: 'all 0.2s' }} onClick={handleBulkDeactivate}><FiUserX size={14}/> Deactivate</button>
-                                <button style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', fontSize: 12, fontWeight: 700, color: t.color.danger, background: t.color.dangerBg, border: `1px solid ${t.color.dangerBorder}`, borderRadius: 10, cursor: 'pointer', transition: 'all 0.2s' }} onClick={() => setBulkDeleteOpen(true)}><FiTrash2 size={14}/> Delete</button>
-                                <div style={{ width: 1, height: 20, background: 'rgba(7, 34, 103, 0.1)', margin: '0 4px' }} />
-                                <button style={{ fontSize: 12, fontWeight: 700, color: t.color.textPlaceholder, background: 'none', border: 'none', cursor: 'pointer', padding: '0 8px' }} onClick={clearSelection}>Cancel</button>
+                            <div className="flex items-center gap-2">
+                                <button onClick={handleBulkActivate} className="flex items-center gap-2 px-4 py-2 text-xs font-black text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-xl hover:bg-emerald-100 transition-all duration-300 active:scale-95 shadow-sm">
+                                    <FiUserCheck size={16}/> Activate
+                                </button>
+                                <button onClick={handleBulkDeactivate} className="flex items-center gap-2 px-4 py-2 text-xs font-black text-amber-600 bg-amber-50 border border-amber-100 rounded-xl hover:bg-amber-100 transition-all duration-300 active:scale-95 shadow-sm">
+                                    <FiUserX size={16}/> Deactivate
+                                </button>
+                                <button onClick={() => setBulkDeleteOpen(true)} className="flex items-center gap-2 px-4 py-2 text-xs font-black text-rose-600 bg-rose-50 border border-rose-100 rounded-xl hover:bg-rose-100 transition-all duration-300 active:scale-95 shadow-sm">
+                                    <FiTrash2 size={16}/> Delete
+                                </button>
+                                <div className="w-px h-8 bg-slate-200 mx-2" />
+                                <button onClick={clearSelection} className="px-4 py-2 text-xs font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Cancel</button>
                             </div>
                         </div>
                     </Motion.div>
                 )}
             </AnimatePresence>
 
-            {/* Table Area */}
-            <div style={{ 
-                background: 'rgba(255, 255, 255, 0.9)', 
-                backdropFilter: 'blur(10px)',
-                border: `1px solid ${t.color.border}`, 
-                borderRadius: 24, 
-                overflow: 'hidden', 
-                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.04)', 
-                minHeight: 400 
-            }}>
+            {/* Main Table Area */}
+            <Motion.div 
+                variants={itemVariants} 
+                className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-[32px] overflow-hidden shadow-2xl shadow-slate-200/50 min-h-[400px] flex flex-col transition-all duration-300 ring-1 ring-slate-200/50 relative"
+            >
+                {/* Grain texture overlay */}
+                <div className="absolute inset-0 opacity-[0.01] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />
+                
                 {loading ? (
                     <TableSkeleton />
                 ) : (
-                    <>
+                    <div className="relative z-10 flex-1 flex flex-col">
                         <UserTable 
                             data={sortedUsers}
                             selectedIds={selectedIds}
@@ -347,24 +365,37 @@ export default function Users() {
                         />
                         
                         {sortedUsers.length === 0 && (
-                            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'56px 20px', textAlign:'center' }}>
-                                <div style={{ width:44, height:44, background:'#F3F4F6', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}><FiUsers size={20} color="#9CA3AF"/></div>
-                                <div style={{ fontSize:14, fontWeight:600, color:'#111827', marginBottom:4 }}>No users found</div>
-                                <div style={{ fontSize:12, color:'#6B7280', marginBottom:14 }}>Try adjusting your search or filters</div>
-                                <button onClick={resetFilters} style={{ fontSize:12, fontWeight:600, color:'#4F46E5', background:'none', border:'1px solid #C7D2FE', borderRadius:6, padding:'5px 14px', cursor:'pointer' }}>Reset filters</button>
+                            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <div className="w-20 h-20 bg-slate-50 border border-slate-100 rounded-[30px] flex items-center justify-center mb-6 shadow-sm rotate-3 group-hover:rotate-0 transition-transform">
+                                    <FiUsers size={32} className="text-slate-300"/>
+                                </div>
+                                <h3 className="text-xl font-black text-slate-900 tracking-tight mb-2">No Personnel Found</h3>
+                                <p className="text-sm font-semibold text-slate-500 mb-8 max-w-xs mx-auto text-pretty">
+                                    We couldn&apos;t find any users matching your current criteria. Try refining your search or filters.
+                                </p>
+                                <button onClick={resetFilters} className="px-6 py-2.5 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all duration-300 shadow-xl shadow-slate-900/10 active:scale-95">
+                                    Reset Selection
+                                </button>
                             </div>
                         )}
-                    </>
-                )}
-
-                {sortedUsers.length > 0 && (
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'9px 14px', background:'#F9FAFB', borderTop:'1px solid #F3F4F6' }}>
-                        <span style={{ fontSize:12, color:'#6B7280' }}>
-                            Displaying <strong>{sortedUsers.length}</strong> user{sortedUsers.length!==1?'s':''} total
-                        </span>
                     </div>
                 )}
-            </div>
+
+                {/* Footer Bar */}
+                {sortedUsers.length > 0 && (
+                    <div className="relative z-10 px-8 py-3 bg-slate-50/50 backdrop-blur-md border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            Dataset Overview
+                        </span>
+                        <div className="flex items-center gap-2">
+                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                                Displaying {sortedUsers.length} profile{sortedUsers.length!==1?'s':''}
+                             </span>
+                        </div>
+                    </div>
+                )}
+            </Motion.div>
 
             {/* ── Modals ── */}
             <UserPeekView
@@ -389,7 +420,7 @@ export default function Users() {
                 onConfirm={handleConfirmDelete}
                 title="Delete User"
                 message={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
-                confirmText="Delete"
+                confirmText="Delete Profile"
                 danger={true}
                 loading={loading}
             />
@@ -398,16 +429,12 @@ export default function Users() {
                 isOpen={bulkDeleteOpen}
                 onClose={() => setBulkDeleteOpen(false)}
                 onConfirm={handleBulkDelete}
-                title="Delete Selected Users"
-                message={`Are you sure you want to delete ${selectedIds.length} selected users? This action cannot be undone.`}
-                confirmText={`Delete ${selectedIds.length} Users`}
+                title="Bulk Delete"
+                message={`You are about to permanently delete ${selectedIds.length} users. This action is irreversible.`}
+                confirmText={`Confirm Delete (${selectedIds.length})`}
                 danger={true}
                 loading={loading}
             />
-
-            <style>{`
-                @keyframes slideDown { from { transform: translateY(-20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
-            `}</style>
-        </div>
+        </Motion.div>
     );
 }

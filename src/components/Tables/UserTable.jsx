@@ -3,25 +3,34 @@ import Table from '../UI/Table';
 import DotStatus from '../UI/DotStatus';
 import UserAvatar from '../UI/UserAvatar';
 import { FiExternalLink, FiEdit2 } from 'react-icons/fi';
-import { t } from '../../theme/theme';
 
 const ROLE_STYLE = {
-    coordinator:    { bg: t.color.coordinatorBg, color: t.color.coordinatorText, border: t.color.coordinatorBorder },
-    'field officer':{ bg: t.color.fieldOfficerBg, color: t.color.fieldOfficerText, border: t.color.fieldOfficerBorder },
-    admin:          { bg: t.color.adminBg, color: t.color.adminText, border: t.color.adminBorder },
+    coordinator:    'bg-sky-50 text-sky-700 border-sky-100',
+    'field officer': 'bg-teal-50 text-teal-700 border-teal-100',
+    admin:          'bg-indigo-50 text-indigo-700 border-indigo-200',
+    default:        'bg-slate-50 text-slate-600 border-slate-200'
 };
 
 const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick, onEdit }) => {
     const columns = [
         {
-            header: 'User',
+            header: 'Personnel Profile',
             accessor: 'name',
             render: (_, row) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: t.space.lg }}>
-                    <UserAvatar name={row.name} size="32px" fontSize={t.fontSize.xxs} weight={900} />
+                <div className="flex items-center gap-4 py-1">
+                    <div className="relative group">
+                        <UserAvatar name={row.name} size="42px" className="shadow-sm border-2 border-white ring-1 ring-slate-200 group-hover:scale-105 transition-transform duration-300" />
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white 
+                            ${row.status?.toLowerCase() === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`} 
+                        />
+                    </div>
                     <div>
-                        <div style={{ fontSize: t.fontSize.md, fontWeight: 700, color: t.color.text, lineHeight: 1.2 }}>{row.name}</div>
-                        <div style={{ fontSize: t.fontSize.xs, color: t.color.textPlaceholder, marginTop: 2, fontWeight: 500 }}>{row.email}</div>
+                        <div className="text-sm font-black text-slate-900 tracking-tight leading-none mb-1 group-hover:text-primary transition-colors">
+                            {row.name}
+                        </div>
+                        <div className="text-[11px] font-bold text-slate-400 tracking-wide uppercase">
+                            {row.email}
+                        </div>
                     </div>
                 </div>
             )
@@ -30,96 +39,57 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
             header: 'Organization',
             accessor: 'organization',
             render: value => (
-                <span style={{ fontSize: t.fontSize.md, color: value ? t.color.textSecondary : t.color.textPlaceholder, fontStyle: value ? 'normal' : 'italic', fontWeight: 500 }}>
-                    {value || 'Not assigned'}
-                </span>
+                <div className="flex flex-col">
+                    <span className={`text-[13px] font-bold ${value ? 'text-slate-700' : 'text-slate-400 italic font-medium'}`}>
+                        {value || 'Independent Contractor'}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Primary Unit</span>
+                </div>
             )
         },
         {
-            header: 'Role',
+            header: 'Access Level',
             accessor: 'role',
             render: value => {
-                const s = ROLE_STYLE[value?.toLowerCase()] || { bg: t.color.bgMuted, color: t.color.textSecondary, border: t.color.border };
+                const style = ROLE_STYLE[value?.toLowerCase()] || ROLE_STYLE.default;
                 return (
-                    <span style={{
-                        display: 'inline-block',
-                        padding: '2px 10px',
-                        fontSize: t.fontSize.xxs, fontWeight: 800,
-                        background: s.bg, color: s.color,
-                        border: `1px solid ${s.border}`,
-                        borderRadius: t.radius.pill,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.02em'
-                    }}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest border rounded-lg shadow-sm ${style}`}>
                         {value}
                     </span>
                 );
             }
         },
         {
-            header: 'Status',
-            accessor: 'status',
-            render: (value) => (
-                <DotStatus
-                    type={value?.toLowerCase() === 'active' ? 'active' : 'inactive'}
-                    text={value}
-                />
-            )
-        },
-        {
             header: 'Operations',
             accessor: 'assignment',
             render: (value) => (
-                <div style={{ display: 'flex', gap: 4 }}>
-                   <span style={{ 
-                       padding:'2px 8px', 
-                       fontSize: t.fontSize.xxs, 
-                       fontWeight: 800, 
-                       borderRadius: t.radius.sm, 
-                       background: value === 'assigned' ? t.color.successBg : t.color.bgMuted, 
-                       color: value === 'assigned' ? t.color.success : t.color.textMuted,
-                       textTransform: 'uppercase',
-                       letterSpacing: '0.04em',
-                       border: `1px solid ${value === 'assigned' ? t.color.successBorder : t.color.border}`
-                   }}>
+                <div className="flex items-center gap-2">
+                   <span className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-md shadow-sm
+                       ${value === 'assigned' 
+                           ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                           : 'bg-slate-50 text-slate-500 border-slate-100'}`}>
                        {value || 'Standby'}
                    </span>
                 </div>
             )
         },
         {
-            header: '',
+            header: 'Personnel Actions',
             accessor: 'actions',
             render: (_, row) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: t.space.sm, justifyContent: 'flex-end' }}>
+                <div className="flex items-center gap-2 justify-end pr-2">
                     <button
-                        title="View profile"
+                        title="View Detailed Profile"
                         onClick={e => { e.stopPropagation(); onRowClick && onRowClick(row); }}
-                        style={{ padding: '6px', background: 'transparent', border: 'none', cursor: 'pointer', color: t.color.textPlaceholder, borderRadius: t.radius.lg, display: 'flex' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = t.color.bgHover; e.currentTarget.style.color = t.color.text; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = t.color.textPlaceholder; }}
+                        className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all duration-300 active:scale-90"
                     >
-                        <FiExternalLink size={14} />
+                        <FiExternalLink size={16} />
                     </button>
                     <button
                         onClick={e => { e.stopPropagation(); onEdit && onEdit(row); }}
-                        style={{ 
-                            padding: '6px 12px', 
-                            fontSize: t.fontSize.sm, 
-                            fontWeight: 700, 
-                            color: t.color.primary, 
-                            background: 'transparent', 
-                            border: `1px solid ${t.color.border}`, 
-                            borderRadius: t.radius.lg, 
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 6
-                        }}
-                        onMouseEnter={e => { e.currentTarget.style.background = t.color.primaryBg; e.currentTarget.style.borderColor = t.color.primaryBorder; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = t.color.border; }}
+                        className="flex items-center gap-2 px-4 py-1.5 text-[11px] font-black uppercase tracking-widest text-primary hover:bg-primary hover:text-white border border-primary/20 hover:border-primary rounded-xl transition-all duration-300 shadow-sm active:scale-95 group"
                     >
-                        <FiEdit2 size={12} />
+                        <FiEdit2 size={12} className="group-hover:translate-x-0.5 transition-transform" />
                         Edit
                     </button>
                 </div>
@@ -135,6 +105,7 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
             selectedIds={selectedIds}
             onSelectionChange={onSelectionChange}
             onRowClick={onRowClick}
+            className="elite-table-standard"
         />
     );
 };

@@ -91,6 +91,19 @@ const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
     );
 };
 
+const ProgressIndicatorStep = ({ scrollYProgress, index, total }) => {
+    const scaleY = useTransform(scrollYProgress, [index/total, (index+1)/total], [0, 1]);
+    
+    return (
+        <motion.div className="w-1 h-10 bg-slate-100 rounded-full overflow-hidden relative">
+            <motion.div
+                style={{ scaleY, originY: 0 }}
+                className="absolute inset-0 bg-primary"
+            />
+        </motion.div>
+    );
+};
+
 const Workflow = () => {
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({
@@ -122,18 +135,12 @@ const Workflow = () => {
             {/* Progress Hub (Sticky Side Nav) */}
             <div className="fixed right-10 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-[100] pointer-events-none hidden xl:flex">
                 {steps.map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="w-1 h-10 bg-slate-100 rounded-full overflow-hidden relative"
-                    >
-                        <motion.div
-                            style={{
-                                scaleY: useTransform(scrollYProgress, [i/steps.length, (i+1)/steps.length], [0, 1]),
-                                originY: 0
-                            }}
-                            className="absolute inset-0 bg-primary"
-                        />
-                    </motion.div>
+                    <ProgressIndicatorStep 
+                        key={i} 
+                        scrollYProgress={scrollYProgress} 
+                        index={i} 
+                        total={steps.length} 
+                    />
                 ))}
             </div>
 

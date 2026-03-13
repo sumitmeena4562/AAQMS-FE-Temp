@@ -14,7 +14,7 @@ function RegistrationPage() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
-    const onSubmit = async (data) => {
+    const onSubmit = async () => {
         setIsLoading(true);
         try {
             await new Promise(resolve => setTimeout(resolve, 2000));

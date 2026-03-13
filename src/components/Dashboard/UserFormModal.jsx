@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { 
-    FiX, FiUser, FiMail, FiBriefcase, FiShield, FiMapPin, 
-    FiChevronRight, FiChevronLeft, FiCpu, FiGrid, FiActivity, FiLayers
+    FiX, FiUser, FiMail, FiShield, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle
 } from 'react-icons/fi';
-import { t } from '../../theme/theme';
 
 const ROLE_DETAILS = [
     { 
@@ -12,21 +10,30 @@ const ROLE_DETAILS = [
         name: 'Coordinator', 
         desc: 'Strategic oversight: Manage regional assets, field units, and operational workflows.', 
         icon: <FiLayers size={22} />,
-        color: t.color.primary
+        color: 'text-sky-600',
+        bg: 'bg-sky-50',
+        border: 'border-sky-100',
+        glow: 'shadow-sky-500/10'
     },
     { 
         id: 'Field Officer', 
         name: 'Field Officer', 
         desc: 'Tactical execution: On-site inspections, direct asset management, and data logging.', 
         icon: <FiActivity size={22} />,
-        color: t.color.fieldOfficerText
+        color: 'text-teal-600',
+        bg: 'bg-teal-50',
+        border: 'border-teal-100',
+        glow: 'shadow-teal-500/10'
     },
     { 
         id: 'Admin', 
         name: 'Administrator', 
         desc: 'Global control: Full system access, security protocols, and user authorization management.', 
         icon: <FiShield size={22} />,
-        color: t.color.adminText
+        color: 'text-indigo-600',
+        bg: 'bg-indigo-50',
+        border: 'border-indigo-100',
+        glow: 'shadow-indigo-500/10'
     }
 ];
 
@@ -121,154 +128,86 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         setStep(1);
     };
 
-    const fieldStyle = (hasError) => ({
-        width: '100%', padding: '14px 18px', fontSize: 14,
-        border: `1px solid ${hasError ? t.color.danger : 'rgba(0,0,0,0.1)'}`,
-        borderRadius: 16, outline: 'none', color: t.color.text,
-        background: hasError ? 'rgba(239, 68, 68, 0.05)' : 'rgba(255, 255, 255, 0.5)',
-        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-        boxSizing: 'border-box',
-        fontWeight: 500,
-        backdropFilter: 'blur(4px)',
-        letterSpacing: '-0.01em'
-    });
+    const inputClasses = (hasError) => `
+        w-full px-5 py-3.5 text-sm font-bold rounded-2xl border outline-none transition-all duration-300 backdrop-blur-sm
+        ${hasError 
+            ? 'bg-rose-50/50 border-rose-200 text-rose-900 focus:border-rose-400 focus:ring-4 focus:ring-rose-500/5' 
+            : 'bg-white/50 border-slate-200 text-slate-700 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 focus:-translate-y-0.5'}
+    `;
 
-    const focusStyle = (e) => {
-        e.target.style.borderColor = t.color.primary;
-        e.target.style.background = '#fff';
-        e.target.style.boxShadow = `0 4px 12px rgba(0, 0, 0, 0.03), 0 0 0 4px ${t.color.primary}10`;
-        e.target.style.transform = 'translateY(-1px)';
-    };
-
-    const blurStyle = (e, hasError) => {
-        e.target.style.borderColor = hasError ? t.color.danger : 'rgba(0,0,0,0.1)';
-        e.target.style.background = hasError ? 'rgba(239, 68, 68, 0.05)' : 'rgba(255, 255, 255, 0.5)';
-        e.target.style.boxShadow = 'none';
-        e.target.style.transform = 'translateY(0)';
-    };
-
-    const labelStyle = { 
-        display: 'block', fontSize: 12, fontWeight: 800, color: t.color.textPlaceholder, 
-        marginBottom: 8, letterSpacing: '-0.01em', marginLeft: 4
-    };
-
-    const sectionTitleStyle = {
-        fontSize: 14, fontWeight: 900, color: t.color.text,
-        display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20,
-        letterSpacing: '-0.02em', opacity: 0.9
-    };
-
-
+    const labelClasses = "block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1";
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
                     <Motion.div
-                        initial={{ opacity:0 }}
-                        animate={{ opacity:1 }}
-                        exit={{ opacity:0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         onClick={onClose}
-                        style={{ position:'fixed', inset:0, background: 'rgba(7, 34, 103, 0.1)', backdropFilter:'blur(8px)', zIndex: t.zIndex.overlay }}
+                        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
                     />
                     
                     <Motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        transition={{ 
-                            type: 'spring', 
-                            damping: 25, 
-                            stiffness: 300,
-                            mass: 0.8
-                        }}
-                        style={{
-                            position: 'fixed',
-                            left: '50%',
-                            top: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: 600,
-                            maxWidth: '92vw',
-                            maxHeight: '92vh',
-                            background: 'rgba(255, 255, 255, 0.8)',
-                            backdropFilter: 'blur(32px) saturate(180%)',
-                            WebkitBackdropFilter: 'blur(32px) saturate(180%)',
-                            border: '1px solid rgba(255, 255, 255, 0.5)',
-                            borderRadius: 32,
-                            boxShadow: `
-                                0 20px 50px rgba(0, 0, 0, 0.1),
-                                0 10px 20px rgba(0, 0, 0, 0.05),
-                                inset 0 0 0 1px rgba(255, 255, 255, 0.6)
-                            `,
-                            zIndex: t.zIndex.modal,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            overflow: 'hidden'
-                        }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className="relative w-full max-w-[640px] max-h-[90vh] bg-white/90 backdrop-blur-2xl border border-white/50 rounded-[40px] shadow-2xl flex flex-col overflow-hidden ring-1 ring-black/5"
                     >
-                        {/* Header */}
-                        <div style={{ 
-                            padding: '32px 40px 24px',
-                            display:'flex', alignItems:'flex-start', justifyContent:'space-between',
-                            background: 'linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)'
-                        }}>
+                        {/* Grain overlay */}
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />
+
+                        {/* Modal Header */}
+                        <div className="relative z-10 p-8 pb-4 flex items-start justify-between">
                             <div>
-                                <h1 style={{ fontSize: 22, fontWeight: 900, color: t.color.text, margin: 0, letterSpacing: '-0.03em' }}>
+                                <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none mb-2">
                                     {isEdit ? 'Update Personnel Profile' : 'Register New Member'}
-                                </h1>
-                                <p style={{ fontSize: 13, color: t.color.textPlaceholder, margin: '6px 0 0', fontWeight: 600, opacity: 0.8 }}>
-                                    {step === 0 ? 'Step 1: Authorization Level' : `Step 2: Profile Configuration (${form.role})`}
-                                </p>
+                                </h2>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                                        {step === 0 ? 'Step 1: Authorization Level' : `Step 2: Configuration (${form.role})`}
+                                    </span>
+                                </div>
                             </div>
-                            <Motion.button 
-                                whileHover={{ scale: 1.1, backgroundColor: 'rgba(0,0,0,0.05)' }}
-                                whileTap={{ scale: 0.9 }}
+                            <button 
                                 onClick={onClose} 
-                                style={{ 
-                                    background: 'rgba(0,0,0,0.03)', border: 'none', cursor: 'pointer', 
-                                    color: t.color.text, padding: 10, borderRadius: 14, 
-                                    display: 'flex', transition: 'all 0.2s' 
-                                }}
+                                className="p-2.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 rounded-2xl transition-all duration-300 active:scale-95"
                             >
-                                <FiX size={18} />
-                            </Motion.button>
+                                <FiX size={20} />
+                            </button>
                         </div>
 
-                        {/* Content */}
-                        <div style={{ flex: 1, overflowY: 'auto', padding: '0 40px 40px' }}>
+                        {/* Modal Body */}
+                        <div className="relative z-10 flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar">
                             <AnimatePresence mode="wait">
                                 {step === 0 ? (
                                     <Motion.div 
                                         key="step0" 
-                                        initial={{ opacity: 0, y: 10 }} 
-                                        animate={{ opacity: 1, y: 0 }} 
-                                        exit={{ opacity: 0, y: -10 }} 
-                                        transition={{ duration: 0.2 }} 
-                                        style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 10 }}
+                                        initial={{ opacity: 0, scale: 0.98 }} 
+                                        animate={{ opacity: 1, scale: 1 }} 
+                                        exit={{ opacity: 0, x: -20 }} 
+                                        className="space-y-4 pt-4"
                                     >
-                                        <div style={{ fontSize: 13, fontWeight: 700, color: t.color.textPlaceholder, marginBottom: 4, letterSpacing: '-0.01em' }}>
-                                            Select access level to continue
-                                        </div>
+                                        <div className="text-[13px] font-bold text-slate-500 mb-6">Select appropriate access level to proceed</div>
                                         {ROLE_DETAILS.map(role => (
                                             <Motion.div
                                                 key={role.id}
                                                 onClick={() => handleRoleSelect(role.id)}
-                                                whileHover={{ y: -2, borderColor: `${role.color}40`, background: `${role.color}05`, boxShadow: `0 8px 24px ${role.color}10` }}
-                                                whileTap={{ scale: 0.99 }}
-                                                style={{
-                                                    padding: '24px 28px', borderRadius: 24, border: `1px solid rgba(0,0,0,0.06)`,
-                                                    background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 20,
-                                                    transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
-                                                }}
+                                                whileHover={{ y: -4, scale: 1.01 }}
+                                                className={`group relative p-6 bg-white border border-slate-100 rounded-[30px] cursor-pointer flex items-center gap-6 transition-all duration-500 hover:shadow-2xl ${role.glow}`}
                                             >
-                                                <div style={{ width: 52, height: 52, borderRadius: 16, background: `${role.color}10`, color: role.color, display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${role.color}15`, flexShrink: 0 }}>
+                                                <div className={`w-16 h-16 rounded-[22px] ${role.bg} ${role.color} flex items-center justify-center border border-current/10 shadow-inner group-hover:scale-110 transition-transform duration-500`}>
                                                     {role.icon}
                                                 </div>
-                                                <div style={{ flex: 1 }}>
-                                                    <div style={{ fontSize: 16, fontWeight: 800, color: t.color.text, letterSpacing: '-0.02em' }}>{role.name}</div>
-                                                    <div style={{ fontSize: 13, color: t.color.textPlaceholder, marginTop: 4, fontWeight: 500, lineHeight: 1.5 }}>{role.desc}</div>
+                                                <div className="flex-1">
+                                                    <div className="text-lg font-black text-slate-900 tracking-tight group-hover:text-primary transition-colors">{role.name}</div>
+                                                    <div className="text-[13px] font-bold text-slate-400 leading-relaxed mt-1">{role.desc}</div>
                                                 </div>
-                                                <FiChevronRight size={18} color={t.color.textPlaceholder} style={{ opacity: 0.5 }} />
+                                                <div className="p-2 bg-slate-50 rounded-full group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300 opacity-50 group-hover:opacity-100">
+                                                    <FiChevronRight size={20} />
+                                                </div>
                                             </Motion.div>
                                         ))}
                                     </Motion.div>
@@ -278,98 +217,98 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                         initial={{ opacity: 0, x: 20 }} 
                                         animate={{ opacity: 1, x: 0 }} 
                                         exit={{ opacity: 0, x: -20 }} 
-                                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                                        style={{ paddingTop: 10 }}
+                                        className="pt-4 space-y-8"
                                     >
                                         {submitError && (
-                                            <div style={{ padding: '14px 18px', background: t.color.dangerBg, border: `1px solid ${t.color.dangerBorder}`, borderRadius: 16, color: t.color.danger, fontSize: 13, marginBottom: 32, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10, boxShadow: '0 4px 12px rgba(239, 68, 68, 0.1)' }}>
-                                                <FiAlertCircle size={16} /> {submitError}
+                                            <div className="flex items-center gap-3 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-sm font-black shadow-sm">
+                                                <FiAlertCircle size={18} /> {submitError}
                                             </div>
                                         )}
 
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
-                                            {/* Section 1 */}
-                                            <div>
-                                                <div style={sectionTitleStyle}><FiUser size={16} /> Basic Identity</div>
-                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-                                                    <div style={{ gridColumn: 'span 2' }}>
-                                                        <label style={labelStyle}>Full Name</label>
-                                                        <input style={fieldStyle(errors.name)} placeholder="e.g. Alexander Pierce" value={form.name} onChange={e => handleChange('name', e.target.value)} onFocus={focusStyle} onBlur={(e) => blurStyle(e, errors.name)} />
-                                                    </div>
-                                                    <div style={{ gridColumn: 'span 2' }}>
-                                                        <label style={labelStyle}>Work Email Address</label>
-                                                        <input style={fieldStyle(errors.email)} placeholder="name@company.com" value={form.email} onChange={e => handleChange('email', e.target.value)} onFocus={focusStyle} onBlur={(e) => blurStyle(e, errors.email)} />
-                                                    </div>
+                                        <div className="grid grid-cols-2 gap-x-6 gap-y-8">
+                                            {/* Section Header */}
+                                            <div className="col-span-2 flex items-center gap-3 pb-2 border-b border-slate-100">
+                                                <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shadow-inner">
+                                                    <FiUser size={16} />
                                                 </div>
+                                                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Base Identity Profile</h3>
                                             </div>
 
-                                            {/* Section 2 */}
-                                            <div>
-                                                <div style={sectionTitleStyle}><FiShield size={16} /> Deployment Parameters</div>
-                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-                                                    <div>
-                                                        <label style={labelStyle}>Employee ID</label>
-                                                        <input style={fieldStyle(errors.employeeId)} placeholder="EMP-402" value={form.employeeId} onChange={e => handleChange('employeeId', e.target.value)} onFocus={focusStyle} onBlur={(e) => blurStyle(e, errors.employeeId)} />
-                                                    </div>
-                                                    <div>
-                                                        <label style={labelStyle}>Designation</label>
-                                                        <select style={fieldStyle(false)} value={form.designation} onChange={e => handleChange('designation', e.target.value)} onFocus={focusStyle} onBlur={blurStyle}>
-                                                            <option value="">Select Level</option>
-                                                            {DESIGNATIONS.map(d => <option key={d} value={d}>{d}</option>)}
-                                                        </select>
-                                                    </div>
-                                                    <div style={{ gridColumn: 'span 2' }}>
-                                                        <label style={labelStyle}>Assigned Organization</label>
-                                                        <select style={fieldStyle(false)} value={form.organization} onChange={e => handleChange('organization', e.target.value)} onFocus={focusStyle} onBlur={blurStyle}>
-                                                            <option value="">Choose Unit</option>
-                                                            {ORGANIZATIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                        </select>
-                                                    </div>
-                                                    
-                                                    {form.role === 'Coordinator' && (
-                                                        <div style={{ gridColumn: 'span 2' }}>
-                                                            <label style={labelStyle}>Operational Region</label>
-                                                            <input style={fieldStyle(errors.region)} placeholder="e.g. Northern Sector" value={form.region} onChange={e => handleChange('region', e.target.value)} onFocus={focusStyle} onBlur={(e) => blurStyle(e, errors.region)} />
-                                                        </div>
-                                                    )}
-                                                    
-                                                    {form.role === 'Field Officer' && (
-                                                        <>
-                                                            <div>
-                                                                <label style={labelStyle}>Phone Node</label>
-                                                                <input style={fieldStyle(errors.phoneNumber)} placeholder="+91..." value={form.phoneNumber} onChange={e => handleChange('phoneNumber', e.target.value)} onFocus={focusStyle} onBlur={(e) => blurStyle(e, errors.phoneNumber)} />
-                                                            </div>
-                                                            <div>
-                                                                <label style={labelStyle}>Equipment Class</label>
-                                                                <input style={fieldStyle(errors.equipmentId)} placeholder="UI-900" value={form.equipmentId} onChange={e => handleChange('equipmentId', e.target.value)} onFocus={focusStyle} onBlur={(e) => blurStyle(e, errors.equipmentId)} />
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </div>
+                                            <div className="col-span-2">
+                                                <label className={labelClasses}>Full Personnel Name</label>
+                                                <input className={inputClasses(errors.name)} placeholder="e.g. Commander Alexander" value={form.name} onChange={e => handleChange('name', e.target.value)} />
+                                                {errors.name && <span className="text-[10px] font-black text-rose-500 mt-1 block ml-1">{errors.name}</span>}
                                             </div>
 
-                                            {/* Section 3 */}
-                                            <div>
-                                                <div style={sectionTitleStyle}><FiActivity size={16} /> Operational Status</div>
-                                                <div style={{ display: 'flex', gap: 12 }}>
+                                            <div className="col-span-2">
+                                                <label className={labelClasses}>Encrypted Work Email</label>
+                                                <input className={inputClasses(errors.email)} placeholder="id@enterprise.gov" value={form.email} onChange={e => handleChange('email', e.target.value)} />
+                                                {errors.email && <span className="text-[10px] font-black text-rose-500 mt-1 block ml-1">{errors.email}</span>}
+                                            </div>
+
+                                            {/* Deployment Section */}
+                                            <div className="col-span-2 flex items-center gap-3 pb-2 border-b border-slate-100 mt-4">
+                                                <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-inner">
+                                                    <FiLayers size={16} />
+                                                </div>
+                                                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Deployment Parameters</h3>
+                                            </div>
+
+                                            <div className="col-span-1">
+                                                <label className={labelClasses}>System ID (EMP)</label>
+                                                <input className={inputClasses(errors.employeeId)} placeholder="ID-4029" value={form.employeeId} onChange={e => handleChange('employeeId', e.target.value)} />
+                                            </div>
+
+                                            <div className="col-span-1">
+                                                <label className={labelClasses}>Designation Tier</label>
+                                                <select className={inputClasses(false)} value={form.designation} onChange={e => handleChange('designation', e.target.value)}>
+                                                    <option value="">Choose Rank</option>
+                                                    {DESIGNATIONS.map(d => <option key={d} value={d}>{d}</option>)}
+                                                </select>
+                                            </div>
+
+                                            <div className="col-span-2">
+                                                <label className={labelClasses}>Assigned Strategic Unit</label>
+                                                <select className={inputClasses(false)} value={form.organization} onChange={e => handleChange('organization', e.target.value)}>
+                                                    <option value="">Select Organization</option>
+                                                    {ORGANIZATIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                                                </select>
+                                            </div>
+                                            
+                                            {form.role === 'Coordinator' && (
+                                                <div className="col-span-2">
+                                                    <label className={labelClasses}>Assigned Operational Sector</label>
+                                                    <input className={inputClasses(errors.region)} placeholder="Strategic Region Alpha" value={form.region} onChange={e => handleChange('region', e.target.value)} />
+                                                </div>
+                                            )}
+                                            
+                                            {form.role === 'Field Officer' && (
+                                                <>
+                                                    <div className="col-span-1">
+                                                        <label className={labelClasses}>Comms Node</label>
+                                                        <input className={inputClasses(errors.phoneNumber)} placeholder="+1 (555) 000-0000" value={form.phoneNumber} onChange={e => handleChange('phoneNumber', e.target.value)} />
+                                                    </div>
+                                                    <div className="col-span-1">
+                                                        <label className={labelClasses}>Hardware Class ID</label>
+                                                        <input className={inputClasses(errors.equipmentId)} placeholder="TX-802" value={form.equipmentId} onChange={e => handleChange('equipmentId', e.target.value)} />
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            <div className="col-span-2 space-y-3 mt-4">
+                                                <label className={labelClasses}>Operational Readiness</label>
+                                                <div className="flex gap-4">
                                                     {STATUS_OPTIONS.map(s => (
-                                                        <Motion.button 
+                                                        <button 
                                                             key={s} 
-                                                            whileHover={{ y: -2 }} 
-                                                            whileTap={{ scale: 0.98 }} 
                                                             onClick={() => handleChange('status', s)} 
-                                                            style={{ 
-                                                                flex: 1, padding: '14px', borderRadius: 16, fontSize: 11, fontWeight: 900, 
-                                                                border: `1.5px solid ${form.status === s ? (s === 'active' ? t.color.success : t.color.border) : t.color.borderLight}`, 
-                                                                background: form.status === s ? (s === 'active' ? t.color.successBg : t.color.bg) : 'rgba(255, 255, 255, 0.4)', 
-                                                                color: form.status === s ? (s === 'active' ? t.color.successDark : t.color.text) : t.color.textPlaceholder, 
-                                                                cursor: 'pointer', textTransform: 'uppercase', letterSpacing:'0.08em',
-                                                                boxShadow: form.status === s ? '0 4px 12px rgba(0,0,0,0.05)' : 'none',
-                                                                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-                                                            }}
+                                                            className={`flex-1 py-4 px-6 rounded-2xl text-[11px] font-black uppercase tracking-widest border transition-all duration-300 group
+                                                                ${form.status === s 
+                                                                    ? (s === 'active' ? 'bg-emerald-500 text-white border-emerald-400 shadow-xl shadow-emerald-500/20 scale-[1.02]' : 'bg-slate-900 text-white border-slate-800 shadow-xl shadow-slate-900/20 scale-[1.02]')
+                                                                    : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:bg-slate-50'}`}
                                                         >
-                                                            {s}
-                                                        </Motion.button>
+                                                            {s === 'active' ? 'Deploy (Active)' : 'Standby (Inactive)'}
+                                                        </button>
                                                     ))}
                                                 </div>
                                             </div>
@@ -379,59 +318,40 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                             </AnimatePresence>
                         </div>
 
-                        {/* Footer */}
-                        <div style={{ 
-                            padding: '24px 40px 32px', 
-                            background: 'rgba(255, 255, 255, 0.5)', 
-                            borderTop: '1px solid rgba(0,0,0,0.05)',
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'center' 
-                        }}>
-                            {step === 1 && !isEdit ? (
-                                <Motion.button 
-                                    whileHover={{ x: -2, color: t.color.primary }} 
-                                    onClick={() => setStep(0)} 
-                                    style={{ 
-                                        display: 'flex', alignItems: 'center', gap: 8, background: 'none', 
-                                        border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 800, 
-                                        color: t.color.textPlaceholder, letterSpacing: '-0.01em', transition: 'color 0.2s'
-                                    }}
-                                >
-                                    <FiChevronLeft size={16} /> Previous step
-                                </Motion.button>
-                            ) : <div />}
+                        {/* Modal Footer */}
+                        <div className="relative z-10 p-8 pt-4 bg-slate-50/50 backdrop-blur-md border-t border-slate-100 flex items-center justify-between">
+                            <div className="flex items-center">
+                                {step === 1 && !isEdit && (
+                                    <button 
+                                        onClick={() => setStep(0)} 
+                                        className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-primary transition-colors pr-6 group"
+                                    >
+                                        <FiChevronLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" /> 
+                                        Back to Tier
+                                    </button>
+                                )}
+                            </div>
                             
-                            <div style={{ display: 'flex', gap: 12 }}>
-                                <Motion.button 
-                                    whileHover={{ background: 'rgba(0,0,0,0.05)' }} 
+                            <div className="flex items-center gap-3">
+                                <button 
                                     onClick={onClose} 
-                                    style={{ 
-                                        padding: '12px 24px', borderRadius: 16, border: `1px solid rgba(0,0,0,0.1)`, 
-                                        background: 'transparent', color: t.color.text, fontWeight: 750, 
-                                        cursor: 'pointer', fontSize: 13, letterSpacing: '-0.01em' 
-                                    }}
+                                    className="px-6 py-3 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors"
                                 >
                                     Cancel
-                                </Motion.button>
+                                </button>
                                 {step === 1 && (
-                                    <Motion.button 
-                                        whileHover={{ y: -2, boxShadow: `0 12px 24px ${t.color.primary}25` }} 
-                                        whileTap={{ scale: 0.98 }} 
+                                    <button 
                                         onClick={handleSubmit} 
                                         disabled={loading} 
-                                        style={{ 
-                                            padding: '12px 32px', borderRadius: 16, border: 'none', 
-                                            background: t.color.primary, color: '#fff', fontWeight: 800, 
-                                            cursor: 'pointer', fontSize: 13, letterSpacing: '-0.01em', 
-                                            boxShadow: `0 8px 16px ${t.color.primary}15` 
-                                        }}
+                                        className="px-8 py-3 bg-primary text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:bg-primary/90 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:translate-y-0 active:scale-95"
                                     >
-                                        {loading ? 'Processing...' : (isEdit ? 'Save Changes' : 'Confirm Registration')}
-                                    </Motion.button>
+                                        {loading ? 'Transmitting Data...' : (isEdit ? 'Update Dataset' : 'Finalize Registration')}
+                                    </button>
                                 )}
                             </div>
                         </div>
                     </Motion.div>
-                </>
+                </div>
             )}
         </AnimatePresence>
     );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
@@ -35,7 +35,7 @@ function LoginPage() {
             loadingText="Signing in..."
             footer={
                 <span className="font-semibold text-slate-500">
-                    Don't have access? 
+                    Don&apos;t have access? 
                     <a 
                         href="/registration" 
                         className="text-primary font-black ml-1.5 border-b-2 border-transparent hover:border-primary transition-all duration-300"
