@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { MdSearch, MdOutlineLanguage } from 'react-icons/md';
+import { FaXTwitter, FaGithub } from 'react-icons/fa6';
 import Logo from '../Branding/Logo';
 
 const LandingNavbar = ({
@@ -9,6 +11,15 @@ const LandingNavbar = ({
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [hoveredIdx, setHoveredIdx] = useState(null);
+    const [activeIdx, setActiveIdx] = useState(0);
+
+    const { scrollYProgress } = useScroll();
+    const scaleX = useSpring(scrollYProgress, {
+        stiffness: 100,
+        damping: 30,
+        restDelta: 0.001
+    });
 
     // Track scroll for background change
     useEffect(() => {
@@ -72,37 +83,104 @@ const LandingNavbar = ({
                         <motion.div 
                             whileHover={{ scale: 1.02 }} 
                             whileTap={{ scale: 0.98 }}
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             className="cursor-pointer flex items-center"
                         >
                             <Logo size="lg" className="text-slate-900" />
                         </motion.div>
                     </div>
 
-                    {/* Center — Desktop Nav Links */}
-                    <div className="hidden lg:flex items-center justify-center gap-6 xl:gap-12 flex-[2]">
-                        {navLinks.map((link) => (
+                    {/* Center — Desktop Nav Links with Sliding Pill */}
+                    <div className="hidden lg:flex items-center justify-center gap-2 xl:gap-4 flex-[2] relative">
+                        {/* Sliding Pill Background */}
+                        <AnimatePresence>
+                            {hoveredIdx !== null && (
+                                <motion.div
+                                    layoutId="nav-pill"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    className="absolute bg-slate-100/80 rounded-full z-0 h-10"
+                                    style={{
+                                        width: 'var(--pill-width)',
+                                        left: 'var(--pill-left)',
+                                    }}
+                                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                                />
+                            )}
+                        </AnimatePresence>
+
+                        {navLinks.map((link, idx) => (
                             <motion.a
                                 key={link.label}
                                 href={link.href || '#'}
-                                className="relative flex items-center gap-1 text-[12px] xl:text-[13px] font-bold tracking-tight text-slate-600 hover:text-primary transition-colors duration-300 whitespace-nowrap"
+                                onMouseEnter={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    const parentRect = e.currentTarget.parentElement.getBoundingClientRect();
+                                    e.currentTarget.parentElement.style.setProperty('--pill-width', `${rect.width + 24}px`);
+                                    e.currentTarget.parentElement.style.setProperty('--pill-left', `${rect.left - parentRect.left - 12}px`);
+                                    setHoveredIdx(idx);
+                                }}
+                                onMouseLeave={() => setHoveredIdx(null)}
+                                onClick={(e) => {
+                                    setActiveIdx(idx);
+                                    if (link.onClick) {
+                                        e.preventDefault();
+                                        link.onClick();
+                                    }
+                                }}
+                                className={`
+                                    relative z-10 flex flex-col items-center gap-1.5 px-3 py-2 text-[12px] xl:text-[13px] font-bold tracking-tight transition-colors duration-300 whitespace-nowrap cursor-pointer
+                                    ${activeIdx === idx ? 'text-primary' : 'text-slate-500 hover:text-slate-900'}
+                                `}
                             >
-                                {link.label}
-                                {(link.label === 'Trading' || link.label === 'Platforms' || link.label === 'Tools & Education' || link.label === 'About Us') && (
-                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"><path d="m6 9 6 6 6-6"/></svg>
+                                <div className="flex items-center gap-1">
+                                    {link.label}
+                                    {(link.label === 'Trading' || link.label === 'Platforms' || link.label === 'Tools & Education' || link.label === 'About Us') && (
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"><path d="m6 9 6 6 6-6"/></svg>
+                                    )}
+                                </div>
+                                
+                                {/* Active Link Dot */}
+                                {activeIdx === idx && (
+                                    <motion.div 
+                                        layoutId="active-dot"
+                                        className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary"
+                                        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                                    />
                                 )}
                             </motion.a>
                         ))}
                     </div>
 
-                    {/* Right — Desktop Buttons */}
-                    <div className="hidden lg:flex items-center justify-end gap-3 xl:gap-6 flex-1">
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="px-4 xl:px-8 py-2.5 bg-primary text-white text-[11px] xl:text-[12px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 transition-all whitespace-nowrap"
-                        >
-                            Log in
-                        </motion.button>
+                    {/* Right — Desktop Buttons & Icons */}
+                    <div className="hidden lg:flex items-center justify-end gap-3 xl:gap-5 flex-1">
+                        {/* Global/Social Switcher */}
+                        <div className="flex items-center gap-3 text-slate-400">
+                            <motion.button whileHover={{ scale: 1.1, color: 'var(--color-primary)' }} className="transition-colors">
+                                <MdOutlineLanguage className="text-xl" />
+                            </motion.button>
+                            <motion.button whileHover={{ scale: 1.1, color: '#000' }} className="transition-colors hidden xl:block">
+                                <FaGithub className="text-lg" />
+                            </motion.button>
+                        </div>
+
+                        {buttons.map((btn, i) => (
+                            <motion.button
+                                key={i}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={btn.onClick}
+                                className={`
+                                    px-4 xl:px-6 py-2 text-[11px] xl:text-[12px] font-black uppercase tracking-widest rounded-xl transition-all whitespace-nowrap ml-2
+                                    ${btn.variant === 'filled' 
+                                        ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark' 
+                                        : 'text-slate-600 hover:text-primary'}
+                                `}
+                            >
+                                {btn.label}
+                            </motion.button>
+                        ))}
                     </div>
 
                     {/* Mobile Menu Toggle Button */}
@@ -127,6 +205,12 @@ const LandingNavbar = ({
                         </div>
                     </motion.button>
                 </nav>
+
+                {/* Scroll Progress Bar */}
+                <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary origin-left z-[100]"
+                    style={{ scaleX }}
+                />
             </motion.header>
 
             {/* Mobile Menu Drawer */}
@@ -169,14 +253,25 @@ const LandingNavbar = ({
                         <div className="flex flex-col gap-8">
                             <div className="text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase font-sans">Account</div>
                             <div className="flex flex-col gap-5">
-                                <button className="w-full py-4 text-[14px] font-bold text-slate-600 hover:text-primary transition-colors text-left px-2">Log in</button>
-                                <motion.button
-                                    variants={itemVariants}
-                                    whileTap={{ scale: 0.98 }}
-                                    className="w-full py-4 bg-primary text-white text-[13px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-primary/20 transition-all font-sans"
-                                >
-                                    Sign up
-                                </motion.button>
+                                {buttons.map((btn, i) => (
+                                    <motion.button
+                                        key={i}
+                                        variants={itemVariants}
+                                        whileTap={{ scale: 0.98 }}
+                                        onClick={() => {
+                                            setIsMenuOpen(false);
+                                            if (btn.onClick) btn.onClick();
+                                        }}
+                                        className={`
+                                            w-full py-4 text-[13px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all font-sans
+                                            ${btn.variant === 'filled'
+                                                ? 'bg-primary text-white shadow-xl shadow-primary/20'
+                                                : 'text-slate-600 hover:text-primary text-left px-2'}
+                                        `}
+                                    >
+                                        {btn.label}
+                                    </motion.button>
+                                ))}
                             </div>
                         </div>
                     </motion.div>
