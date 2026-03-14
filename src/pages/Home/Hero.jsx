@@ -111,26 +111,26 @@ const Hero = () => {
                 {/* Mini Badge */}
                 <motion.div 
                     variants={itemVariants} 
-                    className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-[10px] font-bold tracking-tight text-primary-dark/60 bg-white border border-slate-100 rounded-full shadow-sm cursor-default"
+                    className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-[10px] font-black tracking-[0.2em] text-primary/70 bg-white border border-slate-100 rounded-full shadow-sm cursor-default uppercase"
                 >
                     <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                    Insight Boost
+                    Asset Intelligence System
                 </motion.div>
 
                 <motion.h1
                     variants={itemVariants}
-                    className="mb-8 font-black leading-[1.02] tracking-tighter text-slate-900 text-[clamp(2.5rem,8.5vw,5.5rem)]"
+                    className="mb-8 font-black leading-[1.05] tracking-tighter text-slate-900 text-[clamp(2rem,7vw,4rem)] px-4"
                 >
-                    Empower Audits <br />
-                    with <span className="text-primary">Expert Insights</span>
+                    Next-Gen Asset Audits <br />
+                    Made <span className="text-primary">Simple & Precise</span>
                 </motion.h1>
 
                 <motion.p
                     variants={itemVariants}
-                    className="mb-12 text-base lg:text-lg font-medium leading-relaxed text-slate-400 max-w-2xl px-4"
+                    className="mb-12 text-sm lg:text-base font-bold leading-relaxed text-slate-500 max-w-xl px-6"
                 >
-                    Unlock your operational potential with our comprehensive resources, <br className="hidden md:block" />
-                    tailored to guide you every step of the way.
+                    The complete platform for field inspections, QR tracking, <br className="hidden md:block" />
+                    and real-time safety management. Professional audits, simplified.
                 </motion.p>
 
                 <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">

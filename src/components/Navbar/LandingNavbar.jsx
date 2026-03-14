@@ -96,13 +96,12 @@ const LandingNavbar = ({
 
                     {/* Right — Desktop Buttons */}
                     <div className="hidden lg:flex items-center justify-end gap-3 xl:gap-6 flex-1">
-                        <button className="text-[12px] xl:text-[13px] font-bold text-slate-600 hover:text-primary transition-colors whitespace-nowrap">Log in</button>
                         <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className="px-4 xl:px-8 py-2.5 bg-primary text-white text-[11px] xl:text-[12px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 transition-all whitespace-nowrap"
                         >
-                            Sign up
+                            Log in
                         </motion.button>
                     </div>
 
