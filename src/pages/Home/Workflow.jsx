@@ -14,15 +14,15 @@ const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: isEven ? -80 : 80 }}
+            initial={{ opacity: 0, x: isEven ? -40 : 40 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 1, ease: [0.23, 1, 0.32, 1], delay: index * 0.1 }}
-            className={`w-full flex ${isEven ? 'justify-start' : 'justify-end'} mb-20 relative z-10`}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: index * 0.1 }}
+            className={`w-full flex justify-center lg:${isEven ? 'justify-start' : 'justify-end'} mb-12 sm:mb-20 relative z-10`}
         >
             <motion.div
                 ref={cardRef}
-                className="w-full max-w-[380px] p-8 rounded-[32px] bg-white border border-white/40 shadow-2xl transition-all hover:shadow-primary/5 relative cursor-pointer overflow-hidden group ring-1 ring-slate-100/50"
+                className="w-full max-w-[420px] p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] bg-white border border-white/40 shadow-xl sm:shadow-2xl transition-all hover:shadow-primary/5 relative cursor-pointer overflow-hidden group ring-1 ring-slate-100/50"
             >
                 {/* Grain Texture Overlay - Static */}
                 <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />

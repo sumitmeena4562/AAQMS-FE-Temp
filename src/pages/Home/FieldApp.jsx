@@ -45,12 +45,12 @@ const MobileMockup = () => (
             whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1, ease: [0.21, 1, 0.36, 1] }}
-            className="w-[300px] h-[600px] bg-slate-900 rounded-[48px] p-2.5 relative z-10 shadow-2xl border border-white/10 ring-1 ring-slate-800 flex flex-col group"
+            className="w-full max-w-[280px] sm:max-w-[300px] aspect-[1/2] h-auto bg-slate-900 rounded-[32px] sm:rounded-[48px] p-2 sm:p-2.5 relative z-10 shadow-2xl border border-white/10 ring-1 ring-slate-800 flex flex-col group"
         >
             {/* Internal Bezel */}
-            <div className="flex-1 bg-slate-950 rounded-[38px] relative overflow-hidden flex flex-col">
+            <div className="flex-1 bg-slate-950 rounded-[28px] sm:rounded-[38px] relative overflow-hidden flex flex-col">
                 {/* Phone Notch */}
-                <div className="w-28 h-6 bg-slate-950 absolute top-0 left-1/2 -translate-x-1/2 rounded-b-2xl z-20" />
+                <div className="w-20 sm:w-28 h-4 sm:h-6 bg-slate-950 absolute top-0 left-1/2 -translate-x-1/2 rounded-b-xl sm:rounded-b-2xl z-20" />
 
                 {/* App Header */}
                 <div className="pt-8 pb-5 px-5 bg-gradient-to-b from-slate-900 to-slate-950">
@@ -132,22 +132,22 @@ const MobileMockup = () => (
             </div>
         </motion.div>
 
-        {/* Floating Verified Badge */}
+        {/* Floating Verified Badge - Adjusted for mobile safety */}
         <motion.div 
             initial={{ x: 30, opacity: 0 }}
             whileInView={{ x: 0, opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="absolute -right-8 top-1/2 -translate-y-1/2 bg-white p-4 rounded-2xl shadow-xl z-20 flex items-center gap-4 border border-slate-100 ring-1 ring-slate-100 group cursor-default"
+            className="absolute -right-4 sm:-right-8 top-1/2 -translate-y-1/2 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl z-20 flex items-center gap-3 sm:gap-4 border border-slate-100 ring-1 ring-slate-100 group cursor-default"
         >
             <div 
-                className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform"
+                className="w-8 sm:w-10 h-8 sm:h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg sm:rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform"
             >
-                <MdOutlineVerified className="text-xl" />
+                <MdOutlineVerified className="text-lg sm:text-xl" />
             </div>
             <div>
-                <div className="text-[13px] font-black text-slate-900 leading-none mb-1">Audit Live</div>
-                <div className="text-[10px] text-emerald-500 font-black uppercase tracking-widest leading-none">100% Synced</div>
+                <div className="text-[11px] sm:text-[13px] font-black text-slate-900 leading-none mb-1">Audit Live</div>
+                <div className="text-[9px] sm:text-[10px] text-emerald-500 font-black uppercase tracking-widest leading-none">100% Synced</div>
             </div>
         </motion.div>
     </div>

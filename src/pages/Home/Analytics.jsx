@@ -142,7 +142,7 @@ const Analytics = () => {
                         </div>
 
                         {/* Fancy Chart Area */}
-                        <div className="h-44 bg-slate-50 rounded-2xl border border-slate-100 flex items-end p-5 gap-3 relative overflow-hidden group shadow-inner">
+                        <div className="h-44 bg-slate-50 rounded-2xl border border-slate-100 flex items-end p-4 sm:p-5 gap-1.5 sm:gap-3 relative overflow-hidden group shadow-inner">
                             {/* Static grid pattern for aesthetic */}
                             <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:16px_16px]" />
                             
@@ -154,7 +154,7 @@ const Analytics = () => {
                                     viewport={{ once: true }}
                                     transition={{ duration: 1, delay: 0.6 + (i * 0.05), ease: "easeOut" }}
                                     className={`
-                                        flex-1 rounded-t-lg transition-all duration-300
+                                        flex-1 rounded-t-sm sm:rounded-t-lg transition-all duration-300
                                         ${i === 7 ? 'bg-primary' : 'bg-primary/20 group-hover:bg-primary/30'}
                                     `}
                                 />
@@ -181,15 +181,15 @@ const Analytics = () => {
                         </div>
                     </Card>
 
-                    {/* Decorative Floating Label */}
+                    {/* Decorative Floating Label - Adjusted for Mobile safety */}
                     <motion.div 
                         initial={{ x: 20, opacity: 0 }}
                         whileInView={{ x: 0, opacity: 1 }}
                         transition={{ delay: 1 }}
-                        className="absolute -bottom-5 -left-5 bg-white p-3.5 px-6 rounded-2xl shadow-xl z-20 flex items-center gap-3 border border-slate-100 ring-2 ring-white"
+                        className="absolute -bottom-5 sm:-left-5 left-0 sm:left-auto bg-white p-3 sm:p-3.5 px-4 sm:px-6 rounded-2xl shadow-xl z-20 flex items-center gap-3 border border-slate-100 ring-2 ring-white"
                     >
                         <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_12px_var(--color-success)]" />
-                        <span className="text-sm font-black text-slate-900 tracking-tight">Live Sync Active</span>
+                        <span className="text-[12px] sm:text-sm font-black text-slate-900 tracking-tight">Live Sync Active</span>
                     </motion.div>
                 </motion.div>
             </div>

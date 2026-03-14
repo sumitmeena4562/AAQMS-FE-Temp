@@ -79,22 +79,22 @@ const Hero = () => {
     ];
 
     return (
-        <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden bg-white">
+        <section className="relative min-h-[90vh] flex flex-col items-center justify-between pt-32 sm:pt-40 pb-16 overflow-hidden bg-white">
             {/* --- Alchemy Background (Halo Effect) --- */}
             <div className="absolute inset-0 pointer-events-none">
                 {/* Large Background Glow */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white" />
                 
-                {/* Main Purple Arcs - More Defined for Portal Effect */}
-                <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[150%] max-w-[1500px] aspect-square rounded-full border-[1px] border-primary/10 blur-[2px]" />
-                <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[130%] max-w-[1300px] aspect-square rounded-full border-[80px] border-primary/5 blur-3xl opacity-60" />
-                <div className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[110%] max-w-[1100px] aspect-square rounded-full border-[60px] border-primary/10 blur-2xl opacity-70" />
-                <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-[90%] max-w-[900px] aspect-square rounded-full border-[40px] border-primary/[0.15] blur-xl opacity-80" />
-                <div className="absolute top-[40%] left-1/2 -translate-x-1/2 w-[80%] max-w-[800px] aspect-square rounded-full bg-gradient-to-b from-primary/[0.08] to-transparent blur-3xl opacity-50" />
+                {/* Main Purple Arcs - Responsive Scaling */}
+                <div className="absolute top-[20%] sm:top-[25%] left-1/2 -translate-x-1/2 w-[180%] sm:w-[150%] max-w-[1500px] aspect-square rounded-full border-[1px] border-primary/10 blur-[2px]" />
+                <div className="absolute top-[25%] sm:top-[30%] left-1/2 -translate-x-1/2 w-[160%] sm:w-[130%] max-w-[1300px] aspect-square rounded-full border-[40px] sm:border-[80px] border-primary/5 blur-3xl opacity-60" />
+                <div className="absolute top-[30%] sm:top-[35%] left-1/2 -translate-x-1/2 w-[140%] sm:w-[110%] max-w-[1100px] aspect-square rounded-full border-[30px] sm:border-[60px] border-primary/10 blur-2xl opacity-70" />
+                <div className="absolute top-[35%] sm:top-[40%] left-1/2 -translate-x-1/2 w-[120%] sm:w-[90%] max-w-[900px] aspect-square rounded-full border-[20px] sm:border-[40px] border-primary/[0.15] blur-xl opacity-80" />
+                <div className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 w-[100%] sm:w-[80%] max-w-[800px] aspect-square rounded-full bg-gradient-to-b from-primary/[0.08] to-transparent blur-3xl opacity-50" />
 
-                {/* Orbital Lines - Slightly deeper */}
-                <div className="absolute top-[42%] left-1/2 -translate-x-1/2 w-[85%] max-w-[850px] aspect-square rounded-full border border-primary/[0.08]" />
-                <div className="absolute top-[45%] left-1/2 -translate-x-1/2 w-[75%] max-w-[750px] aspect-square rounded-full border border-primary/[0.05]" />
+                {/* Orbital Lines - Responsive Sizes */}
+                <div className="absolute top-[42%] sm:top-[45%] left-1/2 -translate-x-1/2 w-[110%] sm:w-[85%] max-w-[850px] aspect-square rounded-full border border-primary/[0.08]" />
+                <div className="absolute top-[45%] sm:top-[48%] left-1/2 -translate-x-1/2 w-[100%] sm:w-[75%] max-w-[750px] aspect-square rounded-full border border-primary/[0.05]" />
                 
                 {/* Floating Nodes */}
                 <div className="absolute top-[38%] left-[28%] w-1.5 h-1.5 rounded-full bg-primary/20" />
@@ -103,7 +103,7 @@ const Hero = () => {
 
             {/* --- Main Content --- */}
             <motion.div
-                className="relative z-20 flex flex-col items-center text-center px-6 max-w-4xl -mt-20"
+                className="relative z-20 flex flex-col items-center text-center px-6 max-w-4xl"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
@@ -133,17 +133,17 @@ const Hero = () => {
                     tailored to guide you every step of the way.
                 </motion.p>
 
-                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-10">
+                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
                     <motion.button
                         whileHover={{ scale: 1.02, backgroundColor: 'var(--color-primary-dark)' }}
                         whileTap={{ scale: 0.98 }}
-                        className="px-10 py-4 text-xs font-black text-white bg-primary rounded-xl shadow-xl shadow-primary/20 uppercase tracking-[0.2em] transition-all"
+                        className="w-full sm:w-auto px-10 py-4 text-xs font-black text-white bg-primary rounded-xl shadow-xl shadow-primary/20 uppercase tracking-[0.2em] transition-all"
                     >
                         Start Auditing
                     </motion.button>
                     
-                    <div className="flex items-center gap-4 border-l border-slate-100 pl-8">
-                        <span className="text-4xl font-black text-slate-900 tracking-tighter">10</span>
+                    <div className="flex items-center gap-4 border-l-0 sm:border-l border-slate-100 pl-0 sm:pl-8">
+                        <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter">10</span>
                         <div className="text-[10px] font-bold text-slate-400 leading-tight text-left uppercase tracking-tighter">
                             years of <br /> reliability
                         </div>
@@ -156,15 +156,15 @@ const Hero = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8, duration: 1 }}
-                className="absolute bottom-16 w-full max-w-6xl px-12 z-30"
+                className="relative w-full max-w-6xl px-12 z-30 mt-12 sm:mt-20"
             >
-                <div className="flex flex-wrap items-center justify-between gap-12 pt-12 border-t border-slate-100/80">
+                <div className="grid grid-cols-2 md:flex md:flex-wrap items-center justify-between gap-6 sm:gap-12 pt-8 sm:pt-12 border-t border-slate-100/80">
                     {capabilities.map((cap, i) => (
-                        <div key={i} className="flex items-center gap-5 group cursor-pointer transition-all hover:translate-y-[-4px]">
-                            <div className="text-3xl filter grayscale group-hover:grayscale-0 transition-all group-hover:scale-110 drop-shadow-sm">{cap.icon}</div>
+                        <div key={i} className="flex items-center gap-3 sm:gap-5 group cursor-pointer transition-all hover:translate-y-[-4px]">
+                            <div className="text-2xl sm:text-3xl filter grayscale group-hover:grayscale-0 transition-all group-hover:scale-110 drop-shadow-sm">{cap.icon}</div>
                             <div className="flex flex-col">
-                                <span className="text-[14px] font-black text-slate-800 tracking-tight leading-none mb-1">{cap.label}</span>
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-80">Management</span>
+                                <span className="text-[12px] sm:text-[14px] font-black text-slate-800 tracking-tight leading-none mb-1">{cap.label}</span>
+                                <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-80">Management</span>
                             </div>
                         </div>
                     ))}
