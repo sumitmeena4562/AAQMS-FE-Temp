@@ -10,22 +10,6 @@ import {
 
 const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
     const cardRef = useRef(null);
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-
-    const mouseXSpring = useSpring(x);
-    const mouseYSpring = useSpring(y);
-
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["8deg", "-8deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"]);
-
-    const handleMouseMove = (e) => {
-        if (!cardRef.current) return;
-        const rect = cardRef.current.getBoundingClientRect();
-        x.set((e.clientX - rect.left) / rect.width - 0.5);
-        y.set((e.clientY - rect.top) / rect.height - 0.5);
-    };
-
     const isEven = index % 2 === 0;
 
     return (
@@ -38,27 +22,13 @@ const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
         >
             <motion.div
                 ref={cardRef}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={() => { x.set(0); y.set(0); }}
-                style={{
-                    rotateX,
-                    rotateY,
-                    transformStyle: 'preserve-3d',
-                }}
-                className="w-full max-w-[380px] p-8 rounded-[32px] bg-white/80 backdrop-blur-2xl border border-white/40 shadow-2xl transition-shadow hover:shadow-primary/10 relative cursor-pointer overflow-hidden group ring-1 ring-slate-100/50"
+                className="w-full max-w-[380px] p-8 rounded-[32px] bg-white border border-white/40 shadow-2xl transition-all hover:shadow-primary/5 relative cursor-pointer overflow-hidden group ring-1 ring-slate-100/50"
             >
-                {/* Grain Texture Overlay */}
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />
+                {/* Grain Texture Overlay - Static */}
+                <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />
 
-                {/* Internal Glow Follower */}
-                <motion.div
-                    style={{
-                        background: `radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--color-primary-rgb), 0.1) 0%, transparent 70%)`,
-                    }}
-                    className="absolute inset-0 rounded-[32px] z-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                />
 
-                <div style={{ transform: 'translateZ(50px)' }} className="relative z-10">
+                <div className="relative z-10">
                     <motion.div 
                         initial={{ scale: 0.5, opacity: 0 }}
                         whileInView={{ scale: 1, opacity: 1 }}
@@ -80,12 +50,6 @@ const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
                     </p>
                 </div>
 
-                <style dangerouslySetInnerHTML={{ __html: `
-                    .group:hover {
-                        --mouse-x: ${mouseXSpring.get() * 100 + 50}%;
-                        --mouse-y: ${mouseYSpring.get() * 100 + 50}%;
-                    }
-                `}} />
             </motion.div>
         </motion.div>
     );
@@ -178,7 +142,7 @@ const Workflow = () => {
                             stroke="currentColor"
                             strokeWidth="3"
                             style={{ pathLength }}
-                            className="text-primary-light filter drop-shadow-[0_0_8px_rgba(var(--color-primary-light-rgb),0.5)]"
+                            className="text-primary-light"
                         />
                         
                         {/* Pulsing Nodes on Path */}

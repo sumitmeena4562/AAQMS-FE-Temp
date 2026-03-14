@@ -16,7 +16,7 @@ const StatCard = ({ label, value, trend, icon: Icon, color, index }) => (
         className="flex-1 min-w-[140px]"
     >
         <Card
-            className="flex flex-col gap-4 h-full bg-white/80 backdrop-blur-md border border-white/50 group"
+            className="flex flex-col gap-4 h-full bg-white border border-white group transition-shadow hover:shadow-lg"
             hoverEffect={true}
         >
             <div className="flex justify-between items-center">
@@ -110,15 +110,15 @@ const Analytics = () => {
                     <Card
                         padding="32px"
                         borderRadius="28px"
-                        className="bg-white/90 backdrop-blur-2xl border-white/50 shadow-2xl flex flex-col gap-8 ring-1 ring-slate-100"
+                        className="bg-white/95 border-white shadow-2xl flex flex-col gap-8 ring-1 ring-slate-100"
                     >
                         {/* Header */}
                         <div className="flex justify-between items-center">
                             <h4 className="text-lg font-black text-slate-900 tracking-tight">Compliance Overview</h4>
                             <div className="flex gap-2">
-                                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 2, repeat: Infinity }} className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_8px_var(--color-success)]" />
-                                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 2, repeat: Infinity, delay: 0.5 }} className="w-2.5 h-2.5 rounded-full bg-warning" />
-                                <motion.div animate={{ opacity: [0.4, 1, 0.4] }} transition={{ duration: 2, repeat: Infinity, delay: 1 }} className="w-2.5 h-2.5 rounded-full bg-slate-200" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-success opacity-40" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-warning opacity-40" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-slate-200 opacity-40" />
                             </div>
                         </div>
 
@@ -143,12 +143,8 @@ const Analytics = () => {
 
                         {/* Fancy Chart Area */}
                         <div className="h-44 bg-slate-50 rounded-2xl border border-slate-100 flex items-end p-5 gap-3 relative overflow-hidden group shadow-inner">
-                            {/* Scanning line for dashboard aesthetic */}
-                            <motion.div 
-                                animate={{ top: ["0%", "100%", "0%"] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                                className="absolute inset-x-0 h-px bg-primary/20 pointer-events-none z-10"
-                            />
+                            {/* Static grid pattern for aesthetic */}
+                            <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:16px_16px]" />
                             
                             {[40, 70, 45, 90, 65, 80, 55, 95].map((h, i) => (
                                 <motion.div 

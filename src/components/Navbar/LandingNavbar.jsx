@@ -60,21 +60,21 @@ const LandingNavbar = ({
                 animate={{ y: 0 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 className={`
-                    ${sticky ? 'sticky' : 'relative'} top-0 left-0 right-0 z-50 px-6 transition-all duration-500
+                    ${sticky ? 'fixed' : 'relative'} top-0 left-0 right-0 z-50 px-8 transition-all duration-500
                     ${isScrolled 
-                        ? 'h-16 py-2 bg-white/70 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]' 
-                        : 'h-20 py-4 bg-transparent border-b border-transparent'}
+                        ? 'h-16 py-2 bg-white/80 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.02)]' 
+                        : 'h-24 py-4 bg-transparent border-b border-transparent'}
                 `}
             >
-                <nav className="flex items-center justify-between h-full max-w-7xl mx-auto overflow-visible">
+                <nav className="flex items-center justify-between h-full max-w-7xl mx-auto">
                     {/* Left — Logo */}
                     <div className="flex-1 flex justify-start z-[60]">
                         <motion.div 
-                            whileHover={{ scale: 1.05 }} 
-                            whileTap={{ scale: 0.95 }}
-                            className="cursor-pointer"
+                            whileHover={{ scale: 1.02 }} 
+                            whileTap={{ scale: 0.98 }}
+                            className="cursor-pointer flex items-center"
                         >
-                            <Logo size="md" />
+                            <Logo size="lg" className="text-slate-900" />
                         </motion.div>
                     </div>
 
@@ -84,42 +84,26 @@ const LandingNavbar = ({
                             <motion.a
                                 key={link.label}
                                 href={link.href || '#'}
-                                onClick={(e) => {
-                                    if (link.onClick) {
-                                        e.preventDefault();
-                                        link.onClick();
-                                    }
-                                }}
-                                whileHover={{ y: -2 }}
-                                className="relative text-[13px] font-bold tracking-tight text-slate-500 hover:text-primary transition-colors duration-300 group"
+                                className="relative flex items-center gap-1 text-[13px] font-bold tracking-tight text-slate-600 hover:text-primary transition-colors duration-300"
                             >
                                 {link.label}
-                                <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full rounded-full" />
+                                {(link.label === 'Trading' || link.label === 'Platforms' || link.label === 'Tools & Education' || link.label === 'About Us') && (
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"><path d="m6 9 6 6 6-6"/></svg>
+                                )}
                             </motion.a>
                         ))}
                     </div>
 
                     {/* Right — Desktop Buttons */}
-                    <div className="hidden lg:flex items-center justify-end gap-3 flex-1">
-                        {buttons.map((btn) => (
-                            <motion.button
-                                key={btn.label}
-                                onClick={btn.onClick}
-                                whileHover={{ 
-                                    scale: 1.05,
-                                    boxShadow: btn.variant === 'filled' ? '0 10px 20px -5px rgba(var(--color-primary-rgb), 0.3)' : 'none'
-                                }}
-                                whileTap={{ scale: 0.95 }}
-                                className={`
-                                    px-6 py-2.5 text-[12px] font-black uppercase tracking-widest border rounded-xl transition-all duration-300
-                                    ${btn.variant === 'filled' 
-                                        ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' 
-                                        : 'bg-white/50 backdrop-blur-md border-slate-200 text-slate-900 hover:bg-white/80'}
-                                `}
-                            >
-                                {btn.label}
-                            </motion.button>
-                        ))}
+                    <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
+                        <button className="text-[13px] font-bold text-slate-600 hover:text-primary transition-colors">Log in</button>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="px-8 py-2.5 bg-primary text-white text-[12px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 transition-all"
+                        >
+                            Sign up
+                        </motion.button>
                     </div>
 
                     {/* Mobile Menu Toggle Button */}

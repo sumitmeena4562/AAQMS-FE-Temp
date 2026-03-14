@@ -114,13 +114,7 @@ const MobileMockup = () => (
                         </motion.div>
                     </div>
 
-                    {/* Scanning Line Animation in Mockup */}
-                    <motion.div 
-                        animate={{ top: ["0%", "100%", "0%"] }}
-                        transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                        className="absolute inset-x-0 h-px bg-primary/20 pointer-events-none z-10"
-                        style={{ top: '40%' }}
-                    />
+                    <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase mt-2">Quick Utilities</span>
                 </div>
 
                 {/* App Bottom Nav */}
@@ -144,15 +138,13 @@ const MobileMockup = () => (
             whileInView={{ x: 0, opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="absolute -right-8 top-1/2 -translate-y-1/2 bg-white/80 backdrop-blur-xl p-4 rounded-2xl shadow-xl z-20 flex items-center gap-4 border border-white/50 ring-1 ring-slate-100 group cursor-default"
+            className="absolute -right-8 top-1/2 -translate-y-1/2 bg-white p-4 rounded-2xl shadow-xl z-20 flex items-center gap-4 border border-slate-100 ring-1 ring-slate-100 group cursor-default"
         >
-            <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            <div 
                 className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform"
             >
                 <MdOutlineVerified className="text-xl" />
-            </motion.div>
+            </div>
             <div>
                 <div className="text-[13px] font-black text-slate-900 leading-none mb-1">Audit Live</div>
                 <div className="text-[10px] text-emerald-500 font-black uppercase tracking-widest leading-none">100% Synced</div>
