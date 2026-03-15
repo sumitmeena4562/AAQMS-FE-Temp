@@ -1,81 +1,21 @@
 import React from 'react';
-
-/**
- * Global StatsCard — Reusable across all pages.
- *
- * Props:
- * @param {string}        label     - e.g. "TOTAL ASSETS", "VERIFIED"
- * @param {string|number} value     - e.g. 24, 18
- * @param {ReactNode}     icon      - e.g. <FiUsers size={16} />
- * @param {string}        iconBg    - bg for icon circle, e.g. "#EFF6FF"
- * @param {string}        iconColor - icon color, e.g. "#2563EB"
- * @param {object}        style     - optional override
- */
-const StatsCard = ({ label, value, icon, iconBg = '#F3F4F6', iconColor = '#6B7280', style = {} }) => {
+import { getChangeStyles } from "../../utils/cardStyles";
+// ==========================================
+// 1. FOR USERS_MANAGEMENT (Small Horizontal Cards)
+// ==========================================
+export const StatsCardSmall = ({ label, value, icon, iconBg = 'bg-gray-100', iconColor = 'text-gray-500' }) => {
     return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 14,
-                padding: '16px 20px',
-                background: '#FFFFFF',
-                border: '1px solid #F0F0F0',
-                borderRadius: 12,
-                boxShadow: '0 1px 4px rgba(0,0,0,0.05), 0 0 1px rgba(0,0,0,0.05)',
-                minWidth: 0,
-                flex: '1 1 0',
-                cursor: 'default',
-                transition: 'box-shadow 0.15s ease',
-                ...style,
-            }}
-            onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08), 0 0 1px rgba(0,0,0,0.04)'; }}
-            onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.05), 0 0 1px rgba(0,0,0,0.05)'; }}
-        >
-            {/* Icon Circle */}
+        <div className="flex items-center gap-4 px-6 py-5 bg-white border border-gray-200 rounded-2xl shadow-2xl  transition-all duration-200 cursor-default flex-1 min-w-0">
             {icon && (
-                <div
-                    style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: '50%',
-                        background: iconBg,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: iconColor,
-                        flexShrink: 0,
-                    }}
-                >
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${iconBg} ${iconColor}`}>
                     {icon}
                 </div>
             )}
-
-            {/* Label + Value */}
-            <div style={{ minWidth: 0, flex: 1 }}>
-                <div
-                    style={{
-                        fontSize: 11,
-                        fontWeight: 500,
-                        color: '#9CA3AF',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        marginBottom: 3,
-                    }}
-                >
+            <div className="flex-1 min-w-0">
+                <div className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap overflow-hidden text-ellipsis mb-1">
                     {label}
                 </div>
-                <div
-                    style={{
-                        fontSize: 24,
-                        fontWeight: 700,
-                        color: '#111827',
-                        lineHeight: 1,
-                    }}
-                >
+                <div className="text-2xl font-bold text-gray-900 leading-none">
                     {value}
                 </div>
             </div>
@@ -83,28 +23,57 @@ const StatsCard = ({ label, value, icon, iconBg = '#F3F4F6', iconColor = '#6B728
     );
 };
 
-/**
- * StatsRow — A responsive grid row of StatsCards.
- *
- * @param {Array}  items  - [{ label, value, icon, iconBg, iconColor }]
- * @param {number} gap    - gap between cards (default: 12)
- * @param {object} style  - optional override on the row
- */
-export const StatsRow = ({ items = [], gap = 12, style = {} }) => {
+export const StatsRow = ({ items = [] }) => {
     return (
-        <div
-            style={{
-                display: 'grid',
-                gridTemplateColumns: `repeat(${items.length}, 1fr)`,
-                gap,
-                ...style,
-            }}
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {items.map((item, i) => (
-                <StatsCard key={i} {...item} />
+                <StatsCardSmall key={i} {...item} />
             ))}
         </div>
     );
 };
 
-export default StatsCard;
+// ==========================================
+// 2. FOR STATS GRID (Large Dashboard Cards)
+// ==========================================
+export const StatCard = ({ title, value, change, description, icon, iconBgClass, iconColorClass, changeType = 'neutral' }) => {
+    const changeStyle = getChangeStyles(changeType);
+    return (
+        <div className="bg-white !px-6 !py-5 rounded-2xl w-full  border border-gray-300 shadow-2xl flex flex-col min-h-[148px] hover:shadow-md transition-all duration-200 cursor-default min-w-[236px]">
+
+            {/* Header Area */}
+            <div className="flex items-start justify-between gap-4 ">
+                <div className="flex flex-col min-w-0 flex-1">
+                    <p className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase mb-1 truncate">
+                        {title}
+                    </p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-none tabular-nums !mt-1">
+                        {value}
+                    </h2>
+                </div>
+
+                {/* Icon Box */}
+                <div className={`w-10 h-10 flex items-center justify-center rounded-xl shrink-0 ${iconBgClass} ${iconColorClass}`}>
+                    {icon}
+                </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-[2px] w-full bg-gray-200 !my-4"></div>
+
+
+            <div className=" flex items-center gap-2 justify-between flex-wrap pt-1">
+                <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ${changeStyle.text} ${changeStyle.bg}`}>
+                    {change}
+                </span>
+                <span className="text-[12px] font-medium text-gray-400 truncate flex-1 text-right">
+                    {description}
+                </span>
+            </div>
+        </div>
+    );
+};
+
+export default StatCard;
+
+// ==========================================

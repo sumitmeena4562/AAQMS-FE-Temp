@@ -2,9 +2,7 @@ import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Logo from "../../components/Branding/Logo";
 import Sidebar from "../../components/sidebar/Sidebar";
-
 import ProfileDropdown from "../../components/Navbar/ProfileDropdown";
-
 import Navbar from "../../components/Navbar/Navbar";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 import { BreadcrumbProvider, useBreadcrumb, generateBreadcrumbs } from "../../context/BreadcrumbContext";
@@ -89,7 +87,9 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#fff', fontFamily: 'inherit' }}>
+        // <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#fff', fontFamily: 'inherit' }}>
+
+        <div className="flex h-screen overflow-hidden bg-white">
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}
@@ -98,7 +98,8 @@ const AdminLayoutInner = () => {
                 mobileOpen={isMobileOpen}
                 setMobileOpen={setIsMobileOpen}
             />
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: '#fff' }}>
+            {/* <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: '#fff' }}> */}
+            <div className="flex-1 flex flex-col overflow-hidden bg-white">
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
@@ -120,8 +121,8 @@ const AdminLayoutInner = () => {
                         </div>
                     }
                 />
-                <main style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
-                    <div style={{ width: '100%', maxWidth: 1400, margin: '0 auto' }}>
+                <main className="flex-1 overflow-y-auto !p-8 bg-[var(--color-bg-light)]">
+                    <div className="w-full max-w-7xl mx-auto">
                         <Outlet />
                     </div>
                 </main>

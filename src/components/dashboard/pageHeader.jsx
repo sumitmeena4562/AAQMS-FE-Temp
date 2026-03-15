@@ -33,7 +33,7 @@ import React from 'react';
 
 const PageHeader = ({ title, subtitle, rightContent }) => {
     return (
-        <header className="flex flex-row items-center justify-between w-full pb-6 border-b border-gray-200">
+        <header className="flex flex-row items-center justify-between w-full !pb-2 mb-6 border-b border-gray-200">
 
             {/* Left Side */}
             <div className="flex flex-col gap-1">
