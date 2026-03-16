@@ -29,6 +29,7 @@ const Button = ({
         success: "bg-success text-white hover:bg-success/90 shadow-[var(--shadow-button)] border border-transparent",
         outline: "bg-white border border-[var(--color-border)] text-text-secondary hover:border-[var(--color-border-hover)] hover:text-text-primary",
         ghost: "bg-transparent text-text-secondary hover:bg-zinc-100 hover:text-text-primary shadow-none border-none",
+        danger: "bg-rose-500 text-white hover:bg-rose-600 shadow-md border border-transparent",
     };
 
     return (

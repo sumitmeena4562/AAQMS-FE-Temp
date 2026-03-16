@@ -89,7 +89,7 @@ const ConfirmModal = ({
                                 variant={danger ? 'danger' : 'primary'}
                                 onClick={onConfirm}
                                 loading={loading}
-                                className={`!h-10 !px-6 !rounded-xl !text-[12px] !font-black ${danger ? 'bg-danger hover:bg-danger/90' : ''}`}
+                                className="!h-10 !px-6 !rounded-xl !text-[12px] !font-black"
                             >
                                 {confirmText}
                             </Button>

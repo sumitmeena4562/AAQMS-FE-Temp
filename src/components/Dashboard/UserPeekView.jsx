@@ -135,9 +135,9 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                         {/* Modal Footer */}
                         <div className="relative z-10 p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
                             <Button
-                                variant="ghost"
+                                variant="danger"
                                 onClick={() => { onClose(); onDelete(user); }}
-                                className="!h-10 !px-5 !text-[11px] !font-bold !uppercase !tracking-wider !text-rose-500 hover:!text-rose-700"
+                                className="!h-10 !px-5 !text-[11px] !font-bold !uppercase !tracking-wider"
                             >
                                 Remove User
                             </Button>
