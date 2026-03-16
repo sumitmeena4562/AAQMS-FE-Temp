@@ -121,7 +121,15 @@ const InputField = ({
                 <motion.span 
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
-                    style={{ color: t.color.danger, fontSize: t.fontSize.xs, marginTop: '2px', fontWeight: t.fontWeight.semibold, marginLeft: '4px' }}
+                    style={{ 
+                        color: t.color.danger, 
+                        fontSize: t.fontSize.xs, 
+                        marginTop: '2px', 
+                        fontWeight: t.fontWeight.semibold, 
+                        marginLeft: '4px',
+                        letterSpacing: 'normal',
+                        textAlign: 'left'
+                    }}
                 >
                     {error}
                 </motion.span>

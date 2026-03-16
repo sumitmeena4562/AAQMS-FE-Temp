@@ -156,7 +156,8 @@ function ForgotPasswordModal({ isOpen, onClose }) {
 
 function EmailStep({ onSubmit, isLoading }) {
     const { register, handleSubmit, formState: { errors } } = useForm({
-        resolver: zodResolver(forgotPasswordSchema)
+        resolver: zodResolver(forgotPasswordSchema),
+        mode: 'onChange'
     });
 
     return (
@@ -192,7 +193,8 @@ function EmailStep({ onSubmit, isLoading }) {
 
 function OtpStep({ email, onSubmit, onResend, isLoading }) {
     const { register, handleSubmit, formState: { errors } } = useForm({
-        resolver: zodResolver(otpSchema)
+        resolver: zodResolver(otpSchema),
+        mode: 'onChange'
     });
 
     return (
@@ -235,7 +237,8 @@ function OtpStep({ email, onSubmit, onResend, isLoading }) {
 
 function ResetStep({ onSubmit, isLoading }) {
     const { register, handleSubmit, formState: { errors } } = useForm({
-        resolver: zodResolver(resetPasswordSchema)
+        resolver: zodResolver(resetPasswordSchema),
+        mode: 'onChange'
     });
 
     return (
