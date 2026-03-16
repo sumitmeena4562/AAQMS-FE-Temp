@@ -322,7 +322,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             )}
 
                                             <div className="col-span-2">
-                                                <label className={labelClasses}>Operational Status</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Operational Status</label>
                                                 <div className="flex gap-2">
                                                     {STATUS_OPTIONS.map(s => (
                                                         <button 
