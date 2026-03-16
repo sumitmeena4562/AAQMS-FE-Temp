@@ -1,32 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import OrganizationCard from '../../components/organization/OrganizationCard';
 import PageHeader from '../../components/UI/PageHeader';
+import CreateOrganization from '../../components/organization/CreateOrganization';
+import { useOrgStore } from '../../store/useOrgStore';
 
 const DashboardIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
 const FolderIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>;
 const OrgIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>;
 
-const org = [
-  {
-    name: "Acme Corp", industry: "Technology", region: "North America", coordinators: 2, sites: 4, floors: 5, status: "ACTIVE",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    name: "Global Logistics", industry: "Logistics", region: "Europe", coordinators: 5, sites: 12, floors: 8, status: "ACTIVE",
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    name: "SSISM", industry: "Security", region: "Asia Pacific", coordinators: 1, sites: 2, floors: 4, status: "MAINTENANCE",
-    image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=800&auto=format&fit=crop"
-  }
-];
-
 const Organizations = () => {
+  const orgs = useOrgStore(state => state.orgs);
+  const addOrg = useOrgStore(state => state.addOrg);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const breadcrumbItems = [
     { label: "Dashboard", path: "/admin", icon: DashboardIcon },
     { label: "Organization Management", path: "/admin/organizations", icon: FolderIcon },
     { label: "Organizations", path: "/admin/organizations", icon: OrgIcon, isActive: true }
   ];
+
+  const handleCreateOrganization = (newOrg) => {
+    addOrg(newOrg);
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
@@ -37,7 +33,7 @@ const Organizations = () => {
         addButtonText="Add New Org" 
         onReset={() => console.log("Reset")}
         onApplyFilters={() => console.log("Filter")}
-        onAdd={() => console.log("Add")}
+        onAdd={() => setIsModalOpen(true)}
       />
 
       {/* 2. MAIN BODY */}
@@ -49,14 +45,14 @@ const Organizations = () => {
             Select Organization to Manage
           </h1>
           <span className="text-[13px] font-medium text-gray-500 mb-0.5">
-            Showing {org.length} total organizations
+            Showing {orgs.length} total organizations
           </span>
         </div>
 
         {/* CARDS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {org.map((item, index) => (
-            <div key={index} className="w-full max-w-[340px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          {orgs.map((item, index) => (
+            <div key={item.id || index} className="w-full max-w-[340px]">
               <OrganizationCard org={item} />
             </div>
           ))}
@@ -71,6 +67,14 @@ const Organizations = () => {
         </div>
 
       </div>
+
+      {/* Create Organization Modal */}
+      {isModalOpen && (
+        <CreateOrganization 
+          onSubmit={handleCreateOrganization} 
+          onClose={() => setIsModalOpen(false)} 
+        />
+      )}
     </div>
   );
 };

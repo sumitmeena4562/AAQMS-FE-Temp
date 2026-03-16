@@ -1,22 +1,40 @@
 import React from 'react';
 
 const OrganizationCard = ({ org }) => {
+  // Logic to determine active/deactive status based on last inventory audit
+  const getStatus = () => {
+    if (org.lastInventoryAudit) {
+      const auditDate = new Date(org.lastInventoryAudit);
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      
+      // If audit is older than 1 month, it's DEACTIVE
+      if (auditDate < oneMonthAgo) {
+        return 'DEACTIVE';
+      }
+      return 'ACTIVE';
+    }
+    return org.status || 'ACTIVE'; // Fallback
+  };
+
+  const currentStatus = getStatus();
+
   return (
     <div className="h-[470px] bg-white rounded-[24px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] hover:shadow-lg transition-all duration-300 flex flex-col border border-gray-100 overflow-hidden">
       
       {/* Top Image Section */}
       <div className="relative h-[200px] w-full shrink-0 bg-gray-100">
         <img
-          src={org.image}
+          src={org.imagery?.profile || org.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop'}
           alt={org.name}
           className="w-full h-full object-cover"
         />
         {/* Status Badge */}
         <div className="absolute top-4 right-4">
           <span className={`px-5 py-5 rounded-[2px] text-[11px] font-bold tracking-wider bg-white shadow-sm
-            ${org.status === 'ACTIVE' ? 'text-[#2e7d32]' : 'text-yellow-600'}
+            ${currentStatus === 'ACTIVE' ? 'text-[#2e7d32]' : currentStatus === 'MAINTENANCE' ? 'text-yellow-600' : 'text-red-600'}
           `}>
-            {org.status || 'ACTIVE'}
+            {currentStatus}
           </span>
         </div>
       </div>
@@ -38,21 +56,21 @@ const OrganizationCard = ({ org }) => {
         <div className="grid grid-cols-3 gap-1 mt-6 border-t border-gray-100 !pt-4 !px-12 !py-14">
           <div className="flex flex-col">
             <p className="text-[10px] text-gray-400 uppercase tracking-widest truncate">
-              Coordi....
+              Sites
             </p>
-            <p className="text-[18px] font-bold text-gray-900 mt-0.5">{org.coordinators}</p>
+            <p className="text-[18px] font-bold text-gray-900 mt-0.5">{org.stats?.sites ?? 0}</p>
           </div>
           <div className="flex flex-col">
-            <p className="text-[10px] text-gray-400  uppercase tracking-widest truncate">
-              Total S....
+            <p className="text-[10px] text-gray-400 uppercase tracking-widest truncate">
+              Floors
             </p>
-            <p className="text-[18px] font-bold text-gray-900 mt-0.5">{org.sites}</p>
+            <p className="text-[18px] font-bold text-gray-900 mt-0.5">{org.stats?.floors ?? 0}</p>
           </div>
           <div className="flex flex-col">
-            <p className="text-[10px] text-gray-400  uppercase tracking-widest truncate">
-              Floor...
+            <p className="text-[10px] text-gray-400 uppercase tracking-widest truncate">
+              Zones
             </p>
-            <p className="text-[18px] font-bold text-gray-900 mt-0.5">{org.floors}</p>
+            <p className="text-[18px] font-bold text-gray-900 mt-0.5">{org.stats?.zones ?? 0}</p>
           </div>
         </div>
 
