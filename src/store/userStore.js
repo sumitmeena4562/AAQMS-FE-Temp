@@ -1,7 +1,10 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { userService } from '../services/userService';
 
-const useUserStore = create((set, get) => ({
+const useUserStore = create(
+    persist(
+        (set, get) => ({
     // ── Data State ──
     users: [],
     stats: { total: 0, active: 0, inactive: 0, unassigned: 0 },
@@ -144,6 +147,13 @@ const useUserStore = create((set, get) => ({
 
     clearError: () => set({ error: null }),
     setSelectedIds: (selectedIds) => set({ selectedIds }),
+}), {
+    name: 'aaqms-user-filters',
+    partialize: (state) => ({ 
+        filters: state.filters, 
+        sortKey: state.sortKey, 
+        sortDir: state.sortDir 
+    }),
 }));
 
 export default useUserStore;

@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { userSchema } from '../../schema/userSchema';
 import { 
-    FiX, FiUser, FiMail, FiShield, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle
+    FiX, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle
 } from 'react-icons/fi';
 
 const ROLE_DETAILS = [
@@ -32,18 +35,28 @@ const ORGANIZATIONS = ['EcoTest Solutions', 'Urban Green Tech', 'PureAir Monitor
 const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false }) => {
     const isEdit = !!user;
     const [step, setStep] = useState(0);
-    const [form, setForm] = useState({ 
-        name: '', email: '', organization: '', role: '', 
-        assignment: 'unassigned', status: 'active',
-        region: '', employeeId: '', equipmentId: '', 
-        phoneNumber: '', managedTeams: '',
-        managedAssetClasses: [], designation: '',
-        workPhone: '', workArea: ''
-    });
-    const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState('');
-
     const lastProcessedRef = useRef('');
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        reset,
+        formState: { errors }
+    } = useForm({
+        resolver: zodResolver(userSchema),
+        defaultValues: {
+            name: '', email: '', organization: '', role: '', 
+            assignment: 'unassigned', status: 'active',
+            region: '', employeeId: '', equipmentId: '', 
+            phoneNumber: '', designation: ''
+        }
+    });
+
+    const currentRole = watch('role');
+    const currentStatus = watch('status');
 
     useEffect(() => {
         if (!isOpen) {
@@ -55,63 +68,36 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         if (lastProcessedRef.current === currentKey) return;
         lastProcessedRef.current = currentKey;
 
-        setTimeout(() => {
-            if (user) {
-                setForm({
-                    name: user.name || '',
-                    email: user.email || '',
-                    organization: user.organization || '',
-                    role: user.role || '',
-                    assignment: user.assignment || 'unassigned',
-                    status: user.status || 'active',
-                    region: user.region || '',
-                    employeeId: user.employeeId || '',
-                    equipmentId: user.equipmentId || '',
-                    phoneNumber: user.phoneNumber || '',
-                    managedTeams: user.managedTeams || '',
-                    managedAssetClasses: user.managedAssetClasses || [],
-                    designation: user.designation || '',
-                    workPhone: user.workPhone || '',
-                    workArea: user.workArea || ''
-                });
-                setStep(1);
-            } else {
-                setForm({ 
-                    name: '', email: '', organization: '', role: '', 
-                    assignment: 'unassigned', status: 'active',
-                    region: '', employeeId: '', equipmentId: '',
-                    phoneNumber: '', managedTeams: '',
-                    managedAssetClasses: [], designation: '',
-                    workPhone: '', workArea: ''
-                });
-                setStep(0);
-            }
-            setErrors({});
-            setSubmitError('');
-        }, 0);
-    }, [user, isOpen]);
-
-    const validate = () => {
-        const e = {};
-        if (!form.name.trim()) e.name = 'Name is required';
-        if (!form.email.trim()) e.email = 'Email is required';
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email format';
-        
-        if (form.role === 'Coordinator' && !form.region) e.region = 'Region is required';
-        if (form.role === 'Field Officer') {
-            if (!form.equipmentId) e.equipmentId = 'Equipment ID is required';
-            if (!form.phoneNumber) e.phoneNumber = 'Phone number is required';
+        if (user) {
+            reset({
+                name: user.name || '',
+                email: user.email || '',
+                organization: user.organization || '',
+                role: user.role || '',
+                assignment: user.assignment || 'unassigned',
+                status: user.status || 'active',
+                region: user.region || '',
+                employeeId: user.employeeId || '',
+                equipmentId: user.equipmentId || '',
+                phoneNumber: user.phoneNumber || '',
+                designation: user.designation || ''
+            });
+            setStep(1);
+        } else {
+            reset({ 
+                name: '', email: '', organization: '', role: '', 
+                assignment: 'unassigned', status: 'active',
+                region: '', employeeId: '', equipmentId: '',
+                phoneNumber: '', designation: ''
+            });
+            setStep(0);
         }
-        if (!form.employeeId) e.employeeId = 'Employee ID is required';
-        
-        setErrors(e);
-        return Object.keys(e).length === 0;
-    };
-
-    const handleSubmit = async () => {
-        if (!validate()) return;
         setSubmitError('');
-        const result = await onSubmit(form);
+    }, [user, isOpen, reset]);
+
+    const onFormSubmit = async (data) => {
+        setSubmitError('');
+        const result = await onSubmit(data);
         if (result?.success) {
             onClose();
         } else {
@@ -119,13 +105,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         }
     };
 
-    const handleChange = (key, value) => {
-        setForm(f => ({ ...f, [key]: value }));
-        if (errors[key]) setErrors(e => ({ ...e, [key]: undefined }));
-    };
-
     const handleRoleSelect = (roleId) => {
-        setForm(f => ({ ...f, role: roleId }));
+        setValue('role', roleId);
         setStep(1);
     };
 
@@ -166,7 +147,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                 <div className="flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                        {step === 0 ? 'Select Role' : `Details: ${form.role}`}
+                                        {step === 0 ? 'Select Role' : `Details: ${currentRole}`}
                                     </span>
                                 </div>
                             </div>
@@ -220,7 +201,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
                                         )}
 
-                                        <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+                                        <form onSubmit={handleSubmit(onFormSubmit)} className="grid grid-cols-2 gap-x-4 gap-y-5">
                                             {/* Section Header */}
                                             <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-slate-100">
                                                 <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Basic Information</h3>
@@ -228,12 +209,22 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
                                             <div className="col-span-2">
                                                 <label className={labelClasses}>Full Name</label>
-                                                <input className={inputClasses(errors.name)} placeholder="Enter full name" value={form.name} onChange={e => handleChange('name', e.target.value)} />
+                                                <input 
+                                                    {...register('name')}
+                                                    className={inputClasses(errors.name)} 
+                                                    placeholder="Enter full name" 
+                                                />
+                                                {errors.name && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.name.message}</p>}
                                             </div>
 
                                             <div className="col-span-2">
                                                 <label className={labelClasses}>Email Address</label>
-                                                <input className={inputClasses(errors.email)} placeholder="user@example.com" value={form.email} onChange={e => handleChange('email', e.target.value)} />
+                                                <input 
+                                                    {...register('email')}
+                                                    className={inputClasses(errors.email)} 
+                                                    placeholder="user@example.com" 
+                                                />
+                                                {errors.email && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.email.message}</p>}
                                             </div>
 
                                             {/* Deployment Section */}
@@ -243,41 +234,69 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
                                             <div className="col-span-1">
                                                 <label className={labelClasses}>Employee ID</label>
-                                                <input className={inputClasses(errors.employeeId)} placeholder="EMP-001" value={form.employeeId} onChange={e => handleChange('employeeId', e.target.value)} />
+                                                <input 
+                                                    {...register('employeeId')}
+                                                    className={inputClasses(errors.employeeId)} 
+                                                    placeholder="EMP-001" 
+                                                />
+                                                {errors.employeeId && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.employeeId.message}</p>}
                                             </div>
 
                                             <div className="col-span-1">
                                                 <label className={labelClasses}>Designation</label>
-                                                <select className={inputClasses(false)} value={form.designation} onChange={e => handleChange('designation', e.target.value)}>
+                                                <select 
+                                                    {...register('designation')}
+                                                    className={inputClasses(errors.designation)}
+                                                >
                                                     <option value="">Select...</option>
                                                     {DESIGNATIONS.map(d => <option key={d} value={d}>{d}</option>)}
                                                 </select>
+                                                {errors.designation && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.designation.message}</p>}
                                             </div>
 
                                             <div className="col-span-2">
                                                 <label className={labelClasses}>Organization / Company</label>
-                                                <select className={inputClasses(false)} value={form.organization} onChange={e => handleChange('organization', e.target.value)}>
+                                                <select 
+                                                    {...register('organization')}
+                                                    className={inputClasses(errors.organization)}
+                                                >
                                                     <option value="">Select Organization</option>
                                                     {ORGANIZATIONS.map(o => <option key={o} value={o}>{o}</option>)}
                                                 </select>
+                                                {errors.organization && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.organization.message}</p>}
                                             </div>
                                             
-                                            {form.role === 'Coordinator' && (
+                                            {currentRole === 'Coordinator' && (
                                                 <div className="col-span-2">
                                                     <label className={labelClasses}>Work Region / Area</label>
-                                                    <input className={inputClasses(errors.region)} placeholder="e.g. North Zone" value={form.region} onChange={e => handleChange('region', e.target.value)} />
+                                                    <input 
+                                                        {...register('region')}
+                                                        className={inputClasses(errors.region)} 
+                                                        placeholder="e.g. North Zone" 
+                                                    />
+                                                    {errors.region && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.region.message}</p>}
                                                 </div>
                                             )}
                                             
-                                            {form.role === 'Field Officer' && (
+                                            {currentRole === 'Field Officer' && (
                                                 <>
                                                     <div className="col-span-1">
                                                         <label className={labelClasses}>Phone Number</label>
-                                                        <input className={inputClasses(errors.phoneNumber)} placeholder="+1 (555) 000-0000" value={form.phoneNumber} onChange={e => handleChange('phoneNumber', e.target.value)} />
+                                                        <input 
+                                                            {...register('phoneNumber')}
+                                                            className={inputClasses(errors.phoneNumber)} 
+                                                            placeholder="+1 (555) 000-0000" 
+                                                        />
+                                                        {errors.phoneNumber && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.phoneNumber.message}</p>}
                                                     </div>
                                                     <div className="col-span-1">
                                                         <label className={labelClasses}>Equipment ID</label>
-                                                        <input className={inputClasses(errors.equipmentId)} placeholder="e.g. EQ-101" value={form.equipmentId} onChange={e => handleChange('equipmentId', e.target.value)} />
+                                                        <input 
+                                                            {...register('equipmentId')}
+                                                            className={inputClasses(errors.equipmentId)} 
+                                                            placeholder="e.g. EQ-101" 
+                                                        />
+                                                        {errors.equipmentId && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.equipmentId.message}</p>}
                                                     </div>
                                                 </>
                                             )}
@@ -287,10 +306,11 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 <div className="flex gap-2">
                                                     {STATUS_OPTIONS.map(s => (
                                                         <button 
+                                                            type="button"
                                                             key={s} 
-                                                            onClick={() => handleChange('status', s)} 
+                                                            onClick={() => setValue('status', s)} 
                                                             className={`flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase transition-all
-                                                                ${form.status === s 
+                                                                ${currentStatus === s 
                                                                     ? 'bg-slate-900 text-white shadow-md'
                                                                     : 'bg-white border border-slate-200 text-slate-400 hover:border-slate-300'}`}
                                                         >
@@ -299,7 +319,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                     ))}
                                                 </div>
                                             </div>
-                                        </div>
+                                        </form>
                                     </Motion.div>
                                 )}
                             </AnimatePresence>
@@ -310,6 +330,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                             <div className="flex items-center">
                                 {step === 1 && !isEdit && (
                                     <button 
+                                        type="button"
                                         onClick={() => setStep(0)} 
                                         className="text-[11px] font-bold text-slate-400 uppercase tracking-wider hover:text-primary transition-colors flex items-center gap-1"
                                     >
@@ -320,6 +341,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                             
                             <div className="flex items-center gap-2">
                                 <button 
+                                    type="button"
                                     onClick={onClose} 
                                     className="px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors"
                                 >
@@ -327,7 +349,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                 </button>
                                 {step === 1 && (
                                     <button 
-                                        onClick={handleSubmit} 
+                                        onClick={handleSubmit(onFormSubmit)} 
                                         disabled={loading} 
                                         className="px-6 py-2.5 bg-primary text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-primary/10 hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50"
                                     >
@@ -344,4 +366,3 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 };
 
 export default UserFormModal;
-

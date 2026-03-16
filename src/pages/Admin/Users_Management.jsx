@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
@@ -12,19 +12,15 @@ import {
     FiRefreshCw, FiCalendar
 } from 'react-icons/fi';
 import UserTable from '../../components/Tables/UserTable';
+import useClickOutside from '../../hooks/useClickOutside';
+import useDebounce from '../../hooks/useDebounce';
 
 // ─── Reusable Filter Dropdown ───────────────────────────────────────────────────────
 const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All' }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
 
-    useEffect(() => {
-        const handleClickOutside = (e) => {
-            if (containerRef.current && !containerRef.current.contains(e.target)) setIsOpen(false);
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    useClickOutside(containerRef, () => setIsOpen(false));
 
     // Get display label for current value
     const getDisplayLabel = () => {
@@ -135,15 +131,12 @@ export default function Users() {
     const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
     const [toast, setToast] = useState(null);
 
-    // Initial Fetch
-    useEffect(() => { fetchUsers(); }, [filters, fetchUsers]);
-
     // Search Debounce
-    const doSearch = useCallback(() => { fetchUsers(); }, [fetchUsers]);
+    const debouncedSearch = useDebounce(search, 300);
+    
     useEffect(() => {
-        const t = setTimeout(doSearch, 300);
-        return () => clearTimeout(t);
-    }, [search, doSearch]);
+        fetchUsers();
+    }, [debouncedSearch, filters, fetchUsers]);
 
     const sortedUsers = useMemo(() => {
         const list = [...users];
