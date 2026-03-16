@@ -91,9 +91,9 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
   const isNameValid = nameValue?.trim()?.length > 0 && !errors.name;
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-[#0a1128]/60 p-4 sm:p-6 backdrop-blur-md !p-22">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-[#0a1128]/60 p-4 sm:p-6 backdrop-blur-md !p-45">
       <div
-        className="w-full bg-white rounded-[16px] shadow-2xl flex flex-col mx-auto max-h-[95vh] overflow-y-auto !p-3"
+        className="w-full bg-white rounded-[16px] shadow-2xl flex flex-col mx-auto max-h-[95vh] overflow-y-auto !p-5"
         style={{ maxWidth: '800px' }}
       >
         <div className="p-8">
@@ -192,7 +192,7 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
             <div className="mt-8 mb-6 p-1">
               <div className="flex items-center justify-between mb-6 border-b border-gray-100 !pb-3 !pt-3">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-[15px] font-bold text-gray-900 uppercase tracking-widest">Site Imagery</h3>
+                  <h3 className="text-[15px] font-bold text-gray-900">Site Imagery</h3>
                   <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-[4px] uppercase tracking-wider">Required</span>
                 </div>
                 <button
@@ -230,7 +230,7 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
             {/* Profile Section */}
             <div className="mt-6 mb-4 p-1">
               <div className="mb-6 border-b border-gray-100 !p-3">
-                <h3 className="text-[15px] font-bold text-gray-900 uppercase tracking-widest">Add Profile</h3>
+                <h3 className="text-[15px] font-bold text-gray-900">Add Profile</h3>
               </div>
               <div className="w-full lg:w-[calc(25%-18px)] !pb-10 !pt-2">
                 <ImageUploadCard value={imageryValues?.profile} onUpload={(url) => handleImage('profile', url)} error={errors.imagery?.profile?.message} />
