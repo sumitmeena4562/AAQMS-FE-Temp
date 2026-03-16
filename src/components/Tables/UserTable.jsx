@@ -4,6 +4,7 @@ import UserAvatar from '../UI/UserAvatar';
 import { FiExternalLink, FiEdit2 } from 'react-icons/fi';
 import Badge from '../UI/Badge';
 import DotStatus from '../UI/DotStatus';
+import Button from '../UI/Button';
 
 const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick, onEdit }) => {
     const columns = [
@@ -66,20 +67,21 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
             accessor: 'actions',
             render: (_, row) => (
                 <div className="flex items-center gap-2 justify-end">
-                    <button
+                    <Button
+                        variant="ghost"
                         title="View Detailed Profile"
                         onClick={e => { e.stopPropagation(); onRowClick && onRowClick(row); }}
-                        className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all duration-300 active:scale-90"
-                    >
-                        <FiExternalLink size={16} />
-                    </button>
-                    <button
+                        className="!p-1.5 !h-8 !w-8 !rounded-lg text-slate-400 hover:!text-primary"
+                        icon={FiExternalLink}
+                    />
+                    <Button
+                        variant="outline"
                         onClick={e => { e.stopPropagation(); onEdit && onEdit(row); }}
-                        className="flex items-center gap-2 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#072267] hover:bg-[#072267] hover:text-white border border-[#072267]/20 rounded-lg transition-all duration-300 shadow-sm active:scale-95 group/btn"
+                        className="!flex !items-center !gap-2 !px-3 !py-1.5 !h-8 !text-[10px] !font-black !uppercase !tracking-widest !text-[#072267] hover:!bg-[#072267] hover:!text-white !border-[#072267]/20 !rounded-lg group/btn"
+                        icon={FiEdit2}
                     >
-                        <FiEdit2 size={12} className="group-hover/btn:translate-x-0.5 transition-transform" />
                         Edit
-                    </button>
+                    </Button>
                 </div>
             )
         }

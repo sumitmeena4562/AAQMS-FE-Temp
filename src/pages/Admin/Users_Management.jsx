@@ -15,6 +15,7 @@ import UserTable from '../../components/Tables/UserTable';
 import useDebounce from '../../hooks/useDebounce';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import TableSkeleton from '../../components/UI/TableSkeleton';
+import Button from '../../components/UI/Button';
 
 export default function Users() {
     const store = useUserStore();
@@ -141,18 +142,22 @@ export default function Users() {
                     <p className="text-[13px] font-semibold text-slate-500 mt-1">Manage platform users, roles & enterprise permissions</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button 
+                    <Button 
+                        variant="outline"
                         onClick={exportCSV} 
-                        className="flex items-center gap-2 px-4 py-2 text-[13px] font-bold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all shadow-sm active:scale-95"
+                        icon={FiDownload}
+                        className="!h-10 !px-4 !text-[13px] !font-bold"
                     >
-                        <FiDownload size={16} /> Export
-                    </button>
-                    <button 
+                        Export
+                    </Button>
+                    <Button 
+                        variant="primary"
                         onClick={handleAddUser} 
-                        className="flex items-center gap-2 px-5 py-2 text-[13px] font-black text-white bg-[#072267] rounded-xl shadow-lg shadow-primary/20 hover:bg-[#072267]/95 transition-all active:scale-95"
+                        icon={FiPlus}
+                        className="!h-10 !px-5 !text-[13px] !font-black !bg-[#072267] hover:!bg-[#072267]/95"
                     >
-                        <FiPlus size={18} /> Add User
-                    </button>
+                        Add User
+                    </Button>
                 </div>
             </div>
 
@@ -220,24 +225,25 @@ export default function Users() {
                     />
 
                     {activeFilterCount > 0 && (
-                        <button 
+                        <Button 
+                            variant="ghost" 
                             onClick={resetFilters} 
-                            className="text-[10px] font-black text-rose-500 uppercase tracking-widest hover:text-rose-600 px-2 py-1 transition-colors flex items-center gap-1.5 active:scale-95"
+                            className="!px-2 !py-1 !text-[10px] !font-black !text-rose-500 !uppercase !tracking-widest hover:!text-rose-600 group"
                         >
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 group-hover:animate-pulse mr-1" />
                             Clear All
-                        </button>
+                        </Button>
                     )}
                 </div>
 
                 <div className="flex items-center gap-2.5 whitespace-nowrap lg:border-l lg:border-slate-100 lg:pl-4">
-                    <button 
+                    <Button 
+                        variant="outline"
                         onClick={fetchUsers} 
                         title="Refresh Data"
-                        className="p-2 bg-white border border-slate-100 rounded-xl text-slate-500 hover:text-primary hover:border-primary transition-all active:scale-90 shadow-sm"
-                    >
-                        <FiRefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-                    </button>
+                        className="!p-2 !h-9 !w-9 !rounded-xl"
+                        icon={FiRefreshCw}
+                    />
                     <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
                         <strong className="text-slate-900">{sortedUsers.length}</strong> / {stats.total} Users
                     </span>
@@ -261,17 +267,17 @@ export default function Users() {
                                 <span className="text-[13px] font-black text-[#072267]">Users Selected</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button onClick={handleBulkActivate} className="flex items-center gap-2 px-4 py-1.5 text-xs font-black text-emerald-600 bg-emerald-50 border border-emerald-100 rounded-lg hover:bg-emerald-100 transition-all active:scale-95 shadow-sm">
-                                    <FiUserCheck size={14}/> Activate
-                                </button>
-                                <button onClick={handleBulkDeactivate} className="flex items-center gap-2 px-4 py-1.5 text-xs font-black text-amber-600 bg-amber-50 border border-amber-100 rounded-lg hover:bg-amber-100 transition-all active:scale-95 shadow-sm">
-                                    <FiUserX size={14}/> Deactivate
-                                </button>
-                                <button onClick={() => setBulkDeleteOpen(true)} className="flex items-center gap-2 px-4 py-1.5 text-xs font-black text-rose-600 bg-rose-50 border border-rose-100 rounded-lg hover:bg-rose-100 transition-all active:scale-95 shadow-sm">
-                                    <FiTrash2 size={14}/> Delete
-                                </button>
+                                <Button onClick={handleBulkActivate} icon={FiUserCheck} variant="outline" className="!h-8 !px-4 !text-xs !bg-emerald-50 !text-emerald-600 !border-emerald-100 hover:!bg-emerald-100">
+                                    Activate
+                                </Button>
+                                <Button onClick={handleBulkDeactivate} icon={FiUserX} variant="outline" className="!h-8 !px-4 !text-xs !bg-amber-50 !text-amber-600 !border-amber-100 hover:!bg-amber-100">
+                                    Deactivate
+                                </Button>
+                                <Button onClick={() => setBulkDeleteOpen(true)} icon={FiTrash2} variant="outline" className="!h-8 !px-4 !text-xs !bg-rose-50 !text-rose-600 !border-rose-100 hover:!bg-rose-100">
+                                    Delete
+                                </Button>
                                 <div className="w-px h-6 bg-slate-200 mx-2" />
-                                <button onClick={clearSelection} className="px-3 py-1.5 text-[10px] font-black text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-colors">Cancel</button>
+                                <Button variant="ghost" onClick={clearSelection} className="!h-8 !px-3 !text-[10px] !font-black !text-slate-400 hover:!text-slate-600 !uppercase !tracking-widest">Cancel</Button>
                             </div>
                         </div>
                     </Motion.div>
@@ -303,9 +309,13 @@ export default function Users() {
                                 <p className="text-[13px] font-semibold text-slate-500 mb-6 max-w-xs mx-auto">
                                     Try adjusting your search terms or filters to find what you&apos;re looking for.
                                 </p>
-                                <button onClick={resetFilters} className="px-5 py-2 bg-slate-900 text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 active:scale-95">
+                                <Button 
+                                    onClick={resetFilters} 
+                                    variant="primary"
+                                    className="!px-5 !py-2 !bg-slate-900 hover:!bg-slate-800 !rounded-xl !font-black !text-[11px] !uppercase !tracking-widest shadow-lg shadow-slate-900/10"
+                                >
                                     Reset All Filters
-                                </button>
+                                </Button>
                             </div>
                         )}
                     </div>

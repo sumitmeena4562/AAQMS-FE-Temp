@@ -11,6 +11,8 @@ function getAvatar(name) {
     return { initials: (p.length>=2?`${p[0][0]}${p[1][0]}`:name.slice(0,2)).toUpperCase(), colors: AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length] };
 }
 
+import Button from '../UI/Button';
+
 const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
     if (!user) return null;
     const { initials, colors } = getAvatar(user.name);
@@ -132,18 +134,20 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
 
                         {/* Modal Footer */}
                         <div className="relative z-10 p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
-                            <button
+                            <Button
+                                variant="ghost"
                                 onClick={() => { onClose(); onDelete(user); }}
-                                className="px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-rose-500 hover:text-rose-700 transition-colors"
+                                className="!h-10 !px-5 !text-[11px] !font-bold !uppercase !tracking-wider !text-rose-500 hover:!text-rose-700"
                             >
                                 Remove User
-                            </button>
-                            <button
+                            </Button>
+                            <Button
+                                variant="primary"
                                 onClick={() => { onClose(); onEdit(user); }}
-                                className="px-6 py-2.5 bg-primary text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-primary/10 hover:bg-primary/90 transition-all active:scale-95"
+                                className="!h-10 !px-6 !rounded-xl !text-[11px] !font-bold !uppercase !tracking-wider shadow-lg shadow-primary/10"
                             >
                                 Edit Profile
-                            </button>
+                            </Button>
                         </div>
                     </Motion.div>
                 </div>

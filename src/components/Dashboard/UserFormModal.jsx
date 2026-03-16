@@ -6,6 +6,7 @@ import { userSchema } from '../../schema/userSchema';
 import { 
     FiX, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle
 } from 'react-icons/fi';
+import Button from '../UI/Button';
 
 const ROLE_DETAILS = [
     { 
@@ -340,21 +341,21 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                             </div>
                             
                             <div className="flex items-center gap-2">
-                                <button 
-                                    type="button"
+                                <Button 
+                                    variant="ghost"
                                     onClick={onClose} 
-                                    className="px-5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors"
+                                    className="!text-[11px] !font-bold !uppercase !tracking-wider !text-slate-500 hover:!text-slate-900"
                                 >
                                     Cancel
-                                </button>
+                                </Button>
                                 {step === 1 && (
-                                    <button 
+                                    <Button 
                                         onClick={handleSubmit(onFormSubmit)} 
-                                        disabled={loading} 
-                                        className="px-6 py-2.5 bg-primary text-white rounded-xl text-[11px] font-bold uppercase tracking-wider shadow-lg shadow-primary/10 hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50"
+                                        loading={loading} 
+                                        className="!px-6 !rounded-xl !text-[11px] !font-bold !uppercase !tracking-wider"
                                     >
-                                        {loading ? 'Saving...' : (isEdit ? 'Save Changes' : 'Create User')}
-                                    </button>
+                                        {isEdit ? 'Save Changes' : 'Create User'}
+                                    </Button>
                                 )}
                             </div>
                         </div>
