@@ -9,6 +9,7 @@ import InputField from "../../components/UI/InputField";
 import SelectField from "../../components/UI/SelectField";
 import Checkbox from "../../components/UI/Checkbox";
 import { MailIcon, LockIcon, UserIcon } from "../../assets/icon";
+import { FiAlertCircle } from 'react-icons/fi';
 
 function RegistrationPage() {
     const navigate = useNavigate();
@@ -132,14 +133,15 @@ function RegistrationPage() {
                     
                     <AnimatePresence>
                         {errors.termsAccepted && (
-                            <motion.p
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="text-rose-500 text-[11px] font-bold mt-[-8px] mb-4 sm:col-span-2"
+                            <motion.div
+                                initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                                className="flex items-center gap-1.5 text-rose-500 text-[11px] font-bold mt-[-8px] mb-4 sm:col-span-2 ml-1"
                             >
-                                {errors.termsAccepted.message}
-                            </motion.p>
+                                <FiAlertCircle size={13} strokeWidth={2.5} />
+                                <span>{errors.termsAccepted.message}</span>
+                            </motion.div>
                         )}
                     </AnimatePresence>
                 </>

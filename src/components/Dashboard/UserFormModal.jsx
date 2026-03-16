@@ -7,6 +7,8 @@ import {
     FiX, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle
 } from 'react-icons/fi';
 import Button from '../UI/Button';
+import InputField from '../UI/InputField';
+import { MailIcon, UserIcon, ShieldIcon, ActivityIcon } from '../../assets/icon';
 
 const ROLE_DETAILS = [
     { 
@@ -118,8 +120,6 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             : 'bg-white border-slate-200 text-slate-700 focus:border-primary/50 focus:ring-2 focus:ring-primary/5'}
     `;
 
-    const labelClasses = "block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-0.5";
-
     return (
         <AnimatePresence>
             {isOpen && (
@@ -209,23 +209,24 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
 
                                             <div className="col-span-2">
-                                                <label className={labelClasses}>Full Name</label>
-                                                <input 
+                                                <InputField
+                                                    label="Full Name"
+                                                    placeholder="Enter full name"
                                                     {...register('name')}
-                                                    className={inputClasses(errors.name)} 
-                                                    placeholder="Enter full name" 
+                                                    error={errors.name?.message}
+                                                    required
                                                 />
-                                                {errors.name && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.name.message}</p>}
                                             </div>
 
                                             <div className="col-span-2">
-                                                <label className={labelClasses}>Email Address</label>
-                                                <input 
+                                                <InputField
+                                                    label="Email Address"
+                                                    type="email"
+                                                    placeholder="user@example.com"
                                                     {...register('email')}
-                                                    className={inputClasses(errors.email)} 
-                                                    placeholder="user@example.com" 
+                                                    error={errors.email?.message}
+                                                    required
                                                 />
-                                                {errors.email && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.email.message}</p>}
                                             </div>
 
                                             {/* Deployment Section */}
@@ -234,70 +235,88 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
 
                                             <div className="col-span-1">
-                                                <label className={labelClasses}>Employee ID</label>
-                                                <input 
+                                                <InputField
+                                                    label="Employee ID"
+                                                    placeholder="EMP-001"
                                                     {...register('employeeId')}
-                                                    className={inputClasses(errors.employeeId)} 
-                                                    placeholder="EMP-001" 
+                                                    error={errors.employeeId?.message}
                                                 />
-                                                {errors.employeeId && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.employeeId.message}</p>}
                                             </div>
 
                                             <div className="col-span-1">
-                                                <label className={labelClasses}>Designation</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Designation</label>
                                                 <select 
                                                     {...register('designation')}
-                                                    className={inputClasses(errors.designation)}
+                                                    className={`w-full px-4 py-2.5 bg-slate-50 border ${errors.designation ? 'border-rose-300' : 'border-slate-100'} rounded-xl text-[13px] font-medium text-slate-900 outline-none transition-all focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5`}
                                                 >
                                                     <option value="">Select...</option>
                                                     {DESIGNATIONS.map(d => <option key={d} value={d}>{d}</option>)}
                                                 </select>
-                                                {errors.designation && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.designation.message}</p>}
+                                                <AnimatePresence>
+                                                    {errors.designation && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -8 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            className="flex items-center gap-1.5 text-rose-500 text-[11px] font-bold mt-1.5 ml-1"
+                                                        >
+                                                            <FiAlertCircle size={12} />
+                                                            {errors.designation.message}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
 
                                             <div className="col-span-2">
-                                                <label className={labelClasses}>Organization / Company</label>
+                                                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Organization / Company</label>
                                                 <select 
                                                     {...register('organization')}
-                                                    className={inputClasses(errors.organization)}
+                                                    className={`w-full px-4 py-2.5 bg-slate-50 border ${errors.organization ? 'border-rose-300' : 'border-slate-100'} rounded-xl text-[13px] font-medium text-slate-900 outline-none transition-all focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5`}
                                                 >
                                                     <option value="">Select Organization</option>
                                                     {ORGANIZATIONS.map(o => <option key={o} value={o}>{o}</option>)}
                                                 </select>
-                                                {errors.organization && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.organization.message}</p>}
+                                                <AnimatePresence>
+                                                    {errors.organization && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -8 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            className="flex items-center gap-1.5 text-rose-500 text-[11px] font-bold mt-1.5 ml-1"
+                                                        >
+                                                            <FiAlertCircle size={12} />
+                                                            {errors.organization.message}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
                                             </div>
                                             
                                             {currentRole === 'Coordinator' && (
                                                 <div className="col-span-2">
-                                                    <label className={labelClasses}>Work Region / Area</label>
-                                                    <input 
+                                                    <InputField
+                                                        label="Work Region / Area"
+                                                        placeholder="e.g. North Zone"
                                                         {...register('region')}
-                                                        className={inputClasses(errors.region)} 
-                                                        placeholder="e.g. North Zone" 
+                                                        error={errors.region?.message}
                                                     />
-                                                    {errors.region && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.region.message}</p>}
                                                 </div>
                                             )}
                                             
                                             {currentRole === 'Field Officer' && (
                                                 <>
                                                     <div className="col-span-1">
-                                                        <label className={labelClasses}>Phone Number</label>
-                                                        <input 
+                                                        <InputField
+                                                            label="Phone Number"
+                                                            placeholder="+1 (555) 000-0000"
                                                             {...register('phoneNumber')}
-                                                            className={inputClasses(errors.phoneNumber)} 
-                                                            placeholder="+1 (555) 000-0000" 
+                                                            error={errors.phoneNumber?.message}
                                                         />
-                                                        {errors.phoneNumber && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.phoneNumber.message}</p>}
                                                     </div>
                                                     <div className="col-span-1">
-                                                        <label className={labelClasses}>Equipment ID</label>
-                                                        <input 
+                                                        <InputField
+                                                            label="Equipment ID"
+                                                            placeholder="e.g. EQ-101"
                                                             {...register('equipmentId')}
-                                                            className={inputClasses(errors.equipmentId)} 
-                                                            placeholder="e.g. EQ-101" 
+                                                            error={errors.equipmentId?.message}
                                                         />
-                                                        {errors.equipmentId && <p className="text-[10px] text-rose-500 mt-1 ml-1 font-bold">{errors.equipmentId.message}</p>}
                                                     </div>
                                                 </>
                                             )}

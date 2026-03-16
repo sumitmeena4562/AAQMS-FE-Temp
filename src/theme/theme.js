@@ -95,7 +95,7 @@ const color = {
         ['#3B82F6', '#06B6D4'],
         ['#F43F5E', '#FB923C'],
         ['#10B981', '#3B82F6'],
-        ['#F59E0B', '#EF4444'],
+        ['#F59E0B', '#ef4444ff'],
     ],
 
     // Overlay / Backdrop
