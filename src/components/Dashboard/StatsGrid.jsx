@@ -107,9 +107,9 @@ export const StatGrid = () => {
             change: <><TrendUpIcon /> +12%</>,
             description: "vs last month",
             icon: <OrgIcon />,
-            iconBgClass: "bg-blue-50",        // ✅ Changed: Tailwind class
-            iconColorClass: "text-blue-600",  // ✅ Changed: Tailwind class
-            changeType: "positive"             // ✅ NEW: Dynamic color type
+            iconBgClass: "bg-blue-50",        // âœ… Changed: Tailwind class
+            iconColorClass: "text-blue-600",  // âœ… Changed: Tailwind class
+            changeType: "positive"             // âœ… NEW: Dynamic color type
         },
         {
             title: "Coordinators",
@@ -117,9 +117,9 @@ export const StatGrid = () => {
             change: <><TrendUpIcon /> +5%</>,
             description: "new this week",
             icon: <CoordIcon />,
-            iconBgClass: "bg-purple-50",       // ✅ Tailwind
-            iconColorClass: "text-purple-600", // ✅ Tailwind
-            changeType: "positive"              // ✅ Dynamic
+            iconBgClass: "bg-purple-50",       // âœ… Tailwind
+            iconColorClass: "text-purple-600", // âœ… Tailwind
+            changeType: "positive"              // âœ… Dynamic
         },
         {
             title: "Field Officers",
@@ -127,9 +127,9 @@ export const StatGrid = () => {
             change: "98% Active",
             description: "currently online",
             icon: <OfficerIcon />,
-            iconBgClass: "bg-green-50",        // ✅ Tailwind
-            iconColorClass: "text-green-600",  // ✅ Tailwind
-            changeType: "neutral"               // ✅ Different type = different color
+            iconBgClass: "bg-green-50",        // âœ… Tailwind
+            iconColorClass: "text-green-600",  // âœ… Tailwind
+            changeType: "neutral"               // âœ… Different type = different color
         },
         {
             title: "Safety Zones",
@@ -137,9 +137,9 @@ export const StatGrid = () => {
             change: "All Operational",
             description: "updated 2m ago",
             icon: <ZoneIcon />,
-            iconBgClass: "bg-orange-50",       // ✅ Tailwind
-            iconColorClass: "text-orange-600", // ✅ Tailwind
-            changeType: "warning"               // ✅ Different type = different color
+            iconBgClass: "bg-orange-50",       // âœ… Tailwind
+            iconColorClass: "text-orange-600", // âœ… Tailwind
+            changeType: "warning"               // âœ… Different type = different color
         },
     ];
 
