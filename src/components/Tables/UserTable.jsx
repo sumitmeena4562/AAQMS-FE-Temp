@@ -11,9 +11,9 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
         {
             header: 'Personnel Profile',
             accessor: 'name',
-            width: '32%',
+            width: '35%',
             render: (_, row) => (
-                <div className="flex items-center gap-4 py-1.5">
+                <div className="flex items-center gap-3 sm:gap-4 py-1.5">
                     <div className="relative group/avatar shrink-0">
                         <UserAvatar 
                             name={row.name} 
@@ -38,11 +38,11 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
         {
             header: 'Organization',
             accessor: 'organization',
-            width: '22%',
+            width: '20%',
             render: value => (
                 <div className="flex flex-col py-1">
                     <span className={`text-[13px] font-bold truncate ${value ? 'text-slate-700' : 'text-slate-400 italic font-medium'}`}>
-                        {value || 'Independent Contractor'}
+                        {value || 'Contractor'}
                     </span>
                     <span className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.1em] mt-1 opacity-80">Primary Unit</span>
                 </div>
@@ -52,9 +52,9 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
             header: 'Access Level',
             accessor: 'role',
             align: 'center',
-            width: '14%',
+            width: '13%',
             render: value => (
-                <Badge color={value} variant="light" size="sm" className="font-bold uppercase tracking-[0.12em] text-[9.5px] px-3 py-1 rounded-lg">
+                <Badge color={value} variant="light" size="sm" className="font-bold uppercase tracking-[0.12em] text-[9.5px] px-2.5 py-1 rounded-lg">
                     {value}
                 </Badge>
             )
@@ -63,20 +63,20 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
             header: 'Operational Status',
             accessor: 'assignment',
             align: 'center',
-            width: '14%',
+            width: '13%',
             render: (value) => (
                 <div className="flex justify-center">
-                    <DotStatus type={value} text={value === 'assigned' ? 'Assigned' : 'On Standby'} size="sm" className="font-bold uppercase tracking-wider text-[10px]" />
+                    <DotStatus type={value} text={value === 'assigned' ? 'Assigned' : 'Standby'} size="sm" className="font-bold uppercase tracking-wider text-[10px]" />
                 </div>
             )
         },
         {
-            header: 'Personnel Actions',
+            header: 'Actions',
             accessor: 'actions',
             align: 'right',
-            width: '18%',
+            width: '19%',
             render: (_, row) => (
-                <div className="flex items-center gap-2 justify-end">
+                <div className="flex items-center gap-1.5 sm:gap-2 justify-end">
                     <Button
                         variant="ghost"
                         onClick={e => { e.stopPropagation(); onRowClick && onRowClick(row); }}
@@ -87,11 +87,11 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
                     <Button
                         variant="primary"
                         onClick={e => { e.stopPropagation(); onEdit && onEdit(row); }}
-                        className="!h-9 !px-5 !rounded-lg !text-[11px] !font-bold !uppercase !tracking-wider shadow-[0_4px_12px_rgba(var(--color-primary-rgb),0.15)] hover:shadow-[0_6px_16px_rgba(var(--color-primary-rgb),0.25)] transition-all duration-300"
+                        className="!h-9 !px-3 sm:px-5 !rounded-lg !text-[11px] !font-bold !uppercase !tracking-wider shadow-[0_4px_12px_rgba(var(--color-primary-rgb),0.15)] hover:shadow-[0_6px_16px_rgba(var(--color-primary-rgb),0.25)] transition-all duration-300"
                         icon={FiEdit2}
                         iconSize={14}
                     >
-                        Edit
+                        <span className="hidden sm:inline">Edit</span>
                     </Button>
                 </div>
             )
