@@ -6,7 +6,9 @@ import ProfileDropdown from "../../components/Navbar/ProfileDropdown";
 import NotificationCenter from "../../components/Navbar/NotificationCenter";
 import Navbar from "../../components/Navbar/Navbar";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
-import { BreadcrumbProvider, useBreadcrumb, generateBreadcrumbs } from "../../context/BreadcrumbContext";
+import { BreadcrumbProvider } from "../../context/BreadcrumbContext";
+import { useBreadcrumb } from "../../hooks/useBreadcrumb";
+import { generateBreadcrumbs } from "../../utils/breadcrumbUtils";
 
 import { 
     FiBriefcase, FiUsers, FiAlertTriangle, 
