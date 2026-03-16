@@ -44,7 +44,8 @@ function AuthForm({
     grid = false
 }) {
     const { register, handleSubmit, formState: { errors } } = useForm({
-        resolver: zodResolver(schema)
+        resolver: zodResolver(schema),
+        mode: 'onChange' // Enable real-time validation
     });
 
     const renderedChildren = typeof children === 'function'
