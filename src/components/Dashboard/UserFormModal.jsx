@@ -136,7 +136,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                         initial={{ opacity: 0, scale: 0.98, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                        className="relative w-full max-w-[520px] max-h-[85vh] bg-white border border-slate-200 rounded-3xl shadow-xl flex flex-col overflow-hidden"
+                        className="relative w-full max-w-[520px] max-h-[90vh] sm:max-h-[85vh] bg-white border border-slate-200 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col overflow-hidden"
                     >
 
                         {/* Modal Header */}
@@ -202,7 +202,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
                                         )}
 
-                                        <form onSubmit={handleSubmit(onFormSubmit)} className="grid grid-cols-2 gap-x-4 gap-y-5">
+                                        <form onSubmit={handleSubmit(onFormSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 sm:gap-y-5">
                                             {/* Section Header */}
                                             <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-slate-100">
                                                 <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Basic Information</h3>

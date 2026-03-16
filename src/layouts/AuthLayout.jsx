@@ -102,13 +102,13 @@ const AuthLayout = ({ children }) => {
             </div>
 
             {/* --- Right Side: Auth Form --- */}
-            <div className="flex-1 flex items-center justify-center p-6 md:p-12 relative z-20 overflow-y-auto">
+            <div className="flex-1 flex items-center justify-center p-4 sm:p-8 md:p-12 relative z-20 overflow-y-auto">
                 {/* Mobile Logo Only */}
-                <div className="absolute top-8 left-8 lg:hidden">
+                <div className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:hidden">
                     <Logo size="md" />
                 </div>
 
-                <div className="w-full max-w-[440px]">
+                <div className="w-full max-w-[440px] mt-12 lg:mt-0">
                     {children}
                 </div>
             </div>
