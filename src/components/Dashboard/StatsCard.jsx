@@ -23,7 +23,12 @@ const StatsCard = ({
 
             {/* Icon Container */}
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-black/5 transition-transform group-hover:scale-110 duration-300 ${iconBg} ${iconColor}`}>
-                {icon && React.cloneElement(icon, { size: 20 })}
+                {icon && (() => {
+                    const IconComponent = icon;
+                    return React.isValidElement(icon) 
+                        ? React.cloneElement(icon, { size: 20 })
+                        : <IconComponent size={20} />;
+                })()}
             </div>
 
             {/* Content Container */}

@@ -2,13 +2,8 @@ import React from 'react';
 import Table from '../UI/Table';
 import UserAvatar from '../UI/UserAvatar';
 import { FiExternalLink, FiEdit2 } from 'react-icons/fi';
-
-const ROLE_STYLE = {
-    coordinator:    'bg-sky-50 text-sky-700 border-sky-100',
-    'field officer': 'bg-teal-50 text-teal-700 border-teal-100',
-    admin:          'bg-indigo-50 text-indigo-700 border-indigo-200',
-    default:        'bg-slate-50 text-slate-600 border-slate-200'
-};
+import Badge from '../UI/Badge';
+import DotStatus from '../UI/DotStatus';
 
 const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick, onEdit }) => {
     const columns = [
@@ -53,28 +48,17 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
         {
             header: 'Access Level',
             accessor: 'role',
-            render: value => {
-                const style = ROLE_STYLE[value?.toLowerCase()] || ROLE_STYLE.default;
-                return (
-                    <span className={`inline-flex items-center px-2 py-0.5 text-[10px] font-black uppercase tracking-widest border rounded-md shadow-sm ${style}`}>
-                        {value}
-                    </span>
-                );
-            }
+            render: value => (
+                <Badge color={value} variant="light" size="sm">
+                    {value}
+                </Badge>
+            )
         },
         {
             header: 'Operational Status',
             accessor: 'assignment',
             render: (value) => (
-                <div className="flex items-center gap-2">
-                   <span className={`inline-flex items-center px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border rounded-md shadow-inner
-                       ${value === 'assigned' 
-                           ? 'bg-emerald-50 text-emerald-700 border-emerald-100 flex items-center gap-1' 
-                           : 'bg-slate-50 text-slate-500 border-slate-100'}`}>
-                       {value === 'assigned' && <div className="w-1 h-1 rounded-full bg-emerald-500" />}
-                       {value || 'On Standby'}
-                   </span>
-                </div>
+                <DotStatus type={value} text={value === 'assigned' ? 'Assigned' : 'On Standby'} size="sm" />
             )
         },
         {
