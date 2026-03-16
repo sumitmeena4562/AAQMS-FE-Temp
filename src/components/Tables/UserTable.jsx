@@ -11,23 +11,24 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
         {
             header: 'Personnel Profile',
             accessor: 'name',
+            width: '32%',
             render: (_, row) => (
-                <div className="flex items-center gap-3.5 py-0.5">
+                <div className="flex items-center gap-4 py-1.5">
                     <div className="relative group/avatar shrink-0">
                         <UserAvatar 
                             name={row.name} 
-                            size="40px" 
-                            className="shadow-sm border-2 border-white ring-1 ring-slate-200 group-hover/avatar:scale-105 transition-transform duration-300" 
+                            size="44px" 
+                            className="shadow-[0_4px_12px_rgba(0,0,0,0.08)] border-2 border-white ring-1 ring-slate-100/50 group-hover/avatar:scale-110 transition-all duration-500 ease-out" 
                         />
-                        <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm
-                            ${row.status?.toLowerCase() === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} 
+                        <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm transition-transform duration-300 group-hover/avatar:scale-110
+                            ${row.status?.toLowerCase() === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`} 
                         />
                     </div>
                     <div className="min-w-0">
-                        <div className="text-[13px] font-black text-slate-900 tracking-tight leading-tight truncate group-hover:text-primary transition-colors">
+                        <div className="text-[14px] font-bold text-slate-800 tracking-[-0.01em] leading-tight truncate group-hover:text-primary transition-colors duration-300">
                             {row.name}
                         </div>
-                        <div className="text-[10px] font-black text-slate-400 tracking-wider uppercase mt-0.5 truncate opacity-80">
+                        <div className="text-[11px] font-medium text-slate-400 tracking-normal mt-0.5 truncate group-hover:text-slate-500 transition-colors duration-300">
                             {row.email}
                         </div>
                     </div>
@@ -37,20 +38,23 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
         {
             header: 'Organization',
             accessor: 'organization',
+            width: '22%',
             render: value => (
-                <div className="flex flex-col">
+                <div className="flex flex-col py-1">
                     <span className={`text-[13px] font-bold truncate ${value ? 'text-slate-700' : 'text-slate-400 italic font-medium'}`}>
                         {value || 'Independent Contractor'}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Primary Unit</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.1em] mt-1 opacity-80">Primary Unit</span>
                 </div>
             )
         },
         {
             header: 'Access Level',
             accessor: 'role',
+            align: 'center',
+            width: '14%',
             render: value => (
-                <Badge color={value} variant="light" size="sm">
+                <Badge color={value} variant="light" size="sm" className="font-bold uppercase tracking-[0.12em] text-[9.5px] px-3 py-1 rounded-lg">
                     {value}
                 </Badge>
             )
@@ -58,27 +62,34 @@ const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick,
         {
             header: 'Operational Status',
             accessor: 'assignment',
+            align: 'center',
+            width: '14%',
             render: (value) => (
-                <DotStatus type={value} text={value === 'assigned' ? 'Assigned' : 'On Standby'} size="sm" />
+                <div className="flex justify-center">
+                    <DotStatus type={value} text={value === 'assigned' ? 'Assigned' : 'On Standby'} size="sm" className="font-bold uppercase tracking-wider text-[10px]" />
+                </div>
             )
         },
         {
             header: 'Personnel Actions',
             accessor: 'actions',
+            align: 'right',
+            width: '18%',
             render: (_, row) => (
                 <div className="flex items-center gap-2 justify-end">
                     <Button
                         variant="ghost"
-                        title="View Detailed Profile"
                         onClick={e => { e.stopPropagation(); onRowClick && onRowClick(row); }}
-                        className="!p-1.5 !h-8 !w-8 !rounded-lg text-slate-400 hover:!text-primary"
+                        className="!p-0 !h-9 !w-9 !rounded-xl text-slate-400 hover:!text-primary hover:!bg-primary/5 transition-all duration-300"
                         icon={FiExternalLink}
+                        iconSize={18}
                     />
                     <Button
-                        variant="outline"
+                        variant="primary"
                         onClick={e => { e.stopPropagation(); onEdit && onEdit(row); }}
-                        className="!flex !items-center !gap-2 !px-3 !py-1.5 !h-8 !text-[10px] !font-black !uppercase !tracking-widest !text-[#072267] hover:!bg-[#072267] hover:!text-white !border-[#072267]/20 !rounded-lg group/btn"
+                        className="!h-9 !px-5 !rounded-lg !text-[11px] !font-bold !uppercase !tracking-wider shadow-[0_4px_12px_rgba(var(--color-primary-rgb),0.15)] hover:shadow-[0_6px_16px_rgba(var(--color-primary-rgb),0.25)] transition-all duration-300"
                         icon={FiEdit2}
+                        iconSize={14}
                     >
                         Edit
                     </Button>
