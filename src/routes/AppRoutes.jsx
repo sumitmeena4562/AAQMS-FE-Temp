@@ -6,6 +6,7 @@ import { Toaster } from 'react-hot-toast';
 const LandingPage = lazy(() => import('../pages/Home/LandingPage'));
 const Login = lazy(() => import('../pages/Auth/LoginPage'));
 const Registration = lazy(() => import('../pages/Auth/RegistrationPage'));
+const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPasswordPage'));
 
 // Lazy loading route modules
 const AdminRoutes = lazy(() => import('./AdminRoutes'));
@@ -43,6 +44,7 @@ const AppRoutes = () => {
                     <Route element={<GuestRoute />}>
                         <Route path="/login" element={<Login />} />
                         <Route path="/registration" element={<Registration />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
                     </Route>
 
                     {/* Role-Based Access (Protected) */}

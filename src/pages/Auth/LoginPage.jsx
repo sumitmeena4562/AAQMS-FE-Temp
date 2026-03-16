@@ -80,22 +80,16 @@ function LoginPage() {
                             label="Remember me"
                             {...register('rememberMe')}
                         />
-                        <button 
-                            type="button"
-                            onClick={() => setIsForgotPasswordOpen(true)}
-                            className="text-slate-500 text-xs font-black hover:text-primary transition-colors bg-transparent p-0 border-none"
+                        <a 
+                            href="/forgot-password"
+                            className="text-slate-500 text-xs font-black hover:text-primary transition-colors"
                         >
                             Forgot password?
-                        </button>
+                        </a>
                     </motion.div>
                 </>
             )}
         </AuthForm>
-
-        <ForgotPasswordModal 
-            isOpen={isForgotPasswordOpen} 
-            onClose={() => setIsForgotPasswordOpen(false)} 
-        />
         </>
     );
 }
