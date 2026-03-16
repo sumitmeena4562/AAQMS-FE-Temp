@@ -4,7 +4,7 @@ import Logo from '../components/Branding/Logo';
 
 const AuthLayout = ({ children }) => {
     return (
-        <div className="flex min-h-screen w-full bg-slate-50 relative overflow-hidden font-sans selection:bg-primary/20">
+        <div className="flex h-[100dvh] w-full bg-slate-50 relative overflow-hidden font-sans selection:bg-primary/20">
             {/* --- Elite Background System --- */}
             <div className="absolute inset-0 z-0">
                 {/* Mesh Gradient Base */}
@@ -102,7 +102,7 @@ const AuthLayout = ({ children }) => {
             </div>
 
             {/* --- Right Side: Auth Form --- */}
-            <div className="flex-1 flex items-center justify-center p-6 md:p-12 relative z-20">
+            <div className="flex-1 flex items-center justify-center p-6 md:p-12 relative z-20 overflow-y-auto">
                 {/* Mobile Logo Only */}
                 <div className="absolute top-8 left-8 lg:hidden">
                     <Logo size="md" />
