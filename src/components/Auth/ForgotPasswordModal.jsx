@@ -182,8 +182,8 @@ function EmailStep({ onSubmit, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" disabled={isLoading}>
-                        {isLoading ? "Sending..." : "Send OTP"}
+                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
+                        Send OTP
                     </Button>
                 </motion.div>
             </form>
@@ -220,8 +220,8 @@ function OtpStep({ email, onSubmit, onResend, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" disabled={isLoading}>
-                        {isLoading ? "Verifying..." : "Verify OTP"}
+                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
+                        Verify OTP
                     </Button>
                 </motion.div>
             </form>
@@ -273,8 +273,8 @@ function ResetStep({ onSubmit, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" disabled={isLoading}>
-                        {isLoading ? "Updating..." : "Reset Password"}
+                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
+                        Reset Password
                     </Button>
                 </motion.div>
             </form>

@@ -92,7 +92,7 @@ function AuthForm({
                             variant="primary" 
                             size="lg" 
                             className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20 transition-all active:scale-95" 
-                            disabled={isLoading}
+                            loading={isLoading}
                         >
                             {isLoading ? loadingText : submitText}
                         </Button>
