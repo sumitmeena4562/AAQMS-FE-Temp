@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fi';
 import Button from '../UI/Button';
 import InputField from '../UI/InputField';
-import { MailIcon, UserIcon, ShieldIcon, ActivityIcon } from '../../assets/icon';
+import { MailIcon, UserIcon } from '../../assets/icon';
 
 const ROLE_DETAILS = [
     { 
