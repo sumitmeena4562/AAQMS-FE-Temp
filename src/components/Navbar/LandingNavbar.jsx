@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { MdSearch, MdOutlineLanguage } from 'react-icons/md';
 import { FaXTwitter, FaGithub } from 'react-icons/fa6';

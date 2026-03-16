@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 
@@ -24,14 +24,10 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
     const toggleMenu = (label) => setOpenMenus(p => ({ ...p, [label]: !p[label] }));
 
-    const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
-    const isParentActive = (item) => item.children ? item.children.some(c => isActive(c.path)) : isActive(item.path);
-
-    useEffect(() => {
-        navItems.forEach(item => {
-            if (item.children && isParentActive(item)) setOpenMenus(p => ({ ...p, [item.label]: true }));
-        });
-    }, [location.pathname, navItems]);
+    const isActive = useCallback((path) => location.pathname === path || location.pathname.startsWith(path + '/'), [location.pathname]);
+    const isParentActive = useCallback((item) => 
+        item.children ? item.children.some(c => isActive(c.path)) : isActive(item.path)
+    , [isActive]);
 
     useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname, setMobileOpen]);
 
@@ -42,7 +38,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 {act && <div className="absolute left-[-10px] top-2 bottom-2 w-[3px] bg-[#072267] rounded-r-[3px]" />}
                 <NavLink
                     to={item.path}
-                    className={({ isActive: linkActive }) => `
+                    className={() => `
                         flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] transition-all duration-150
                         ${collapsed ? 'justify-center px-0' : 'justify-start'}
                         ${act ? 'bg-[#072267]/[0.06] text-[#072267] font-semibold' : 'text-slate-500 hover:bg-slate-50 font-medium'}

@@ -41,7 +41,7 @@ const MonitorStatusTag = ({ text, type = "success" }) => {
     );
 };
 
-const CommandPanelRow = ({ label, value, icon: Icon, type }) => (
+const CommandPanelRow = ({ label, value, icon: Icon }) => (
     <div className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
         <div className="flex items-center gap-2">
             <div className={`p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:text-primary transition-colors`}>

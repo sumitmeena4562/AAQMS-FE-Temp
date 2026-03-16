@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { 
     FiX, FiUser, FiMail, FiShield, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle
@@ -43,39 +43,52 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState('');
 
+    const lastProcessedRef = useRef('');
+
     useEffect(() => {
-        if (user) {
-            setForm({
-                name: user.name || '',
-                email: user.email || '',
-                organization: user.organization || '',
-                role: user.role || '',
-                assignment: user.assignment || 'unassigned',
-                status: user.status || 'active',
-                region: user.region || '',
-                employeeId: user.employeeId || '',
-                equipmentId: user.equipmentId || '',
-                phoneNumber: user.phoneNumber || '',
-                managedTeams: user.managedTeams || '',
-                managedAssetClasses: user.managedAssetClasses || [],
-                designation: user.designation || '',
-                workPhone: user.workPhone || '',
-                workArea: user.workArea || ''
-            });
-            setStep(1);
-        } else {
-            setForm({ 
-                name: '', email: '', organization: '', role: '', 
-                assignment: 'unassigned', status: 'active',
-                region: '', employeeId: '', equipmentId: '',
-                phoneNumber: '', managedTeams: '',
-                managedAssetClasses: [], designation: '',
-                workPhone: '', workArea: ''
-            });
-            setStep(0);
+        if (!isOpen) {
+            lastProcessedRef.current = '';
+            return;
         }
-        setErrors({});
-        setSubmitError('');
+        
+        const currentKey = `${user?.id || 'new'}-${isOpen}`;
+        if (lastProcessedRef.current === currentKey) return;
+        lastProcessedRef.current = currentKey;
+
+        setTimeout(() => {
+            if (user) {
+                setForm({
+                    name: user.name || '',
+                    email: user.email || '',
+                    organization: user.organization || '',
+                    role: user.role || '',
+                    assignment: user.assignment || 'unassigned',
+                    status: user.status || 'active',
+                    region: user.region || '',
+                    employeeId: user.employeeId || '',
+                    equipmentId: user.equipmentId || '',
+                    phoneNumber: user.phoneNumber || '',
+                    managedTeams: user.managedTeams || '',
+                    managedAssetClasses: user.managedAssetClasses || [],
+                    designation: user.designation || '',
+                    workPhone: user.workPhone || '',
+                    workArea: user.workArea || ''
+                });
+                setStep(1);
+            } else {
+                setForm({ 
+                    name: '', email: '', organization: '', role: '', 
+                    assignment: 'unassigned', status: 'active',
+                    region: '', employeeId: '', equipmentId: '',
+                    phoneNumber: '', managedTeams: '',
+                    managedAssetClasses: [], designation: '',
+                    workPhone: '', workArea: ''
+                });
+                setStep(0);
+            }
+            setErrors({});
+            setSubmitError('');
+        }, 0);
     }, [user, isOpen]);
 
     const validate = () => {

@@ -1,8 +1,7 @@
 import React from 'react';
-import { t } from '../../theme/theme';
 import { Outlet, useLocation } from 'react-router-dom';
 import Logo from "../../components/Branding/Logo";
-import Sidebar from "../../components/Sidebar/Sidebar";
+import Sidebar from "../../components/sidebar/Sidebar";
 import ProfileDropdown from "../../components/Navbar/ProfileDropdown";
 import NotificationCenter from "../../components/Navbar/NotificationCenter";
 import Navbar from "../../components/Navbar/Navbar";

@@ -122,7 +122,7 @@ export default function Users() {
         users, stats, filterOptions, loading,
         search, filters, sortKey, sortDir, selectedIds,
         fetchUsers, createUser, updateUser, deleteUser, bulkAction, exportCSV,
-        setSearch, setFilters, toggleSelectAll, toggleSelectRow,
+        setFilters, toggleSelectAll, toggleSelectRow,
         clearSelection, resetFilters,
     } = store;
 
@@ -136,7 +136,7 @@ export default function Users() {
     const [toast, setToast] = useState(null);
 
     // Initial Fetch
-    useEffect(() => { fetchUsers(); }, [filters]);
+    useEffect(() => { fetchUsers(); }, [filters, fetchUsers]);
 
     // Search Debounce
     const doSearch = useCallback(() => { fetchUsers(); }, [fetchUsers]);
@@ -391,7 +391,7 @@ export default function Users() {
                                 </div>
                                 <h3 className="text-lg font-black text-slate-900 tracking-tight">No Results Found</h3>
                                 <p className="text-[13px] font-semibold text-slate-500 mb-6 max-w-xs mx-auto">
-                                    Try adjusting your search terms or filters to find what you're looking for.
+                                    Try adjusting your search terms or filters to find what you&apos;re looking for.
                                 </p>
                                 <button onClick={resetFilters} className="px-5 py-2 bg-slate-900 text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 active:scale-95">
                                     Reset All Filters

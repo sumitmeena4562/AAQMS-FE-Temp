@@ -26,7 +26,7 @@ function loadUsers() {
     try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) return JSON.parse(stored);
-    } catch (e) { /* fall through */ }
+    } catch { /* fall through */ }
     // First load — seed
     localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_USERS));
     return [...SEED_USERS];
