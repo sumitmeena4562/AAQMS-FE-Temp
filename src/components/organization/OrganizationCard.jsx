@@ -1,6 +1,8 @@
-import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const OrganizationCard = ({ org }) => {
+  const navigate = useNavigate();
+
   // Logic to determine active/deactive status based on last inventory audit
   const getStatus = () => {
     if (org.lastInventoryAudit) {
@@ -75,7 +77,9 @@ const OrganizationCard = ({ org }) => {
         </div>
 
         {/* Bottom Button matched to Figma (70px height, 16px radius) */}
-    <button className=" !mt-auto   w-full py-3 px-4 !pb-2 !pt-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 hover:bg-gray-50 hover:border-gray-300 transition-colors flex items-center justify-center gap-4 group">
+    <button 
+      onClick={() => navigate('/admin/coordinators')}
+      className=" !mt-auto   w-full py-3 px-4 !pb-2 !pt-2 border border-gray-200 rounded-xl text-sm font-semibold text-gray-800 hover:bg-gray-50 hover:border-gray-300 transition-colors flex items-center justify-center gap-4 group">
 
   <span className="text-center leading-tight">
     Select <br /> Organization

@@ -7,7 +7,7 @@ import Reports from "../pages/Admin/Reports";
 import Users from "../pages/Admin/Users_Management";
 import Settings from "../pages/Admin/Settings";
 
-import Coordinator from "../pages/Admin/Coordinator";
+import AssignedCoordinators from "../pages/Admin/AssignedCoordinators";
 
 const AdminRoutes = () => {
     return (
@@ -17,7 +17,7 @@ const AdminRoutes = () => {
 
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="organizations" element={<Organizations />} />
-                <Route path="coordinators" element={<Coordinator />} />
+                <Route path="coordinators" element={<AssignedCoordinators />} />
                 <Route path="risk-alerts" element={<RiskAlerts />} />
                 <Route path="reports" element={<Reports />} />
                 <Route path="users" element={<Users />} />
