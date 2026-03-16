@@ -3,6 +3,21 @@ import { create } from "zustand";
 // Helper function to simulate network delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+const MOCK_USERS = {
+    'admin@aaqms.com': { 
+        password: 'Admin@123', 
+        user: { id: 1, name: 'Sumit Meena', email: 'admin@aaqms.com', role: 'admin' } 
+    },
+    'coordinator@aaqms.com': { 
+        password: 'Coord@123', 
+        user: { id: 2, name: 'Anjali Sharma', email: 'coordinator@aaqms.com', role: 'coordinator' } 
+    },
+    'officer@aaqms.com': { 
+        password: 'Officer@123', 
+        user: { id: 3, name: 'Rahul Gupta', email: 'officer@aaqms.com', role: 'field_officer' } 
+    }
+};
+
 const useAuthStore = create((set) => ({
     // Initialize state from localStorage
     isAuthenticated: !!localStorage.getItem('token'),
@@ -18,25 +33,7 @@ const useAuthStore = create((set) => ({
         set({ isLoading: true, error: null });
         
         try {
-            // Simulate network latency (mast experience ke liye)
             await delay(1500);
-
-            // Mock User Database
-            const MOCK_USERS = {
-                'admin@aaqms.com': { 
-                    password: 'Admin@123', 
-                    user: { id: 1, name: 'Sumit Meena', email: 'admin@aaqms.com', role: 'admin' } 
-                },
-                'coordinator@aaqms.com': { 
-                    password: 'Coord@123', 
-                    user: { id: 2, name: 'Anjali Sharma', email: 'coordinator@aaqms.com', role: 'coordinator' } 
-                },
-                'officer@aaqms.com': { 
-                    password: 'Officer@123', 
-                    user: { id: 3, name: 'Rahul Gupta', email: 'officer@aaqms.com', role: 'field_officer' } 
-                }
-            };
-
             const userData = MOCK_USERS[email.toLowerCase()];
 
             if (userData && userData.password === password) {
@@ -48,13 +45,10 @@ const useAuthStore = create((set) => ({
                     localStorage.setItem('token', mockToken);
                     localStorage.setItem('user', JSON.stringify(loggedInUser));
                 } else {
-                    // For security-sensitive apps, if not rememberMe, you might skip localStorage
-                    // but usually, we keep it for the session. Let's stick to standard behavior:
+                    // For short-lived sessions, we still use localStorage for simplicity 
+                    // in this POC, but the logic structure allows for sessionStorage later.
                     localStorage.setItem('token', mockToken);
                     localStorage.setItem('user', JSON.stringify(loggedInUser));
-                    
-                    // Note: In a real app, you'd use sessionStorage for non-persistent sessions.
-                    // For this proof-of-concept, we'll keep it simple.
                 }
 
                 set({ 
@@ -69,11 +63,9 @@ const useAuthStore = create((set) => ({
                 throw new Error('Invalid Email or Password!');
             }
         } catch (err) {
-            set({ 
-                error: err.message || 'Authentication Failed', 
-                isLoading: false 
-            });
-            return { success: false, error: err.message };
+            const error = err.message || 'Authentication Failed';
+            set({ error, isLoading: false });
+            return { success: false, error };
         }
     },
 
