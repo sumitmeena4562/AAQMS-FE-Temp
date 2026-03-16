@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
@@ -9,10 +9,12 @@ import InputField from '../../components/UI/InputField';
 import Checkbox from '../../components/UI/Checkbox';
 import useAuthStore from '../../store/authStore';
 import { MailIcon, LockIcon } from '../../assets/icon';
+import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal';
 
 function LoginPage() {
     const navigate = useNavigate();
     const { login, isLoading } = useAuthStore();
+    const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
     const onSubmit = async (data) => {
         const result = await login(data);
@@ -25,6 +27,7 @@ function LoginPage() {
     };
 
     return (
+        <>
         <AuthForm
             title="Sign in to your account"
             subtitle="Access your enterprise dashboard securely"
@@ -77,16 +80,23 @@ function LoginPage() {
                             label="Remember me"
                             {...register('rememberMe')}
                         />
-                        <a 
-                            href="/forgot-password" 
-                            className="text-slate-500 text-xs font-black hover:text-primary transition-colors"
+                        <button 
+                            type="button"
+                            onClick={() => setIsForgotPasswordOpen(true)}
+                            className="text-slate-500 text-xs font-black hover:text-primary transition-colors bg-transparent p-0 border-none"
                         >
                             Forgot password?
-                        </a>
+                        </button>
                     </motion.div>
                 </>
             )}
         </AuthForm>
+
+        <ForgotPasswordModal 
+            isOpen={isForgotPasswordOpen} 
+            onClose={() => setIsForgotPasswordOpen(false)} 
+        />
+        </>
     );
 }
 
