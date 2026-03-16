@@ -9,7 +9,7 @@ import { StatsRow } from '../../components/Dashboard/StatsCard';
 import {
     FiPlus, FiDownload, FiTrash2,
     FiUserCheck, FiUserX, FiUsers,
-    FiRefreshCw, FiCalendar
+    FiRefreshCw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock
 } from 'react-icons/fi';
 import UserTable from '../../components/Tables/UserTable';
 import useDebounce from '../../hooks/useDebounce';
@@ -127,10 +127,37 @@ export default function Users() {
     };
 
     const statsData = [
-        { label: 'Total Personnel', value: stats.total, icon: FiUsers, iconColor: 'text-primary', iconBg: 'bg-primary/10' },
-        { label: 'Active Status', value: stats.active, icon: FiUserCheck, iconColor: 'text-emerald-500', iconBg: 'bg-emerald-50' },
-        { label: 'Inactive / Standby', value: stats.inactive, icon: FiUserX, iconColor: 'text-slate-400', iconBg: 'bg-slate-50' },
-        { label: 'Unassigned', value: stats.unassigned, icon: FiUsers, iconColor: 'text-amber-500', iconBg: 'bg-amber-50' },
+        { 
+            label: 'Total Users', 
+            value: stats.total, 
+            icon: FiUsers, 
+            iconColor: 'text-primary', 
+            iconBg: 'bg-primary/10',
+            subValue: `${stats.active} Active / ${stats.inactive} Inactive`
+        },
+        { 
+            label: 'Active Users', 
+            value: stats.active, 
+            icon: FiCheckCircle, 
+            iconColor: 'text-emerald-500', 
+            iconBg: 'bg-emerald-50',
+            trend: 12
+        },
+        { 
+            label: 'Inactive', 
+            value: stats.inactive, 
+            icon: FiAlertCircle, 
+            iconColor: 'text-rose-500', 
+            iconBg: 'bg-rose-50',
+            trend: -5
+        },
+        { 
+            label: 'Unassigned', 
+            value: stats.unassigned, 
+            icon: FiClock, 
+            iconColor: 'text-amber-500', 
+            iconBg: 'bg-amber-50' 
+        },
     ];
 
     return (

@@ -1,4 +1,5 @@
 import React from 'react';
+import { FiArrowUpRight, FiArrowDownRight } from 'react-icons/fi';
 
 /**
  * Global StatsCard — Reusable across all pages.
@@ -15,8 +16,8 @@ const StatsCard = ({
 }) => {
     return (
         <div
-            className={`flex items-center gap-4 p-5 bg-white border border-slate-100 rounded-2xl cursor-default relative overflow-hidden group 
-                transition-all duration-300 hover:-translate-y-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.13)] hover:shadow-[0_20px_50px_rgba(7,34,103,0.20)] ${className}`}
+            className={`flex items-center gap-4 p-5 bg-white border border-slate-200/60 rounded-2xl cursor-default relative overflow-hidden group 
+                transition-all duration-500 hover:-translate-y-1.5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-12px_rgba(7,34,103,0.12)] ${className}`}
         >
             {/* Subtle Gradient Hover Effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
@@ -41,8 +42,9 @@ const StatsCard = ({
                         {value}
                     </div>
                     {trend !== undefined && (
-                        <div className={`text-[11px] font-extrabold flex items-center ${trend > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                            {trend > 0 ? '↑' : '↓'}{Math.abs(trend)}%
+                        <div className={`text-[11px] font-black flex items-center gap-0.5 px-1.5 py-0.5 rounded-lg ${trend > 0 ? 'text-emerald-600 bg-emerald-50/50' : 'text-rose-600 bg-rose-50/50'}`}>
+                            {trend > 0 ? <FiArrowUpRight size={12} /> : <FiArrowDownRight size={12} />}
+                            {Math.abs(trend)}%
                         </div>
                     )}
                 </div>
