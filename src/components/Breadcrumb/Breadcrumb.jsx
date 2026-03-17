@@ -29,6 +29,7 @@ const Breadcrumb = ({ items = [] }) => {
               /* Normal inactive path */
               <Link
                 to={item.path || "#"}
+                state={item.state}
                 className="flex items-center gap-1.5 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
               >
                 {item.icon && <span className="text-gray-400 flex items-center">{item.icon}</span>}

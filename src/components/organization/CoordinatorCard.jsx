@@ -1,9 +1,11 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { getInitials } from '../../utils/avatarInitials';
+import { useNavigate } from 'react-router-dom';
 
-const CoordinatorCard = ({ coordinator }) => {
+const CoordinatorCard = ({ coordinator, orgName }) => {
   const { name, id, status, sites, zones, image } = coordinator;
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between !p-2 px-8 bg-white border border-[#E5E7EB] rounded-[16px] shadow-[0px_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0px_8px_24px_rgba(0,0,0,0.08)] transition-all duration-200 gap-6">
@@ -71,7 +73,10 @@ const CoordinatorCard = ({ coordinator }) => {
 
       {/* Right Section (View Site Plans Button) */}
       <div className="w-full md:w-auto flex flex-1 justify-end shrink-0">
-        <button className="flex items-center justify-center gap-[6px] w-[131px] px-[14px] py-[6px] text-[12px] font-semibold text-[#111827] bg-white border border-[#D1D5DB] rounded-[24px] hover:bg-[#F9FAFB] transition-colors whitespace-nowrap">
+        <button 
+          onClick={() => navigate('/admin/site-plan', { state: { orgName, coordinator } })}
+          className="flex items-center justify-center gap-[6px] w-[131px] px-[14px] py-[6px] text-[12px] font-semibold text-[#111827] bg-white border border-[#D1D5DB] rounded-[24px] hover:bg-[#F9FAFB] transition-colors whitespace-nowrap"
+        >
           View Site Plans
           <ArrowRight className="w-3.5 h-3.5 text-[#111827]" strokeWidth={2.5} />
         </button>

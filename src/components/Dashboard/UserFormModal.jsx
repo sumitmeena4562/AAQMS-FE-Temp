@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fi';
 import Button from '../UI/Button';
 import InputField from '../UI/InputField';
-import { MailIcon, UserIcon } from '../../assets/icon';
+import { useOrgStore } from '../../store/useOrgStore';
 
 const ROLE_DETAILS = [
     { 
@@ -33,13 +33,15 @@ const ROLE_DETAILS = [
 
 const STATUS_OPTIONS = ['active', 'inactive'];
 const DESIGNATIONS = ['Regional Manager', 'Senior Coordinator', 'Operations Lead', 'Compliance Officer'];
-const ORGANIZATIONS = ['EcoTest Solutions', 'Urban Green Tech', 'PureAir Monitoring', 'Global Eco Labs'];
 
 const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false }) => {
     const isEdit = !!user;
     const [step, setStep] = useState(0);
     const [submitError, setSubmitError] = useState('');
     const lastProcessedRef = useRef('');
+
+    const orgs = useOrgStore(state => state.orgs);
+    const dynamicOrganizations = orgs.map(org => org.name);
 
     const {
         register,
@@ -273,7 +275,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                     className={`w-full px-4 py-2.5 bg-slate-50 border ${errors.organization ? 'border-rose-300' : 'border-slate-100'} rounded-xl text-[13px] font-medium text-slate-900 outline-none transition-all focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5`}
                                                 >
                                                     <option value="">Select Organization</option>
-                                                    {ORGANIZATIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                                                    {dynamicOrganizations.map(o => <option key={o} value={o}>{o}</option>)}
                                                 </select>
                                                 <AnimatePresence>
                                                     {errors.organization && (
