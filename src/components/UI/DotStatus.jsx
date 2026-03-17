@@ -1,24 +1,39 @@
 import React from 'react';
+import { t } from '../../theme/theme';
 
-const DotStatus = ({ type, text }) => {
+const DotStatus = ({ type, text, size = 'sm' }) => {
     const styles = {
-        unassigned: { dot: '#F87171', bg: '#FEF2F2', border: '#FECACA', color: '#B91C1C' },
-        assigned:   { dot: '#94A3B8', bg: '#F8FAFC', border: '#E2E8F0', color: '#475569' },
-        active:     { dot: '#34D399', bg: '#ECFDF5', border: '#A7F3D0', color: '#065F46' },
-        inactive:   { dot: '#D1D5DB', bg: '#F9FAFB', border: '#E5E7EB', color: '#6B7280' },
+        unassigned: { dot: t.color.danger, bg: t.color.dangerBg, border: t.color.dangerBorder, color: t.color.dangerDark },
+        assigned:   { dot: t.color.success, bg: t.color.successBg, border: t.color.successBorder, color: t.color.successDark },
+        active:     { dot: t.color.success, bg: t.color.successBg, border: t.color.successBorder, color: t.color.successDark },
+        inactive:   { dot: t.color.textPlaceholder, bg: t.color.bgMuted, border: t.color.border, color: t.color.textSecondary },
+        pending:    { dot: t.color.warning, bg: t.color.warningBg, border: t.color.warningBorder, color: t.color.warningDark },
     };
 
     const s = styles[type?.toLowerCase()] || styles.inactive;
-    const label = text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
-
+    const label = text || type || '';
+    
     return (
         <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 5,
-            padding: '3px 8px', borderRadius: 20,
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: size === 'sm' ? '2px 8px' : '4px 12px', 
+            borderRadius: t.radius.pill,
             background: s.bg, border: `1px solid ${s.border}`,
-            fontSize: 11, fontWeight: 600, color: s.color,
+            fontSize: size === 'sm' ? 10 : 12, 
+            fontWeight: t.fontWeight.bold, 
+            color: s.color,
+            textTransform: 'uppercase',
+            letterSpacing: '0.03em',
+            boxShadow: t.shadow.xs
         }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
+            <span style={{ 
+                width: size === 'sm' ? 6 : 8, 
+                height: size === 'sm' ? 6 : 8, 
+                borderRadius: '50%', 
+                background: s.dot, 
+                flexShrink: 0,
+                boxShadow: `0 0 4px ${s.dot}40`
+            }} />
             {label}
         </span>
     );

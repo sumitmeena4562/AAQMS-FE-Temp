@@ -1,50 +1,78 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { userSchema } from '../../schema/userSchema';
 import { 
-    FiX, FiUser, FiMail, FiBriefcase, FiShield, FiMapPin, 
-    FiChevronRight, FiChevronLeft, FiCpu, FiGrid, FiCheckCircle, FiActivity
+    FiX, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle
 } from 'react-icons/fi';
-import { t } from '../../theme/theme';
+import Button from '../UI/Button';
+import InputField from '../UI/InputField';
+import { MailIcon, UserIcon } from '../../assets/icon';
 
 const ROLE_DETAILS = [
     { 
         id: 'Coordinator', 
         name: 'Coordinator', 
-        desc: 'Oversee regional operations and manage field teams.', 
-        icon: <FiGrid size={24} />,
-        color: '#3B82F6'
+        desc: 'Strategic oversight: Manage regional assets, field units, and operational workflows.', 
+        icon: <FiLayers size={18} />,
+        color: 'text-sky-600',
+        bg: 'bg-sky-50',
+        border: 'border-sky-100',
     },
     { 
         id: 'Field Officer', 
         name: 'Field Officer', 
-        desc: 'Conduct on-site inspections and manage assets.', 
-        icon: <FiMapPin size={24} />,
-        color: '#10B981'
+        desc: 'Tactical execution: On-site inspections, direct asset management, and data logging.', 
+        icon: <FiActivity size={18} />,
+        color: 'text-teal-600',
+        bg: 'bg-teal-50',
+        border: 'border-teal-100',
     }
 ];
 
 const STATUS_OPTIONS = ['active', 'inactive'];
-const ASSET_CLASSES = ['Air Quality Sensors', 'Drones', 'Water Meters', 'Noise Monitors', 'Weather Stations'];
 const DESIGNATIONS = ['Regional Manager', 'Senior Coordinator', 'Operations Lead', 'Compliance Officer'];
 const ORGANIZATIONS = ['EcoTest Solutions', 'Urban Green Tech', 'PureAir Monitoring', 'Global Eco Labs'];
 
 const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false }) => {
     const isEdit = !!user;
     const [step, setStep] = useState(0);
-    const [form, setForm] = useState({ 
-        name: '', email: '', organization: '', role: '', 
-        assignment: 'unassigned', status: 'active',
-        region: '', employeeId: '', equipmentId: '', 
-        phoneNumber: '', managedTeams: '',
-        managedAssetClasses: [], designation: '',
-        workPhone: '', workArea: ''
-    });
-    const [errors, setErrors] = useState({});
     const [submitError, setSubmitError] = useState('');
+    const lastProcessedRef = useRef('');
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        reset,
+        formState: { errors }
+    } = useForm({
+        resolver: zodResolver(userSchema),
+        defaultValues: {
+            name: '', email: '', organization: '', role: '', 
+            assignment: 'unassigned', status: 'active',
+            region: '', employeeId: '', equipmentId: '', 
+            phoneNumber: '', designation: ''
+        }
+    });
+
+    const currentRole = watch('role');
+    const currentStatus = watch('status');
 
     useEffect(() => {
+        if (!isOpen) {
+            lastProcessedRef.current = '';
+            return;
+        }
+        
+        const currentKey = `${user?.id || 'new'}-${isOpen}`;
+        if (lastProcessedRef.current === currentKey) return;
+        lastProcessedRef.current = currentKey;
+
         if (user) {
-            setForm({
+            reset({
                 name: user.name || '',
                 email: user.email || '',
                 organization: user.organization || '',
@@ -55,49 +83,24 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 employeeId: user.employeeId || '',
                 equipmentId: user.equipmentId || '',
                 phoneNumber: user.phoneNumber || '',
-                managedTeams: user.managedTeams || '',
-                managedAssetClasses: user.managedAssetClasses || [],
-                designation: user.designation || '',
-                workPhone: user.workPhone || '',
-                workArea: user.workArea || ''
+                designation: user.designation || ''
             });
             setStep(1);
         } else {
-            setForm({ 
+            reset({ 
                 name: '', email: '', organization: '', role: '', 
                 assignment: 'unassigned', status: 'active',
                 region: '', employeeId: '', equipmentId: '',
-                phoneNumber: '', managedTeams: '',
-                managedAssetClasses: [], designation: '',
-                workPhone: '', workArea: ''
+                phoneNumber: '', designation: ''
             });
             setStep(0);
         }
-        setErrors({});
         setSubmitError('');
-    }, [user, isOpen]);
+    }, [user, isOpen, reset]);
 
-    const validate = () => {
-        const e = {};
-        if (!form.name.trim()) e.name = 'Name is required';
-        if (!form.email.trim()) e.email = 'Email is required';
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email format';
-        
-        if (form.role === 'Coordinator' && !form.region) e.region = 'Region is required';
-        if (form.role === 'Field Officer') {
-            if (!form.equipmentId) e.equipmentId = 'Equipment ID is required';
-            if (!form.phoneNumber) e.phoneNumber = 'Phone number is required';
-        }
-        if (!form.employeeId) e.employeeId = 'Employee ID is required';
-        
-        setErrors(e);
-        return Object.keys(e).length === 0;
-    };
-
-    const handleSubmit = async () => {
-        if (!validate()) return;
+    const onFormSubmit = async (data) => {
         setSubmitError('');
-        const result = await onSubmit(form);
+        const result = await onSubmit(data);
         if (result?.success) {
             onClose();
         } else {
@@ -105,232 +108,278 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         }
     };
 
-    const handleChange = (key, value) => {
-        setForm(f => ({ ...f, [key]: value }));
-        if (errors[key]) setErrors(e => ({ ...e, [key]: undefined }));
-    };
-
     const handleRoleSelect = (roleId) => {
-        setForm(f => ({ ...f, role: roleId }));
+        setValue('role', roleId);
         setStep(1);
     };
 
-    const fieldStyle = (hasError) => ({
-        width: '100%', padding: '12px 16px', fontSize: 13,
-        border: `1.5px solid ${hasError ? '#FCA5A5' : t.color.borderLight}`,
-        borderRadius: 12, outline: 'none', color: t.color.text,
-        background: hasError ? t.color.dangerBg : '#FFFFFF',
-        transition: 'all 0.2s ease',
-        boxSizing: 'border-box',
-        fontWeight: 600
-    });
-
-    const focusStyle = (e) => {
-        e.target.style.borderColor = t.color.primary;
-        e.target.style.boxShadow = `0 0 0 3px ${t.color.primary}10`;
-    };
-
-    const blurStyle = (e, hasError) => {
-        e.target.style.borderColor = hasError ? '#FCA5A5' : t.color.borderLight;
-        e.target.style.boxShadow = 'none';
-    };
-
-    const labelStyle = { 
-        fontSize: 10, fontWeight: 900, color: t.color.textPlaceholder, 
-        marginBottom: 8, display: 'block', textTransform: 'uppercase', 
-        letterSpacing: '0.08em' 
-    };
-
-    const sectionTitleStyle = {
-        fontSize: 14, fontWeight: 800, color: t.color.primary,
-        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 24,
-        paddingBottom: 0
-    };
-
-    if (!isOpen) return null;
+    const inputClasses = (hasError) => `
+        w-full px-4 py-2.5 text-[13px] font-medium rounded-xl border outline-none transition-all duration-200
+        ${hasError 
+            ? 'bg-rose-50/50 border-rose-200 text-rose-900 focus:border-rose-400' 
+            : 'bg-white border-slate-200 text-slate-700 focus:border-primary/50 focus:ring-2 focus:ring-primary/5'}
+    `;
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
                     <Motion.div
-                        initial={{ opacity:0 }}
-                        animate={{ opacity:1 }}
-                        exit={{ opacity:0 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         onClick={onClose}
-                        style={{ position:'fixed', inset:0, background: 'rgba(0,0,0,0.1)', backdropFilter:'blur(4px)', zIndex: t.zIndex.overlay }}
+                        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
                     />
                     
-                    <Motion.div 
-                        initial={{ x: '100%' }}
-                        animate={{ x: 0 }}
-                        exit={{ x: '100%' }}
-                        transition={{ type: 'spring', damping: 30, stiffness: 250 }}
-                        style={{
-                            position: 'fixed', right: 0, top: 0, height: '100%', width: 500, maxWidth: '95vw',
-                            background: '#fff', boxShadow: '-12px 0 50px rgba(0,0,0,0.06)',
-                            zIndex: t.zIndex.modal, display: 'flex', flexDirection: 'column'
-                        }}
+                    <Motion.div
+                        initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                        className="relative w-full max-w-[520px] max-h-[90vh] sm:max-h-[85vh] bg-white border border-slate-200 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col overflow-hidden"
                     >
-                        {/* Header */}
-                        <div style={{ 
-                            padding: '24px 32px', borderBottom: '1px solid #F1F5F9',
-                            display:'flex', alignItems:'center', justifyContent:'space-between',
-                            background: '#fff'
-                        }}>
+
+                        {/* Modal Header */}
+                        <div className="relative z-10 p-6 pb-2 flex items-start justify-between">
                             <div>
-                                <h2 style={{ fontSize: 14, fontWeight: 900, color: t.color.text, margin: 0, letterSpacing: '-0.01em' }}>
-                                    {isEdit ? 'Update Member' : 'Onboard New User'}
+                                <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-none mb-1.5">
+                                    {isEdit ? 'Edit User' : 'Add New User'}
                                 </h2>
-                                <p style={{ fontSize: 12, color: t.color.textPlaceholder, margin: '2px 0 0', fontWeight: 600 }}>
-                                    {step === 0 ? 'Define access level' : `Configuring ${form.role}`}
-                                </p>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                        {step === 0 ? 'Select Role' : `Details: ${currentRole}`}
+                                    </span>
+                                </div>
                             </div>
-                            <Motion.button 
-                                whileHover={{ scale: 1.1, background: '#F8FAFC' }}
-                                whileTap={{ scale: 0.9 }}
+                            <button 
                                 onClick={onClose} 
-                                style={{ background: '#fff', border: '1px solid #E2E8F0', cursor: 'pointer', color: t.color.textPlaceholder, padding: 8, borderRadius: 12, display: 'flex' }}
+                                className="p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 rounded-lg transition-colors"
                             >
                                 <FiX size={18} />
-                            </Motion.button>
+                            </button>
                         </div>
 
-                        {/* Content */}
-                        <div style={{ flex: 1, overflowY: 'auto', padding: '32px' }}>
+                        {/* Modal Body */}
+                        <div className="relative z-10 flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar">
                             <AnimatePresence mode="wait">
                                 {step === 0 ? (
-                                    <Motion.div key="step0" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                    <Motion.div 
+                                        key="step0" 
+                                        initial={{ opacity: 0 }} 
+                                        animate={{ opacity: 1 }} 
+                                        exit={{ opacity: 0, y: -10 }} 
+                                        className="space-y-3 pt-3"
+                                    >
+                                        <div className="text-[12px] font-medium text-slate-500 mb-4 px-1">Select user role type</div>
                                         {ROLE_DETAILS.map(role => (
-                                            <Motion.div
+                                            <div
                                                 key={role.id}
                                                 onClick={() => handleRoleSelect(role.id)}
-                                                whileHover={{ y: -4, borderColor: role.color, background: `${role.color}05` }}
-                                                whileTap={{ scale: 0.98 }}
-                                                style={{
-                                                    padding: '28px', borderRadius: 24, border: '1.5px solid #f1f5f9',
-                                                    background: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 24,
-                                                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.02)',
-                                                    transition: 'all 0.3s ease'
-                                                }}
+                                                className={`group relative p-4 bg-white border border-slate-100 rounded-2xl cursor-pointer flex items-center gap-4 transition-all hover:border-slate-200 hover:bg-slate-50/50`}
                                             >
-                                                <div style={{ width: 52, height: 52, borderRadius: 16, background: `${role.color}15`, color: role.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <div className={`w-12 h-12 rounded-xl ${role.bg} ${role.color} flex items-center justify-center border border-current/10 shrink-0`}>
                                                     {role.icon}
                                                 </div>
-                                                <div style={{ flex: 1 }}>
-                                                    <div style={{ fontSize: 16, fontWeight: 800, color: t.color.text }}>{role.name}</div>
-                                                    <div style={{ fontSize: 13, color: t.color.textSecondary, marginTop: 4, fontWeight: 500 }}>{role.desc}</div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-[15px] font-bold text-slate-900">{role.name}</div>
+                                                    <div className="text-[12px] font-medium text-slate-400 truncate mt-0.5">{role.desc}</div>
                                                 </div>
-                                                <FiChevronRight size={18} color={t.color.textPlaceholder} />
-                                            </Motion.div>
+                                                <FiChevronRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                                            </div>
                                         ))}
                                     </Motion.div>
                                 ) : (
-                                    <Motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                                    <Motion.div 
+                                        key="step1" 
+                                        initial={{ opacity: 0 }} 
+                                        animate={{ opacity: 1 }} 
+                                        className="pt-3 space-y-6"
+                                    >
                                         {submitError && (
-                                            <div style={{ padding: '12px', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12, color: '#DC2626', fontSize: 13, marginBottom: 24, fontWeight: 600 }}>
-                                                {submitError}
+                                            <div className="flex items-center gap-2 p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-[12px] font-bold">
+                                                <FiAlertCircle size={14} /> {submitError}
                                             </div>
                                         )}
 
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
-                                            <div>
-                                                <div style={sectionTitleStyle}><FiUser size={16} /> Identity Parameters</div>
-                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                                    <div>
-                                                        <label style={labelStyle}>Full Name</label>
-                                                        <input style={fieldStyle(errors.name)} placeholder="Rahul Sharma" value={form.name} onChange={e => handleChange('name', e.target.value)} onFocus={focusStyle} onBlur={(e) => blurStyle(e, errors.name)} />
-                                                    </div>
-                                                    <div>
-                                                        <label style={labelStyle}>Email Address</label>
-                                                        <input style={fieldStyle(errors.email)} placeholder="rahul@org.com" value={form.email} onChange={e => handleChange('email', e.target.value)} onFocus={focusStyle} onBlur={(e) => blurStyle(e, errors.email)} />
-                                                    </div>
+                                        <form onSubmit={handleSubmit(onFormSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 sm:gap-y-5">
+                                            {/* Section Header */}
+                                            <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-slate-100">
+                                                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Basic Information</h3>
+                                            </div>
+
+                                            <div className="col-span-2">
+                                                <InputField
+                                                    label="Full Name"
+                                                    placeholder="Enter full name"
+                                                    {...register('name')}
+                                                    error={errors.name?.message}
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="col-span-2">
+                                                <InputField
+                                                    label="Email Address"
+                                                    type="email"
+                                                    placeholder="user@example.com"
+                                                    {...register('email')}
+                                                    error={errors.email?.message}
+                                                    required
+                                                />
+                                            </div>
+
+                                            {/* Deployment Section */}
+                                            <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-slate-100 mt-2">
+                                                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Work Details</h3>
+                                            </div>
+
+                                            <div className="col-span-1">
+                                                <InputField
+                                                    label="Employee ID"
+                                                    placeholder="EMP-001"
+                                                    {...register('employeeId')}
+                                                    error={errors.employeeId?.message}
+                                                />
+                                            </div>
+
+                                            <div className="col-span-1">
+                                                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Designation</label>
+                                                <select 
+                                                    {...register('designation')}
+                                                    className={`w-full px-4 py-2.5 bg-slate-50 border ${errors.designation ? 'border-rose-300' : 'border-slate-100'} rounded-xl text-[13px] font-medium text-slate-900 outline-none transition-all focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5`}
+                                                >
+                                                    <option value="">Select...</option>
+                                                    {DESIGNATIONS.map(d => <option key={d} value={d}>{d}</option>)}
+                                                </select>
+                                                <AnimatePresence>
+                                                    {errors.designation && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -8 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            className="flex items-center gap-1.5 text-rose-500 text-[11px] font-bold mt-1.5 ml-1"
+                                                        >
+                                                            <FiAlertCircle size={12} />
+                                                            {errors.designation.message}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+
+                                            <div className="col-span-2">
+                                                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Organization / Company</label>
+                                                <select 
+                                                    {...register('organization')}
+                                                    className={`w-full px-4 py-2.5 bg-slate-50 border ${errors.organization ? 'border-rose-300' : 'border-slate-100'} rounded-xl text-[13px] font-medium text-slate-900 outline-none transition-all focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5`}
+                                                >
+                                                    <option value="">Select Organization</option>
+                                                    {ORGANIZATIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                                                </select>
+                                                <AnimatePresence>
+                                                    {errors.organization && (
+                                                        <motion.div
+                                                            initial={{ opacity: 0, y: -8 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            className="flex items-center gap-1.5 text-rose-500 text-[11px] font-bold mt-1.5 ml-1"
+                                                        >
+                                                            <FiAlertCircle size={12} />
+                                                            {errors.organization.message}
+                                                        </motion.div>
+                                                    )}
+                                                </AnimatePresence>
+                                            </div>
+                                            
+                                            {currentRole === 'Coordinator' && (
+                                                <div className="col-span-2">
+                                                    <InputField
+                                                        label="Work Region / Area"
+                                                        placeholder="e.g. North Zone"
+                                                        {...register('region')}
+                                                        error={errors.region?.message}
+                                                    />
                                                 </div>
-                                            </div>
-
-                                            <div>
-                                                <div style={sectionTitleStyle}><FiShield size={16} /> Operational Profile</div>
-                                                {form.role === 'Coordinator' && (
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-                                                            <div>
-                                                                <label style={labelStyle}>Employee ID</label>
-                                                                <input style={fieldStyle(errors.employeeId)} placeholder="EMP-9901" value={form.employeeId} onChange={e => handleChange('employeeId', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
-                                                            </div>
-                                                            <div>
-                                                                <label style={labelStyle}>Designation</label>
-                                                                <select style={fieldStyle(false)} value={form.designation} onChange={e => handleChange('designation', e.target.value)} onFocus={focusStyle} onBlur={blurStyle}>
-                                                                    <option value="">Select Level</option>
-                                                                    {DESIGNATIONS.map(d => <option key={d} value={d}>{d}</option>)}
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label style={labelStyle}>Organization</label>
-                                                            <select style={fieldStyle(false)} value={form.organization} onChange={e => handleChange('organization', e.target.value)} onFocus={focusStyle} onBlur={blurStyle}>
-                                                                <option value="">Choose Unit</option>
-                                                                {ORGANIZATIONS.map(o => <option key={o} value={o}>{o}</option>)}
-                                                            </select>
-                                                        </div>
-                                                        <div>
-                                                            <label style={labelStyle}>Assignment Sector</label>
-                                                            <input style={fieldStyle(errors.region)} placeholder="North Zone" value={form.region} onChange={e => handleChange('region', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
-                                                        </div>
+                                            )}
+                                            
+                                            {currentRole === 'Field Officer' && (
+                                                <>
+                                                    <div className="col-span-1">
+                                                        <InputField
+                                                            label="Phone Number"
+                                                            placeholder="+1 (555) 000-0000"
+                                                            {...register('phoneNumber')}
+                                                            error={errors.phoneNumber?.message}
+                                                        />
                                                     </div>
-                                                )}
-                                                {form.role === 'Field Officer' && (
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
-                                                            <div>
-                                                                <label style={labelStyle}>Employee ID</label>
-                                                                <input style={fieldStyle(errors.employeeId)} placeholder="FO-7721" value={form.employeeId} onChange={e => handleChange('employeeId', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
-                                                            </div>
-                                                            <div>
-                                                                <label style={labelStyle}>Communication Node</label>
-                                                                <input style={fieldStyle(errors.phoneNumber)} placeholder="+91..." value={form.phoneNumber} onChange={e => handleChange('phoneNumber', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
-                                                            </div>
-                                                        </div>
-                                                        <div>
-                                                            <label style={labelStyle}>Infrastructure ID</label>
-                                                            <input style={fieldStyle(errors.equipmentId)} placeholder="DRONE-882" value={form.equipmentId} onChange={e => handleChange('equipmentId', e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
-                                                        </div>
+                                                    <div className="col-span-1">
+                                                        <InputField
+                                                            label="Equipment ID"
+                                                            placeholder="e.g. EQ-101"
+                                                            {...register('equipmentId')}
+                                                            error={errors.equipmentId?.message}
+                                                        />
                                                     </div>
-                                                )}
-                                            </div>
+                                                </>
+                                            )}
 
-                                            <div>
-                                                <div style={sectionTitleStyle}><FiActivity size={16} /> Registry Status</div>
-                                                <div style={{ display: 'flex', gap: 12 }}>
+                                            <div className="col-span-2">
+                                                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Operational Status</label>
+                                                <div className="flex gap-2">
                                                     {STATUS_OPTIONS.map(s => (
-                                                        <Motion.button key={s} whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} onClick={() => handleChange('status', s)} style={{ flex: 1, padding: '12px', borderRadius: 12, fontSize: 12, fontWeight: 900, border: `2px solid ${form.status === s ? (s === 'active' ? '#10B981' : '#EF4444') : '#f1f5f9'}`, background: form.status === s ? (s === 'active' ? '#ECFDF5' : '#FFF1F2') : '#fff', color: form.status === s ? (s === 'active' ? '#059669' : '#E11D48') : t.color.textPlaceholder, cursor: 'pointer', textTransform: 'uppercase', letterSpacing:'0.05em' }}>{s}</Motion.button>
+                                                        <button 
+                                                            type="button"
+                                                            key={s} 
+                                                            onClick={() => setValue('status', s)} 
+                                                            className={`flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase transition-all
+                                                                ${currentStatus === s 
+                                                                    ? 'bg-slate-900 text-white shadow-md'
+                                                                    : 'bg-white border border-slate-200 text-slate-400 hover:border-slate-300'}`}
+                                                        >
+                                                            {s}
+                                                        </button>
                                                     ))}
                                                 </div>
                                             </div>
-                                        </div>
+                                        </form>
                                     </Motion.div>
                                 )}
                             </AnimatePresence>
                         </div>
 
-                        {/* Footer */}
-                        <div style={{ padding: '24px 32px', borderTop: '1px solid #F1F5F9', background: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            {step === 1 && !isEdit ? (
-                                <Motion.button onClick={() => setStep(0)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 800, color: t.color.textPlaceholder }}>
-                                    <FiChevronLeft size={16} /> BACK
-                                </Motion.button>
-                            ) : <div />}
+                        {/* Modal Footer */}
+                        <div className="relative z-10 p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                            <div className="flex items-center">
+                                {step === 1 && !isEdit && (
+                                    <button 
+                                        type="button"
+                                        onClick={() => setStep(0)} 
+                                        className="text-[11px] font-bold text-slate-400 uppercase tracking-wider hover:text-primary transition-colors flex items-center gap-1"
+                                    >
+                                        <FiChevronLeft size={14} /> Back
+                                    </button>
+                                )}
+                            </div>
                             
-                            <div style={{ display: 'flex', gap: 10 }}>
-                                <Motion.button onClick={onClose} style={{ padding: '10px 20px', borderRadius: 10, border: '1px solid #E2E8F0', background: '#fff', color: t.color.textSecondary, fontWeight: 800, cursor: 'pointer', fontSize: 12 }}>CANCEL</Motion.button>
+                            <div className="flex items-center gap-2">
+                                <Button 
+                                    variant="ghost"
+                                    onClick={onClose} 
+                                    className="!text-[11px] !font-bold !uppercase !tracking-wider !text-slate-500 hover:!text-slate-900"
+                                >
+                                    Cancel
+                                </Button>
                                 {step === 1 && (
-                                    <Motion.button whileHover={{ scale: 1.02, background: t.color.primaryDark }} whileTap={{ scale: 0.98 }} onClick={handleSubmit} disabled={loading} style={{ padding: '10px 24px', borderRadius: 10, border: 'none', background: t.color.primary, color: '#fff', fontWeight: 900, cursor: 'pointer', fontSize: 12, boxShadow: `0 6px 12px ${t.color.primary}15` }}>
-                                        {loading ? 'PROCESSING...' : (isEdit ? 'UPDATE' : 'COMPLETE')}
-                                    </Motion.button>
+                                    <Button 
+                                        onClick={handleSubmit(onFormSubmit)} 
+                                        loading={loading} 
+                                        className="!px-6 !rounded-xl !text-[11px] !font-bold !uppercase !tracking-wider"
+                                    >
+                                        {isEdit ? 'Save Changes' : 'Create User'}
+                                    </Button>
                                 )}
                             </div>
                         </div>
                     </Motion.div>
-                </>
+                </div>
             )}
         </AnimatePresence>
     );

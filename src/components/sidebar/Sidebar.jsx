@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
-import { t } from '../../theme/theme';
 
 /* ── Animated Collapsible ── */
 const CollapsibleSection = ({ isOpen, children }) => {
@@ -9,175 +8,13 @@ const CollapsibleSection = ({ isOpen, children }) => {
     const [height, setHeight] = useState(0);
     useEffect(() => { if (ref.current) setHeight(ref.current.scrollHeight); }, [children, isOpen]);
     return (
-        <div style={{ maxHeight: isOpen ? `${height}px` : '0px', overflow:'hidden', transition:`max-height ${t.transition.smooth}` }}>
+        <div 
+            className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
+            style={{ maxHeight: isOpen ? `${height}px` : '0px' }}
+        >
             <div ref={ref}>{children}</div>
         </div>
     );
-};
-
-/* ── Styles ── */
-const S = {
-    aside: (collapsed, mobileOpen) => ({
-        width: collapsed ? t.layout.sidebarCollapsed : t.layout.sidebarWidth,
-        minWidth: collapsed ? t.layout.sidebarCollapsed : t.layout.sidebarWidth,
-        background: t.color.sidebarBg,
-        borderRight: `1px solid ${t.color.sidebarBorder}`,
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
-        position: 'sticky',
-        top: 0,
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        transition: `width ${t.transition.smooth}, min-width ${t.transition.smooth}`,
-        zIndex: t.zIndex.sidebar,
-        flexShrink: 0,
-        fontFamily: 'inherit',
-    }),
-    logoWrap: (collapsed) => ({
-        height: t.layout.navbarHeight,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: collapsed ? `0 ${t.space.lg}px` : `0 ${t.space.xl}px`,
-        marginBottom: t.space.md,
-        position: 'sticky',
-        top: 0,
-        background: t.color.sidebarBg,
-        zIndex: 10,
-        boxSizing: 'border-box',
-        borderBottom: `1px solid ${t.color.borderLight}`,
-    }),
-    toggleBtn: {
-        width: 28, height: 28, borderRadius: t.radius.sm,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'transparent', border: '1px solid transparent',
-        cursor: 'pointer', color: t.color.textPlaceholder, flexShrink: 0,
-        transition: `all ${t.transition.fast}`,
-    },
-    nav: { padding: `${t.space.xs}px 10px`, display:'flex', flexDirection:'column', gap:1 },
-    simpleLink: (active, collapsed) => ({
-        display: 'flex',
-        alignItems: 'center',
-        gap: collapsed ? 0 : 10,
-        justifyContent: collapsed ? 'center' : 'flex-start',
-        padding: collapsed ? '9px 0' : `${t.space.md}px ${t.space.lg}px`,
-        borderRadius: t.radius.sm,
-        fontSize: t.fontSize.md,
-        fontWeight: active ? t.fontWeight.semibold : 450,
-        color: active ? t.color.primary : t.color.textTertiary,
-        background: active ? t.color.primaryBg : 'transparent',
-        textDecoration: 'none',
-        transition: `all ${t.transition.fast}`,
-        position: 'relative',
-        cursor: 'pointer',
-        border: 'none',
-        width: '100%',
-        textAlign: 'left',
-        fontFamily: 'inherit',
-        outline: 'none',
-        letterSpacing: '-0.01em',
-    }),
-    icon: (active) => ({
-        opacity: active ? 1 : 0.55,
-        display: 'flex',
-        alignItems: 'center',
-        color: active ? t.color.primary : t.color.textMuted,
-        transition: `all ${t.transition.fast}`,
-        flexShrink: 0,
-    }),
-    chevron: (open) => ({
-        width: 14, height: 14,
-        transform: open ? 'rotate(180deg)' : 'rotate(0)',
-        transition: `transform ${t.transition.smooth}`,
-        opacity: 0.4,
-        flexShrink: 0,
-        marginLeft: 'auto',
-    }),
-    childrenWrap: {
-        marginLeft: t.space['2xl'],
-        paddingLeft: 10,
-        borderLeft: `1.5px solid ${t.color.border}`,
-        marginTop: 2,
-        marginBottom: t.space.xs,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 1,
-    },
-    childLink: (active) => ({
-        display: 'flex',
-        alignItems: 'center',
-        gap: t.space.md,
-        padding: `${t.space.sm}px 10px`,
-        borderRadius: 5,
-        fontSize: t.fontSize.sm,
-        fontWeight: active ? t.fontWeight.semibold : 450,
-        color: active ? t.color.primary : t.color.textMuted,
-        background: active ? t.color.primaryBg : 'transparent',
-        textDecoration: 'none',
-        transition: `all ${t.transition.fast}`,
-        letterSpacing: '-0.01em',
-    }),
-    sectionLabel: {
-        fontSize: t.fontSize.xxs,
-        fontWeight: t.fontWeight.semibold,
-        color: t.color.textPlaceholder,
-        textTransform: 'uppercase',
-        letterSpacing: '0.08em',
-        padding: `14px ${t.space.lg}px ${t.space.sm}px`,
-    },
-    bottom: {
-        marginTop: 'auto',
-        padding: '10px 10px',
-        borderTop: `1px solid ${t.color.borderLight}`,
-        background: t.color.sidebarBg,
-    },
-    userCard: (collapsed) => ({
-        padding: collapsed ? `${t.space.md}px ${t.space.sm}px` : `${t.space.md}px 10px`,
-        borderRadius: t.radius.md,
-        display: 'flex',
-        alignItems: 'center',
-        gap: collapsed ? 0 : 10,
-        justifyContent: collapsed ? 'center' : 'flex-start',
-        background: t.color.bg,
-        border: `1px solid ${t.color.border}`,
-        cursor: 'pointer',
-        transition: `all ${t.transition.fast}`,
-    }),
-    avatar: {
-        width: 30, height: 30, borderRadius: t.radius.sm,
-        background: `linear-gradient(135deg, ${t.color.primary}, #7C3AED)`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: t.color.textInverse, fontWeight: t.fontWeight.bold, fontSize: t.fontSize.sm, flexShrink: 0,
-    },
-    userName: {
-        fontWeight: t.fontWeight.semibold, fontSize: t.fontSize.sm,
-        color: t.color.text,
-        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        lineHeight: 1.2,
-    },
-    userEmail: {
-        fontSize: 10.5,
-        color: t.color.textPlaceholder,
-        whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-        marginTop: 1,
-    },
-    activeBar: {
-        position: 'absolute',
-        left: -10,
-        top: 8,
-        bottom: 8,
-        width: 3,
-        background: t.color.primary,
-        borderRadius: '0 3px 3px 0',
-    },
-    overlay: {
-        position: 'fixed',
-        inset: 0,
-        background: t.color.overlayDark,
-        backdropFilter: 'blur(2px)',
-        zIndex: 999,
-    },
 };
 
 const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, setMobileOpen, onToggle }) => {
@@ -187,33 +24,30 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
     const toggleMenu = (label) => setOpenMenus(p => ({ ...p, [label]: !p[label] }));
 
-    const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
-    const isParentActive = (item) => item.children ? item.children.some(c => isActive(c.path)) : isActive(item.path);
+    const isActive = useCallback((path) => location.pathname === path || location.pathname.startsWith(path + '/'), [location.pathname]);
+    const isParentActive = useCallback((item) => 
+        item.children ? item.children.some(c => isActive(c.path)) : isActive(item.path)
+    , [isActive]);
 
-    useEffect(() => {
-        navItems.forEach(item => {
-            if (item.children && isParentActive(item)) setOpenMenus(p => ({ ...p, [item.label]: true }));
-        });
-    }, [location.pathname]);
-
-    useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname]);
-
-    const hoverOn = (e, isAct) => { if (!isAct) e.currentTarget.style.background = t.color.bgMuted; };
-    const hoverOff = (e, isAct) => { e.currentTarget.style.background = isAct ? t.color.primaryBg : 'transparent'; };
+    useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname, setMobileOpen]);
 
     const renderSimple = (item) => {
         const act = isActive(item.path);
         return (
-            <div key={item.path} style={{ position:'relative', marginBottom:1 }}>
-                {act && <div style={S.activeBar} />}
+            <div key={item.path} className="relative mb-0.5 group">
+                {act && <div className="absolute left-[-10px] top-2 bottom-2 w-[3px] bg-[#072267] rounded-r-[3px]" />}
                 <NavLink
                     to={item.path}
-                    style={S.simpleLink(act, collapsed)}
-                    onMouseEnter={e => hoverOn(e, act)}
-                    onMouseLeave={e => hoverOff(e, act)}
+                    className={() => `
+                        flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] transition-all duration-150
+                        ${collapsed ? 'justify-center px-0' : 'justify-start'}
+                        ${act ? 'bg-[#072267]/[0.06] text-[#072267] font-semibold' : 'text-slate-500 hover:bg-slate-50 font-medium'}
+                    `}
                 >
-                    <span style={S.icon(act)}>{item.icon}</span>
-                    {!collapsed && <span>{item.label}</span>}
+                    <span className={`flex items-center shrink-0 transition-opacity ${act ? 'opacity-100 text-[#072267]' : 'opacity-60 text-slate-400 group-hover:opacity-100 group-hover:text-slate-600'}`}>
+                        {item.icon}
+                    </span>
+                    {!collapsed && <span className="truncate">{item.label}</span>}
                 </NavLink>
             </div>
         );
@@ -222,36 +56,50 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
     const renderParent = (item) => {
         const isOpen = openMenus[item.label];
         const childActive = isParentActive(item);
+        const activeOrOpen = childActive || isOpen;
+        
         return (
-            <div key={item.label} style={{ marginBottom:1 }}>
+            <div key={item.label} className="mb-0.5 group">
                 <button
                     onClick={() => toggleMenu(item.label)}
-                    style={S.simpleLink(childActive || isOpen, collapsed)}
-                    onMouseEnter={e => hoverOn(e, childActive || isOpen)}
-                    onMouseLeave={e => hoverOff(e, childActive || isOpen)}
+                    className={`
+                        w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] transition-all duration-150 border-none outline-none cursor-pointer
+                        ${collapsed ? 'justify-center px-0' : 'justify-start'}
+                        ${activeOrOpen ? 'bg-[#072267]/[0.06] text-[#072267] font-semibold' : 'text-slate-500 hover:bg-slate-50 font-medium'}
+                    `}
                 >
-                    <span style={S.icon(childActive)}>{item.icon}</span>
-                    {!collapsed && <span style={{flex:1}}>{item.label}</span>}
+                    <span className={`flex items-center shrink-0 transition-opacity ${activeOrOpen ? 'opacity-100 text-[#072267]' : 'opacity-60 text-slate-400 group-hover:opacity-100 group-hover:text-slate-600'}`}>
+                        {item.icon}
+                    </span>
+                    {!collapsed && <span className="flex-1 text-left truncate">{item.label}</span>}
                     {!collapsed && (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={S.chevron(isOpen)}>
+                        <svg 
+                            xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" 
+                            className={`shrink-0 transition-transform duration-300 opacity-40 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+                        >
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     )}
                 </button>
                 <CollapsibleSection isOpen={isOpen && !collapsed}>
-                    <div style={S.childrenWrap}>
+                    <div className="ml-8 pl-2.5 border-l-1.5 border-slate-200 mt-0.5 mb-1.5 flex flex-col gap-0.5 transition-all">
                         {item.children.map(child => {
                             const cAct = isActive(child.path);
                             return (
                                 <NavLink
                                     key={child.path}
                                     to={child.path}
-                                    style={S.childLink(cAct)}
-                                    onMouseEnter={e => hoverOn(e, cAct)}
-                                    onMouseLeave={e => hoverOff(e, cAct)}
+                                    className={`
+                                        flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[12px] transition-all duration-150 text-slate-500
+                                        ${cAct ? 'bg-[#072267]/[0.06] text-[#072267] font-semibold' : 'hover:bg-slate-50 hover:text-slate-900 font-medium'}
+                                    `}
                                 >
-                                    {child.icon && <span style={S.icon(cAct)}>{child.icon}</span>}
-                                    {child.label}
+                                    {child.icon && (
+                                        <span className={`flex items-center shrink-0 transition-opacity ${cAct ? 'opacity-100 text-[#072267]' : 'opacity-50 text-slate-400 group-hover:opacity-100'}`}>
+                                            {child.icon}
+                                        </span>
+                                    )}
+                                    <span className="truncate">{child.label}</span>
                                 </NavLink>
                             );
                         })}
@@ -263,22 +111,34 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
     return (
         <>
-            {mobileOpen && <div onClick={() => setMobileOpen(false)} style={S.overlay} />}
+            {/* Mobile Overlay */}
+            {mobileOpen && (
+                <div 
+                    onClick={() => setMobileOpen(false)} 
+                    className="fixed inset-0 bg-slate-900/40 backdrop-blur-[1px] z-[999]" 
+                />
+            )}
 
+            {/* Sidebar Container */}
             <aside
-                className={`sidebar-panel ${mobileOpen ? 'sidebar-mobile-open' : ''}`}
-                style={S.aside(collapsed, mobileOpen)}
+                className={`
+                    flex flex-col h-screen sticky top-0 bg-white border-r border-slate-200 z-[1000] shrink-0 transition-all duration-300 ease-in-out font-sans overflow-hidden
+                    ${collapsed ? 'w-[64px]' : 'w-[240px]'}
+                    ${mobileOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}
+                    max-md:fixed max-md:top-0 max-md:left-0 max-md:z-[1000] max-md:w-[240px] max-md:shadow-2xl
+                `}
             >
-                <div style={{ flex:1, overflowY:'auto', overflowX:'hidden', paddingBottom:10 }} className="no-scrollbar">
+                <div className="flex-1 overflow-y-auto no-scrollbar pb-2.5">
                     {/* Logo + Toggle */}
-                    <div style={S.logoWrap(collapsed)}>
+                    <div className={`h-[52px] flex items-center justify-between sticky top-0 bg-white z-10 px-4 mb-2 border-b border-slate-50 ${collapsed ? 'px-4' : 'px-6'}`}>
                         {!collapsed && logo}
                         <button
                             onClick={onToggle}
-                            style={S.toggleBtn}
+                            className={`
+                                w-7 h-7 flex items-center justify-center rounded-md border border-transparent bg-transparent cursor-pointer text-slate-400 hover:text-slate-600 hover:bg-slate-50 hover:border-slate-200 transition-all duration-200 shrink-0
+                                ${collapsed ? 'mx-auto' : ''}
+                            `}
                             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                            onMouseEnter={e => { e.currentTarget.style.background = t.color.bgMuted; e.currentTarget.style.borderColor = t.color.border; e.currentTarget.style.color = t.color.textSecondary; }}
-                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = t.color.textPlaceholder; }}
                         >
                             {collapsed ? (
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -293,10 +153,14 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     </div>
 
                     {/* Section Label */}
-                    {!collapsed && <div style={S.sectionLabel}>Menu</div>}
+                    {!collapsed && (
+                        <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-[0.08em] px-6 pt-3 pb-2 select-none">
+                            Main Menu
+                        </div>
+                    )}
 
                     {/* Navigation */}
-                    <nav style={S.nav}>
+                    <nav className="px-2.5 flex flex-col gap-0.5">
                         {navItems.map(item =>
                             item.children && item.children.length > 0
                                 ? renderParent(item)
@@ -306,44 +170,31 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 </div>
 
                 {/* User Card */}
-                <div style={S.bottom}>
+                <div className="mt-auto p-2.5 border-t border-slate-100 bg-white sticky bottom-0 z-10">
                     {user && (
                         <div
-                            style={S.userCard(collapsed)}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = t.color.primaryBorder; e.currentTarget.style.boxShadow = t.shadow.xs; }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = t.color.border; e.currentTarget.style.boxShadow = t.shadow.none; }}
+                            className={`
+                                flex items-center rounded-xl bg-white border border-slate-200 transition-all duration-200 cursor-pointer group hover:border-[#072267]/30 hover:shadow-sm
+                                ${collapsed ? 'p-2 justify-center' : 'p-2.5 gap-3 justify-start'}
+                            `}
                         >
-                            <div style={S.avatar}>
+                            <div className="w-8 h-8 rounded-lg bg-[#072267] flex items-center justify-center text-white text-[13px] font-bold shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                                 {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'U'}
                             </div>
                             {!collapsed && (
-                                <div style={{ overflow:'hidden', flex:1 }}>
-                                    <div style={S.userName}>{user.name || 'Admin User'}</div>
-                                    <div style={S.userEmail}>{user.email || 'admin@aisafety.com'}</div>
+                                <div className="overflow-hidden flex-1">
+                                    <p className="text-[#111827] text-[13px] font-semibold truncate leading-tight group-hover:text-[#072267] transition-colors">
+                                        {user.name || 'System User'}
+                                    </p>
+                                    <p className="text-slate-400 text-[10px] font-medium truncate mt-0.5">
+                                        {user.email || 'user@system.com'}
+                                    </p>
                                 </div>
                             )}
                         </div>
                     )}
                 </div>
             </aside>
-
-            <style>{`
-                .sidebar-panel::-webkit-scrollbar { width: 3px; }
-                .sidebar-panel::-webkit-scrollbar-thumb { background: ${t.color.borderDark}; border-radius: ${t.radius.full}px; }
-                .sidebar-panel::-webkit-scrollbar-track { background: transparent; }
-                @media (max-width: 768px) {
-                    .sidebar-panel {
-                        position: fixed !important;
-                        top: 0 !important; left: 0 !important;
-                        height: 100vh !important;
-                        transform: translateX(-100%);
-                        transition: transform ${t.transition.slow} !important;
-                        box-shadow: 4px 0 20px rgba(0,0,0,0.08);
-                        width: ${t.layout.sidebarWidth}px !important; min-width: ${t.layout.sidebarWidth}px !important;
-                    }
-                    .sidebar-panel.sidebar-mobile-open { transform: translateX(0); }
-                }
-            `}</style>
         </>
     );
 };

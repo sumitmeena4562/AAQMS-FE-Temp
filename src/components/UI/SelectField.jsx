@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiAlertCircle } from 'react-icons/fi';
 import { t } from '../../theme/theme';
 
 const SelectField = ({
@@ -15,8 +17,21 @@ const SelectField = ({
 }) => {
     const [isFocused, setIsFocused] = useState(false);
 
+    // Shake animation variant
+    const shakeVariants = {
+        error: {
+            x: [0, -4, 4, -4, 4, 0],
+            transition: { duration: 0.4 }
+        }
+    };
+
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px', width: '100%', ...containerStyle }} className={className}>
+        <motion.div 
+            style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px', width: '100%', ...containerStyle }} 
+            className={className}
+            animate={error ? "error" : ""}
+            variants={shakeVariants}
+        >
             {label && (
                 <label style={{ 
                     fontSize: t.fontSize.sm, 
@@ -94,12 +109,31 @@ const SelectField = ({
                 </div>
             </div>
 
-            {error && (
-                <span style={{ color: t.color.danger, fontSize: t.fontSize.xs, marginTop: '2px', fontWeight: t.fontWeight.semibold, marginLeft: '4px' }}>
-                    {error}
-                </span>
-            )}
-        </div>
+            {/* Error Message with animation */}
+            <AnimatePresence>
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                        style={{ 
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            color: t.color.danger, 
+                            fontSize: '11px',
+                            marginTop: '2px', 
+                            fontWeight: t.fontWeight.bold, 
+                            marginLeft: '4px',
+                            letterSpacing: '0.01em',
+                        }}
+                    >
+                        <FiAlertCircle size={13} strokeWidth={2.5} />
+                        <span>{error}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 };
 

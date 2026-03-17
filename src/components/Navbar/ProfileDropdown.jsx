@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
-import { t } from '../../theme/theme';
 
 const ProfileDropdown = () => {
     const navigate = useNavigate();
@@ -27,88 +26,55 @@ const ProfileDropdown = () => {
     ];
 
     return (
-        <div ref={ref} style={{ position:'relative' }}>
+        <div ref={ref} className="relative">
             {/* Avatar Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                style={{
-                    width:32, height:32, borderRadius: t.radius.circle,
-                    background: `linear-gradient(135deg, ${t.color.primary}, #7C3AED)`,
-                    border:'none', cursor:'pointer',
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                    color: t.color.textInverse, fontSize: t.fontSize.sm, fontWeight: t.fontWeight.bold,
-                    transition: `box-shadow ${t.transition.base}`,
-                    boxShadow: isOpen ? '0 0 0 3px rgba(79,70,229,0.2)' : t.shadow.none,
-                }}
-                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.2)'; }}
-                onMouseLeave={e => { if (!isOpen) e.currentTarget.style.boxShadow = t.shadow.none; }}
+                className={`w-8 h-8 rounded-full bg-[#072267] flex items-center justify-center text-white text-sm font-bold transition-all duration-200 hover:ring-2 hover:ring-[#072267]/10 ${isOpen ? 'ring-2 ring-[#072267]/10 shadow-lg' : ''}`}
             >
                 {name.charAt(0).toUpperCase()}
             </button>
 
             {/* Dropdown */}
             {isOpen && (
-                <div style={{
-                    position:'absolute', right:0, top:'calc(100% + 8px)',
-                    width:220, background: t.color.bg,
-                    border: `1px solid ${t.color.border}`, borderRadius: t.radius.xl,
-                    boxShadow: t.shadow.md,
-                    zIndex: t.zIndex.dropdown, overflow:'hidden',
-                }}>
-                    {/* User Info */}
-                    <div style={{ padding: `${t.space.lg}px 14px`, display:'flex', alignItems:'center', gap:10, borderBottom: `1px solid ${t.color.borderLight}` }}>
-                        <div style={{
-                            width:34, height:34, borderRadius: t.radius.circle,
-                            background: `linear-gradient(135deg, ${t.color.primary}, #7C3AED)`,
-                            display:'flex', alignItems:'center', justifyContent:'center',
-                            color: t.color.textInverse, fontSize: t.fontSize.md, fontWeight: t.fontWeight.bold, flexShrink:0,
-                        }}>
+                <div className="absolute right-0 top-[calc(100%+12px)] w-[240px] bg-white border border-slate-200 rounded-2xl shadow-[0_20px_60px_rgba(7,34,103,0.15)] z-[2000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    {/* User Info Section */}
+                    <div className="p-4 flex items-center gap-3.5 bg-gradient-to-br from-[#072267]/[0.05] to-transparent border-b border-slate-100">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#072267] to-[#6366F1] flex items-center justify-center text-white text-[15px] font-extrabold shadow-md relative shrink-0">
                             {name.charAt(0).toUpperCase()}
+                            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
                         </div>
-                        <div style={{ overflow:'hidden' }}>
-                            <div style={{ fontSize: t.fontSize.md, fontWeight: t.fontWeight.semibold, color: t.color.text, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', lineHeight:1.2 }}>{name}</div>
-                            <div style={{ fontSize: t.fontSize.xs, color: t.color.textPlaceholder, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', marginTop:1 }}>{email}</div>
+                        <div className="overflow-hidden">
+                            <div className="flex items-center gap-1.5 mb-0.5">
+                                <p className="text-[#111827] text-sm font-extrabold truncate leading-tight">{name}</p>
+                                <span className="text-[9px] font-black bg-[#072267] text-white px-1.5 py-0.5 rounded uppercase tracking-wider">ADMIN</span>
+                            </div>
+                            <p className="text-[#6B7280] text-[11px] font-semibold truncate">{email.toLowerCase()}</p>
                         </div>
                     </div>
 
                     {/* Menu Items */}
-                    <div style={{ padding: `${t.space.xs}px 0` }}>
+                    <div className="py-2.5">
                         {menuItems.map((item, i) => (
-                            <a
+                            <button
                                 key={i}
-                                href="#"
-                                style={{
-                                    display:'flex', alignItems:'center', gap:10,
-                                    padding: `${t.space.md}px 14px`, fontSize: t.fontSize.sm, fontWeight: t.fontWeight.medium,
-                                    color: t.color.textTertiary, textDecoration:'none',
-                                    transition: `all 0.1s`,
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.background = t.color.bgHover; e.currentTarget.style.color = t.color.text; }}
-                                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = t.color.textTertiary; }}
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-slate-600 transition-all duration-150 hover:bg-[#072267]/[0.04] hover:text-[#072267] group text-left"
                             >
-                                <span style={{ opacity:0.5, display:'flex', alignItems:'center' }}>{item.icon}</span>
+                                <span className="text-[#072267]/60 group-hover:text-[#072267] transition-colors">{item.icon}</span>
                                 {item.label}
-                            </a>
+                            </button>
                         ))}
                     </div>
 
-                    {/* Logout */}
-                    <div style={{ borderTop: `1px solid ${t.color.borderLight}`, padding: `${t.space.xs}px 0` }}>
-                        <a
-                            href="#"
+                    {/* Logout Section */}
+                    <div className="border-t border-slate-100 p-2">
+                        <button
                             onClick={handleLogout}
-                            style={{
-                                display:'flex', alignItems:'center', gap:10,
-                                padding: `${t.space.md}px 14px`, fontSize: t.fontSize.sm, fontWeight: t.fontWeight.semibold,
-                                color: t.color.danger, textDecoration:'none',
-                                transition: 'all 0.1s',
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.background = t.color.dangerBg; }}
-                            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-rose-500 rounded-xl transition-all duration-150 hover:bg-rose-50 group text-left"
                         >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                            Log out
-                        </a>
+                            <svg className="stroke-[2.5]" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span>Log out</span>
+                        </button>
                     </div>
                 </div>
             )}

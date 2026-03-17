@@ -5,18 +5,18 @@ const STORAGE_KEY = 'aaqms_users';
 
 // ── Seed Data ──
 const SEED_USERS = [
-    { id: 1,  name: "Sarah Jenkins",    email: "sarah.j@acmecorp.com",   organization: "Acme Corp",     role: "Coordinator",   assignment: "unassigned", status: "active",   verified: true,  lastActive: "2 hours ago",  createdAt: "2024-11-15" },
-    { id: 2,  name: "David Kim",        email: "david.kim@ssism.com",    organization: "SSISM",         role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "Now",          createdAt: "2024-10-20" },
-    { id: 3,  name: "Elena Rodriguez",  email: "elena.r@globex.org",     organization: "Globex",        role: "Coordinator",   assignment: "assigned",   status: "active",   verified: true,  lastActive: "5 mins ago",   createdAt: "2024-09-12" },
-    { id: 4,  name: "Marcus Thorne",    email: "m.thorne@innovate.io",   organization: "Innovate Ltd",  role: "Field Officer", assignment: "unassigned", status: "inactive", verified: false, lastActive: "3 days ago",   createdAt: "2025-01-05" },
-    { id: 5,  name: "Aisha Khan",       email: "aisha.k@techcore.com",   organization: "TechCore",      role: "Coordinator",   assignment: "assigned",   status: "active",   verified: true,  lastActive: "1 hour ago",   createdAt: "2024-08-01" },
-    { id: 6,  name: "John Smith",       email: "j.smith@builders.inc",   organization: "Builders Inc",  role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "10 mins ago",  createdAt: "2024-12-18" },
-    { id: 7,  name: "Yuki Tanaka",      email: "yuki.t@zensoft.jp",      organization: "ZenSoft",       role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "Now",          createdAt: "2024-07-22" },
-    { id: 8,  name: "Liam O'Connor",    email: "liam.oc@emerald.ie",     organization: "Emerald Eco",   role: "Coordinator",   assignment: "unassigned", status: "active",   verified: false, lastActive: "1 day ago",    createdAt: "2025-02-01" },
-    { id: 9,  name: "Sofia Rossi",      email: "s.rossi@lume.it",        organization: "Lume SpA",      role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "4 hours ago",  createdAt: "2024-06-10" },
-    { id: 10, name: "Chen Wei",         email: "c.wei@easternstar.cn",   organization: "Eastern Star",  role: "Coordinator",   assignment: "assigned",   status: "inactive", verified: true,  lastActive: "2 days ago",   createdAt: "2024-05-30" },
-    { id: 11, name: "Maria Garcia",     email: "m.garcia@techcorp.es",   organization: "TechCorp",      role: "Admin",         assignment: "assigned",   status: "active",   verified: true,  lastActive: "30 mins ago",  createdAt: "2024-04-14" },
-    { id: 12, name: "Ahmed Hassan",     email: "a.hassan@innovate.ae",   organization: "Innovate Labs", role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "15 mins ago",  createdAt: "2024-03-20" },
+    { id: 1,  name: "Sarah Jenkins",    email: "sarah.j@acmecorp.com",   organization: "Acme Corp",     role: "Coordinator",   assignment: "unassigned", status: "active",   verified: true,  lastActive: "2 hours ago",  createdAt: "2024-11-15", region: "North Zone" },
+    { id: 2,  name: "David Kim",        email: "david.kim@ssism.com",    organization: "SSISM",         role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "Now",          createdAt: "2024-10-20", region: "South Zone" },
+    { id: 3,  name: "Elena Rodriguez",  email: "elena.r@globex.org",     organization: "Globex",        role: "Coordinator",   assignment: "assigned",   status: "active",   verified: true,  lastActive: "5 mins ago",   createdAt: "2024-09-12", region: "East Zone" },
+    { id: 4,  name: "Marcus Thorne",    email: "m.thorne@innovate.io",   organization: "Innovate Ltd",  role: "Field Officer", assignment: "unassigned", status: "inactive", verified: false, lastActive: "3 days ago",   createdAt: "2025-01-05", region: "West Zone" },
+    { id: 5,  name: "Aisha Khan",       email: "aisha.k@techcore.com",   organization: "TechCore",      role: "Coordinator",   assignment: "assigned",   status: "active",   verified: true,  lastActive: "1 hour ago",   createdAt: "2024-08-01", region: "Central Zone" },
+    { id: 6,  name: "John Smith",       email: "j.smith@builders.inc",   organization: "Builders Inc",  role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "10 mins ago",  createdAt: "2024-12-18", region: "North Zone" },
+    { id: 7,  name: "Yuki Tanaka",      email: "yuki.t@zensoft.jp",      organization: "ZenSoft",       role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "Now",          createdAt: "2024-07-22", region: "South Zone" },
+    { id: 8,  name: "Liam O'Connor",    email: "liam.oc@emerald.ie",     organization: "Emerald Eco",   role: "Coordinator",   assignment: "unassigned", status: "active",   verified: false, lastActive: "1 day ago",    createdAt: "2025-02-01", region: "East Zone" },
+    { id: 9,  name: "Sofia Rossi",      email: "s.rossi@lume.it",        organization: "Lume SpA",      role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "4 hours ago",  createdAt: "2024-06-10", region: "West Zone" },
+    { id: 10, name: "Chen Wei",         email: "c.wei@easternstar.cn",   organization: "Eastern Star",  role: "Coordinator",   assignment: "assigned",   status: "inactive", verified: true,  lastActive: "2 days ago",   createdAt: "2024-05-30", region: "Central Zone" },
+    { id: 11, name: "Maria Garcia",     email: "m.garcia@techcorp.es",   organization: "TechCorp",      role: "Admin",         assignment: "assigned",   status: "active",   verified: true,  lastActive: "30 mins ago",  createdAt: "2024-04-14", region: "North Zone" },
+    { id: 12, name: "Ahmed Hassan",     email: "a.hassan@innovate.ae",   organization: "Innovate Labs", role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "15 mins ago",  createdAt: "2024-03-20", region: "South Zone" },
 ];
 
 // ── Helpers ──
@@ -26,7 +26,7 @@ function loadUsers() {
     try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) return JSON.parse(stored);
-    } catch (e) { /* fall through */ }
+    } catch { /* fall through */ }
     // First load — seed
     localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_USERS));
     return [...SEED_USERS];
@@ -64,6 +64,34 @@ export const userService = {
         if (filters.role)         users = users.filter(u => u.role === filters.role);
         if (filters.status)       users = users.filter(u => u.status === filters.status);
         if (filters.assignment)   users = users.filter(u => u.assignment === filters.assignment);
+        if (filters.region)       users = users.filter(u => u.region === filters.region);
+        if (filters.verified !== undefined && filters.verified !== '') {
+            const isVerified = filters.verified === 'true' || filters.verified === true;
+            users = users.filter(u => u.verified === isVerified);
+        }
+
+        // Time Range Filter
+        if (filters.timeRange && filters.timeRange !== 'all') {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            users = users.filter(u => {
+                const createdDate = new Date(u.createdAt);
+                const diffTime = Math.abs(today - createdDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (filters.timeRange === 'today') {
+                    return createdDate >= today;
+                }
+                if (filters.timeRange === '7d') {
+                    return diffDays <= 7;
+                }
+                if (filters.timeRange === '30d') {
+                    return diffDays <= 30;
+                }
+                return true;
+            });
+        }
 
         return users;
     },
@@ -100,6 +128,7 @@ export const userService = {
             verified: false,
             lastActive: 'Never',
             createdAt: new Date().toISOString().split('T')[0],
+            region: userData.region || 'North Zone'
         };
 
         users.push(newUser);
@@ -171,14 +200,23 @@ export const userService = {
     },
 
     /**
-     * Get filter option lists
+     * Get filter option lists (Dynamic based on selected filters)
      */
-    getFilterOptions: async () => {
+    getFilterOptions: async (filters = {}) => {
         await delay(50);
-        const users = loadUsers();
+        const allUsers = loadUsers();
+        
+        // Start with all users, then narrow down based on dependent filters
+        let availableForOrgs = [...allUsers];
+        if (filters.role) availableForOrgs = availableForOrgs.filter(u => u.role === filters.role);
+        
+        let availableForRegions = [...availableForOrgs]; // Region depends on Role AND Organization
+        if (filters.organization) availableForRegions = availableForRegions.filter(u => u.organization === filters.organization);
+
         return {
-            organizations: [...new Set(users.map(u => u.organization).filter(Boolean))].sort(),
-            roles: [...new Set(users.map(u => u.role).filter(Boolean))].sort(),
+            organizations: [...new Set(availableForOrgs.map(u => u.organization).filter(Boolean))].sort(),
+            roles: [...new Set(allUsers.map(u => u.role).filter(Boolean))].sort(),
+            regions: [...new Set(availableForRegions.map(u => u.region).filter(Boolean))].sort(),
         };
     },
 

@@ -1,155 +1,47 @@
-import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-hot-toast';
 import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
 import UserFormModal from '../../components/Dashboard/UserFormModal';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
-import { t } from '../../theme/theme';
 import {
-    FiPlus, FiSearch, FiDownload, FiTrash2,
-    FiUserCheck, FiUserX, FiUsers, FiAlertCircle,
-    FiCheckCircle, FiClock, FiX, FiChevronDown,
-    FiRefreshCw, FiCalendar
+    FiPlus, FiDownload, FiTrash2,
+    FiUserCheck, FiUserX, FiUsers,
+    FiRefreshCw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock
 } from 'react-icons/fi';
+import UserTable from '../../components/Tables/UserTable';
+import useDebounce from '../../hooks/useDebounce';
+import FilterDropdown from '../../components/UI/FilterDropdown';
+import TableSkeleton from '../../components/UI/TableSkeleton';
+import Button from '../../components/UI/Button';
 
-// ─── Avatar helper ──────────────────────────────────────────────────────────────
-const AVATAR_COLORS = t.color.avatarGradients;
-function getAvatar(name) {
-    if (!name) return { initials:'?', colors: AVATAR_COLORS[0] };
-    let h = 0; for (let i=0;i<name.length;i++) h = name.charCodeAt(i)+((h<<5)-h);
-    const p = name.split(' ');
-    return { initials: (p.length>=2?`${p[0][0]}${p[1][0]}`:name.slice(0,2)).toUpperCase(), colors: AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length] };
-}
-
-// ─── Badge components ───────────────────────────────────────────────────────────
-const ROLE_BADGE = { coordinator:{bg: t.color.coordinatorBg, color: t.color.coordinatorText, border: t.color.coordinatorBorder}, 'field officer':{bg: t.color.fieldOfficerBg, color: t.color.fieldOfficerText, border: t.color.fieldOfficerBorder}, admin:{bg: t.color.adminBg, color: t.color.adminText, border: t.color.adminBorder} };
-const STATUS_BADGE = { 
-    active:     { dot: t.color.success, bg: t.color.successBg, color: t.color.successDark, border: t.color.successBorder }, 
-    inactive:   { dot: t.color.textPlaceholder, bg: t.color.bgMuted, color: t.color.textTertiary, border: t.color.border }, 
-    assigned:   { dot: t.color.info, bg: t.color.infoBg, color: t.color.infoDark, border: t.color.infoBorder }, 
-    unassigned: { dot: t.color.danger, bg: t.color.dangerBg, color: t.color.dangerDark, border: t.color.dangerBorder } 
-};
-
-const RoleBadge = ({role}) => { const s=ROLE_BADGE[role?.toLowerCase()]||{bg: t.color.bgMuted, color: t.color.textSecondary, border: t.color.border}; return <span style={{display:'inline-block',padding:'2px 9px',fontSize: t.fontSize.xs, fontWeight: t.fontWeight.semibold, background:s.bg, color:s.color, border:`1px solid ${s.border}`, borderRadius: t.radius.pill}}>{role}</span>; };
-const StatusBadge = ({type,text}) => { const s=STATUS_BADGE[type?.toLowerCase()]||STATUS_BADGE.inactive; return <span style={{display:'inline-flex',alignItems:'center',gap:5,padding:'2px 8px',fontSize: t.fontSize.xs, fontWeight: t.fontWeight.semibold, background:s.bg, color:s.color, border:`1px solid ${s.border}`, borderRadius: t.radius.pill}}><span style={{width:6,height:6,borderRadius: t.radius.circle, background:s.dot,flexShrink:0}}/>{text}</span>; };
-
-// ─── FilterDropdown ─────────────────────────────────────────────────────────────
-function FilterDropdown({ label, value, options, onChange, allLabel = 'All' }) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef(null);
-    useEffect(() => {
-        const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-        document.addEventListener('mousedown', h);
-        return () => document.removeEventListener('mousedown', h);
-    }, []);
-    const isActive = value && value !== '';
-    const displayLabel = isActive ? `${label}: ${value}` : label;
-    return (
-        <div ref={ref} style={{ position:'relative' }}>
-            <button 
-                onClick={() => setOpen(!open)} 
-                style={{ 
-                    display:'flex', alignItems:'center', gap:5, padding:'6px 10px', fontSize:12, fontWeight:500, 
-                    color: isActive ? t.color.primary : t.color.textSecondary, 
-                    background: isActive ? t.color.primaryBg : t.color.bg, 
-                    border: `1px solid ${isActive ? t.color.primaryBorder : t.color.border}`, 
-                    borderRadius: 7, cursor:'pointer', whiteSpace:'nowrap' 
-                }}
-            >
-                {displayLabel}
-                <FiChevronDown size={12} style={{ transform: open?'rotate(180deg)':'rotate(0)', transition:'transform 0.15s' }} />
-                {isActive && <span onClick={(e) => { e.stopPropagation(); onChange(''); setOpen(false); }} style={{ display:'flex', alignItems:'center', marginLeft:2, color: t.color.primary, cursor:'pointer' }}><FiX size={11} /></span>}
-            </button>
-            {open && (
-                <div style={{ position:'absolute', top:'calc(100% + 4px)', left:0, minWidth:180, background: t.color.bg, border: `1px solid ${t.color.border}`, borderRadius: 8, boxShadow: t.shadow.lg, zIndex: 50, padding: '4px 0', maxHeight: 220, overflowY: 'auto' }}>
-                    <div onClick={() => { onChange(''); setOpen(false); }} style={{ padding:'7px 12px', fontSize:12, fontWeight: !isActive?600:400, color: !isActive? t.color.primary : t.color.textSecondary, background: !isActive? t.color.primaryBg : 'transparent', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between' }}
-                        onMouseEnter={e => { if(isActive) e.currentTarget.style.background = t.color.bgHover; }}
-                        onMouseLeave={e => { if(isActive) e.currentTarget.style.background='transparent'; }}
-                    >
-                        {allLabel}
-                        {!isActive && <span style={{fontSize:10,color: t.color.primary}}>✓</span>}
-                    </div>
-                    <div style={{ height:1, background: t.color.borderLight, margin:'2px 0' }} />
-                    {options.map(opt => {
-                        const sel = value === opt;
-                        return (
-                            <div key={opt} onClick={() => { onChange(opt); setOpen(false); }} style={{ padding:'7px 12px', fontSize:12, fontWeight: sel?600:400, color: sel? t.color.primary : t.color.textSecondary, background: sel? t.color.primaryBg : 'transparent', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between' }}
-                                onMouseEnter={e => { if(!sel) e.currentTarget.style.background = t.color.bgHover; }}
-                                onMouseLeave={e => { if(!sel) e.currentTarget.style.background='transparent'; }}
-                            >
-                                {opt}
-                                {sel && <span style={{fontSize:10,color: t.color.primary}}>✓</span>}
-                            </div>
-                        );
-                    })}
-                </div>
-            )}
-        </div>
-    );
-}
-
-// ─── Toast ──────────────────────────────────────────────────────────────────────
-function Toast({ message, type = 'success', onClose }) {
-    useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t); }, []);
-    return (
-        <div style={{ position:'fixed', top:20, right:20, zIndex:10000, padding:'10px 16px', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)', display:'flex', alignItems:'center', gap:8, fontSize:13, fontWeight:500, background: type==='success'?'#065F46':'#991B1B', color:'#fff', animation:'slideDown 0.2s ease' }}>
-            {type==='success' ? <FiCheckCircle size={15}/> : <FiAlertCircle size={15}/>}
-            {message}
-            <button onClick={onClose} style={{ background:'none', border:'none', color:'rgba(255,255,255,0.7)', cursor:'pointer', display:'flex', marginLeft:4 }}><FiX size={13}/></button>
-        </div>
-    );
-}
-
-// ─── Loading Skeleton ───────────────────────────────────────────────────────────
-function TableSkeleton() {
-    return (
-        <div style={{ padding:20 }}>
-            {[1,2,3,4,5].map(i => (
-                <div key={i} style={{ display:'flex', gap:16, alignItems:'center', padding:'14px 0', borderBottom:'1px solid #F3F4F6' }}>
-                    <div style={{ width:13, height:13, borderRadius:3, background:'#F3F4F6' }} />
-                    <div style={{ width:30, height:30, borderRadius:'50%', background:'#F3F4F6' }} />
-                    <div style={{ flex:1 }}>
-                        <div style={{ width:`${50+i*10}%`, height:12, borderRadius:4, background:'#F3F4F6', marginBottom:4 }} />
-                        <div style={{ width:'40%', height:10, borderRadius:4, background:'#F9FAFB' }} />
-                    </div>
-                    <div style={{ width:60, height:20, borderRadius:10, background:'#F3F4F6' }} />
-                    <div style={{ width:70, height:20, borderRadius:10, background:'#F3F4F6' }} />
-                </div>
-            ))}
-        </div>
-    );
-}
-
-// ─── Main ───────────────────────────────────────────────────────────────────────
 export default function Users() {
     const store = useUserStore();
     const {
         users, stats, filterOptions, loading,
         search, filters, sortKey, sortDir, selectedIds,
-        fetchUsers, createUser, updateUser, deleteUser, bulkAction, exportCSV,
-        setSearch, setFilters, handleSort, toggleSelectAll, toggleSelectRow,
+        fetchUsers, exportCSV,
+        setFilters, toggleSelectAll, toggleSelectRow,
         clearSelection, resetFilters,
     } = store;
 
-    // ── Modal state ──
+    // ── Modal & UI state ──
     const [peekUser, setPeekUser] = useState(null);
     const [isPeekOpen, setIsPeekOpen] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-    const [toast, setToast] = useState(null);
 
-    // ── Fetch on mount and when filters/search change ──
-    useEffect(() => { fetchUsers(); }, [filters]);
-
-    const doSearch = useCallback(() => { fetchUsers(); }, [fetchUsers]);
+    // Search Debounce
+    const debouncedSearch = useDebounce(search, 300);
+    
     useEffect(() => {
-        const t = setTimeout(doSearch, 300);
-        return () => clearTimeout(t);
-    }, [search]);
+        fetchUsers();
+    }, [debouncedSearch, filters, fetchUsers]);
 
-    // ── Sort & filter users client-side (already filtered from service) ──
     const sortedUsers = useMemo(() => {
         const list = [...users];
         list.sort((a, b) => {
@@ -160,229 +52,319 @@ export default function Users() {
         return list;
     }, [users, sortKey, sortDir]);
 
-    const activeFilterCount = Object.values(filters).filter(v => v && v !== '').length;
+    const activeFilterCount = Object.values(filters).filter(v => v && v !== '' && v !== 'all').length;
 
     // ── Handlers ──
-    const showToast = (message, type='success') => setToast({ message, type });
 
-    const handleAddUser = () => { setEditingUser(null); setIsFormOpen(true); };
-    const handleEditUser = (user) => { setEditingUser(user); setIsFormOpen(true); };
-    const handleDeleteUser = (user) => setDeleteTarget(user);
+    const handleAddUser = () => {
+        setEditingUser(null);
+        setIsFormOpen(true);
+    };
 
-    const handleFormSubmit = async (formData) => {
-        if (editingUser) {
-            const res = await updateUser(editingUser.id, formData);
-            if (res.success) showToast(`${formData.name} updated successfully`);
-            return res;
+    const handleEditUser = (user) => {
+        setEditingUser(user);
+        setIsFormOpen(true);
+        setIsPeekOpen(false);
+    };
+
+    const handleFormSubmit = async (data) => {
+        const res = editingUser 
+            ? await store.updateUser(editingUser.id, data)
+            : await store.createUser(data);
+        
+        if (res.success) {
+            toast.success(editingUser ? 'Profile updated successfully' : 'User created successfully');
+            setIsFormOpen(false);
+            setEditingUser(null);
         } else {
-            const res = await createUser(formData);
-            if (res.success) showToast(`${formData.name} added successfully`);
-            return res;
+            toast.error(res.error || 'Failed to save user');
         }
+        return res;
+    };
+
+    const handleDeleteUser = (user) => {
+        setDeleteTarget(user);
+        setIsPeekOpen(false);
     };
 
     const handleConfirmDelete = async () => {
-        if (deleteTarget) {
-            const res = await deleteUser(deleteTarget.id);
-            if (res.success) showToast(`${deleteTarget.name} deleted`, 'success');
+        if (!deleteTarget) return;
+        const res = await store.deleteUser(deleteTarget.id);
+        if (res.success) {
+            toast.success('User deleted successfully');
             setDeleteTarget(null);
+        } else {
+            toast.error(res.error || 'Failed to delete user');
+        }
+    };
+
+    const handleBulkActivate = async () => {
+        const res = await store.bulkAction('activate');
+        if (res.success) {
+            toast.success(`${selectedIds.length} users activated`);
+        } else {
+            toast.error(res.error || 'Bulk activation failed');
+        }
+    };
+
+    const handleBulkDeactivate = async () => {
+        const res = await store.bulkAction('deactivate');
+        if (res.success) {
+            toast.success(`${selectedIds.length} users deactivated`);
+        } else {
+            toast.error(res.error || 'Bulk deactivation failed');
         }
     };
 
     const handleBulkDelete = async () => {
-        const res = await bulkAction('delete');
-        if (res?.success) showToast(`${selectedIds.length} users deleted`);
-        setBulkDeleteOpen(false);
+        const res = await store.bulkAction('delete');
+        if (res.success) {
+            toast.success(`${selectedIds.length} users deleted`);
+            setBulkDeleteOpen(false);
+        } else {
+            toast.error(res.error || 'Bulk deletion failed');
+        }
     };
 
-    const handleBulkActivate = async () => {
-        const res = await bulkAction('activate');
-        if (res?.success) showToast(`${selectedIds.length} users activated`);
-    };
-
-    const handleBulkDeactivate = async () => {
-        const res = await bulkAction('deactivate');
-        if (res?.success) showToast(`${selectedIds.length} users deactivated`);
-    };
-
-    // ── Sort Icon ──
-    const SortIcon = ({col}) => {
-        if(sortKey!==col) return <span style={{opacity:0.3,marginLeft:3,fontSize:10}}>↕</span>;
-        return <span style={{marginLeft:3,fontSize:10,color:'#4F46E5'}}>{sortDir==='asc'?'↑':'↓'}</span>;
-    };
-
-    // ── Stats Data ──
     const statsData = [
-        { label:'Total Users', value:stats.total,      icon:<FiUsers size={16}/>,       iconBg:'#EFF6FF', iconColor:'#2563EB', subValue: `${stats.active} Active / ${stats.inactive} Inactive` },
-        { label:'Active Users', value:stats.active,     icon:<FiCheckCircle size={16}/>,  iconBg:'#ECFDF5', iconColor:'#059669', trend: 12 },
-        { label:'Inactive',    value:stats.inactive,   icon:<FiAlertCircle size={16}/>,  iconBg:'#FEF2F2', iconColor:'#DC2626', trend: -5 },
-        { label:'Unassigned',  value:stats.unassigned,  icon:<FiClock size={16}/>,        iconBg:'#FFFBEB', iconColor:'#D97706' },
-    ];
-
-    const colHeaders = [
-        { label:'User', key:'name' },
-        { label:'Organization', key:'organization' },
-        { label:'Role', key:'role' },
-        { label:'Tags', key:'tags' },
-        { label:'Status', key:'status' },
+        { 
+            label: 'Total Users', 
+            value: stats.total, 
+            icon: FiUsers, 
+            iconColor: 'text-primary', 
+            iconBg: 'bg-primary/10',
+            subValue: `${stats.active} Active / ${stats.inactive} Inactive`
+        },
+        { 
+            label: 'Active Users', 
+            value: stats.active, 
+            icon: FiCheckCircle, 
+            iconColor: 'text-emerald-500', 
+            iconBg: 'bg-emerald-50',
+            trend: 12
+        },
+        { 
+            label: 'Inactive', 
+            value: stats.inactive, 
+            icon: FiAlertCircle, 
+            iconColor: 'text-rose-500', 
+            iconBg: 'bg-rose-50',
+            trend: -5
+        },
+        { 
+            label: 'Unassigned', 
+            value: stats.unassigned, 
+            icon: FiClock, 
+            iconColor: 'text-amber-500', 
+            iconBg: 'bg-amber-50' 
+        },
     ];
 
     return (
-        <div style={{ width:'100%' }}>
-            {/* Toast */}
-            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-
-            {/* Header */}
-            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:20 }}>
+        <div className="flex flex-col gap-6 p-4 md:p-8 max-w-[1600px] mx-auto min-h-screen">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 style={{ fontSize:20, fontWeight:700, color: t.color.text, margin:'0 0 3px 0', letterSpacing:'-0.3px' }}>User Management</h1>
-                    <p style={{ fontSize:12, color: t.color.textPlaceholder, margin:0 }}>Manage platform users, roles &amp; permissions</p>
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">User Management</h1>
+                    <p className="text-[13px] font-semibold text-slate-500 mt-1">Manage platform users, roles & enterprise permissions</p>
                 </div>
-                <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-                    <button onClick={exportCSV} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 13px', fontSize:12, fontWeight:500, color: t.color.textSecondary, background: t.color.bg, border: `1px solid ${t.color.border}`, borderRadius:7, cursor:'pointer' }}>
-                        <FiDownload size={13} /> Export
-                    </button>
-                    <button onClick={handleAddUser} style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 15px', fontSize:12, fontWeight:600, color: t.color.textInverse, background: t.color.primary, border: `1px solid ${t.color.primaryDark}`, borderRadius:7, cursor:'pointer' }}>
-                        <FiPlus size={13} /> Add User
-                    </button>
+                <div className="flex items-center gap-3">
+                    <Button 
+                        variant="outline"
+                        onClick={exportCSV} 
+                        icon={FiDownload}
+                        className="!h-10 !px-4 !text-[13px] !font-bold"
+                    >
+                        Export
+                    </Button>
+                    <Button 
+                        variant="primary"
+                        onClick={handleAddUser} 
+                        icon={FiPlus}
+                        className="!h-10 !px-5 !text-[13px] !font-black !bg-[#072267] hover:!bg-[#072267]/95"
+                    >
+                        Add User
+                    </Button>
                 </div>
             </div>
 
-            {/* Stats */}
-            <StatsRow items={statsData} gap={12} style={{ marginBottom:16 }} />
+            {/* Stats Section */}
+            <StatsRow items={statsData} />
 
-            {/* Toolbar */}
-            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12, flexWrap:'wrap' }}>
-                <div style={{ position:'relative', width:260, flexShrink:0 }}>
-                    <span style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#9CA3AF', pointerEvents:'none', display:'flex' }}><FiSearch size={13}/></span>
-                    <input
-                        style={{ width:'100%', paddingLeft:32, paddingRight:28, paddingTop:7, paddingBottom:7, fontSize:13, background:'#fff', border:'1px solid #E5E7EB', borderRadius:7, outline:'none', boxSizing:'border-box', color:'#111827' }}
-                        placeholder="Search users..."
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
+            {/* Toolbar Section */}
+            <div className="bg-white border border-slate-100 p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-20">
+                <div className="flex flex-wrap items-center gap-2.5 flex-1">
+                    <FilterDropdown 
+                        label="Role" 
+                        value={filters.role} 
+                        options={filterOptions.roles} 
+                        onChange={v => setFilters({...filters, role:v})} 
+                        allLabel="All Roles" 
                     />
-                    {search && <button onClick={() => setSearch('')} style={{ position:'absolute', right:8, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#9CA3AF', display:'flex', padding:2 }}><FiX size={12}/></button>}
+                    <FilterDropdown 
+                        label="Organization" 
+                        value={filters.organization} 
+                        options={filterOptions.organizations} 
+                        onChange={v => setFilters({...filters, organization:v, region: ''})} 
+                        allLabel="All Orgs" 
+                    />
+                    <FilterDropdown 
+                        label="Zone" 
+                        value={filters.region} 
+                        options={filterOptions.regions} 
+                        onChange={v => setFilters({...filters, region:v})} 
+                        allLabel="All Zones" 
+                    />
+
+                    <div className="h-6 w-[1px] bg-slate-200 mx-1 hidden md:block" />
+
+                    <FilterDropdown 
+                        label="Status" 
+                        value={filters.status} 
+                        options={[
+                            { value: 'active', label: 'Active Only' },
+                            { value: 'inactive', label: 'Inactive Only' }
+                        ]} 
+                        onChange={v => setFilters({...filters, status:v})} 
+                        allLabel="Any Status" 
+                    />
+                    <FilterDropdown 
+                        label="Assignment" 
+                        value={filters.assignment} 
+                        options={[
+                            { value: 'assigned', label: 'Assigned' },
+                            { value: 'unassigned', label: 'Unassigned' }
+                        ]} 
+                        onChange={v => setFilters({...filters, assignment:v})} 
+                        allLabel="Any Assignment" 
+                    />
+                    <FilterDropdown 
+                        label="Time Range" 
+                        value={filters.timeRange} 
+                        options={[
+                            { value: 'today', label: 'Today' },
+                            { value: '7d', label: 'Last 7 Days' },
+                            { value: '30d', label: 'Last 30 Days' }
+                        ]} 
+                        onChange={v => setFilters({...filters, timeRange:v})} 
+                        allLabel="All Time"
+                        icon={<FiCalendar size={14} />}
+                    />
+
+                    {activeFilterCount > 0 && (
+                        <Button 
+                            variant="ghost" 
+                            onClick={resetFilters} 
+                            className="!px-2 !py-1 !text-[10px] !font-black !text-rose-500 !uppercase !tracking-widest hover:!text-rose-600 group"
+                        >
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 group-hover:animate-pulse mr-1" />
+                            Clear All
+                        </Button>
+                    )}
                 </div>
 
-                <div style={{ width:1, height:24, background:'#E5E7EB' }} />
-
-                <FilterDropdown label="Role" value={filters.role} options={filterOptions.roles} onChange={v => setFilters({...filters, role:v})} allLabel="All Roles" />
-                <FilterDropdown label="Status" value={filters.status} options={['active','inactive']} onChange={v => setFilters({...filters, status:v})} allLabel="All Statuses" />
-                <FilterDropdown label="Organization" value={filters.organization} options={filterOptions.organizations} onChange={v => setFilters({...filters, organization:v})} allLabel="All Orgs" />
-                
-                {/* Date Filter (Mini) */}
-                <div style={{ display:'flex', alignItems:'center', gap:6, padding:'6px 10px', background:'#fff', border:'1px solid #E5E7EB', borderRadius:7, cursor:'pointer' }}>
-                    <FiCalendar size={13} color="#6B7280" />
-                    <span style={{ fontSize:12, fontWeight:500, color:'#374151' }}>Date Range: All Time</span>
-                </div>
-
-                {activeFilterCount > 0 && <button onClick={resetFilters} style={{ fontSize:11, color:'#EF4444', fontWeight:500, cursor:'pointer', background:'none', border:'none', padding:'4px 8px' }}>Clear all</button>}
-
-                <div style={{ display:'flex', alignItems:'center', gap:8, marginLeft:'auto' }}>
-                    <button onClick={fetchUsers} title="Refresh" style={{ display:'flex', alignItems:'center', padding:'7px 10px', fontSize:12, fontWeight:500, color:'#374151', background:'#fff', border:'1px solid #E5E7EB', borderRadius:7, cursor:'pointer' }}><FiRefreshCw size={13} /></button>
-                    <span style={{ fontSize:12, color:'#6B7280', whiteSpace:'nowrap' }}><strong style={{color:'#111827'}}>{sortedUsers.length}</strong> / {stats.total} users</span>
+                <div className="flex items-center gap-2.5 whitespace-nowrap lg:border-l lg:border-slate-100 lg:pl-4">
+                    <Button 
+                        variant="outline"
+                        onClick={fetchUsers} 
+                        title="Refresh Data"
+                        className="!p-2 !h-9 !w-9 !rounded-xl"
+                        icon={FiRefreshCw}
+                    />
+                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
+                        <strong className="text-slate-900">{sortedUsers.length}</strong> / {stats.total} Users
+                    </span>
                 </div>
             </div>
 
-            {/* Bulk Bar */}
-            {selectedIds.length > 0 && (
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'9px 12px', marginBottom:10, background:'#EEF2FF', border:'1px solid #C7D2FE', borderRadius:7 }}>
-                    <span style={{ fontSize:12, fontWeight:600, color:'#4338CA' }}>{selectedIds.length} selected</span>
-                    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                        <button style={{ display:'flex', alignItems:'center', gap:5, padding:'4px 10px', fontSize:11, fontWeight:600, color:'#065F46', background:'#D1FAE5', border:'none', borderRadius:5, cursor:'pointer' }} onClick={handleBulkActivate}><FiUserCheck size={12}/> Activate</button>
-                        <button style={{ display:'flex', alignItems:'center', gap:5, padding:'4px 10px', fontSize:11, fontWeight:600, color:'#92400E', background:'#FEF3C7', border:'none', borderRadius:5, cursor:'pointer' }} onClick={handleBulkDeactivate}><FiUserX size={12}/> Deactivate</button>
-                        <button style={{ display:'flex', alignItems:'center', gap:5, padding:'4px 10px', fontSize:11, fontWeight:600, color:'#991B1B', background:'#FEE2E2', border:'none', borderRadius:5, cursor:'pointer' }} onClick={() => setBulkDeleteOpen(true)}><FiTrash2 size={12}/> Delete</button>
-                        <button style={{ fontSize:11, color:'#6B7280', background:'none', border:'none', cursor:'pointer', marginLeft:4 }} onClick={clearSelection}>Cancel</button>
-                    </div>
-                </div>
-            )}
+            {/* Bulk Actions Bar */}
+            <AnimatePresence>
+                {selectedIds.length > 0 && (
+                    <Motion.div 
+                        initial={{ opacity: 0, y: 10, height: 0 }}
+                        animate={{ opacity: 1, y: 0, height: 'auto' }}
+                        exit={{ opacity: 0, y: 10, height: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="flex items-center justify-between px-6 py-3 bg-white border border-[#072267]/10 rounded-2xl mb-3 shadow-[0_10px_40px_rgba(7,34,103,0.08)]">
+                            <div className="flex items-center gap-4">
+                                <div className="w-8 h-8 rounded-full bg-[#072267] text-white flex items-center justify-center text-xs font-black shadow-lg shadow-[#072267]/20">
+                                    {selectedIds.length}
+                                </div>
+                                <span className="text-[13px] font-black text-[#072267]">Users Selected</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Button onClick={handleBulkActivate} icon={FiUserCheck} variant="outline" className="!h-8 !px-4 !text-xs !bg-emerald-50 !text-emerald-600 !border-emerald-100 hover:!bg-emerald-100">
+                                    Activate
+                                </Button>
+                                <Button onClick={handleBulkDeactivate} icon={FiUserX} variant="outline" className="!h-8 !px-4 !text-xs !bg-amber-50 !text-amber-600 !border-amber-100 hover:!bg-amber-100">
+                                    Deactivate
+                                </Button>
+                                <Button onClick={() => setBulkDeleteOpen(true)} icon={FiTrash2} variant="outline" className="!h-8 !px-4 !text-xs !bg-rose-50 !text-rose-600 !border-rose-100 hover:!bg-rose-100">
+                                    Delete
+                                </Button>
+                                <div className="w-px h-6 bg-slate-200 mx-2" />
+                                <Button variant="ghost" onClick={clearSelection} className="!h-8 !px-3 !text-[10px] !font-black !text-slate-400 hover:!text-slate-600 !uppercase !tracking-widest">Cancel</Button>
+                            </div>
+                        </div>
+                    </Motion.div>
+                )}
+            </AnimatePresence>
 
-            {/* Table */}
-            <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:12, overflow:'hidden', boxShadow: t.shadow.card, transition: `box-shadow ${t.transition.base}` }}>
-                {loading && users.length === 0 ? (
+            {/* Main Table Area */}
+            <div className="bg-white border border-slate-100 rounded-[20px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] min-h-[400px] flex flex-col relative transition-all duration-300">
+                {loading ? (
                     <TableSkeleton />
                 ) : (
-                    <table style={{ width:'100%', borderCollapse:'collapse', minWidth:700 }}>
-                        <thead style={{ background:'#F9FAFB', borderBottom:'1px solid #E5E7EB' }}>
-                            <tr>
-                                <th style={{ padding:'9px 10px', width:36 }}>
-                                    <input type="checkbox" style={{ width:13, height:13, cursor:'pointer', accentColor:'#4F46E5' }} checked={sortedUsers.length>0 && selectedIds.length===sortedUsers.length} onChange={() => toggleSelectAll(sortedUsers.map(u=>u.id))}/>
-                                </th>
-                                {colHeaders.map(h => (
-                                    <th key={h.key} style={{ padding:'9px 12px', fontSize:11, fontWeight:600, color:'#6B7280', textTransform:'uppercase', letterSpacing:'0.06em', textAlign:'left', cursor:'pointer', userSelect:'none' }} onClick={() => handleSort(h.key)}>
-                                        {h.label}<SortIcon col={h.key}/>
-                                    </th>
-                                ))}
-                                <th style={{ padding:'9px 12px', fontSize:11, fontWeight:600, color:'#6B7280', textTransform:'uppercase', letterSpacing:'0.06em', textAlign:'right' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sortedUsers.map(user => {
-                                const {initials,colors} = getAvatar(user.name);
-                                const isSel = selectedIds.includes(user.id);
-                                return (
-                                    <tr key={user.id} style={{ background: isSel?'#EEF2FF':'transparent', cursor:'pointer' }}
-                                        onClick={() => { setPeekUser(user); setIsPeekOpen(true); }}
-                                        onMouseEnter={e => { if(!isSel) e.currentTarget.style.background='#F9FAFB'; }}
-                                        onMouseLeave={e => { e.currentTarget.style.background = isSel?'#EEF2FF':'transparent'; }}
-                                    >
-                                        <td style={{ padding:'10px 10px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }} onClick={e => e.stopPropagation()}>
-                                            <input type="checkbox" style={{ width:13, height:13, cursor:'pointer', accentColor:'#4F46E5' }} checked={isSel} onChange={() => toggleSelectRow(user.id)}/>
-                                        </td>
-                                        <td style={{ padding:'10px 12px', fontSize:13, color:'#374151', whiteSpace:'nowrap', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}>
-                                            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                                                <div style={{ width:30,height:30,borderRadius:'50%',flexShrink:0,background:`linear-gradient(135deg,${colors[0]},${colors[1]})`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:'#fff' }}>{initials}</div>
-                                                <div>
-                                                    <div style={{ fontSize:13, fontWeight:600, color:'#111827', lineHeight:1.2 }}>{user.name}</div>
-                                                    <div style={{ fontSize:11, color:'#9CA3AF', marginTop:1 }}>{user.email}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td style={{ padding:'10px 12px', fontSize:13, color:'#374151', whiteSpace:'nowrap', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}>
-                                            {user.organization ? <span>{user.organization}</span> : <span style={{color:'#D1D5DB',fontStyle:'italic',fontSize:12}}>Not assigned</span>}
-                                        </td>
-                                        <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}><RoleBadge role={user.role}/></td>
-                                        <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}>
-                                            <div style={{ display:'flex', gap:4 }}>
-                                                {user.id % 3 === 0 && <span style={{ padding:'2px 6px', fontSize:10, fontWeight:700, borderRadius:4, background:'#EEF2FF', color:'#4F46E5', border:'1px solid #C7D2FE' }}>CRITICAL</span>}
-                                                {user.id % 2 === 0 ? <span style={{ padding:'2px 6px', fontSize:10, fontWeight:700, borderRadius:4, background:'#F0FDF4', color:'#16A34A', border:'1px solid #BBF7D0' }}>VERIFIED</span> : <span style={{ padding:'2px 6px', fontSize:10, fontWeight:700, borderRadius:4, background:'#F8FAFC', color:'#64748B', border:'1px solid #E2E8F0' }}>STANDARD</span>}
-                                            </div>
-                                        </td>
-                                        <td style={{ padding:'10px 12px', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }}><StatusBadge type={user.status} text={user.status==='active'?'Active':'Inactive'}/></td>
-                                        <td style={{ padding:'10px 12px', textAlign:'right', verticalAlign:'middle', borderBottom:'1px solid #F3F4F6' }} onClick={e => e.stopPropagation()}>
-                                            <button
-                                                onClick={() => { setPeekUser(user); setIsPeekOpen(true); }}
-                                                style={{ padding:'4px 9px', fontSize:11, fontWeight:600, color:'#4F46E5', background:'none', border:'1px solid transparent', borderRadius:5, cursor:'pointer' }}
-                                                onMouseEnter={e => { e.currentTarget.style.background='#EEF2FF'; e.currentTarget.style.borderColor='#C7D2FE'; }}
-                                                onMouseLeave={e => { e.currentTarget.style.background='none'; e.currentTarget.style.borderColor='transparent'; }}
-                                            >View</button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                )}
-
-                {!loading && sortedUsers.length === 0 && (
-                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'56px 20px', textAlign:'center' }}>
-                        <div style={{ width:44, height:44, background:'#F3F4F6', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}><FiUsers size={20} color="#9CA3AF"/></div>
-                        <div style={{ fontSize:14, fontWeight:600, color:'#111827', marginBottom:4 }}>No users found</div>
-                        <div style={{ fontSize:12, color:'#6B7280', marginBottom:14 }}>Try adjusting your search or filters</div>
-                        <button onClick={resetFilters} style={{ fontSize:12, fontWeight:600, color:'#4F46E5', background:'none', border:'1px solid #C7D2FE', borderRadius:6, padding:'5px 14px', cursor:'pointer' }}>Reset filters</button>
+                    <div className="flex-1 flex flex-col">
+                        <UserTable 
+                            data={sortedUsers}
+                            selectedIds={selectedIds}
+                            onSelectionChange={(ids) => store.setSelectedIds(ids)} 
+                            onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
+                            onEdit={handleEditUser}
+                            toggleSelectAll={() => toggleSelectAll(sortedUsers.map(u=>u.id))}
+                            toggleSelectRow={toggleSelectRow}
+                        />
+                    
+                        {sortedUsers.length === 0 && (
+                            <div className="flex-1 flex flex-col items-center justify-center p-16 text-center">
+                                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
+                                    <FiUsers size={28} className="text-slate-300"/>
+                                </div>
+                                <h3 className="text-lg font-black text-slate-900 tracking-tight">No Results Found</h3>
+                                <p className="text-[13px] font-semibold text-slate-500 mb-6 max-w-xs mx-auto">
+                                    Try adjusting your search terms or filters to find what you&apos;re looking for.
+                                </p>
+                                <Button 
+                                    onClick={resetFilters} 
+                                    variant="primary"
+                                    className="!px-5 !py-2 !bg-slate-900 hover:!bg-slate-800 !rounded-xl !font-black !text-[11px] !uppercase !tracking-widest shadow-lg shadow-slate-900/10"
+                                >
+                                    Reset All Filters
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 )}
 
+                {/* Footer Bar */}
                 {sortedUsers.length > 0 && (
-                    <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'9px 14px', background:'#F9FAFB', borderTop:'1px solid #F3F4F6' }}>
-                        <span style={{ fontSize:12, color:'#6B7280' }}>
-                            Displaying <strong>{sortedUsers.length}</strong> user{sortedUsers.length!==1?'s':''} total
+                    <div className="px-6 py-2.5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            Database synchronized
                         </span>
+                        <div className="flex items-center gap-2">
+                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                                {sortedUsers.length} profile{sortedUsers.length!==1?'s':''} listed
+                             </span>
+                        </div>
                     </div>
                 )}
             </div>
 
-            {/* ── Modals ── */}
+            {/* Modals */}
             <UserPeekView
                 isOpen={isPeekOpen}
                 onClose={() => setIsPeekOpen(false)}
@@ -405,7 +387,7 @@ export default function Users() {
                 onConfirm={handleConfirmDelete}
                 title="Delete User"
                 message={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
-                confirmText="Delete"
+                confirmText="Delete Profile"
                 danger={true}
                 loading={loading}
             />
@@ -414,16 +396,12 @@ export default function Users() {
                 isOpen={bulkDeleteOpen}
                 onClose={() => setBulkDeleteOpen(false)}
                 onConfirm={handleBulkDelete}
-                title="Delete Selected Users"
-                message={`Are you sure you want to delete ${selectedIds.length} selected users? This action cannot be undone.`}
-                confirmText={`Delete ${selectedIds.length} Users`}
+                title="Bulk Delete"
+                message={`You are about to permanently delete ${selectedIds.length} users. This action is irreversible.`}
+                confirmText={`Confirm Delete (${selectedIds.length})`}
                 danger={true}
                 loading={loading}
             />
-
-            <style>{`
-                @keyframes slideDown { from { transform: translateY(-20px); opacity:0; } to { transform: translateY(0); opacity:1; } }
-            `}</style>
         </div>
     );
 }

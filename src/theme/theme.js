@@ -29,7 +29,7 @@ const color = {
 
     // Backgrounds
     bg:             '#FFFFFF',
-    bgPage:         '#eef1f5ff',
+    bgPage:         '#f3f3f3',
     bgHover:        '#F9FAFB',
     bgMuted:        '#F3F4F6',
     bgDark:         '#F9FAFB',
@@ -95,7 +95,7 @@ const color = {
         ['#3B82F6', '#06B6D4'],
         ['#F43F5E', '#FB923C'],
         ['#10B981', '#3B82F6'],
-        ['#F59E0B', '#EF4444'],
+        ['#F59E0B', '#ef4444ff'],
     ],
 
     // Overlay / Backdrop
@@ -127,7 +127,7 @@ const radius = {
     lg:   8,
     xl:   10,
     '2xl':12,
-    pill:  20,
+    pill:  24,
     full:  9999,
     circle:'50%',
 };
@@ -160,8 +160,8 @@ const shadow = {
     none:   'none',
     xs:     '0 1px 2px rgba(0,0,0,0.04)',
     sm:     '0 1px 3px rgba(0,0,0,0.04), 0 0 1px rgba(0,0,0,0.05)',
-    card:   '0 4px 12px rgba(0, 0, 0, 0.23), 0 0 1px rgba(0,0,0,0.05)',
-    cardHover:'0 12px 28px rgba(0, 0, 0, 0.21), 0 0 1px rgba(0,0,0,0.05)',
+    card:   '0 4px 12px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0,0,0,0.05)',
+    cardHover:'0 12px 28px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.26)',
     md:     '0 4px 12px rgba(0,0,0,0.08)',
     lg:     '0 8px 24px rgba(0,0,0,0.1)',
     xl:     '0 20px 60px rgba(0,0,0,0.15)',
@@ -191,7 +191,7 @@ const layout = {
 
 // ── Z-Index Scale ───────────────────────────────────────────────────────────────
 const zIndex = {
-    dropdown:  50,
+    dropdown:  2000,
     sidebar:   1000,
     overlay:   9998,
     modal:     9999,

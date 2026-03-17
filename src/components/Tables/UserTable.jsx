@@ -1,113 +1,162 @@
+import React, { useMemo } from 'react';
 import Table from '../UI/Table';
-import DotStatus from '../UI/DotStatus';
 import UserAvatar from '../UI/UserAvatar';
-import { FiExternalLink } from 'react-icons/fi';
+import { FiExternalLink, FiEdit2 } from 'react-icons/fi';
+import Badge from '../UI/Badge';
+import DotStatus from '../UI/DotStatus';
+import Button from '../UI/Button';
 
-const ROLE_STYLE = {
-    coordinator:    { bg: '#F5F3FF', color: '#6D28D9', border: '#DDD6FE' },
-    'field officer':{ bg: '#EFF6FF', color: '#1D4ED8', border: '#BFDBFE' },
-    admin:          { bg: '#FFFBEB', color: '#B45309', border: '#FDE68A' },
-};
+const UserTable = ({
+    data = [],
+    selectedIds = [],
+    onSelectionChange,
+    onRowClick,
+    onEdit
+}) => {
 
-const UserTable = ({ data = [], selectedIds = [], onSelectionChange, onRowClick }) => {
-    const columns = [
+    const columns = useMemo(() => [
         {
-            header: 'User',
+            header: 'Personnel Profile',
             accessor: 'name',
+            minWidth: '240px',
             render: (_, row) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <UserAvatar name={row.name} size="30px" fontSize="11px" />
-                    <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', lineHeight: 1.2 }}>{row.name}</div>
-                        <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>{row.email}</div>
+                <div className="flex items-center gap-3 sm:gap-4 py-1.5">
+                    <div className="relative group/avatar shrink-0">
+                        <UserAvatar
+                            name={row?.name}
+                            size="44px"
+                            className="shadow-[0_4px_12px_rgba(0,0,0,0.08)] border-2 border-white ring-1 ring-slate-100/50 group-hover/avatar:scale-110 transition-all duration-500 ease-out"
+                        />
+
+                        <div
+                            className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm transition-transform duration-300 group-hover/avatar:scale-110
+                            ${row?.status?.toLowerCase?.() === 'active'
+                                    ? 'bg-emerald-500'
+                                    : 'bg-slate-300'
+                                }`}
+                        />
+                    </div>
+
+                    <div className="min-w-0">
+                        <div className="text-[14px] font-bold text-slate-800 tracking-[-0.01em] leading-tight truncate transition-colors duration-300">
+                            {row?.name}
+                        </div>
+
+                        <div className="text-[11px] font-medium text-slate-400 tracking-normal mt-0.5 truncate transition-colors duration-300">
+                            {row?.email}
+                        </div>
                     </div>
                 </div>
             )
         },
+
         {
             header: 'Organization',
             accessor: 'organization',
-            render: value => (
-                <span style={{ fontSize: 13, color: value ? '#374151' : '#D1D5DB', fontStyle: value ? 'normal' : 'italic' }}>
-                    {value || 'Not assigned'}
-                </span>
-            )
-        },
-        {
-            header: 'Role',
-            accessor: 'role',
-            render: value => {
-                const s = ROLE_STYLE[value?.toLowerCase()] || { bg: '#F3F4F6', color: '#374151', border: '#E5E7EB' };
-                return (
-                    <span style={{
-                        display: 'inline-block',
-                        padding: '2px 10px',
-                        fontSize: 11, fontWeight: 600,
-                        background: s.bg, color: s.color,
-                        border: `1px solid ${s.border}`,
-                        borderRadius: 20,
-                    }}>
-                        {value}
+            minWidth: '180px',
+            render: (value) => (
+                <div className="flex flex-col py-1">
+                    <span className={`text-[13px] font-bold truncate ${value
+                        ? 'text-slate-700'
+                        : 'text-slate-400 italic font-medium'
+                        }`}>
+                        {value || 'Contractor'}
                     </span>
-                );
-            }
+
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.1em] mt-1 opacity-80">
+                        Primary Unit
+                    </span>
+                </div>
+            )
         },
+
         {
-            header: 'Assignment',
+            header: 'Access Level',
+            accessor: 'role',
+            align: 'center',
+            minWidth: '140px',
+            render: (value) => (
+                <Badge
+                    color={value}
+                    variant="light"
+                    size="sm"
+                    className="font-bold uppercase tracking-[0.12em] text-[9.5px] px-2.5 py-1 rounded-lg"
+                >
+                    {value}
+                </Badge>
+            )
+        },
+
+        {
+            header: 'Operational Status',
             accessor: 'assignment',
-            render: value => (
-                <DotStatus
-                    type={value?.toLowerCase() === 'assigned' ? 'assigned' : 'unassigned'}
-                    text={value}
-                />
+            align: 'center',
+            minWidth: '150px',
+            render: (value) => (
+                <div className="flex justify-center">
+                    <DotStatus
+                        type={value}
+                        text={value === 'assigned' ? 'Assigned' : 'Standby'}
+                        size="sm"
+                        className="font-bold uppercase tracking-wider text-[10px]"
+                    />
+                </div>
             )
         },
+
         {
-            header: 'Status',
-            accessor: 'status',
-            render: value => (
-                <DotStatus
-                    type={value?.toLowerCase()}
-                    text={value}
-                />
-            )
-        },
-        {
-            header: '',
+            header: 'Actions',
             accessor: 'actions',
+            minWidth: '160px',
             render: (_, row) => (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
-                    <button
-                        title="View profile"
-                        onClick={e => { e.stopPropagation(); onRowClick && onRowClick(row); }}
-                        style={{ padding: '4px 6px', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', borderRadius: 5 }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.color = '#374151'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#9CA3AF'; }}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-2 justify-end">
+                    <Button
+                        variant="ghost"
+                        aria-label="View user"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onRowClick && onRowClick(row);
+                        }}
+                        className="!h-11 sm:!h-9 !w-full sm:!w-9 !rounded-xl text-slate-500 hover:!text-primary hover:!bg-primary/5 transition-all duration-300 border border-slate-100 sm:border-none shadow-sm sm:shadow-none bg-slate-50/30 sm:bg-transparent"
+                        icon={FiExternalLink}
+                        iconSize={18}
                     >
-                        <FiExternalLink size={13} />
-                    </button>
-                    <button
-                        onClick={e => { e.stopPropagation(); row.onEdit && row.onEdit(row); }}
-                        style={{ padding: '4px 10px', fontSize: 12, fontWeight: 600, color: '#4F46E5', background: 'none', border: '1px solid transparent', borderRadius: 6, cursor: 'pointer' }}
-                        onMouseEnter={e => { e.currentTarget.style.background = '#EEF2FF'; e.currentTarget.style.border = '1px solid #C7D2FE'; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.border = '1px solid transparent'; }}
+                        <span className="sm:hidden font-bold text-[11px] uppercase tracking-wider ml-2">View Full Profile</span>
+                    </Button>
+
+                    <Button
+                        variant="primary"
+                        aria-label="Edit user"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit && onEdit(row);
+                        }}
+                        className="!h-11 sm:!h-9 !px-4 sm:!px-5 !w-full sm:!w-auto !rounded-xl sm:!rounded-lg !text-[11px] !font-bold !uppercase !tracking-wider shadow-[0_4px_12px_rgba(var(--color-primary-rgb),0.15)] hover:shadow-[0_6px_16px_rgba(var(--color-primary-rgb),0.25)] transition-all duration-300"
+                        icon={FiEdit2}
+                        iconSize={14}
                     >
-                        Edit
-                    </button>
+                        Edit Personnel
+                    </Button>
                 </div>
             )
         }
-    ];
+
+    ], [onRowClick, onEdit]);
+
 
     return (
-        <Table
-            columns={columns}
-            data={data}
-            selectable={true}
-            selectedIds={selectedIds}
-            onSelectionChange={onSelectionChange}
-            onRowClick={onRowClick}
-        />
+        <div className="w-full overflow-x-auto">
+            <Table
+                columns={columns}
+                data={data}
+                selectable
+                selectedIds={selectedIds}
+                onSelectionChange={onSelectionChange}
+                onRowClick={onRowClick}
+                className="rounded-xl overflow-hidden"
+                emptyMessage="No personnel records found"
+            />
+        </div>
     );
 };
 

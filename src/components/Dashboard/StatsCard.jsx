@@ -1,85 +1,55 @@
 import React from 'react';
-import { t } from '../../theme/theme';
+import { FiArrowUpRight, FiArrowDownRight } from 'react-icons/fi';
 
 /**
  * Global StatsCard — Reusable across all pages.
  */
-const StatsCard = ({ label, value, icon, iconBg = t.color.bgMuted, iconColor = t.color.textMuted, trend, subValue, style = {} }) => {
+const StatsCard = ({ 
+    label, 
+    value, 
+    icon, 
+    iconBg = 'bg-slate-100', 
+    iconColor = 'text-slate-600', 
+    trend, 
+    subValue, 
+    className = "" 
+}) => {
     return (
         <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 14,
-                padding: `${t.space.xl}px ${t.space['2xl']}px`,
-                background: t.color.bg,
-                border: `1px solid #F0F0F0`,
-                borderRadius: t.radius['2xl'],
-                boxShadow: t.shadow.card,
-                minWidth: 0,
-                flex: '1 1 0',
-                cursor: 'default',
-                transition: `all ${t.transition.base}`,
-                ...style,
-            }}
-            onMouseEnter={e => { 
-                e.currentTarget.style.boxShadow = t.shadow.cardHover;
-                e.currentTarget.style.transform = 'translateY(-4px)';
-            }}
-            onMouseLeave={e => { 
-                e.currentTarget.style.boxShadow = t.shadow.card;
-                e.currentTarget.style.transform = 'translateY(0)';
-            }}
+            className={`flex items-center gap-4 p-5 bg-white border border-slate-200/60 rounded-2xl cursor-default relative overflow-hidden group 
+                transition-all duration-500 hover:-translate-y-1.5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-12px_rgba(7,34,103,0.12)] ${className}`}
         >
-            {icon && (
-                <div
-                    style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: t.radius.circle,
-                        background: iconBg,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: iconColor,
-                        flexShrink: 0,
-                    }}
-                >
-                    {icon}
-                </div>
-            )}
-            <div style={{ minWidth: 0, flex: 1 }}>
-                <div style={{
-                    fontSize: t.fontSize.xs,
-                    fontWeight: t.fontWeight.medium,
-                    color: t.color.textPlaceholder,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    marginBottom: 3,
-                }}>
+            {/* Subtle Gradient Hover Effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+            {/* Icon Container */}
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-black/5 transition-transform group-hover:scale-110 duration-300 ${iconBg} ${iconColor}`}>
+                {icon && (() => {
+                    const IconComponent = icon;
+                    return React.isValidElement(icon) 
+                        ? React.cloneElement(icon, { size: 20 })
+                        : <IconComponent size={20} />;
+                })()}
+            </div>
+
+            {/* Content Container */}
+            <div className="min-w-0 flex-1 relative z-10">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 font-sans">
                     {label}
                 </div>
-                <div style={{
-                    fontSize: t.fontSize['5xl'],
-                    fontWeight: t.fontWeight.bold,
-                    color: t.color.text,
-                    lineHeight: 1,
-                    display: 'flex',
-                    alignItems: 'baseline',
-                    gap: 8
-                }}>
-                    {value}
+                <div className="flex items-baseline gap-2">
+                    <div className="text-2xl font-black text-slate-900 leading-none font-sans tracking-tight">
+                        {value}
+                    </div>
                     {trend !== undefined && (
-                        <span style={{ fontSize: 11, fontWeight: 700, color: trend > 0 ? '#059669' : '#DC2626', background: trend > 0 ? '#ECFDF5' : '#FEF2F2', padding: '2px 6px', borderRadius: 6 }}>
-                            {trend > 0 ? '+' : ''}{trend}%
-                        </span>
+                        <div className={`text-[11px] font-black flex items-center gap-0.5 px-1.5 py-0.5 rounded-lg ${trend > 0 ? 'text-emerald-600 bg-emerald-50/50' : 'text-rose-600 bg-rose-50/50'}`}>
+                            {trend > 0 ? <FiArrowUpRight size={12} /> : <FiArrowDownRight size={12} />}
+                            {Math.abs(trend)}%
+                        </div>
                     )}
                 </div>
                 {subValue && (
-                    <div style={{ fontSize: 10, fontWeight: 700, color: t.color.textPlaceholder, marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    <div className="text-[11px] font-semibold text-slate-500 mt-1 truncate">
                         {subValue}
                     </div>
                 )}
@@ -91,14 +61,16 @@ const StatsCard = ({ label, value, icon, iconBg = t.color.bgMuted, iconColor = t
 /**
  * StatsRow — A responsive grid row of StatsCards.
  */
-export const StatsRow = ({ items = [], gap = 12, style = {} }) => {
+export const StatsRow = ({ items = [], columns = 4, className = "" }) => {
+    const gridCols = {
+        1: 'grid-cols-1',
+        2: 'grid-cols-1 sm:grid-cols-2',
+        3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+        4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+    }[columns] || 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+
     return (
-        <div style={{
-            display: 'grid',
-            gridTemplateColumns: `repeat(${items.length}, 1fr)`,
-            gap,
-            ...style,
-        }}>
+        <div className={`grid gap-4 w-full ${gridCols} ${className}`}>
             {items.map((item, i) => (
                 <StatsCard key={i} {...item} />
             ))}

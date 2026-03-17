@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { registerSchema } from '../../schema/authSchema';
 import AuthForm from '../../components/Auth/AuthForm';
@@ -9,13 +9,13 @@ import InputField from "../../components/UI/InputField";
 import SelectField from "../../components/UI/SelectField";
 import Checkbox from "../../components/UI/Checkbox";
 import { MailIcon, LockIcon, UserIcon } from "../../assets/icon";
-import { t } from '../../theme/theme';
+import { FiAlertCircle } from 'react-icons/fi';
 
 function RegistrationPage() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
-    const onSubmit = async (data) => {
+    const onSubmit = async () => {
         setIsLoading(true);
         try {
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -40,8 +40,14 @@ function RegistrationPage() {
             loadingText="Creating account..."
             grid={true}
             footer={
-                <span style={{ fontWeight: 500 }}>
-                    Already have an account? <a href="/login" style={{ color: t.color.primary, fontWeight: 700, textDecoration: 'none', marginLeft: '6px', borderBottom: '1.5px solid transparent', transition: 'all 0.2s ease' }} onMouseEnter={(e) => e.target.style.borderBottomColor = t.color.primary} onMouseLeave={(e) => e.target.style.borderBottomColor = 'transparent'}>Sign in here</a>
+                <span className="font-semibold text-slate-500">
+                    Already have an account? 
+                    <a 
+                        href="/login" 
+                        className="text-primary font-black ml-1.5 border-b-2 border-transparent hover:border-primary transition-all duration-300"
+                    >
+                        Sign in here
+                    </a>
                 </span>
             }
         >
@@ -55,7 +61,6 @@ function RegistrationPage() {
                             icon={<UserIcon />}
                             {...register('fullName')}
                             error={errors.fullName?.message}
-                            containerStyle={{ marginBottom: 0 }}
                         />
                     </motion.div>
 
@@ -67,7 +72,6 @@ function RegistrationPage() {
                             icon={<MailIcon />}
                             {...register('email')}
                             error={errors.email?.message}
-                            containerStyle={{ marginBottom: 0 }}
                         />
                     </motion.div>
 
@@ -82,7 +86,6 @@ function RegistrationPage() {
                             ]}
                             {...register('role')}
                             error={errors.role?.message}
-                            containerStyle={{ marginBottom: 0 }}
                         />
                     </motion.div>
 
@@ -94,11 +97,10 @@ function RegistrationPage() {
                             icon={<LockIcon />}
                             {...register('password')}
                             error={errors.password?.message}
-                            containerStyle={{ marginBottom: 0 }}
                         />
                     </motion.div>
 
-                    <motion.div variants={itemVariants} style={{ gridColumn: '1 / -1' }}>
+                    <motion.div variants={itemVariants} className="sm:col-span-2">
                         <InputField
                             label="Confirm Password"
                             type="password"
@@ -106,19 +108,21 @@ function RegistrationPage() {
                             icon={<LockIcon />}
                             {...register('confirmPassword')}
                             error={errors.confirmPassword?.message}
-                            containerStyle={{ marginBottom: 0 }}
                         />
                     </motion.div>
 
                     <motion.div
                         variants={itemVariants}
-                        style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginBottom: '12px', gridColumn: '1 / -1' }}
+                        className="flex justify-start items-center mb-2 sm:col-span-2"
                     >
                         <Checkbox
                             label={
-                                <span style={{ fontSize: t.fontSize.sm }}>
+                                <span className="text-sm font-medium">
                                     I accept the{' '}
-                                    <a href="#" style={{ color: t.color.primary, fontWeight: 600, textDecoration: 'none' }}>
+                                    <a 
+                                        href="#" 
+                                        className="text-primary font-black hover:underline underline-offset-4"
+                                    >
                                         Terms and Conditions
                                     </a>
                                 </span>
@@ -126,15 +130,20 @@ function RegistrationPage() {
                             {...register('termsAccepted')}
                         />
                     </motion.div>
-                    {errors.termsAccepted && (
-                        <motion.p
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            style={{ color: t.color.danger, fontSize: '12px', marginTop: '-4px', marginBottom: '16px', gridColumn: '1 / -1' }}
-                        >
-                            {errors.termsAccepted.message}
-                        </motion.p>
-                    )}
+                    
+                    <AnimatePresence>
+                        {errors.termsAccepted && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                                className="flex items-center gap-1.5 text-rose-500 text-[11px] font-bold mt-[-8px] mb-4 sm:col-span-2 ml-1"
+                            >
+                                <FiAlertCircle size={13} strokeWidth={2.5} />
+                                <span>{errors.termsAccepted.message}</span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </>
             )}
         </AuthForm>
