@@ -77,40 +77,43 @@ const AdminLayoutInner = () => {
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
-                    leftContent={breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} />}
+                    leftContent={
+                        <div className="relative group hidden sm:block">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none">
+                                <FiSearch size={16} />
+                            </span>
+                            <input
+                                className="pl-11 pr-10 py-2 bg-slate-100/50 border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-white focus:border-transparent focus:shadow-[0_12px_40px_rgba(7,34,103,0.1)] w-[320px] focus:w-[420px]"
+                                placeholder="Search anything..."
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                            />
+                            {search && (
+                                <button
+                                    onClick={() => setSearch('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                                >
+                                    <FiX size={14} />
+                                </button>
+                            )}
+                        </div>
+                    }
                     rightContent={
-                        <div className="flex items-center gap-6">
-                            {/* Global Search Bar */}
-                            <div className="relative group hidden sm:block">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none">
-                                    <FiSearch size={16} />
-                                </span>
-                                <input
-                                    className="pl-11 pr-10 py-2.5 bg-slate-100/50 border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-white focus:border-transparent focus:shadow-[0_12px_40px_rgba(7,34,103,0.1)] w-[240px] focus:w-[320px]"
-                                    placeholder="Search anything..."
-                                    value={search}
-                                    onChange={e => setSearch(e.target.value)}
-                                />
-                                {search && (
-                                    <button 
-                                        onClick={() => setSearch('')} 
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-rose-500 transition-colors"
-                                    >
-                                        <FiX size={14}/>
-                                    </button>
-                                )}
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                                <NotificationCenter />
-                                <ProfileDropdown />
-                            </div>
+                        <div className="flex items-center gap-3">
+                            <NotificationCenter />
+                            <ProfileDropdown />
                         </div>
                     }
                 />
                 
                 <main className="flex-1 overflow-y-auto p-5">
                     <div className="w-full max-w-[1400px] mx-auto">
+                        {/* Global Breadcrumb — shown on every page */}
+                        {breadcrumbs.length > 0 && (
+                            <div className="mb-4">
+                                <Breadcrumb items={breadcrumbs} />
+                            </div>
+                        )}
                         <Outlet />
                     </div>
                 </main>
