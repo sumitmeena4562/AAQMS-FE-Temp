@@ -6,6 +6,7 @@ import UserPeekView from '../../components/Dashboard/UserPeekView';
 import UserFormModal from '../../components/Dashboard/UserFormModal';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
+import PageHeader from '../../components/Dashboard/pageHeader';
 import {
     FiPlus, FiDownload, FiTrash2,
     FiUserCheck, FiUserX, FiUsers,
@@ -128,65 +129,72 @@ export default function Users() {
 
     const statsData = [
         { 
-            label: 'Total Users', 
+            title: 'Total Users', 
             value: stats.total, 
             icon: FiUsers, 
-            iconColor: 'text-primary', 
-            iconBg: 'bg-primary/10',
-            subValue: `${stats.active} Active / ${stats.inactive} Inactive`
+            iconColorClass: 'text-primary', 
+            iconBgClass: 'bg-primary/10',
+            change: `${stats.active} Active / ${stats.inactive} Inactive`,
+            changeType: 'neutral',
+            description: 'all platform users'
         },
         { 
-            label: 'Active Users', 
+            title: 'Active Users', 
             value: stats.active, 
             icon: FiCheckCircle, 
-            iconColor: 'text-emerald-500', 
-            iconBg: 'bg-emerald-50',
-            trend: 12
+            iconColorClass: 'text-emerald-500', 
+            iconBgClass: 'bg-emerald-50',
+            trend: 12,
+            description: 'vs last month'
         },
         { 
-            label: 'Inactive', 
+            title: 'Inactive', 
             value: stats.inactive, 
             icon: FiAlertCircle, 
-            iconColor: 'text-rose-500', 
-            iconBg: 'bg-rose-50',
-            trend: -5
+            iconColorClass: 'text-rose-500', 
+            iconBgClass: 'bg-rose-50',
+            trend: -5,
+            description: 'vs last month'
         },
         { 
-            label: 'Unassigned', 
+            title: 'Unassigned', 
             value: stats.unassigned, 
             icon: FiClock, 
-            iconColor: 'text-amber-500', 
-            iconBg: 'bg-amber-50' 
+            iconColorClass: 'text-amber-500', 
+            iconBgClass: 'bg-amber-50',
+            change: 'Needs Assignment',
+            changeType: 'warning',
+            description: 'pending review'
         },
     ];
 
     return (
         <div className="flex flex-col gap-6 p-4 md:p-8 max-w-[1600px] mx-auto min-h-screen">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">User Management</h1>
-                    <p className="text-[13px] font-semibold text-slate-500 mt-1">Manage platform users, roles & enterprise permissions</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button 
-                        variant="outline"
-                        onClick={exportCSV} 
-                        icon={FiDownload}
-                        className="!h-10 !px-4 !text-[13px] !font-bold"
-                    >
-                        Export
-                    </Button>
-                    <Button 
-                        variant="primary"
-                        onClick={handleAddUser} 
-                        icon={FiPlus}
-                        className="!h-10 !px-5 !text-[13px] !font-black !bg-[#072267] hover:!bg-[#072267]/95"
-                    >
-                        Add User
-                    </Button>
-                </div>
-            </div>
+            {/* Header Section — uses shared PageHeader */}
+            <PageHeader
+                title="User Management"
+                subtitle="Manage platform users, roles & enterprise permissions"
+                rightContent={
+                    <div className="flex items-center gap-3">
+                        <Button 
+                            variant="outline"
+                            onClick={exportCSV} 
+                            icon={FiDownload}
+                            className="!h-10 !px-4 !text-[13px] !font-bold"
+                        >
+                            Export
+                        </Button>
+                        <Button 
+                            variant="primary"
+                            onClick={handleAddUser} 
+                            icon={FiPlus}
+                            className="!h-10 !px-5 !text-[13px] !font-black !bg-primary hover:!bg-primary/95"
+                        >
+                            Add User
+                        </Button>
+                    </div>
+                }
+            />
 
             {/* Stats Section */}
             <StatsRow items={statsData} />
@@ -286,12 +294,12 @@ export default function Users() {
                         exit={{ opacity: 0, y: 10, height: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="flex items-center justify-between px-6 py-3 bg-white border border-[#072267]/10 rounded-2xl mb-3 shadow-[0_10px_40px_rgba(7,34,103,0.08)]">
+                        <div className="flex items-center justify-between px-6 py-3 bg-white border border-primary/10 rounded-2xl mb-3 shadow-[0_10px_40px_rgba(7,34,103,0.08)]">
                             <div className="flex items-center gap-4">
-                                <div className="w-8 h-8 rounded-full bg-[#072267] text-white flex items-center justify-center text-xs font-black shadow-lg shadow-[#072267]/20">
+                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-black shadow-lg shadow-primary/20">
                                     {selectedIds.length}
                                 </div>
-                                <span className="text-[13px] font-black text-[#072267]">Users Selected</span>
+                                <span className="text-[13px] font-black text-primary">Users Selected</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button onClick={handleBulkActivate} icon={FiUserCheck} variant="outline" className="!h-8 !px-4 !text-xs !bg-emerald-50 !text-emerald-600 !border-emerald-100 hover:!bg-emerald-100">

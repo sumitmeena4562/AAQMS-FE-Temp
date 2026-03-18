@@ -130,13 +130,13 @@ export const AccessibleButton = ({
         padding: size === 'sm' ? '6px 12px' : size === 'lg' ? '12px 24px' : '8px 16px',
         fontFamily: 'inherit',
         color: '#fff',
-        backgroundColor: variant === 'primary' ? '#072267' : '#fff',
+        backgroundColor: variant === 'primary' ? 'var(--color-primary)' : '#fff',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         ...props.style
     };
 
     if (variant === 'secondary') {
-        baseStyles.color = '#072267';
+        baseStyles.color = 'var(--color-primary)';
         baseStyles.backgroundColor = '#fff';
         baseStyles.border = '1px solid #e2e8f0';
     }
@@ -183,7 +183,7 @@ export const AccessibleLink = ({ children, href, target = '_self', ...props }) =
             target={target}
             rel={target === '_blank' ? 'noopener noreferrer' : undefined}
             style={{
-                color: '#072267',
+                color: 'var(--color-primary)',
                 textDecoration: 'none',
                 fontWeight: 500,
                 transition: 'all 0.2s ease',
@@ -194,7 +194,7 @@ export const AccessibleLink = ({ children, href, target = '_self', ...props }) =
                 e.target.style.textDecoration = 'underline';
             }}
             onMouseLeave={(e) => {
-                e.target.style.color = '#072267';
+                e.target.style.color = 'var(--color-primary)';
                 e.target.style.textDecoration = 'none';
             }}
             onFocus={(e) => {

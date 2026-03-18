@@ -35,16 +35,16 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         const act = isActive(item.path);
         return (
             <div key={item.path} className="relative mb-0.5 group">
-                {act && <div className="absolute left-[-10px] top-2 bottom-2 w-[3px] bg-[#072267] rounded-r-[3px]" />}
+                {act && <div className="absolute left-[-10px] top-2 bottom-2 w-[3px] bg-primary rounded-r-[3px]" />}
                 <NavLink
                     to={item.path}
                     className={() => `
                         flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] transition-all duration-150
                         ${collapsed ? 'justify-center px-0' : 'justify-start'}
-                        ${act ? 'bg-[#072267]/[0.06] text-[#072267] font-semibold' : 'text-slate-500 hover:bg-slate-50 font-medium'}
+                        ${act ? 'bg-primary/[0.06] text-primary font-semibold' : 'text-slate-500 hover:bg-slate-50 font-medium'}
                     `}
                 >
-                    <span className={`flex items-center shrink-0 transition-opacity ${act ? 'opacity-100 text-[#072267]' : 'opacity-60 text-slate-400 group-hover:opacity-100 group-hover:text-slate-600'}`}>
+                    <span className={`flex items-center shrink-0 transition-opacity ${act ? 'opacity-100 text-primary' : 'opacity-60 text-slate-400 group-hover:opacity-100 group-hover:text-slate-600'}`}>
                         {item.icon}
                     </span>
                     {!collapsed && <span className="truncate">{item.label}</span>}
@@ -65,10 +65,10 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     className={`
                         w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] transition-all duration-150 border-none outline-none cursor-pointer
                         ${collapsed ? 'justify-center px-0' : 'justify-start'}
-                        ${activeOrOpen ? 'bg-[#072267]/[0.06] text-[#072267] font-semibold' : 'text-slate-500 hover:bg-slate-50 font-medium'}
+                        ${activeOrOpen ? 'bg-primary/[0.06] text-primary font-semibold' : 'text-slate-500 hover:bg-slate-50 font-medium'}
                     `}
                 >
-                    <span className={`flex items-center shrink-0 transition-opacity ${activeOrOpen ? 'opacity-100 text-[#072267]' : 'opacity-60 text-slate-400 group-hover:opacity-100 group-hover:text-slate-600'}`}>
+                    <span className={`flex items-center shrink-0 transition-opacity ${activeOrOpen ? 'opacity-100 text-primary' : 'opacity-60 text-slate-400 group-hover:opacity-100 group-hover:text-slate-600'}`}>
                         {item.icon}
                     </span>
                     {!collapsed && <span className="flex-1 text-left truncate">{item.label}</span>}
@@ -91,11 +91,11 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                                     to={child.path}
                                     className={`
                                         flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[12px] transition-all duration-150 text-slate-500
-                                        ${cAct ? 'bg-[#072267]/[0.06] text-[#072267] font-semibold' : 'hover:bg-slate-50 hover:text-slate-900 font-medium'}
+                                        ${cAct ? 'bg-primary/[0.06] text-primary font-semibold' : 'hover:bg-slate-50 hover:text-slate-900 font-medium'}
                                     `}
                                 >
                                     {child.icon && (
-                                        <span className={`flex items-center shrink-0 transition-opacity ${cAct ? 'opacity-100 text-[#072267]' : 'opacity-50 text-slate-400 group-hover:opacity-100'}`}>
+                                        <span className={`flex items-center shrink-0 transition-opacity ${cAct ? 'opacity-100 text-primary' : 'opacity-50 text-slate-400 group-hover:opacity-100'}`}>
                                             {child.icon}
                                         </span>
                                     )}
@@ -174,16 +174,16 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     {user && (
                         <div
                             className={`
-                                flex items-center rounded-xl bg-white border border-slate-200 transition-all duration-200 cursor-pointer group hover:border-[#072267]/30 hover:shadow-sm
+                                flex items-center rounded-xl bg-white border border-slate-200 transition-all duration-200 cursor-pointer group hover:border-primary/30 hover:shadow-sm
                                 ${collapsed ? 'p-2 justify-center' : 'p-2.5 gap-3 justify-start'}
                             `}
                         >
-                            <div className="w-8 h-8 rounded-lg bg-[#072267] flex items-center justify-center text-white text-[13px] font-bold shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-[13px] font-bold shrink-0 shadow-sm group-hover:scale-105 transition-transform">
                                 {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'U'}
                             </div>
                             {!collapsed && (
                                 <div className="overflow-hidden flex-1">
-                                    <p className="text-[#111827] text-[13px] font-semibold truncate leading-tight group-hover:text-[#072267] transition-colors">
+                                    <p className="text-slate-900 text-[13px] font-semibold truncate leading-tight group-hover:text-primary transition-colors">
                                         {user.name || 'System User'}
                                     </p>
                                     <p className="text-slate-400 text-[10px] font-medium truncate mt-0.5">

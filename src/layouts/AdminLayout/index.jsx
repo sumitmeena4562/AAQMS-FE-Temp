@@ -10,9 +10,9 @@ import { BreadcrumbProvider } from "../../context/BreadcrumbContext";
 import { useBreadcrumb } from "../../hooks/useBreadcrumb";
 import { generateBreadcrumbs } from "../../utils/breadcrumbUtils";
 
-import { 
-    FiBriefcase, FiUsers, FiAlertTriangle, 
-    FiSettings, FiMap, FiLayers, FiTarget, 
+import {
+    FiBriefcase, FiUsers, FiAlertTriangle,
+    FiSettings, FiMap, FiLayers, FiTarget,
     FiBox, FiUser, FiHome, FiBarChart2,
     FiSearch, FiX
 } from 'react-icons/fi';
@@ -63,7 +63,7 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-[#f3f3f3] font-sans">
+        <div className="flex h-screen overflow-hidden bg-bg-primary font-sans">
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}
@@ -73,7 +73,7 @@ const AdminLayoutInner = () => {
                 setMobileOpen={setIsMobileOpen}
             />
 
-            <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#f3f3f3]">
+            <div className="flex-1 flex flex-col h-full overflow-hidden bg-bg-primary">
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
@@ -83,7 +83,7 @@ const AdminLayoutInner = () => {
                                 <FiSearch size={16} />
                             </span>
                             <input
-                                className="pl-11 pr-10 py-2 bg-slate-100/50 border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-white focus:border-transparent focus:shadow-[0_12px_40px_rgba(7,34,103,0.1)] w-[320px] focus:w-[420px]"
+                                className="pl-11 pr-10 py-2 bg-slate-100/50 border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-white focus:border-transparent focus:shadow-premium w-[320px] focus:w-[420px]"
                                 placeholder="Search anything..."
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
@@ -105,7 +105,7 @@ const AdminLayoutInner = () => {
                         </div>
                     }
                 />
-                
+
                 <main className="flex-1 overflow-y-auto p-5">
                     <div className="w-full max-w-[1400px] mx-auto">
                         {/* Global Breadcrumb — shown on every page */}

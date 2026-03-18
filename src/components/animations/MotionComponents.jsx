@@ -141,7 +141,7 @@ export const LoadingSpinner = ({ size = "medium", className, ...props }) => {
 
     return (
         <motion.div
-            className={`animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 ${sizeClasses[size]} ${className}`}
+            className={`animate-spin rounded-full border-2 border-slate-300 border-t-primary ${sizeClasses[size]} ${className}`}
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             {...props}
@@ -152,7 +152,7 @@ export const LoadingSpinner = ({ size = "medium", className, ...props }) => {
 // Skeleton loader component
 export const SkeletonLoader = ({ className, height = "auto", width = "100%", borderRadius = "4px", ...props }) => (
     <motion.div
-        className={`bg-gray-200 rounded ${className}`}
+        className={`bg-slate-200 rounded ${className}`}
         style={{ height, width, borderRadius }}
         animate={{ opacity: [0.4, 1, 0.4] }}
         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -174,7 +174,7 @@ export const ScrollProgress = () => {
 
     return (
         <motion.div
-            className="fixed top-0 left-0 h-1 bg-blue-600 z-50"
+            className="fixed top-0 left-0 h-1 bg-primary z-50"
             style={{ width: `${scrollPercentage}%` }}
             initial={{ width: "0%" }}
             animate={{ width: `${scrollPercentage}%` }}

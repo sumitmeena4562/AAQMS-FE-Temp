@@ -91,10 +91,10 @@ const InputField = ({
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     onMouseEnter={(e) => {
-                        if (!isFocused && !error) e.target.style.borderColor = '#CBD5E1';
+                        if (!isFocused && !error) e.target.style.borderColor = 'var(--color-border-hover)';
                     }}
                     onMouseLeave={(e) => {
-                        if (!isFocused && !error) e.target.style.borderColor = '#E2E8F0';
+                        if (!isFocused && !error) e.target.style.borderColor = 'var(--color-border)';
                     }}
                     {...props}
                 />
@@ -110,7 +110,7 @@ const InputField = ({
                             background: 'transparent',
                             border: 'none',
                             cursor: 'pointer',
-                            color: '#94A3B8',
+                            color: 'var(--color-text-muted)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -118,8 +118,8 @@ const InputField = ({
                             borderRadius: '8px',
                             transition: 'color 0.2s, background 0.2s'
                         }}
-                        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-text-primary)'; e.currentTarget.style.background = '#F1F5F9'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.color = '#94A3B8'; e.currentTarget.style.background = 'transparent'; }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-text-primary)'; e.currentTarget.style.background = 'var(--color-bg-hover)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-muted)'; e.currentTarget.style.background = 'transparent'; }}
                     >
                         {showPassword ? (
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
