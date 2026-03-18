@@ -29,7 +29,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null }
       const auditDate = new Date(org.lastInventoryAudit);
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      
+
       // If audit is older than 1 month, it's DEACTIVE
       if (auditDate < oneMonthAgo) {
         currentStatus = 'DEACTIVE';
@@ -47,7 +47,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null }
 
   return (
     <div className="h-[460px] bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col border border-gray-100 overflow-hidden">
-      
+
       {/* Top Image Section */}
       <div className="relative h-[220px] w-full shrink-0 bg-gray-100">
         <img
@@ -58,10 +58,10 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null }
         {/* Status Badge */}
         <div className="absolute top-4 right-4">
           <span className={`px-2.5 py-1.5 rounded-[6px] text-[10px] font-bold tracking-widest shadow-sm uppercase
-            ${currentStatus === 'ACTIVE' 
-              ? 'bg-[#e6f4ea] text-[#137333] border border-[#137333]/20' 
-              : currentStatus === 'MAINTENANCE' 
-                ? 'bg-[#fef7e0] text-[#b06000] border border-[#b06000]/20' 
+            ${currentStatus === 'ACTIVE'
+              ? 'bg-[#e6f4ea] text-[#137333] border border-[#137333]/20'
+              : currentStatus === 'MAINTENANCE'
+                ? 'bg-[#fef7e0] text-[#b06000] border border-[#b06000]/20'
                 : 'bg-[#fce8e6] text-[#c5221f] border border-[#c5221f]/20'}
           `}>
             {currentStatus}
@@ -71,13 +71,13 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null }
 
       {/* Card Body */}
       <div className="p-6 flex-1 flex flex-col">
-        
+
         {/* Header Section */}
         <div>
           <h3 className="text-[20px] font-bold text-gray-900 tracking-tight leading-none mb-2">
             {org.name}
           </h3>
-          
+
           {isSiteCard ? (
             <div className="flex items-start gap-1.5 mt-2">
               <svg className="w-3.5 h-3.5 text-gray-400 shrink-0 relative top-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -129,7 +129,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null }
         {/* Bottom Button */}
         <button
           onClick={handleAction}
-          className="mt-auto w-full py-4.5 px-5 border border-gray-200 rounded-[14px] text-[13px] font-semibold text-gray-800 hover:bg-gray-50 hover:border-gray-300 transition-colors flex items-center justify-between group">
+          className="mt-auto w-full py-4.5 px-5 border border-gray-200 rounded-[14px] text-[13px] font-semibold text-gray-800 hover:bg-gray-50 hover:border-gray-300 transition-colors flex items-center justify-center gap-2 group">
           <span>
             {isSiteCard ? 'View Floor Plans' : 'Select Organization'}
           </span>
@@ -142,7 +142,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null }
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </button>
-        
+
       </div>
     </div>
   );
