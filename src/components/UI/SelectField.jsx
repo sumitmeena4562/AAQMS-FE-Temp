@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiAlertCircle } from 'react-icons/fi';
+import { t } from '../../theme/theme';
 
 const SelectField = ({
     label,
@@ -14,18 +17,47 @@ const SelectField = ({
 }) => {
     const [isFocused, setIsFocused] = useState(false);
 
+    // Shake animation variant
+    const shakeVariants = {
+        error: {
+            x: [0, -4, 4, -4, 4, 0],
+            transition: { duration: 0.4 }
+        }
+    };
+
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px', width: '100%', ...containerStyle }} className={className}>
+        <motion.div 
+            style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px', width: '100%', ...containerStyle }} 
+            className={className}
+            animate={error ? "error" : ""}
+            variants={shakeVariants}
+        >
             {label && (
-                <label style={{ fontSize: 'var(--font-size-sm)', fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                    {label} {required && <span style={{ color: 'var(--color-danger)' }}>*</span>}
+                <label style={{ 
+                    fontSize: t.fontSize.sm, 
+                    fontWeight: t.fontWeight.bold, 
+                    color: error ? t.color.danger : t.color.textSecondary,
+                    letterSpacing: '0.01em',
+                    marginLeft: '4px',
+                }}>
+                    {label} {required && <span style={{ color: t.color.danger }}>*</span>}
                 </label>
             )}
 
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                 {icon && (
-                    <span style={{ position: 'absolute', left: '16px', zIndex: 2, color: isFocused ? 'var(--color-primary)' : 'var(--color-text-muted)', transition: 'color var(--transition-fast)' }}>
-                        {icon}
+                    <span style={{ 
+                        position: 'absolute', 
+                        left: '12px', 
+                        zIndex: 2, 
+                        color: error ? t.color.danger : (isFocused ? t.color.primary : t.color.textPlaceholder), 
+                        transition: 'color 0.2s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        pointerEvents: 'none'
+                    }}>
+                        {React.cloneElement(icon, { size: 16 })}
                     </span>
                 )}
 
@@ -35,28 +67,25 @@ const SelectField = ({
                     required={required}
                     style={{
                         width: '100%',
-                        padding: icon ? '12px 16px 12px 42px' : '12px 16px',
-                        paddingRight: '42px', // Space for dropdown arrow
-                        fontSize: 'var(--font-size-sm)',
+                        padding: icon ? '12px 14px 12px 38px' : '12px 14px',
+                        paddingRight: '38px', 
+                        fontSize: t.fontSize.md,
                         fontFamily: 'var(--font-family)',
-                        color: 'var(--color-text-primary)',
-                        backgroundColor: 'var(--color-bg-secondary)',
-                        border: `1px solid ${error ? 'var(--color-danger)' : 'var(--color-border)'}`,
-                        borderRadius: 'var(--radius-lg)',
+                        color: t.color.text,
+                        backgroundColor: isFocused ? t.color.bg : t.color.bgHover,
+                        border: `1.5px solid ${error ? t.color.danger : (isFocused ? t.color.primary : t.color.border)}`,
+                        borderRadius: t.radius.xl,
                         outline: 'none',
-                        appearance: 'none', // Remove default dropdown arrow
+                        appearance: 'none', 
                         cursor: 'pointer',
-                        transition: 'border-color var(--transition-fast), box-shadow var(--transition-fast)',
-                        boxShadow: isFocused && !error ? '0 0 0 4px var(--color-accent-soft)' : (error && isFocused ? '0 0 0 3px rgba(239, 68, 68, 0.1)' : 'none')
+                        transition: 'all 0.2s ease-in-out',
+                        boxShadow: isFocused 
+                            ? (error ? '0 0 0 3px rgba(239, 68, 68, 0.1)' : `0 0 0 3px ${t.color.primary}15`) 
+                            : t.shadow.sm,
+                        fontWeight: t.fontWeight.medium
                     }}
-                    onFocus={(e) => {
-                        setIsFocused(true);
-                        if (!error) e.target.style.borderColor = 'var(--color-primary)';
-                    }}
-                    onBlur={(e) => {
-                        setIsFocused(false);
-                        if (!error) e.target.style.borderColor = 'var(--color-border)';
-                    }}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
                     {...props}
                 >
                     <option value="" disabled hidden>Select an option</option>
@@ -66,20 +95,47 @@ const SelectField = ({
                 </select>
 
                 {/* Custom Dropdown Arrow */}
-                <div style={{ position: 'absolute', right: '16px', pointerEvents: 'none', color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div style={{ 
+                    position: 'absolute', 
+                    right: '12px', 
+                    pointerEvents: 'none', 
+                    color: t.color.textPlaceholder, 
+                    display: 'flex', 
+                    alignItems: 'center' 
+                }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="m6 9 6 6 6-6" />
                     </svg>
                 </div>
             </div>
 
-            {error && (
-                <span style={{ color: 'var(--color-danger)', fontSize: '12px', marginTop: '2px' }}>
-                    {error}
-                </span>
-            )}
-        </div>
+            {/* Error Message with animation */}
+            <AnimatePresence>
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                        style={{ 
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            color: t.color.danger, 
+                            fontSize: '11px',
+                            marginTop: '2px', 
+                            fontWeight: t.fontWeight.bold, 
+                            marginLeft: '4px',
+                            letterSpacing: '0.01em',
+                        }}
+                    >
+                        <FiAlertCircle size={13} strokeWidth={2.5} />
+                        <span>{error}</span>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 };
 
 export default SelectField;
+

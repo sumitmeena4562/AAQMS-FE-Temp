@@ -9,22 +9,25 @@ import InputField from '../../components/UI/InputField';
 import Checkbox from '../../components/UI/Checkbox';
 import useAuthStore from '../../store/authStore';
 import { MailIcon, LockIcon } from '../../assets/icon';
+import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal';
 
 function LoginPage() {
     const navigate = useNavigate();
     const { login, isLoading } = useAuthStore();
+    const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
     const onSubmit = async (data) => {
-        try {
-            await login(data);
-            toast.success("Login Successful!");
+        const result = await login(data);
+        if (result.success) {
+            toast.success(`Welcome back, ${result.user.name}!`);
             navigate('/admin/dashboard');
-        } catch (error) {
-            toast.error(error || "Invalid Email Or Password!");
+        } else {
+            toast.error(result.error || "Authentication failed. Please try again.");
         }
     };
 
     return (
+        <>
         <AuthForm
             title="Sign in to your account"
             subtitle="Access your enterprise dashboard securely"
@@ -34,8 +37,14 @@ function LoginPage() {
             submitText="Sign In"
             loadingText="Signing in..."
             footer={
-                <span style={{ fontWeight: 500 }}>
-                    Don't have access? <a href="/registration" style={{ color: 'var(--color-primary)', fontWeight: 700, textDecoration: 'none', marginLeft: '6px', borderBottom: '1.5px solid transparent', transition: 'all 0.2s ease' }} onMouseEnter={(e) => e.target.style.borderBottomColor = 'var(--color-primary)'} onMouseLeave={(e) => e.target.style.borderBottomColor = 'transparent'}>Register Here</a>
+                <span className="font-semibold text-slate-500">
+                    Don&apos;t have access? 
+                    <a 
+                        href="/registration" 
+                        className="text-primary font-black ml-1.5 border-b-2 border-transparent hover:border-primary transition-all duration-300"
+                    >
+                        Register Here
+                    </a>
                 </span>
             }
         >
@@ -65,19 +74,23 @@ function LoginPage() {
 
                     <motion.div
                         variants={itemVariants}
-                        style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}
+                        className="flex justify-between items-center mb-1"
                     >
                         <Checkbox
                             label="Remember me"
                             {...register('rememberMe')}
                         />
-                        <a href="/forgot-password" style={{ color: 'var(--color-text-primary)', fontSize: 'var(--font-size-sm)', fontWeight: 600, textDecoration: 'none' }}>
+                        <a 
+                            href="/forgot-password"
+                            className="text-slate-500 text-xs font-black hover:text-primary transition-colors"
+                        >
                             Forgot password?
                         </a>
                     </motion.div>
                 </>
             )}
         </AuthForm>
+        </>
     );
 }
 

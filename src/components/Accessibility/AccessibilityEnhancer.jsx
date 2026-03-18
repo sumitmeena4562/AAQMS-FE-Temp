@@ -1,18 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+
 
 /**
  * Accessibility Enhancer Component
  * Adds ARIA labels, keyboard navigation, and screen reader support
  */
 const AccessibilityEnhancer = () => {
-    const [isHighContrast, setIsHighContrast] = useState(false);
-    const [isReducedMotion, setIsReducedMotion] = useState(false);
-
     useEffect(() => {
-        // Check for user preferences
-        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        setIsReducedMotion(mediaQuery.matches);
-
         // Add keyboard navigation support
         const handleKeyDown = (e) => {
             // Skip to main content
@@ -268,24 +262,6 @@ export const AccessibleCard = ({ children, onClick, ...props }) => {
             {children}
         </div>
     );
-};
-
-/**
- * Screen Reader Announcement Hook
- */
-export const useAnnouncement = () => {
-    const announce = (message) => {
-        const announcer = document.querySelector('[role="status"]');
-        if (announcer) {
-            announcer.textContent = message;
-            // Clear after a short delay
-            setTimeout(() => {
-                announcer.textContent = '';
-            }, 1000);
-        }
-    };
-
-    return { announce };
 };
 
 export default AccessibilityEnhancer;

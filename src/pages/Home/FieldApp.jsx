@@ -14,266 +14,187 @@ import {
     MdKeyboardArrowDown,
     MdOutlineVerified
 } from 'react-icons/md';
+import { motion } from 'framer-motion';
 
-// eslint-disable-next-line no-unused-vars
-const FieldFeature = ({ icon: Icon, title, description }) => (
-    <div style={{ display: 'flex', gap: '20px', marginBottom: '32px' }}>
-        <div style={{
-            minWidth: '48px',
-            height: '48px',
-            borderRadius: '12px',
-            background: '#eff6ff',
-            color: '#3b82f6',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-        }}>
-            <Icon size={24} />
+const FieldFeature = ({ icon: Icon, title, description, index }) => (
+    <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.4 + (index * 0.1) }}
+        className="flex gap-5 mb-8 group"
+    >
+        <div className="min-w-[56px] h-14 rounded-2xl bg-gradient-to-br from-primary/15 to-primary/5 text-primary flex items-center justify-center border border-primary/10 shadow-lg shadow-primary/5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 shrink-0">
+            <Icon className="text-[26px]" />
         </div>
         <div>
-            <h4 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-primary-dark)', marginBottom: '8px' }}>{title}</h4>
-            <p style={{ fontSize: '14px', lineHeight: 1.5, color: 'var(--color-text-secondary)', maxWidth: '380px' }}>{description}</p>
+            <h4 className="text-lg font-black text-slate-900 mb-2 tracking-tight group-hover:text-primary transition-colors">{title}</h4>
+            <p className="text-[15px] leading-relaxed text-slate-500 max-w-sm font-medium">{description}</p>
         </div>
+    </motion.div>
+);
+
+const MobileMockup = () => (
+    <div className="relative flex justify-center perspective-lg">
+        {/* Shadow Decoration */}
+        <div className="absolute inset-0 w-[80%] h-[80%] bg-primary filter blur-[100px] opacity-10 top-[10%] left-[10%] z-0" />
+
+        {/* Phone Frame */}
+        <motion.div 
+            initial={{ opacity: 0, y: 50, rotateX: 10 }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: [0.21, 1, 0.36, 1] }}
+            className="w-full max-w-[280px] sm:max-w-[300px] aspect-[1/2] h-auto bg-slate-900 rounded-[32px] sm:rounded-[48px] p-2 sm:p-2.5 relative z-10 shadow-2xl border border-white/10 ring-1 ring-slate-800 flex flex-col group"
+        >
+            {/* Internal Bezel */}
+            <div className="flex-1 bg-slate-950 rounded-[28px] sm:rounded-[38px] relative overflow-hidden flex flex-col">
+                {/* Phone Notch */}
+                <div className="w-20 sm:w-28 h-4 sm:h-6 bg-slate-950 absolute top-0 left-1/2 -translate-x-1/2 rounded-b-xl sm:rounded-b-2xl z-20" />
+
+                {/* App Header */}
+                <div className="pt-8 pb-5 px-5 bg-gradient-to-b from-slate-900 to-slate-950">
+                    <div className="flex justify-between items-center mb-6">
+                        <MdMenu className="text-slate-400 text-xl" />
+                        <span className="text-white text-[10px] font-black tracking-[0.2em] uppercase">Asset AI</span>
+                        <MdNotificationsNone className="text-slate-400 text-xl" />
+                    </div>
+
+                    <div className="mb-1">
+                        <span className="text-slate-500 text-[9px] font-bold tracking-wider uppercase">Current Site</span>
+                        <div className="flex items-center gap-1.5 text-white text-base font-black">
+                            Warehouse B <MdKeyboardArrowDown className="text-primary text-lg" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* App Content Area */}
+                <div className="flex-1 bg-slate-50 rounded-t-[28px] p-5 flex flex-col gap-4 shadow-inner overflow-hidden">
+                    <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">Assigned Audits</span>
+
+                    {/* App Task Cards */}
+                    <motion.div 
+                        whileHover={{ scale: 1.02, x: 5 }}
+                        className="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-slate-100 cursor-pointer"
+                    >
+                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
+                            <MdOutlineQrCodeScanner className="text-xl" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="text-[13px] font-black text-slate-800 truncate">Shelf 4A Audit</div>
+                            <div className="text-[10px] text-slate-400 font-bold">24 items • High</div>
+                        </div>
+                        <div className="bg-slate-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tighter shrink-0">Go</div>
+                    </motion.div>
+
+                    <motion.div 
+                        whileHover={{ scale: 1.02, x: 5 }}
+                        className="bg-white p-4 rounded-2xl flex items-center gap-3 shadow-sm border border-slate-100 opacity-80"
+                    >
+                        <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500 shrink-0">
+                            <MdHistory className="text-xl" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="text-[13px] font-black text-slate-800 truncate">Zone 3 Safety</div>
+                            <div className="text-[10px] text-slate-400 font-bold">Hazard • 4pm</div>
+                        </div>
+                        <div className="bg-slate-100 text-slate-400 px-2 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-tighter shrink-0">Later</div>
+                    </motion.div>
+
+                    <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase mt-2">Quick Utilities</span>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <motion.div whileHover={{ scale: 1.05 }} className="bg-white h-16 rounded-2xl flex flex-col items-center justify-center gap-1.5 text-slate-400 shadow-sm border border-slate-100 cursor-pointer group/item">
+                            <MdOutlineQrCodeScanner className="text-xl text-primary transition-transform group-hover/item:scale-110" />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Scan</span>
+                        </motion.div>
+                        <motion.div whileHover={{ scale: 1.05 }} className="bg-white h-16 rounded-2xl flex flex-col items-center justify-center gap-1.5 text-slate-400 shadow-sm border border-slate-100 cursor-pointer group/item">
+                            <MdOutlinePhotoCamera className="text-xl text-primary transition-transform group-hover/item:scale-110" />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Snap</span>
+                        </motion.div>
+                    </div>
+
+                    <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase mt-2">Quick Utilities</span>
+                </div>
+
+                {/* App Bottom Nav */}
+                <div className="h-16 bg-white border-t border-slate-100 flex justify-around items-center px-2 pb-2 relative z-20">
+                    <MdHome className="text-xl text-primary" />
+                    <MdMap className="text-xl text-slate-300" />
+                    <div className="relative">
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 w-12 h-12 bg-primary rounded-full flex items-center justify-center border-4 border-white shadow-lg shadow-primary/20 text-white cursor-pointer active:scale-95 transition-transform">
+                            <MdAdd className="text-2xl" />
+                        </div>
+                    </div>
+                    <MdHistory className="text-xl text-slate-300" />
+                    <MdSettings className="text-xl text-slate-300" />
+                </div>
+            </div>
+        </motion.div>
+
+        {/* Floating Verified Badge - Adjusted for mobile safety */}
+        <motion.div 
+            initial={{ x: 30, opacity: 0 }}
+            whileInView={{ x: 0, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 1, duration: 0.8 }}
+            className="absolute -right-4 sm:-right-8 top-1/2 -translate-y-1/2 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl shadow-xl z-20 flex items-center gap-3 sm:gap-4 border border-slate-100 ring-1 ring-slate-100 group cursor-default"
+        >
+            <div 
+                className="w-8 sm:w-10 h-8 sm:h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg sm:rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform"
+            >
+                <MdOutlineVerified className="text-lg sm:text-xl" />
+            </div>
+            <div>
+                <div className="text-[11px] sm:text-[13px] font-black text-slate-900 leading-none mb-1">Audit Live</div>
+                <div className="text-[9px] sm:text-[10px] text-emerald-500 font-black uppercase tracking-widest leading-none">100% Synced</div>
+            </div>
+        </motion.div>
     </div>
 );
 
 const FieldApp = () => {
     return (
-        <section className="field-app-section" style={{
-            padding: '100px 24px',
-            background: '#fff',
-            position: 'relative',
-            overflow: 'hidden'
-        }}>
-            <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }} className="field-app-grid">
+        <section id="mobile" className="py-16 px-6 bg-gradient-to-b from-slate-50 to-white relative overflow-hidden">
+            {/* Background Decorative Mesh */}
+            <div className="absolute -bottom-[20%] -left-[10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center relative z-10">
                 {/* Left Side: Content */}
-                <div style={{ zIndex: 10 }}>
-                    <h2 style={{
-                        fontSize: 'clamp(28px, 4vw, 42px)',
-                        fontWeight: 800,
-                        color: 'var(--color-primary-dark)',
-                        marginBottom: '20px',
-                        letterSpacing: '-0.02em'
-                    }}>
-                        Field Inspections in Your Pocket
+                <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+                >
+                    <div className="flex items-center gap-4 text-[10px] font-black text-primary tracking-widest uppercase mb-4">
+                        <div className="w-10 h-px bg-primary/30"></div>
+                        Next-Gen Inspection
+                    </div>
+
+                    <h2 className="text-[clamp(1.75rem,4vw,2.4rem)] font-black text-slate-900 mb-6 tracking-tighter leading-[1.05]">
+                        Field Inspections in Your <span className="text-primary">Pocket.</span>
                     </h2>
-                    <p style={{
-                        fontSize: '17px',
-                        color: 'var(--color-text-secondary)',
-                        lineHeight: 1.6,
-                        marginBottom: '48px',
-                        maxWidth: '500px'
-                    }}>
-                        Equip your workforce with a powerful, intuitive mobile interface designed for the realities of the field.
+
+                    <p className="text-base text-slate-500 leading-relaxed mb-10 max-w-xl font-medium">
+                        Equip your workforce with a powerful, intuitive mobile interface designed for the rigorous demands of real-world environment audits.
                     </p>
 
-                    <div className="features-list">
-                        <FieldFeature
-                            icon={MdOutlineAssignmentInd}
-                            title="Personal ID Login"
-                            description="Secure, individual access ensures accountability for every action taken."
-                        />
-                        <FieldFeature
-                            icon={MdOutlineQrCodeScanner}
-                            title="QR Scan Capability"
-                            description="Lightning-fast scanning to verify asset presence and pull up specs instantly."
-                        />
-                        <FieldFeature
-                            icon={MdOutlinePhotoCamera}
-                            title="Photo/Video Evidence"
-                            description="Capture visual proof of compliance or damage directly within the audit workflow."
-                        />
-                        <FieldFeature
-                            icon={MdOutlineWifiOff}
-                            title="Low Connectivity Mode"
-                            description="Complete audits offline; data syncs automatically when connection is restored."
-                        />
+                    <div className="flex flex-col gap-2">
+                        {[
+                            { icon: MdOutlineAssignmentInd, title: "Personal ID Login", description: "Secure, individual access ensures accountability for every action taken." },
+                            { icon: MdOutlineQrCodeScanner, title: "QR Scan Capability", description: "Lightning-fast scanning to verify asset presence and pull up specs instantly." },
+                            { icon: MdOutlinePhotoCamera, title: "Photo/Video Evidence", description: "Capture visual proof of compliance or damage directly within the audit workflow." },
+                            { icon: MdOutlineWifiOff, title: "Low Connectivity Mode", description: "Complete audits offline; data syncs automatically when connection is restored." }
+                        ].map((feat, i) => (
+                            <FieldFeature key={i} {...feat} index={i} />
+                        ))}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Right Side: Mobile Mockup */}
-                <div style={{ display: 'flex', justifyContent: 'center', position: 'relative' }}>
-                    {/* Shadow Decoration */}
-                    <div style={{
-                        position: 'absolute',
-                        width: '80%',
-                        height: '80%',
-                        background: 'var(--color-primary)',
-                        filter: 'blur(100px)',
-                        opacity: 0.1,
-                        top: '10%',
-                        left: '10%',
-                        zIndex: 0
-                    }}></div>
-
-                    {/* Phone Frame */}
-                    <div style={{
-                        width: '300px',
-                        height: '600px',
-                        background: '#071221',
-                        borderRadius: '40px',
-                        border: '8px solid #1a2433',
-                        position: 'relative',
-                        zIndex: 1,
-                        boxShadow: '0 50px 100px -20px rgba(7, 18, 33, 0.5)',
-                        overflow: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'column'
-                    }}>
-                        {/* Phone Notch */}
-                        <div style={{
-                            width: '120px',
-                            height: '24px',
-                            background: '#1a2433',
-                            position: 'absolute',
-                            top: 0,
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            borderBottomLeftRadius: '16px',
-                            borderBottomRightRadius: '16px',
-                            zIndex: 10
-                        }}></div>
-
-                        {/* App Header */}
-                        <div style={{ padding: '40px 20px 20px', background: '#071221' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                                <MdMenu color="#fff" size={24} />
-                                <span style={{ color: '#fff', fontSize: '12px', fontWeight: 800, letterSpacing: '0.1em' }}>SAFETY AI</span>
-                                <MdNotificationsNone color="#fff" size={24} />
-                            </div>
-
-                            <div style={{ marginBottom: '4px' }}>
-                                <span style={{ color: '#94a3b8', fontSize: '10px' }}>Current Location</span>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#fff', fontSize: '18px', fontWeight: 700 }}>
-                                    Warehouse B <MdKeyboardArrowDown />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* App Content Area */}
-                        <div style={{
-                            flex: 1,
-                            background: '#f8fafc',
-                            borderTopLeftRadius: '24px',
-                            borderTopRightRadius: '24px',
-                            padding: '20px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '16px'
-                        }}>
-                            <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', letterSpacing: '0.05em' }}>TODAY'S TASKS</span>
-
-                            {/* App Task Cards */}
-                            <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                <div style={{ width: '40px', height: '40px', backgroundColor: '#eff6ff', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
-                                    <MdOutlineQrCodeScanner size={20} />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>Verify Shelf 4A</div>
-                                    <div style={{ fontSize: '11px', color: '#64748b' }}>24 items • Due 2pm</div>
-                                </div>
-                                <button style={{ background: '#071221', color: '#fff', border: 'none', padding: '6px 14px', borderRadius: '8px', fontSize: '10px', fontWeight: 600 }}>Start</button>
-                            </div>
-
-                            <div style={{ background: '#fff', padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                <div style={{ width: '40px', height: '40px', backgroundColor: '#fff7ed', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f97316' }}>
-                                    <MdHistory size={20} />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b' }}>Hazard Check</div>
-                                    <div style={{ fontSize: '11px', color: '#64748b' }}>Zone 3 • Due 4pm</div>
-                                </div>
-                                <button style={{ background: '#f1f5f9', color: '#475569', border: 'none', padding: '6px 14px', borderRadius: '8px', fontSize: '10px', fontWeight: 600 }}>View</button>
-                            </div>
-
-                            <span style={{ fontSize: '10px', fontWeight: 800, color: '#64748b', letterSpacing: '0.05em', marginTop: '10px' }}>QUICK ACTIONS</span>
-
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                                <div style={{ background: '#fff', height: '60px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                    <MdOutlineQrCodeScanner size={24} />
-                                </div>
-                                <div style={{ background: '#fff', height: '60px', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-                                    <MdOutlinePhotoCamera size={24} />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* App Bottom Nav */}
-                        <div style={{
-                            height: '60px',
-                            background: '#fff',
-                            borderTop: '1px solid #f1f5f9',
-                            display: 'flex',
-                            justifyContent: 'space-around',
-                            alignItems: 'center',
-                            padding: '0 10px',
-                            position: 'relative'
-                        }}>
-                            <MdHome size={22} color="#94a3b8" />
-                            <MdMap size={22} color="#94a3b8" />
-                            <div style={{
-                                width: '44px',
-                                height: '44px',
-                                background: '#071221',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginTop: '-30px',
-                                border: '4px solid #fff',
-                                boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
-                            }}>
-                                <MdAdd size={24} color="#fff" />
-                            </div>
-                            <MdHistory size={22} color="#94a3b8" />
-                            <MdSettings size={22} color="#94a3b8" />
-                        </div>
-                    </div>
-
-                    {/* Floating Decorative Elements */}
-                    <div className="floating-badge" style={{
-                        position: 'absolute',
-                        right: '-20px',
-                        top: '150px',
-                        background: '#fff',
-                        padding: '12px',
-                        borderRadius: '16px',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                        zIndex: 10,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px'
-                    }}>
-                        <div style={{ width: '32px', height: '32px', background: '#ecfdf5', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981' }}>
-                            <MdOutlineVerified size={18} />
-                        </div>
-                        <div>
-                            <div style={{ fontSize: '12px', fontWeight: 800, color: '#1e293b' }}>Audit Sync</div>
-                            <div style={{ fontSize: '10px', color: '#64748b' }}>100% Complete</div>
-                        </div>
-                    </div>
-                </div>
+                <MobileMockup />
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @media (max-width: 1024px) {
-                    .field-app-grid {
-                        grid-template-columns: 1fr !important;
-                        gap: 60px !important;
-                        text-align: center;
-                    }
-                    .features-list {
-                        display: inline-block;
-                        text-align: left;
-                        margin: 0 auto;
-                    }
-                    .section-subtitle {
-                        margin: 0 auto !important;
-                    }
-                }
-            `}} />
         </section>
     );
 };

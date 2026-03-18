@@ -1,8 +1,9 @@
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { FiX, FiShield, FiBriefcase, FiClock, FiCalendar, FiEdit2, FiTrash2, FiMail, FiMapPin } from 'react-icons/fi';
+import { AnimatePresence, motion as Motion } from 'framer-motion';
+import { FiX, FiShield, FiBriefcase, FiClock, FiCalendar, FiEdit2, FiTrash2, FiMapPin, FiUser } from 'react-icons/fi';
+import { t } from '../../theme/theme';
 
-const AVATAR_COLORS = [['#6366F1','#A855F7'],['#3B82F6','#06B6D4'],['#F43F5E','#FB923C'],['#10B981','#3B82F6'],['#F59E0B','#EF4444']];
+const AVATAR_COLORS = t.color.avatarGradients;
 function getAvatar(name) {
     if (!name) return { initials:'?', colors: AVATAR_COLORS[0] };
     let h = 0; for (let i=0;i<name.length;i++) h = name.charCodeAt(i)+((h<<5)-h);
@@ -10,27 +11,8 @@ function getAvatar(name) {
     return { initials: (p.length>=2?`${p[0][0]}${p[1][0]}`:name.slice(0,2)).toUpperCase(), colors: AVATAR_COLORS[Math.abs(h)%AVATAR_COLORS.length] };
 }
 
-const InfoRow = ({ icon, label, value }) => (
-    <div style={{ display:'flex', alignItems:'flex-start', gap:12, padding:'12px 0' }}>
-        <div style={{ width:34, height:34, borderRadius:8, background:'#EEF2FF', display:'flex', alignItems:'center', justifyContent:'center', color:'#4F46E5', flexShrink:0 }}>
-            {icon}
-        </div>
-        <div>
-            <div style={{ fontSize:10, fontWeight:600, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.06em', marginBottom:2 }}>{label}</div>
-            <div style={{ fontSize:14, fontWeight:600, color:'#111827' }}>{value || '—'}</div>
-        </div>
-    </div>
-);
+import Button from '../UI/Button';
 
-/**
- * User Peek View — slide-in drawer showing user details
- *
- * @param {boolean}  isOpen   - show/hide
- * @param {Function} onClose  - close handler
- * @param {Object}   user     - user object to display
- * @param {Function} onEdit   - (user) => open edit modal
- * @param {Function} onDelete - (user) => open delete confirmation
- */
 const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
     if (!user) return null;
     const { initials, colors } = getAvatar(user.name);
@@ -38,113 +20,137 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
+                <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
                     {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity:0 }}
-                        animate={{ opacity:1 }}
-                        exit={{ opacity:0 }}
+                    <Motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
                         onClick={onClose}
-                        style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.2)', backdropFilter:'blur(2px)', zIndex:99 }}
+                        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
                     />
 
-                    {/* Drawer */}
-                    <motion.div
-                        initial={{ x:'100%' }}
-                        animate={{ x:0 }}
-                        exit={{ x:'100%' }}
-                        transition={{ type:'spring', damping:25, stiffness:200 }}
-                        style={{ position:'fixed', right:0, top:0, height:'100%', width:420, maxWidth:'95vw', background:'#fff', boxShadow:'-6px 0 24px rgba(0,0,0,0.08)', zIndex:100, display:'flex', flexDirection:'column' }}
+                    {/* Modal Container */}
+                    <Motion.div
+                        initial={{ opacity: 0, scale: 0.98, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.98, y: 10 }}
+                        className="relative w-full max-w-[520px] max-h-[85vh] bg-white border border-slate-200 rounded-3xl shadow-xl flex flex-col overflow-hidden"
                     >
-                        {/* Header */}
-                        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 20px', borderBottom:'1px solid #F3F4F6', flexShrink:0 }}>
-                            <span style={{ fontSize:14, fontWeight:700, color:'#111827', textTransform:'uppercase', letterSpacing:'0.04em' }}>User Profile</span>
-                            <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#9CA3AF', display:'flex', padding:4, borderRadius:6 }}
-                                onMouseEnter={e => e.currentTarget.style.background='#F3F4F6'}
-                                onMouseLeave={e => e.currentTarget.style.background='none'}
+                        {/* Modal Header */}
+                        <div className="relative z-10 p-6 pb-2 flex items-start justify-between">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-none mb-1.5">
+                                    User Profile
+                                </h2>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                        ID: {user.id || 'N/A'}
+                                    </span>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={onClose} 
+                                className="p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 rounded-lg transition-colors"
                             >
                                 <FiX size={18} />
                             </button>
                         </div>
 
-                        {/* Content */}
-                        <div style={{ flex:1, overflowY:'auto', padding:'24px 20px' }}>
-                            {/* Profile Header */}
-                            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', marginBottom:24 }}>
-                                <div style={{ width:72, height:72, borderRadius:'50%', background:`linear-gradient(135deg,${colors[0]},${colors[1]})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:24, fontWeight:700, color:'#fff', marginBottom:12 }}>
+                        {/* Modal Body */}
+                        <div className="relative z-10 flex-1 overflow-y-auto px-6 pt-6 pb-2 custom-scrollbar">
+                            
+                            {/* Profile Identity Section */}
+                            <div className="flex items-center gap-5 mb-8">
+                                <Motion.div 
+                                    initial={{ scale: 0.9, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-lg border-2 border-white shrink-0"
+                                    style={{ background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})` }}
+                                >
                                     {initials}
-                                </div>
-                                <div style={{ fontSize:18, fontWeight:700, color:'#111827', marginBottom:2 }}>{user.name}</div>
-                                <div style={{ fontSize:13, color:'#9CA3AF' }}>{user.email}</div>
-
-                                {/* Action Buttons */}
-                                <div style={{ display:'flex', gap:8, marginTop:16 }}>
-                                    {onEdit && (
-                                        <button
-                                            onClick={() => { onClose(); onEdit(user); }}
-                                            style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 16px', fontSize:12, fontWeight:600, color:'#fff', background:'#4F46E5', border:'1px solid #4338CA', borderRadius:7, cursor:'pointer' }}
-                                        >
-                                            <FiEdit2 size={12} /> Edit
-                                        </button>
-                                    )}
-                                    {onDelete && (
-                                        <button
-                                            onClick={() => { onClose(); onDelete(user); }}
-                                            style={{ display:'flex', alignItems:'center', gap:6, padding:'7px 16px', fontSize:12, fontWeight:600, color:'#EF4444', background:'#fff', border:'1px solid #FECACA', borderRadius:7, cursor:'pointer' }}
-                                            onMouseEnter={e => { e.currentTarget.style.background='#FEF2F2'; }}
-                                            onMouseLeave={e => { e.currentTarget.style.background='#fff'; }}
-                                        >
-                                            <FiTrash2 size={12} /> Delete
-                                        </button>
-                                    )}
+                                </Motion.div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-lg font-bold text-slate-900 truncate leading-tight mb-1">{user.name}</div>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <div className="text-[12px] text-slate-500 font-medium truncate">{user.email}</div>
+                                        <div className={`
+                                            px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border
+                                            ${user.status === 'active' 
+                                                ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+                                                : 'bg-rose-50 text-rose-600 border-rose-100'}
+                                        `}>{user.status}</div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div style={{ height:1, background:'#F3F4F6', margin:'0 0 16px' }} />
-
-                            {/* Details */}
-                            <InfoRow icon={<FiShield size={16}/>} label="Role" value={user.role} />
-                            <InfoRow icon={<FiBriefcase size={16}/>} label="Organization" value={user.organization} />
-                            <InfoRow icon={<FiMapPin size={16}/>} label="Assignment" value={user.assignment ? user.assignment.charAt(0).toUpperCase() + user.assignment.slice(1) : '—'} />
-
-                            <InfoRow
-                                icon={<FiClock size={16}/>}
-                                label="Status"
-                                value={
-                                    <span style={{
-                                        display:'inline-block', padding:'3px 10px', fontSize:11, fontWeight:700,
-                                        borderRadius:20, textTransform:'uppercase', letterSpacing:'0.04em',
-                                        background: user.status === 'active' ? '#ECFDF5' : '#FEF2F2',
-                                        color: user.status === 'active' ? '#065F46' : '#991B1B',
-                                        border: `1px solid ${user.status === 'active' ? '#A7F3D0' : '#FECACA'}`,
-                                    }}>
-                                        {user.status}
-                                    </span>
-                                }
-                            />
-
-                            <InfoRow icon={<FiCalendar size={16}/>} label="Last Active" value={user.lastActive || '—'} />
-                            <InfoRow icon={<FiCalendar size={16}/>} label="Created" value={user.createdAt || '—'} />
-
-                            {/* Activity Section */}
-                            <div style={{ marginTop:20, padding:16, background:'#F9FAFB', borderRadius:10, border:'1px solid #F3F4F6' }}>
-                                <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:12 }}>
-                                    <FiCalendar size={13} color="#9CA3AF" />
-                                    <span style={{ fontSize:11, fontWeight:600, color:'#6B7280', textTransform:'uppercase', letterSpacing:'0.05em' }}>Recent Activity</span>
-                                </div>
-                                {[1,2].map(i => (
-                                    <div key={i} style={{ display:'flex', gap:8, padding:'8px 0', borderBottom: i===1 ? '1px solid #E5E7EB' : 'none' }}>
-                                        <div style={{ width:5, height:5, borderRadius:'50%', background:'#4F46E5', marginTop:5, flexShrink:0 }} />
-                                        <div>
-                                            <div style={{ fontSize:12, fontWeight:600, color:'#111827', lineHeight:1.3 }}>Logged in from Mumbai, India</div>
-                                            <div style={{ fontSize:11, color:'#9CA3AF', marginTop:2 }}>2 hours ago • Chrome/Windows</div>
-                                        </div>
+                            {/* Details Grid */}
+                            <div className="grid grid-cols-2 gap-3 mb-8">
+                                {[
+                                    { icon: <FiShield size={14} />, label: "Role", value: user.role },
+                                    { icon: <FiBriefcase size={14} />, label: "Organization", value: user.organization },
+                                    { icon: <FiMapPin size={14} />, label: "Location", value: user.region || 'North Zone' },
+                                    { icon: <FiCalendar size={14} />, label: "Joined", value: user.createdAt || '20 Mar 2024' },
+                                    { icon: <FiClock size={14} />, label: "Last Active", value: user.lastActive || 'Active Now' },
+                                    { icon: <FiUser size={14} />, label: "Employee ID", value: user.employeeId || 'EM-402' }
+                                ].map((item, idx) => (
+                                    <div 
+                                        key={idx}
+                                        className="p-3 bg-slate-50 border border-slate-100 rounded-xl"
+                                    >
+                                        <div className="text-primary mb-1.5 opacity-70">{item.icon}</div>
+                                        <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</div>
+                                        <div className="text-[13px] font-bold text-slate-700 mt-0.5 truncate">{item.value}</div>
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Activity Section */}
+                            <div className="space-y-6 mb-6">
+                                {/* Activity Summary */}
+                                <div className="p-5 bg-slate-50 border border-slate-100 rounded-2xl">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                                            <span className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">Activity Overview</span>
+                                        </div>
+                                        <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">LIVE</span>
+                                    </div>
+                                    <div className="flex items-end gap-1.5 h-12">
+                                        {[40, 65, 30, 85, 50, 95, 70].map((h, i) => (
+                                            <div key={i} className="flex-1 h-full flex items-end">
+                                                <Motion.div 
+                                                    initial={{ height: 0 }}
+                                                    animate={{ height: `${h}%` }}
+                                                    className={`w-full rounded-sm ${i === 5 ? 'bg-primary' : 'bg-slate-200'}`}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </motion.div>
-                </>
+
+                        {/* Modal Footer */}
+                        <div className="relative z-10 p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+                            <Button
+                                variant="danger"
+                                onClick={() => { onClose(); onDelete(user); }}
+                                className="!h-10 !px-5 !text-[11px] !font-bold !uppercase !tracking-wider"
+                            >
+                                Remove User
+                            </Button>
+                            <Button
+                                variant="primary"
+                                onClick={() => { onClose(); onEdit(user); }}
+                                className="!h-10 !px-6 !rounded-xl !text-[11px] !font-bold !uppercase !tracking-wider shadow-lg shadow-primary/10"
+                            >
+                                Edit Profile
+                            </Button>
+                        </div>
+                    </Motion.div>
+                </div>
             )}
         </AnimatePresence>
     );

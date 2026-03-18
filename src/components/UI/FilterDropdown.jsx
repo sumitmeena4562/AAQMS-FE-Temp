@@ -1,108 +1,71 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown } from 'react-icons/fi';
+import useClickOutside from '../../hooks/useClickOutside';
 
-const FilterDropdown = ({
-    label,
-    options = [],
-    value,
-    onChange,
-    placeholder = "Select Option",
-    className = "",
-    minWidth = "160px"
-}) => {
+const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All' }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const dropdownRef = useRef(null);
+    const containerRef = useRef(null);
 
-    // Close on outside click
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setIsOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    useClickOutside(containerRef, () => setIsOpen(false));
 
-    const selectedOption = options.find(opt => opt.value === value);
+    // Get display label for current value
+    const getDisplayLabel = () => {
+        if (!value) return allLabel;
+        const option = options.find(opt => 
+            typeof opt === 'string' ? opt === value : opt.value === value
+        );
+        return typeof option === 'string' ? option : (option?.label || value);
+    };
 
     return (
-        <div className={`flex flex-col gap-1 ${className}`} ref={dropdownRef}>
-            {/* Label on Top */}
-            {label && (
-                <span className="text-[9px] font-bold uppercase tracking-[0.05em] text-[var(--color-text-muted)] pl-3">
-                    {label}
-                </span>
-            )}
+        <div ref={containerRef} className="relative">
+            <button 
+                onClick={() => setIsOpen(!isOpen)}
+                className={`flex items-center gap-2 px-3 py-1.5 bg-white border rounded-xl cursor-pointer transition-all duration-200 group
+                    ${isOpen ? 'border-primary ring-4 ring-primary/5 shadow-sm' : 'border-slate-200 hover:border-slate-300 shadow-sm'}`}
+            >
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{label}:</span>
+                <span className="text-[13px] font-bold text-slate-700">{getDisplayLabel()}</span>
+                <FiChevronDown className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : ''}`} size={14} />
+            </button>
 
-            <div className="relative">
-                {/* Trigger Button */}
-                <button
-                    type="button"
-                    onClick={() => setIsOpen(!isOpen)}
-                    style={{
-                        height: '34px',
-                        minWidth: minWidth,
-                    }}
-                    className={`flex items-center justify-between gap-2 px-4 bg-white border transition-all duration-200 cursor-pointer select-none w-full rounded-full
-                        ${isOpen ? 'border-accent ring-2 ring-accent-soft' : 'border-border hover:border-border-hover'}
-                        ${value ? 'bg-accent-soft border-accent' : ''}`}
-                >
-                    <span className={`text-[12.5px] font-medium whitespace-nowrap overflow-hidden text-ellipsis leading-tight
-                        ${value ? 'text-text-primary' : 'text-text-secondary'}`}>
-                        {selectedOption ? selectedOption.label : placeholder}
-                    </span>
-                    <FiChevronDown
-                        className={`text-[14px] text-text-muted transition-transform duration-300 flex-shrink-0
-                            ${isOpen ? 'rotate-180 text-accent' : ''}`}
-                    />
-                </button>
-
-                {/* Dropdown Menu */}
+            <AnimatePresence>
                 {isOpen && (
-                    <div
-                        className="absolute top-[calc(100%+8px)] left-0 z-50 py-1.5 bg-white border border-border shadow-xl min-w-full animate-in fade-in slide-in-from-top-2 duration-200"
-                        style={{ borderRadius: '12px', minWidth: '220px' }}
+                    <Motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                        className="absolute top-[calc(100%+8px)] left-0 min-w-[180px] bg-white border border-slate-200 rounded-xl shadow-xl z-[100] overflow-hidden p-1.5"
                     >
-                        <div className="max-h-[280px] overflow-y-auto scrollbar-none">
-                            {/* Default "All" Option */}
-                            <div
-                                onClick={() => { onChange(""); setIsOpen(false); }}
-                                className="px-4 py-2.5 text-[12.5px] font-bold text-text-muted hover:bg-bg-hover cursor-pointer transition-colors"
-                            >
-                                {placeholder}
-                            </div>
-
-                            <div className="h-[1px] bg-border/50 mx-2 my-1" />
-
-                            {options.map((option, idx) => (
-                                <div
-                                    key={idx}
-                                    onClick={() => {
-                                        onChange(option.value);
-                                        setIsOpen(false);
-                                    }}
-                                    className={`group flex items-center justify-between px-4 py-2.5 text-[13px] font-bold cursor-pointer transition-all
-                                        ${value === option.value
-                                            ? 'bg-primary/5 text-primary border-r-[3px] border-primary'
-                                            : 'text-text-secondary hover:bg-bg-hover hover:text-text-primary'}`}
-                                >
-                                    <span>{option.label}</span>
-                                    {value === option.value && (
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                                    )}
-                                </div>
-                            ))}
+                        <button 
+                            onClick={() => { onChange(''); setIsOpen(false); }}
+                            className={`w-full px-3 py-2 text-left rounded-lg transition-colors text-[13px] font-bold
+                                ${!value ? 'bg-primary/[0.06] text-primary' : 'hover:bg-slate-50 text-slate-600'}`}
+                        >
+                            {allLabel}
+                        </button>
+                        <div className="max-h-[240px] overflow-y-auto no-scrollbar pt-1">
+                            {options.map((opt, i) => {
+                                const val = typeof opt === 'string' ? opt : opt.value;
+                                const lbl = typeof opt === 'string' ? opt : opt.label;
+                                const isSelected = value === val;
+                                
+                                return (
+                                    <button 
+                                        key={val || i}
+                                        onClick={() => { onChange(val); setIsOpen(false); }}
+                                        className={`w-full px-3 py-2 text-left rounded-lg transition-colors text-[13px] font-bold mt-0.5
+                                            ${isSelected ? 'bg-primary/[0.06] text-primary' : 'hover:bg-slate-50 text-slate-600'}`}
+                                    >
+                                        {lbl}
+                                    </button>
+                                );
+                            })}
                         </div>
-
-                        {options.length === 0 && (
-                            <div className="px-4 py-6 text-center text-[12px] text-text-muted font-medium italic">
-                                No options available
-                            </div>
-                        )}
-                    </div>
+                    </Motion.div>
                 )}
-            </div>
+            </AnimatePresence>
         </div>
     );
 };

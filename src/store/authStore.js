@@ -1,29 +1,71 @@
 import { create } from "zustand";
 
+// Helper function to simulate network delay
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const MOCK_USERS = {
+    'admin@aaqms.com': { 
+        password: 'Admin@123', 
+        user: { id: 1, name: 'Sumit Meena', email: 'admin@aaqms.com', role: 'admin' } 
+    },
+    'coordinator@aaqms.com': { 
+        password: 'Coord@123', 
+        user: { id: 2, name: 'Anjali Sharma', email: 'coordinator@aaqms.com', role: 'coordinator' } 
+    },
+    'officer@aaqms.com': { 
+        password: 'Officer@123', 
+        user: { id: 3, name: 'Rahul Gupta', email: 'officer@aaqms.com', role: 'field_officer' } 
+    }
+};
+
 const useAuthStore = create((set) => ({
-    // Check if a token exists in local storage on initial load
+    // Initialize state from localStorage
     isAuthenticated: !!localStorage.getItem('token'),
     user: JSON.parse(localStorage.getItem('user')) || null,
     isLoading: false,
     error: null,
 
-    login: async (credentials) => {
+    /**
+     * Simulated Login Method
+     * @param {Object} credentials - email, password, rememberMe
+     */
+    login: async ({ email, password, rememberMe }) => {
         set({ isLoading: true, error: null });
+        
         try {
-            // Placeholder: Replace with actual API call
-            // const response = await api.login(credentials);
-            // const { token, user } = response.data;
+            await delay(1500);
+            const userData = MOCK_USERS[email.toLowerCase()];
 
-            // Simulating successful login for now
-            const mockToken = 'dummy-jwt-token';
-            const mockUser = { name: 'Admin User', role: 'admin' };
+            if (userData && userData.password === password) {
+                const mockToken = `simulated-jwt-${Date.now()}`;
+                const loggedInUser = userData.user;
 
-            localStorage.setItem('token', mockToken);
-            localStorage.setItem('user', JSON.stringify(mockUser));
+                // Handle Persistence for "Remember Me"
+                if (rememberMe) {
+                    localStorage.setItem('token', mockToken);
+                    localStorage.setItem('user', JSON.stringify(loggedInUser));
+                } else {
+                    // For short-lived sessions, we still use localStorage for simplicity 
+                    // in this POC, but the logic structure allows for sessionStorage later.
+                    localStorage.setItem('token', mockToken);
+                    localStorage.setItem('user', JSON.stringify(loggedInUser));
+                }
 
-            set({ isAuthenticated: true, user: mockUser, isLoading: false });
+                set({ 
+                    isAuthenticated: true, 
+                    user: loggedInUser, 
+                    isLoading: false, 
+                    error: null 
+                });
+                
+                return { success: true, user: loggedInUser };
+            } else {
+                throw new Error('Invalid Email or Password!');
+            }
         } catch (err) {
-            set({ error: err.message || 'Login failed', isLoading: false });
+            const error = err.message || 'Authentication Failed';
+            set({ error, isLoading: false });
+            return { success: false, error };
         }
     },
 
@@ -36,4 +78,4 @@ const useAuthStore = create((set) => ({
     setError: (error) => set({ error })
 }));
 
-export default useAuthStore;
+export default useAuthStore;

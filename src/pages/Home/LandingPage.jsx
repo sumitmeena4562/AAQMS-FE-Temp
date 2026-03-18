@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import LandingNavbar from '../../components/Navbar/LandingNavbar';
 import Footer from '../../components/Navbar/Footer';
 
-// Lazy load sections
+// Lazy load sections for optimized performance
 const Hero = lazy(() => import('./Hero'));
 const RoleFeatures = lazy(() => import('./RoleFeatures'));
 const Capabilities = lazy(() => import('./Capabilities'));
@@ -13,20 +13,21 @@ const Analytics = lazy(() => import('./Analytics'));
 const SitePlanning = lazy(() => import('./SitePlanning'));
 const CTA = lazy(() => import('./CTA'));
 
-// Simple Section Loader
+// Skeleton Loader for smooth transitions
 const SectionLoader = () => (
-    <div style={{ padding: '80px 24px', textAlign: 'center', color: 'var(--color-text-muted)', opacity: 0.5 }}>
-        <div className="animate-pulse">Loading section...</div>
+    <div className="py-20 px-6 text-center text-slate-400 opacity-50">
+        <div className="animate-pulse font-black uppercase tracking-[0.2em] text-xs">Loading segment...</div>
     </div>
 );
 
 const LandingPage = () => {
     const navigate = useNavigate();
 
+    // Enhanced scroll function with better easing and timing
     const scrollToSection = (id) => {
         const element = document.getElementById(id);
         if (element) {
-            const offset = 80; // navbar height
+            const offset = 80; // Standard Navbar height
             const bodyRect = document.body.getBoundingClientRect().top;
             const elementRect = element.getBoundingClientRect().top;
             const elementPosition = elementRect - bodyRect;
@@ -50,8 +51,8 @@ const LandingPage = () => {
     ];
 
     return (
-        <div style={{ minHeight: '100vh', background: 'var(--color-bg-primary)', overflowX: 'clip' }}>
-            {/* Navbar */}
+        <div className="min-h-screen bg-white overflow-x-hidden selection:bg-primary/20 selection:text-primary-dark">
+            {/* Elite Navbar */}
             <LandingNavbar
                 navLinks={navLinks}
                 buttons={[
@@ -59,48 +60,42 @@ const LandingPage = () => {
                 ]}
             />
 
+            {/* Main Content Sections with Lazy Loading */}
             <Suspense fallback={<SectionLoader />}>
-                {/* Hero Section */}
-                <div id="home">
+                <section id="home">
                     <Hero />
-                </div>
+                </section>
 
-                {/* Role Features Section */}
-                <div id="roles" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="roles" className="scroll-mt-20">
                     <RoleFeatures />
                 </div>
 
-                {/* Core Capabilities Section */}
-                <div id="capabilities" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="capabilities" className="scroll-mt-20">
                     <Capabilities />
                 </div>
 
-                {/* Site Planning Section */}
-                <div id="planning" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="planning" className="scroll-mt-20">
                     <SitePlanning />
                 </div>
 
-                {/* Workflow Section */}
-                <div id="workflow" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="workflow" className="scroll-mt-20">
                     <Workflow />
                 </div>
 
-                {/* Field App Section */}
-                <div id="mobile" style={{ scrollMarginTop: 'var(--navbar-height)' }}>
+                <div id="mobile" className="scroll-mt-20">
                     <FieldApp />
                 </div>
 
-                {/* Analytics Section */}
-                <div id="analytics" style={{ scrollMarginTop: 'var(--navbar-height)', marginBottom: '60px' }}>
+                <div id="analytics" className="scroll-mt-20">
                     <Analytics />
                 </div>
 
-                {/* CTA Section */}
-                <CTA />
+                <section id="cta">
+                    <CTA />
+                </section>
             </Suspense>
 
-
-            {/* Footer */}
+            {/* Premium Footer */}
             <Footer />
         </div>
     );

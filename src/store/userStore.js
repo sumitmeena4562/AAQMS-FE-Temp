@@ -1,7 +1,10 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { userService } from '../services/userService';
 
-const useUserStore = create((set, get) => ({
+const useUserStore = create(
+    persist(
+        (set, get) => ({
     // ── Data State ──
     users: [],
     stats: { total: 0, active: 0, inactive: 0, unassigned: 0 },
@@ -11,7 +14,7 @@ const useUserStore = create((set, get) => ({
 
     // ── UI State ──
     search: '',
-    filters: { organization: '', role: '', status: '', assignment: '' },
+    filters: { organization: '', role: '', status: '', assignment: '', timeRange: 'all', region: '', verified: '' },
     sortKey: 'name',
     sortDir: 'asc',
     selectedIds: [],
@@ -24,7 +27,7 @@ const useUserStore = create((set, get) => ({
             const { search, filters } = get();
             const users = await userService.getUsers(filters, search);
             const stats = await userService.getUserStats();
-            const filterOptions = await userService.getFilterOptions();
+            const filterOptions = await userService.getFilterOptions(filters);
             set({ users, stats, filterOptions, loading: false });
         } catch (err) {
             set({ error: err.message, loading: false });
@@ -136,10 +139,21 @@ const useUserStore = create((set, get) => ({
 
     resetFilters: () => set({
         search: '',
-        filters: { organization: '', role: '', status: '', assignment: '' },
+        filters: { 
+            organization: '', role: '', status: '', assignment: '', 
+            timeRange: 'all', region: '', verified: '' 
+        },
     }),
 
     clearError: () => set({ error: null }),
+    setSelectedIds: (selectedIds) => set({ selectedIds }),
+}), {
+    name: 'aaqms-user-filters',
+    partialize: (state) => ({ 
+        filters: state.filters, 
+        sortKey: state.sortKey, 
+        sortDir: state.sortDir 
+    }),
 }));
 
 export default useUserStore;

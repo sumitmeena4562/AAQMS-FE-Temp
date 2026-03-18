@@ -1,12 +1,9 @@
+import React from 'react';
+import PlaceholderPage from '../../components/UI/PlaceholderPage';
+import { MdOutlineSupportAgent } from 'react-icons/md';
+
 const Coordinator = () => {
-    return (
-        <div className="p-6">
-            <h1 className="text-2xl font-semibold mb-4 text-gray-800">Coordinators</h1>
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <p className="text-gray-600">Coordinator management features will be implemented here.</p>
-            </div>
-        </div>
-    );
+    return <PlaceholderPage title="Coordinator Management" icon={MdOutlineSupportAgent} />;
 };
 
 export default Coordinator;

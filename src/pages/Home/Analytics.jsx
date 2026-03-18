@@ -1,192 +1,198 @@
 import React from 'react';
 import Card from '../../components/UI/Card';
+import { motion } from 'framer-motion';
 import {
     MdOutlineTrendingUp,
     MdOutlineAssignmentLate,
     MdOutlineAutoGraph
 } from 'react-icons/md';
 
-// eslint-disable-next-line no-unused-vars
-const StatCard = ({ label, value, trend, icon: Icon, color }) => (
-    <Card
-        padding="24px"
-        style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}
+const StatCard = ({ label, value, trend, icon: Icon, color, index }) => (
+    <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.3 + (index * 0.1) }}
+        className="flex-1 min-w-[140px]"
     >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
-                background: `${color}15`,
-                color: color,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <Icon size={20} />
+        <Card
+            className="flex flex-col gap-4 h-full bg-white border border-white group transition-shadow hover:shadow-lg"
+            hoverEffect={true}
+        >
+            <div className="flex justify-between items-center">
+                <div 
+                    className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3"
+                    style={{ 
+                        background: `linear-gradient(135deg, ${color}20, ${color}10)`,
+                        color: color,
+                        boxShadow: `inset 0 0 0 1px ${color}10`
+                    }}
+                >
+                    <Icon className="text-[22px]" />
+                </div>
+                {trend && (
+                    <div className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100 uppercase tracking-tighter">
+                        {trend}
+                    </div>
+                )}
             </div>
-            {trend && <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-success)' }}>{trend}</span>}
-        </div>
-        <div>
-            <div style={{ fontSize: '13px', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>{label}</div>
-            <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--color-primary-dark)' }}>{value}</div>
-        </div>
-    </Card>
+            <div>
+                <div className="text-[11px] font-black text-slate-400 mb-1 uppercase tracking-widest leading-none">
+                    {label}
+                </div>
+                <div className="text-2xl font-black text-slate-900 tracking-tighter leading-none">
+                    {value}
+                </div>
+            </div>
+        </Card>
+    </motion.div>
 );
 
 const Analytics = () => {
     return (
-        <section className="analytics-section" style={{
-            padding: '100px 24px',
-            background: '#fff',
-            borderTop: '1px solid var(--color-border-light)'
-        }}>
-            <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.2fr)', gap: '60px', alignItems: 'center' }} className="analytics-grid">
+        <section id="analytics" className="py-16 px-6 bg-gradient-to-b from-white to-slate-50 border-t border-slate-100 relative overflow-hidden">
+            {/* Background Decorative Blob */}
+            <div className="absolute top-[10%] -right-[5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
 
-                {/* Left Side: Text */}
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--color-info)', letterSpacing: '0.1em', marginBottom: '12px' }}>REPORTING & COMPLIANCE</div>
+            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-16 items-center relative z-10">
+                
+                {/* Left Side: Content */}
+                <motion.div 
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+                >
+                    <div className="flex items-center gap-4 text-[10px] font-black text-primary tracking-widest uppercase mb-4">
+                        <div className="w-10 h-px bg-primary/30"></div>
+                        Reporting & Compliance
+                    </div>
 
-                    <h2 style={{
-                        fontSize: 'clamp(28px, 4vw, 42px)',
-                        fontWeight: 800,
-                        color: 'var(--color-primary-dark)',
-                        marginBottom: '20px',
-                        letterSpacing: '-0.02em'
-                    }}>
-                        Real-Time Insights for Absolute Accountability
+                    <h2 className="text-[clamp(1.75rem,4vw,2.4rem)] font-black text-slate-900 mb-6 tracking-tighter leading-[1.05]">
+                        Real-Time Insights for Absolute <span className="text-primary">Accountability.</span>
                     </h2>
 
-                    <p style={{
-                        fontSize: '17px',
-                        color: 'var(--color-text-secondary)',
-                        lineHeight: 1.6,
-                        marginBottom: '32px',
-                        maxWidth: '520px'
-                    }}>
+                    <p className="text-base text-slate-500 leading-relaxed mb-8 max-w-xl font-medium">
                         Transform raw field data into actionable audit trails. Automatically generate daily, weekly, or monthly compliance reports with AI-verified precision.
                     </p>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="flex flex-col gap-5">
                         {[
                             "Automated AI-Risk identification & flagship alerts.",
                             "Tamper-proof audit trails for regulatory submission.",
                             "Historical data comparison for maintenance trends."
                         ].map((item, idx) => (
-                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '15px', color: 'var(--color-text-primary)', fontWeight: 500 }}>
-                                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-info)' }}></div>
+                            <motion.div 
+                                key={idx}
+                                initial={{ opacity: 0, x: -10 }}
+                                whileInView={{ opacity: 1, x: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.4 + (idx * 0.1) }}
+                                className="flex items-start gap-4 text-base text-slate-700 font-bold"
+                            >
+                                <div className="min-w-[22px] h-5.5 rounded-full bg-primary/10 flex items-center justify-center text-primary mt-0.5">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </div>
                                 {item}
-                            </div>
+                            </motion.div>
                         ))}
                     </div>
-                </div>
+                </motion.div>
 
-                {/* Right Side: Visual Dashboard Snippet */}
-                <div style={{ position: 'relative' }}>
-                    <Card style={{
-                        background: 'var(--color-bg-primary)',
-                        border: '1px solid var(--color-border)',
-                        padding: '24px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '24px'
-                    }}>
-                        {/* Header Snippet */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h4 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--color-primary-dark)' }}>Compliance Overview</h4>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-success)' }}></div>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-warning)' }}></div>
-                                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-border-dark)' }}></div>
+                {/* Right Side: Visual Dashboard Card */}
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, ease: [0.21, 1, 0.36, 1] }}
+                    className="relative"
+                >
+                    <Card
+                        padding="32px"
+                        borderRadius="28px"
+                        className="bg-white/95 border-white shadow-2xl flex flex-col gap-8 ring-1 ring-slate-100"
+                    >
+                        {/* Header */}
+                        <div className="flex justify-between items-center">
+                            <h4 className="text-lg font-black text-slate-900 tracking-tight">Compliance Overview</h4>
+                            <div className="flex gap-2">
+                                <div className="w-2.5 h-2.5 rounded-full bg-success opacity-40" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-warning opacity-40" />
+                                <div className="w-2.5 h-2.5 rounded-full bg-slate-200 opacity-40" />
                             </div>
                         </div>
 
                         {/* Stats Row */}
-                        <div style={{ display: 'flex', gap: '16px' }} className="stats-row">
+                        <div className="flex flex-col sm:flex-row gap-5">
                             <StatCard
                                 label="Audit Score"
                                 value="98.2%"
                                 trend="+2.4%"
                                 icon={MdOutlineTrendingUp}
                                 color="#10b981"
+                                index={0}
                             />
                             <StatCard
                                 label="Risk Flags"
                                 value="03"
                                 icon={MdOutlineAssignmentLate}
                                 color="#ef4444"
+                                index={1}
                             />
                         </div>
 
-                        {/* Chart Area Stub */}
-                        <div style={{
-                            height: '160px',
-                            background: '#fff',
-                            borderRadius: '16px',
-                            border: '1px solid var(--color-border-light)',
-                            display: 'flex',
-                            alignItems: 'flex-end',
-                            padding: '16px',
-                            gap: '12px'
-                        }}>
+                        {/* Fancy Chart Area */}
+                        <div className="h-44 bg-slate-50 rounded-2xl border border-slate-100 flex items-end p-4 sm:p-5 gap-1.5 sm:gap-3 relative overflow-hidden group shadow-inner">
+                            {/* Static grid pattern for aesthetic */}
+                            <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:16px_16px]" />
+                            
                             {[40, 70, 45, 90, 65, 80, 55, 95].map((h, i) => (
-                                <div key={i} style={{
-                                    flex: 1,
-                                    height: `${h}%`,
-                                    background: i === 7 ? 'var(--color-primary)' : 'var(--color-primary-light)',
-                                    opacity: i === 7 ? 1 : 0.3,
-                                    borderRadius: '4px'
-                                }}></div>
+                                <motion.div 
+                                    key={i} 
+                                    initial={{ height: 0 }}
+                                    whileInView={{ height: `${h}%` }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 1, delay: 0.6 + (i * 0.05), ease: "easeOut" }}
+                                    className={`
+                                        flex-1 rounded-t-sm sm:rounded-t-lg transition-all duration-300
+                                        ${i === 7 ? 'bg-primary' : 'bg-primary/20 group-hover:bg-primary/30'}
+                                    `}
+                                />
                             ))}
                         </div>
 
                         {/* Action buttons */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
-                            <button style={{ padding: '8px 16px', fontSize: '12px', fontWeight: 600, color: 'var(--color-text-secondary)', background: '#fff', border: '1px solid var(--color-border)', borderRadius: '8px' }}>History</button>
-                            <button style={{ padding: '8px 16px', fontSize: '12px', fontWeight: 600, color: '#fff', background: 'var(--color-primary)', border: 'none', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                <MdOutlineAutoGraph /> Generate Report
-                            </button>
+                        <div className="flex justify-end gap-3 flex-wrap">
+                            <motion.button 
+                                whileHover={{ scale: 1.05 }} 
+                                whileTap={{ scale: 0.95 }} 
+                                className="px-5 py-2.5 text-[12px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 border border-slate-200 rounded-xl transition-colors hover:bg-slate-100"
+                            >
+                                History
+                            </motion.button>
+                            <motion.button 
+                                whileHover={{ scale: 1.05, boxShadow: "0 10px 20px -5px rgba(var(--color-primary-rgb), 0.3)" }} 
+                                whileTap={{ scale: 0.95 }} 
+                                className="px-5 py-2.5 text-[12px] font-black uppercase tracking-widest text-white bg-primary rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 group transition-all"
+                            >
+                                <MdOutlineAutoGraph className="text-base group-hover:rotate-12 transition-transform" /> 
+                                Generate Report
+                            </motion.button>
                         </div>
                     </Card>
 
-                    {/* Decorative Floating Label */}
-                    <div style={{
-                        position: 'absolute',
-                        bottom: '-20px',
-                        left: '-20px',
-                        background: '#fff',
-                        padding: '12px 20px',
-                        borderRadius: '12px',
-                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        zIndex: 10
-                    }}>
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-success)', boxShadow: '0 0 10px var(--color-success)' }}></div>
-                        <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--color-primary-dark)' }}>Live Sync Active</span>
-                    </div>
-                </div>
+                    {/* Decorative Floating Label - Adjusted for Mobile safety */}
+                    <motion.div 
+                        initial={{ x: 20, opacity: 0 }}
+                        whileInView={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 1 }}
+                        className="absolute -bottom-5 sm:-left-5 left-0 sm:left-auto bg-white p-3 sm:p-3.5 px-4 sm:px-6 rounded-2xl shadow-xl z-20 flex items-center gap-3 border border-slate-100 ring-2 ring-white"
+                    >
+                        <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_12px_var(--color-success)]" />
+                        <span className="text-[12px] sm:text-sm font-black text-slate-900 tracking-tight">Live Sync Active</span>
+                    </motion.div>
+                </motion.div>
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @media (max-width: 1024px) {
-                    .analytics-grid {
-                        grid-template-columns: 1fr !important;
-                        text-align: center;
-                        gap: 40px !important;
-                    }
-                    .analytics-grid > div {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                    }
-                    .stats-row {
-                        flex-direction: column !important;
-                    }
-                }
-            `}} />
         </section>
     );
 };
