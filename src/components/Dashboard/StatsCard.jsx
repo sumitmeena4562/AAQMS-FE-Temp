@@ -1,18 +1,19 @@
 import React from 'react';
 import { FiArrowUpRight, FiArrowDownRight } from 'react-icons/fi';
+import { getChangeStyles } from '../../utils/cardStyles';
 
 /**
  * Global StatsCard — Reusable across all pages.
  */
-const StatsCard = ({ 
-    label, 
-    value, 
-    icon, 
-    iconBg = 'bg-slate-100', 
-    iconColor = 'text-slate-600', 
-    trend, 
-    subValue, 
-    className = "" 
+const StatsCard = ({
+    label,
+    value,
+    icon,
+    iconBg = 'bg-slate-100',
+    iconColor = 'text-slate-600',
+    trend,
+    subValue,
+    className = ""
 }) => {
     return (
         <div
@@ -26,7 +27,7 @@ const StatsCard = ({
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-black/5 transition-transform group-hover:scale-110 duration-300 ${iconBg} ${iconColor}`}>
                 {icon && (() => {
                     const IconComponent = icon;
-                    return React.isValidElement(icon) 
+                    return React.isValidElement(icon)
                         ? React.cloneElement(icon, { size: 20 })
                         : <IconComponent size={20} />;
                 })()}
@@ -77,5 +78,48 @@ export const StatsRow = ({ items = [], columns = 4, className = "" }) => {
         </div>
     );
 };
+{/* 
+// ==========================================
+// 2. FOR STATS GRID (Large Dashboard Cards)
+// ========================================== */}
+export const StatCard = ({ title, value, change, description, icon, iconBgClass, iconColorClass, changeType = 'neutral' }) => {
+    const changeStyle = getChangeStyles(changeType);
+    return (
+        <div className="bg-white !px-6 !py-5 rounded-2xl w-full border border-gray-300 shadow-stat-card flex flex-col min-h-[148px] hover:shadow-2xl transition-all duration-200 cursor-default min-w-[236px]">
 
-export default StatsCard;
+            {/* Header Area */}
+            <div className="flex items-start justify-between gap-4 ">
+                <div className="flex flex-col min-w-0 flex-1">
+                    <p className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase mb-1 truncate">
+                        {title}
+                    </p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-none tabular-nums !mt-1">
+                        {value}
+                    </h2>
+                </div>
+
+                {/* Icon Box */}
+                <div className={`w-10 h-10 flex items-center justify-center rounded-xl shrink-0 ${iconBgClass} ${iconColorClass}`}>
+                    {icon}
+                </div>
+            </div>
+
+            {/* Divider */}
+            <div className="h-[2px] w-full bg-gray-200 !my-4"></div>
+
+
+            <div className=" flex items-center gap-2 justify-between flex-wrap pt-1">
+                <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ${changeStyle.text} ${changeStyle.bg}`}>
+                    {change}
+                </span>
+                <span className="text-[12px] font-medium text-gray-400 truncate flex-1 text-right">
+                    {description}
+                </span>
+            </div>
+        </div>
+    );
+};
+
+export default StatCard;
+
+{/* // ========================================== */ }
