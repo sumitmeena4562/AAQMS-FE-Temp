@@ -124,7 +124,7 @@ function ForgotPasswordModal({ isOpen, onClose }) {
                     </button>
 
                     {/* Grain Texture */}
-                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />
+                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('/noise.svg')]" />
                     <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
 
                     <AnimatePresence mode="wait">

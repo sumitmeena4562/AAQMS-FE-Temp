@@ -61,7 +61,7 @@ function AuthForm({
                 className="bg-white/80 backdrop-blur-2xl p-8 md:p-10 rounded-[32px] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-slate-200/50"
             >
                 {/* Grain Texture Overlay */}
-                <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('/noise.svg')]" />
 
                 {/* Subtle top highlight */}
                 <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />

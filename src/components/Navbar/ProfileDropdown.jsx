@@ -30,7 +30,7 @@ const ProfileDropdown = () => {
             {/* Avatar Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-8 h-8 rounded-full bg-[#072267] flex items-center justify-center text-white text-sm font-bold transition-all duration-200 hover:ring-2 hover:ring-[#072267]/10 ${isOpen ? 'ring-2 ring-[#072267]/10 shadow-lg' : ''}`}
+                className={`w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold transition-all duration-200 hover:ring-2 hover:ring-primary/10 ${isOpen ? 'ring-2 ring-primary/10 shadow-lg' : ''}`}
             >
                 {name.charAt(0).toUpperCase()}
             </button>
@@ -39,17 +39,17 @@ const ProfileDropdown = () => {
             {isOpen && (
                 <div className="absolute right-0 top-[calc(100%+12px)] w-[240px] bg-white border border-slate-200 rounded-2xl shadow-[0_20px_60px_rgba(7,34,103,0.15)] z-[2000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     {/* User Info Section */}
-                    <div className="p-4 flex items-center gap-3.5 bg-gradient-to-br from-[#072267]/[0.05] to-transparent border-b border-slate-100">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#072267] to-[#6366F1] flex items-center justify-center text-white text-[15px] font-extrabold shadow-md relative shrink-0">
+                    <div className="p-4 flex items-center gap-3.5 bg-gradient-to-br from-primary/[0.05] to-transparent border-b border-slate-100">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-[#6366F1] flex items-center justify-center text-white text-[15px] font-extrabold shadow-md relative shrink-0">
                             {name.charAt(0).toUpperCase()}
                             <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
                         </div>
                         <div className="overflow-hidden">
                             <div className="flex items-center gap-1.5 mb-0.5">
-                                <p className="text-[#111827] text-sm font-extrabold truncate leading-tight">{name}</p>
-                                <span className="text-[9px] font-black bg-[#072267] text-white px-1.5 py-0.5 rounded uppercase tracking-wider">ADMIN</span>
+                                <p className="text-slate-900 text-sm font-extrabold truncate leading-tight">{name}</p>
+                                <span className="text-[9px] font-black bg-primary text-white px-1.5 py-0.5 rounded uppercase tracking-wider">ADMIN</span>
                             </div>
-                            <p className="text-[#6B7280] text-[11px] font-semibold truncate">{email.toLowerCase()}</p>
+                            <p className="text-slate-500 text-[11px] font-semibold truncate">{email.toLowerCase()}</p>
                         </div>
                     </div>
 
@@ -58,9 +58,9 @@ const ProfileDropdown = () => {
                         {menuItems.map((item, i) => (
                             <button
                                 key={i}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-slate-600 transition-all duration-150 hover:bg-[#072267]/[0.04] hover:text-[#072267] group text-left"
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-slate-600 transition-all duration-150 hover:bg-primary/[0.04] hover:text-primary group text-left"
                             >
-                                <span className="text-[#072267]/60 group-hover:text-[#072267] transition-colors">{item.icon}</span>
+                                <span className="text-primary/60 group-hover:text-primary transition-colors">{item.icon}</span>
                                 {item.label}
                             </button>
                         ))}
