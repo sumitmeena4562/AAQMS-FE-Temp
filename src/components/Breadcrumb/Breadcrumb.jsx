@@ -1,72 +1,48 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { FiChevronRight, FiHome } from "react-icons/fi";
-import { t } from "../../theme/theme";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-const Breadcrumb = ({ items = [], className = "" }) => {
-    if (!items.length) return null;
+const ChevronIcon = () => (
+  <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+  </svg>
+);
 
-    return (
-        <nav
-            aria-label="Breadcrumb"
-            style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 8, 
-                overflowX: 'auto', 
-                whiteSpace: 'nowrap',
-                fontFamily: 'inherit',
-                ...className
-            }}
-            className="no-scrollbar"
-        >
-            {items.map((item, index) => {
-                const isLast = index === items.length - 1;
-                const isFirst = index === 0;
+const Breadcrumb = ({ items = [] }) => {
+  if (!items.length) return null;
 
-                return (
-                    <React.Fragment key={index}>
-                        {/* Item */}
-                        {isLast ? (
-                            <span style={{ 
-                                padding: '4px 0', 
-                                color: t.color.primary, 
-                                fontWeight: 800, 
-                                fontSize: 13,
-                                letterSpacing: '-0.2px'
-                            }}>
-                                {item.label}
-                            </span>
-                        ) : (
-                            <Link
-                                to={item.path}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 6,
-                                    textDecoration: 'none',
-                                    fontSize: 13,
-                                    fontWeight: 600,
-                                    color: t.color.textPlaceholder,
-                                    transition: `color ${t.transition.fast}`,
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.color = t.color.textSecondary}
-                                onMouseLeave={e => e.currentTarget.style.color = t.color.textPlaceholder}
-                            >
-                                {isFirst && <FiHome size={14} style={{ marginBottom: 1 }} />}
-                                {item.label}
-                            </Link>
-                        )}
+  return (
+    <nav className="flex items-center flex-wrap gap-2">
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
 
-                        {/* Modern Separator */}
-                        {!isLast && (
-                            <FiChevronRight size={14} color={t.color.borderDark} style={{ opacity: 0.6 }} />
-                        )}
-                    </React.Fragment>
-                );
-            })}
-        </nav>
-    );
+        return (
+          <React.Fragment key={index}>
+            {/* Agar item active hai, to Blue Pill (Figma style) dikhayega */}
+            {item.isActive ? (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 border border-blue-100 rounded-md shadow-sm">
+                {item.icon && <span className="text-gray-500 flex items-center">{item.icon}</span>}
+                <span className="text-[13px] font-medium text-gray-700 leading-none mt-[1px]">
+                  {item.label}
+                </span>
+              </div>
+            ) : (
+              /* Normal inactive path */
+              <Link
+                to={item.path || "#"}
+                className="flex items-center gap-1.5 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                {item.icon && <span className="text-gray-400 flex items-center">{item.icon}</span>}
+                <span className="leading-none mt-[1px]">{item.label}</span>
+              </Link>
+            )}
+
+            {/* Separator Chevron > */}
+            {!isLast && <ChevronIcon />}
+          </React.Fragment>
+        );
+      })}
+    </nav>
+  );
 };
 
 export default Breadcrumb;
