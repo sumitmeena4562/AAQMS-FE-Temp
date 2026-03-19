@@ -7,6 +7,7 @@ import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 import useUserStore from '../../store/userStore';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
+import PageHeader from '../../components/Dashboard/pageHeader';
 
 const Organizations = () => {
     const orgs = useOrgStore(state => state.orgs);
@@ -100,40 +101,40 @@ const Organizations = () => {
     ];
 
     return (
-        <div className="flex flex-col min-h-screen font-sans animate-in fade-in duration-500 bg-slate-50/30">
-            <main className="flex-1 w-full pb-20 overflow-y-auto">
-                <div className="px-8 mt-10 max-w-[1600px] mx-auto">
-                    
-                    {/* 1. COMPACT HEADER */}
-                    <div className="flex items-center justify-between mb-8">
-                        <div className="flex flex-col gap-1">
-                            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Organizations</h2>
-                            <p className="text-xs font-medium text-slate-500">Manage client data and operations density</p>
-                        </div>
+        <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-12">
+            
+            {/* 1. Page Header (Unified) */}
+            <PageHeader 
+                title="Organizations" 
+                subtitle={`Manage ${filteredOrgs.length} client entities and their operational density`}
+                rightContent={
+                    <button 
+                        onClick={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
+                        className="h-10 flex items-center gap-2 px-5 bg-slate-900 text-white rounded-xl font-black text-[13px] hover:bg-slate-800 transition-all shadow-sm active:scale-95 shrink-0"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add Organization
+                    </button>
+                }
+            />
 
-                        <button 
-                            onClick={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
-                            className="h-10 flex items-center gap-2 px-5 bg-slate-900 text-white rounded-xl font-bold text-[13px] hover:bg-slate-800 transition-all shadow-sm active:scale-95"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Add Organization
-                        </button>
-                    </div>
+            {/* 2. STATS ROW */}
+            <StatsRow items={statsData} columns={4} />
 
-                    {/* 2. STATS ROW ([NEW]) */}
-                    <div className="mb-10">
-                        <StatsRow items={statsData} columns={4} />
-                    </div>
-
-                    {/* 3. ADVANCED FILTERS (High-Density) */}
-                    <div className="flex flex-wrap items-center gap-4 mb-10 pb-4 border-b border-slate-100">
+            {/* 3. GRID CONTENT WITH FILTERS */}
+            <div className="flex flex-col gap-6">
+                
+                {/* 2.5 PREMIUM FILTER WELL (DataTable Style) */}
+                <div className="bg-white border border-slate-200/60 rounded-2xl p-3.5 shadow-sm">
+                    <div className="flex flex-wrap items-center gap-3">
                         <FilterDropdown 
                             label="Industry"
                             options={industryOptions}
                             value={filters.industry}
                             onChange={(v) => setFilters(prev => ({ ...prev, industry: v }))}
+                            allLabel="All Industries"
                         />
 
                         <FilterDropdown 
@@ -141,62 +142,68 @@ const Organizations = () => {
                             options={regionOptions}
                             value={filters.region}
                             onChange={(v) => setFilters(prev => ({ ...prev, region: v }))}
+                            allLabel="All Regions"
                         />
 
                         <FilterDropdown 
                             label="Status"
                             options={[
                                 { value: 'all', label: 'All Status' },
-                                { value: 'ACTIVE', label: 'Active' },
-                                { value: 'MAINTENANCE', label: 'Maintenance' },
-                                { value: 'DEACTIVE', label: 'Deactive' }
+                                { value: 'ACTIVE', label: 'Active Only' },
+                                { value: 'MAINTENANCE', label: 'Maintenance Only' },
+                                { value: 'DEACTIVE', label: 'Deactive Only' }
                             ]}
                             value={filters.status}
                             onChange={(v) => setFilters(prev => ({ ...prev, status: v }))}
+                            allLabel="All"
                         />
+
+                        <div className="h-5 w-[1.5px] bg-slate-100 shrink-0 mx-2" />
 
                         <button 
                             onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
-                            className="ml-auto h-9 flex items-center gap-2 px-3 text-slate-400 hover:text-rose-500 font-bold text-[10px] uppercase tracking-widest transition-colors rounded-lg hover:bg-rose-50/50"
+                            className="ml-auto h-10 flex items-center gap-2 px-4 text-slate-400 hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/50 group"
                         >
-                            <FiRefreshCcw size={12} />
-                            Reset Filters
+                            <FiRefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
+                            Reset
                         </button>
                     </div>
-
-                    {/* 3. GRID CONTENT */}
-                    {filteredOrgs.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-                            {filteredOrgs.map(org => (
-                                <div key={org.id} className="w-full max-w-[350px]">
-                                    <OrganizationCard 
-                                        org={org} 
-                                        onDelete={() => removeOrg(org.id)}
-                                        onEdit={() => handleEdit(org)}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-24 bg-white/40 border-2 border-dashed border-slate-100 rounded-3xl animate-in zoom-in duration-300">
-                            <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-5 rotate-3">
-                                <FiInbox className="w-7 h-7 text-slate-300" />
-                            </div>
-                            <h3 className="text-lg font-black text-slate-800 mb-1">No Organizations Found</h3>
-                            <p className="text-slate-400 text-xs mb-8 text-center max-w-xs px-6 font-medium leading-relaxed">
-                                We couldn't find any organization matching your selection. Try clearing your filters.
-                            </p>
-                            <button 
-                                onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
-                                className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
-                            >
-                                <FiRefreshCcw className="w-3.5 h-3.5" />
-                                Clear Filter Criteria
-                            </button>
-                        </div>
-                    )}
                 </div>
-            </main>
+
+                {/* THE GRID (Properly Aligned) */}
+
+                {/* THE GRID */}
+                {filteredOrgs.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+                        {filteredOrgs.map(org => (
+                            <div key={org.id} className="w-full max-w-[350px]">
+                                <OrganizationCard 
+                                    org={org} 
+                                    onDelete={() => removeOrg(org.id)}
+                                    onEdit={() => handleEdit(org)}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-24 bg-white/40 border-2 border-dashed border-slate-100 rounded-3xl animate-in zoom-in duration-300">
+                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-5 rotate-3">
+                            <FiInbox className="w-7 h-7 text-slate-300" />
+                        </div>
+                        <h3 className="text-lg font-black text-slate-800 mb-1">No Organizations Found</h3>
+                        <p className="text-slate-400 text-xs mb-8 text-center max-w-xs px-6 font-medium leading-relaxed">
+                            We couldn't find any organization matching your selection. Try clearing your filters.
+                        </p>
+                        <button 
+                            onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
+                            className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+                        >
+                            <FiRefreshCcw className="w-3.5 h-3.5" />
+                            Clear Criteria
+                        </button>
+                    </div>
+                )}
+            </div>
 
             {/* Create Organization Modal */}
             <CreateOrganization 
