@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
@@ -7,16 +6,19 @@ import UserFormModal from '../../components/Dashboard/UserFormModal';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
 import PageHeader from '../../components/Dashboard/pageHeader';
+import DataTable from '../../components/UI/DataTable';
 import {
     FiPlus, FiDownload, FiTrash2,
     FiUserCheck, FiUserX, FiUsers,
-    FiRefreshCw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock
+    FiRefreshCw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock,
+    FiExternalLink, FiEdit2
 } from 'react-icons/fi';
-import UserTable from '../../components/Tables/UserTable';
-import useDebounce from '../../hooks/useDebounce';
 import FilterDropdown from '../../components/UI/FilterDropdown';
-import TableSkeleton from '../../components/UI/TableSkeleton';
 import Button from '../../components/UI/Button';
+import useDebounce from '../../hooks/useDebounce';
+import UserAvatar from '../../components/UI/UserAvatar';
+import Badge from '../../components/UI/Badge';
+import DotStatus from '../../components/UI/DotStatus';
 
 export default function Users() {
     const store = useUserStore();
@@ -24,7 +26,7 @@ export default function Users() {
         users, stats, filterOptions, loading,
         search, filters, sortKey, sortDir, selectedIds,
         fetchUsers, exportCSV,
-        setFilters, toggleSelectAll, toggleSelectRow,
+        setSearch, setFilters, toggleSelectAll, toggleSelectRow,
         clearSelection, resetFilters,
     } = store;
 
@@ -38,7 +40,7 @@ export default function Users() {
 
     // Search Debounce
     const debouncedSearch = useDebounce(search, 300);
-    
+
     useEffect(() => {
         fetchUsers();
     }, [debouncedSearch, filters, fetchUsers]);
@@ -62,17 +64,17 @@ export default function Users() {
         setIsFormOpen(true);
     };
 
-    const handleEditUser = (user) => {
+    const handleEditUser = useCallback((user) => {
         setEditingUser(user);
         setIsFormOpen(true);
         setIsPeekOpen(false);
-    };
+    }, []);
 
     const handleFormSubmit = async (data) => {
-        const res = editingUser 
+        const res = editingUser
             ? await store.updateUser(editingUser.id, data)
             : await store.createUser(data);
-        
+
         if (res.success) {
             toast.success(editingUser ? 'Profile updated successfully' : 'User created successfully');
             setIsFormOpen(false);
@@ -128,39 +130,39 @@ export default function Users() {
     };
 
     const statsData = [
-        { 
-            title: 'Total Users', 
-            value: stats.total, 
-            icon: FiUsers, 
-            iconColorClass: 'text-primary', 
+        {
+            title: 'Total Users',
+            value: stats.total,
+            icon: FiUsers,
+            iconColorClass: 'text-primary',
             iconBgClass: 'bg-primary/10',
             change: `${stats.active} Active / ${stats.inactive} Inactive`,
             changeType: 'neutral',
             description: 'all platform users'
         },
-        { 
-            title: 'Active Users', 
-            value: stats.active, 
-            icon: FiCheckCircle, 
-            iconColorClass: 'text-emerald-500', 
+        {
+            title: 'Active Users',
+            value: stats.active,
+            icon: FiCheckCircle,
+            iconColorClass: 'text-emerald-500',
             iconBgClass: 'bg-emerald-50',
             trend: 12,
             description: 'vs last month'
         },
-        { 
-            title: 'Inactive', 
-            value: stats.inactive, 
-            icon: FiAlertCircle, 
-            iconColorClass: 'text-rose-500', 
+        {
+            title: 'Inactive',
+            value: stats.inactive,
+            icon: FiAlertCircle,
+            iconColorClass: 'text-rose-500',
             iconBgClass: 'bg-rose-50',
             trend: -5,
             description: 'vs last month'
         },
-        { 
-            title: 'Unassigned', 
-            value: stats.unassigned, 
-            icon: FiClock, 
-            iconColorClass: 'text-amber-500', 
+        {
+            title: 'Unassigned',
+            value: stats.unassigned,
+            icon: FiClock,
+            iconColorClass: 'text-amber-500',
             iconBgClass: 'bg-amber-50',
             change: 'Needs Assignment',
             changeType: 'warning',
@@ -168,25 +170,93 @@ export default function Users() {
         },
     ];
 
+    // Define columns for reuse - satisfying user requirement to easily add/remove columns
+    const columns = useMemo(() => [
+        {
+            header: 'Personnel Profile',
+            accessor: 'name',
+            render: (_, row) => (
+                <div className="flex items-center gap-3 py-1.5 focus:opacity-80 transition-opacity">
+                    <UserAvatar name={row?.name} size="40px" className="shadow-sm border-2 border-white ring-1 ring-slate-100" />
+                    <div className="min-w-0">
+                        <div className="text-[14px] font-bold text-slate-800 leading-tight truncate">{row?.name}</div>
+                        <div className="text-[11px] font-medium text-slate-400 mt-0.5 truncate">{row?.email}</div>
+                    </div>
+                </div>
+            )
+        },
+        {
+            header: 'Organization',
+            accessor: 'organization',
+            render: (value) => (
+                <div className="flex flex-col">
+                    <span className="text-[13px] font-bold text-slate-700">{value || 'Contractor'}</span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Primary Unit</span>
+                </div>
+            )
+        },
+        {
+            header: 'Role',
+            accessor: 'role',
+            align: 'center',
+            render: (value) => (
+                <Badge color={value} variant="light" size="sm" className="font-bold uppercase tracking-wider text-[9px] px-2.5">
+                    {value}
+                </Badge>
+            )
+        },
+        {
+            header: 'Status',
+            accessor: 'assignment',
+            align: 'center',
+            render: (value) => (
+                <DotStatus type={value} text={value === 'assigned' ? 'Assigned' : 'Standby'} size="sm" className="font-bold uppercase tracking-wider text-[10px]" />
+            )
+        },
+        {
+            header: 'Actions',
+            accessor: 'actions',
+            align: 'right',
+            render: (_, row) => (
+                <div className="flex items-center justify-end gap-2">
+                    <Button
+                        variant="ghost"
+                        onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }}
+                        className="!p-2 !h-9 !w-9 !rounded-xl text-slate-400 hover:!text-primary hover:!bg-primary/5"
+                        icon={FiExternalLink}
+                    />
+                    <Button
+                        variant="primary"
+                        onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
+                        className="!h-9 !px-4 !rounded-lg !text-[11px] !font-bold !uppercase !tracking-wider shadow-sm"
+                        icon={FiEdit2}
+                    >
+                        Edit
+                    </Button>
+                </div>
+            )
+        }
+    ], [handleEditUser]);
+
     return (
-        <div className="flex flex-col gap-6 p-4 md:p-8 max-w-[1600px] mx-auto min-h-screen">
+        <div className="flex flex-col gap-6 w-full">
             {/* Header Section — uses shared PageHeader */}
             <PageHeader
                 title="User Management"
                 subtitle="Manage platform users, roles & enterprise permissions"
                 rightContent={
                     <div className="flex items-center gap-3">
-                        <Button 
+                        <Button
                             variant="outline"
-                            onClick={exportCSV} 
+                            onClick={exportCSV}
                             icon={FiDownload}
                             className="!h-10 !px-4 !text-[13px] !font-bold"
                         >
                             Export
                         </Button>
-                        <Button 
+                        <Button
                             variant="primary"
-                            onClick={handleAddUser} 
+                            onClick={handleAddUser}
                             icon={FiPlus}
                             className="!h-10 !px-5 !text-[13px] !font-black !bg-primary hover:!bg-primary/95"
                         >
@@ -199,178 +269,149 @@ export default function Users() {
             {/* Stats Section */}
             <StatsRow items={statsData} />
 
-            {/* Toolbar Section */}
-            <div className="bg-white border border-slate-100 p-3 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-20">
-                <div className="flex flex-wrap items-center gap-2.5 flex-1">
-                    <FilterDropdown 
-                        label="Role" 
-                        value={filters.role} 
-                        options={filterOptions.roles} 
-                        onChange={v => setFilters({...filters, role:v})} 
-                        allLabel="All Roles" 
-                    />
-                    <FilterDropdown 
-                        label="Organization" 
-                        value={filters.organization} 
-                        options={filterOptions.organizations} 
-                        onChange={v => setFilters({...filters, organization:v, region: ''})} 
-                        allLabel="All Orgs" 
-                    />
-                    <FilterDropdown 
-                        label="Zone" 
-                        value={filters.region} 
-                        options={filterOptions.regions} 
-                        onChange={v => setFilters({...filters, region:v})} 
-                        allLabel="All Zones" 
-                    />
-
-                    <div className="h-6 w-[1px] bg-slate-200 mx-1 hidden md:block" />
-
-                    <FilterDropdown 
-                        label="Status" 
-                        value={filters.status} 
-                        options={[
-                            { value: 'active', label: 'Active Only' },
-                            { value: 'inactive', label: 'Inactive Only' }
-                        ]} 
-                        onChange={v => setFilters({...filters, status:v})} 
-                        allLabel="Any Status" 
-                    />
-                    <FilterDropdown 
-                        label="Assignment" 
-                        value={filters.assignment} 
-                        options={[
-                            { value: 'assigned', label: 'Assigned' },
-                            { value: 'unassigned', label: 'Unassigned' }
-                        ]} 
-                        onChange={v => setFilters({...filters, assignment:v})} 
-                        allLabel="Any Assignment" 
-                    />
-                    <FilterDropdown 
-                        label="Time Range" 
-                        value={filters.timeRange} 
-                        options={[
-                            { value: 'today', label: 'Today' },
-                            { value: '7d', label: 'Last 7 Days' },
-                            { value: '30d', label: 'Last 30 Days' }
-                        ]} 
-                        onChange={v => setFilters({...filters, timeRange:v})} 
-                        allLabel="All Time"
-                        icon={<FiCalendar size={14} />}
-                    />
-
-                    {activeFilterCount > 0 && (
-                        <Button 
-                            variant="ghost" 
-                            onClick={resetFilters} 
-                            className="!px-2 !py-1 !text-[10px] !font-black !text-rose-500 !uppercase !tracking-widest hover:!text-rose-600 group"
-                        >
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 group-hover:animate-pulse mr-1" />
-                            Clear All
-                        </Button>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-2.5 whitespace-nowrap lg:border-l lg:border-slate-100 lg:pl-4">
-                    <Button 
-                        variant="outline"
-                        onClick={fetchUsers} 
-                        title="Refresh Data"
-                        className="!p-2 !h-9 !w-9 !rounded-xl"
-                        icon={FiRefreshCw}
-                    />
-                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-                        <strong className="text-slate-900">{sortedUsers.length}</strong> / {stats.total} Users
-                    </span>
-                </div>
-            </div>
-
-            {/* Bulk Actions Bar */}
-            <AnimatePresence>
-                {selectedIds.length > 0 && (
-                    <Motion.div 
-                        initial={{ opacity: 0, y: 10, height: 0 }}
-                        animate={{ opacity: 1, y: 0, height: 'auto' }}
-                        exit={{ opacity: 0, y: 10, height: 0 }}
-                        className="overflow-hidden"
-                    >
-                        <div className="flex items-center justify-between px-6 py-3 bg-white border border-primary/10 rounded-2xl mb-3 shadow-[0_10px_40px_rgba(7,34,103,0.08)]">
-                            <div className="flex items-center gap-4">
-                                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-black shadow-lg shadow-primary/20">
-                                    {selectedIds.length}
-                                </div>
-                                <span className="text-[13px] font-black text-primary">Users Selected</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Button onClick={handleBulkActivate} icon={FiUserCheck} variant="outline" className="!h-8 !px-4 !text-xs !bg-emerald-50 !text-emerald-600 !border-emerald-100 hover:!bg-emerald-100">
-                                    Activate
-                                </Button>
-                                <Button onClick={handleBulkDeactivate} icon={FiUserX} variant="outline" className="!h-8 !px-4 !text-xs !bg-amber-50 !text-amber-600 !border-amber-100 hover:!bg-amber-100">
-                                    Deactivate
-                                </Button>
-                                <Button onClick={() => setBulkDeleteOpen(true)} icon={FiTrash2} variant="outline" className="!h-8 !px-4 !text-xs !bg-rose-50 !text-rose-600 !border-rose-100 hover:!bg-rose-100">
-                                    Delete
-                                </Button>
-                                <div className="w-px h-6 bg-slate-200 mx-2" />
-                                <Button variant="ghost" onClick={clearSelection} className="!h-8 !px-3 !text-[10px] !font-black !text-slate-400 hover:!text-slate-600 !uppercase !tracking-widest">Cancel</Button>
-                            </div>
-                        </div>
-                    </Motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Main Table Area */}
-            <div className="bg-white border border-slate-100 rounded-[20px] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] min-h-[400px] flex flex-col relative transition-all duration-300">
-                {loading ? (
-                    <TableSkeleton />
-                ) : (
-                    <div className="flex-1 flex flex-col">
-                        <UserTable 
-                            data={sortedUsers}
-                            selectedIds={selectedIds}
-                            onSelectionChange={(ids) => store.setSelectedIds(ids)} 
-                            onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
-                            onEdit={handleEditUser}
-                            toggleSelectAll={() => toggleSelectAll(sortedUsers.map(u=>u.id))}
-                            toggleSelectRow={toggleSelectRow}
+            {/* Main Data Table Area — Unified Premium DataTable */}
+            <DataTable
+                columns={columns}
+                data={sortedUsers}
+                loading={loading}
+                selectable
+                selectedIds={selectedIds}
+                onSelectionChange={(ids) => store.setSelectedIds(ids)}
+                onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
+                filterContent={
+                    <>
+                        <FilterDropdown
+                            label="Role"
+                            options={filterOptions.roles}
+                            value={filters.role}
+                            onChange={v => setFilters({ ...filters, role: v })}
+                            allLabel="All"
                         />
-                    
-                        {sortedUsers.length === 0 && (
-                            <div className="flex-1 flex flex-col items-center justify-center p-16 text-center">
-                                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 border border-slate-100">
-                                    <FiUsers size={28} className="text-slate-300"/>
-                                </div>
-                                <h3 className="text-lg font-black text-slate-900 tracking-tight">No Results Found</h3>
-                                <p className="text-[13px] font-semibold text-slate-500 mb-6 max-w-xs mx-auto">
-                                    Try adjusting your search terms or filters to find what you&apos;re looking for.
-                                </p>
-                                <Button 
-                                    onClick={resetFilters} 
-                                    variant="primary"
-                                    className="!px-5 !py-2 !bg-slate-900 hover:!bg-slate-800 !rounded-xl !font-black !text-[11px] !uppercase !tracking-widest shadow-lg shadow-slate-900/10"
-                                >
-                                    Reset All Filters
-                                </Button>
+                        <FilterDropdown
+                            label="Organization"
+                            options={filterOptions.organizations}
+                            value={filters.organization}
+                            onChange={v => setFilters({ ...filters, organization: v, region: '' })}
+                            allLabel="All"
+                        />
+                        <FilterDropdown
+                            label="Zone"
+                            options={filterOptions.regions}
+                            value={filters.region}
+                            onChange={v => setFilters({ ...filters, region: v })}
+                            allLabel="All"
+                        />
+                        <FilterDropdown
+                            label="Status"
+                            options={[
+                                { value: 'active', label: 'Active Only' },
+                                { value: 'inactive', label: 'Inactive Only' }
+                            ]}
+                            value={filters.status}
+                            onChange={v => setFilters({ ...filters, status: v })}
+                            allLabel="All"
+                        />
+                        <FilterDropdown
+                            label="Assignment"
+                            options={[
+                                { value: 'assigned', label: 'Assigned' },
+                                { value: 'unassigned', label: 'Unassigned' }
+                            ]}
+                            value={filters.assignment}
+                            onChange={v => setFilters({ ...filters, assignment: v })}
+                            allLabel="All"
+                        />
+                        <FilterDropdown
+                            label="Time Range"
+                            options={[
+                                { value: 'today', label: 'Today' },
+                                { value: '7d', label: 'Last 7 Days' },
+                                { value: '30d', label: 'Last 30 Days' }
+                            ]}
+                            value={filters.timeRange}
+                            onChange={v => setFilters({ ...filters, timeRange: v })}
+                            allLabel="All"
+                            icon={<FiCalendar size={14} />}
+                        />
+                        <div className="h-4 w-[1px] bg-slate-200 shrink-0 mx-1" />
+                        <Button
+                            variant="ghost"
+                            onClick={resetFilters}
+                            className="!h-9 !px-3 !text-[11px] !font-black !text-slate-400 hover:!text-rose-500 !uppercase !tracking-widest flex items-center gap-1.5 shrink-0"
+                        >
+                            <FiRefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+                            Reset
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={fetchUsers}
+                            className="!p-2 !h-11 !w-11 !rounded-xl border-slate-200"
+                            icon={FiRefreshCw}
+                        />
+                    </>
+                }
+                selectionFooter={
+                    <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center text-[12px] font-black shadow-lg shadow-primary/20">
+                                {selectedIds.length}
                             </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Footer Bar */}
-                {sortedUsers.length > 0 && (
-                    <div className="px-6 py-2.5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            Database synchronized
-                        </span>
-                        <div className="flex items-center gap-2">
-                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
-                                {sortedUsers.length} profile{sortedUsers.length!==1?'s':''} listed
-                             </span>
+                            <div className="flex flex-col">
+                                <span className="text-[13px] font-black text-slate-800 uppercase tracking-tight leading-none">Profiles Selected</span>
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Ready for bulk actions</span>
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                            <Button
+                                onClick={handleBulkActivate}
+                                icon={FiUserCheck}
+                                variant="outline"
+                                className="!h-10 !px-4 !text-[11px] !font-bold !bg-emerald-50 !text-emerald-700 !border-emerald-100/50 hover:!bg-emerald-100 !rounded-xl"
+                            >
+                                Activate
+                            </Button>
+                            <Button
+                                onClick={handleBulkDeactivate}
+                                icon={FiUserX}
+                                variant="outline"
+                                className="!h-10 !px-4 !text-[11px] !font-bold !bg-amber-50 !text-amber-700 !border-amber-100/50 hover:!bg-amber-100 !rounded-xl"
+                            >
+                                Deactivate
+                            </Button>
+                            <Button
+                                onClick={() => setBulkDeleteOpen(true)}
+                                icon={FiTrash2}
+                                variant="outline"
+                                className="!h-10 !px-4 !text-[11px] !font-bold !bg-rose-50 !text-rose-700 !border-rose-100/50 hover:!bg-rose-100 !rounded-xl"
+                            >
+                                Delete
+                            </Button>
+                            <div className="hidden sm:block w-px h-6 bg-slate-200 mx-2" />
+                            <Button
+                                variant="ghost"
+                                onClick={clearSelection}
+                                className="!h-10 !px-4 !text-[11px] !font-black !text-slate-400 hover:!text-slate-600 !uppercase !tracking-widest"
+                            >
+                                Cancel
+                            </Button>
                         </div>
                     </div>
-                )}
-            </div>
+                }
+                footer={
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                {sortedUsers.length} of {stats.total} entries cached
+                            </span>
+                        </div>
+                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+                            Database Sync: Live
+                        </span>
+                    </div>
+                }
+                emptyMessage="No personnel records discovered matching your search"
+            />
 
             {/* Modals */}
             <UserPeekView

@@ -123,9 +123,9 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
             <aside
                 className={`
                     flex flex-col h-screen sticky top-0 bg-white border-r border-slate-200 z-[1000] shrink-0 transition-all duration-300 ease-in-out font-sans overflow-hidden
-                    ${collapsed ? 'w-[64px]' : 'w-[240px]'}
+                    ${collapsed ? 'w-[72px]' : 'w-[260px]'}
                     ${mobileOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}
-                    max-md:fixed max-md:top-0 max-md:left-0 max-md:z-[1000] max-md:w-[240px] max-md:shadow-2xl
+                    max-md:fixed max-md:top-0 max-md:left-0 max-md:z-[1000] max-md:w-[260px] max-md:shadow-2xl
                 `}
             >
                 <div className="flex-1 overflow-y-auto no-scrollbar pb-2.5">

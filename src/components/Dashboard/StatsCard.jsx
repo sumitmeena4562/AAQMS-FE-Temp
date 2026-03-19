@@ -79,7 +79,7 @@ const StatsCard = ({
                     <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1 truncate">
                         {displayTitle}
                     </p>
-                    <h2 className="text-2xl md:text-3xl font-black text-slate-900 leading-none tabular-nums mt-1 tracking-tight">
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 leading-none tabular-nums mt-1 tracking-tight truncate">
                         {value}
                     </h2>
                 </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import Table from '../UI/Table';
+import DataTable from '../UI/DataTable';
 import Button from '../UI/Button';
 import {
     FiAlertTriangle,
@@ -69,7 +69,7 @@ const ACTIVITY = [
     },
 ];
 
-// ── Column definitions for reusable Table.jsx ──
+// ── Column definitions ──
 const columns = [
     {
         header: 'Event Type',
@@ -116,44 +116,27 @@ const columns = [
             <span className="text-[13px] text-slate-400 font-medium whitespace-nowrap">{value}</span>
         ),
     },
-    
 ];
 
-// ── Main Component ──
 const RecentActivityTable = () => {
     return (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-pro flex flex-col w-full">
-            {/* Header Section */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between py-4 px-6 border-b border-slate-100 gap-4">
-                {/* Left */}
-                <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-bold text-slate-900 leading-none m-0">
-                        Recent Activity
-                    </h3>
-                    <span className="inline-flex items-center text-xs font-medium text-slate-500 bg-slate-100 border border-slate-200 rounded-full px-2.5 py-0.5">
-                        Live Feed
-                    </span>
-                </div>
-                {/* Right */}
-                <div className="flex items-center gap-2">
+        <DataTable
+            title="Recent Activity"
+            subtitle="Live Feed"
+            rightContent={
+                <>
                     <Button variant="outline" size="sm" icon={FiFilter} className="!rounded-md !h-[30px] !text-[12px]">
                         Filter
                     </Button>
                     <Button variant="ghost" size="sm" className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10">
                         View All Logs
                     </Button>
-                </div>
-            </div>
-
-            {/* Table Section — uses reusable Table.jsx */}
-            <div className="w-full px-2">
-                <Table
-                    columns={columns}
-                    data={ACTIVITY}
-                    emptyMessage="No recent activity"
-                />
-            </div>
-        </div>
+                </>
+            }
+            columns={columns}
+            data={ACTIVITY}
+            emptyMessage="No recent activity"
+        />
     );
 };
 
