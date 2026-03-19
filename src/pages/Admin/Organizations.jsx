@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useOrgStore } from '../../store/useOrgStore';
 import OrganizationCard from '../../components/UI/OrganizationCard';
-import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome } from 'react-icons/fi';
+import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiTrendingUp, FiActivity, FiGlobe } from 'react-icons/fi';
 import CreateOrganization from '../../components/UI/CreateOrganization';
 import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 import useUserStore from '../../store/userStore';
 import FilterDropdown from '../../components/UI/FilterDropdown';
+import { StatsRow } from '../../components/Dashboard/StatsCard';
 
 const Organizations = () => {
     const orgs = useOrgStore(state => state.orgs);
@@ -63,18 +64,51 @@ const Organizations = () => {
         label: r === 'all' ? 'All Regions' : r 
     }));
 
+    const statsData = [
+        {
+            label: 'Total Organizations',
+            value: orgs.length,
+            icon: FiBriefcase,
+            iconBgClass: 'bg-emerald-50',
+            iconColorClass: 'text-emerald-600',
+            description: 'Across all industries'
+        },
+        {
+            label: 'Active Entities',
+            value: orgs.filter(o => o.status === 'ACTIVE').length,
+            icon: FiTrendingUp,
+            iconBgClass: 'bg-blue-50',
+            iconColorClass: 'text-blue-600',
+            description: 'Live & Operational'
+        },
+        {
+            label: 'Under Maintenance',
+            value: orgs.filter(o => o.status === 'MAINTENANCE').length,
+            icon: FiActivity,
+            iconBgClass: 'bg-orange-50',
+            iconColorClass: 'text-orange-600',
+            description: 'Service in progress'
+        },
+        {
+            label: 'Total Sites',
+            value: orgs.reduce((acc, o) => acc + (parseInt(o.stats?.sites) || 0), 0),
+            icon: FiGlobe,
+            iconBgClass: 'bg-indigo-50',
+            iconColorClass: 'text-indigo-600',
+            description: 'Deployed globally'
+        }
+    ];
+
     return (
         <div className="flex flex-col min-h-screen font-sans animate-in fade-in duration-500 bg-slate-50/30">
-            <main className="flex-1 w-full pb-20">
-                <div className="px-8 mt-10">
+            <main className="flex-1 w-full pb-20 overflow-y-auto">
+                <div className="px-8 mt-10 max-w-[1600px] mx-auto">
                     
                     {/* 1. COMPACT HEADER */}
                     <div className="flex items-center justify-between mb-8">
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col gap-1">
                             <h2 className="text-2xl font-black text-slate-900 tracking-tight">Organizations</h2>
-                            <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-[11px] font-black rounded-lg">
-                                {filteredOrgs.length} Total
-                            </span>
+                            <p className="text-xs font-medium text-slate-500">Manage client data and operations density</p>
                         </div>
 
                         <button 
@@ -88,7 +122,12 @@ const Organizations = () => {
                         </button>
                     </div>
 
-                    {/* 2. ADVANCED FILTERS (High-Density) */}
+                    {/* 2. STATS ROW ([NEW]) */}
+                    <div className="mb-10">
+                        <StatsRow items={statsData} columns={4} />
+                    </div>
+
+                    {/* 3. ADVANCED FILTERS (High-Density) */}
                     <div className="flex flex-wrap items-center gap-4 mb-10 pb-4 border-b border-slate-100">
                         <FilterDropdown 
                             label="Industry"
