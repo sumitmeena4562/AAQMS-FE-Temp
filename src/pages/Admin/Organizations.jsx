@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useOrgStore } from '../../store/useOrgStore';
 import OrganizationCard from '../../components/UI/OrganizationCard';
-import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiTrendingUp, FiActivity, FiGlobe } from 'react-icons/fi';
+import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiTrendingUp, FiActivity, FiGlobe, FiGrid, FiList, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import CreateOrganization from '../../components/UI/CreateOrganization';
 import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 import useUserStore from '../../store/userStore';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
 import PageHeader from '../../components/Dashboard/pageHeader';
+import DataTable from '../../components/UI/DataTable';
+import DotStatus from '../../components/UI/DotStatus';
+import Badge from '../../components/UI/Badge';
 
 const Organizations = () => {
     const orgs = useOrgStore(state => state.orgs);
@@ -16,6 +19,7 @@ const Organizations = () => {
     const removeOrg = useOrgStore(state => state.removeOrg);
     
     const [filters, setFilters] = useState({ industry: 'all', status: 'all', region: 'all' });
+    const [viewMode, setViewMode] = useState('grid');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingOrg, setEditingOrg] = useState(null);
 
@@ -158,7 +162,27 @@ const Organizations = () => {
                             allLabel="All"
                         />
 
-                        <div className="h-5 w-[1.5px] bg-slate-100 shrink-0 mx-2" />
+                        <div className="h-6 w-[1.5px] bg-slate-100 shrink-0 mx-2" />
+
+                        {/* View Toggle (Relocated) */}
+                        <div className="flex items-center bg-slate-50/80 p-1 rounded-xl border border-slate-100 shadow-inner group">
+                            <button 
+                                onClick={() => setViewMode('grid')}
+                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+                                title="Grid View"
+                            >
+                                <FiGrid size={13} className={viewMode === 'grid' ? 'text-primary' : ''} />
+                                <span className={viewMode === 'grid' ? 'block' : 'hidden'}>Grid</span>
+                            </button>
+                            <button 
+                                onClick={() => setViewMode('list')}
+                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+                                title="List View"
+                            >
+                                <FiList size={13} className={viewMode === 'list' ? 'text-primary' : ''} />
+                                <span className={viewMode === 'list' ? 'block' : 'hidden'}>List</span>
+                            </button>
+                        </div>
 
                         <button 
                             onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
@@ -172,19 +196,107 @@ const Organizations = () => {
 
                 {/* THE GRID (Properly Aligned) */}
 
-                {/* THE GRID */}
+                {/* THE CONTENT (GRID OR LIST) */}
                 {filteredOrgs.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-                        {filteredOrgs.map(org => (
-                            <div key={org.id} className="w-full max-w-[350px]">
-                                <OrganizationCard 
-                                    org={org} 
-                                    onDelete={() => removeOrg(org.id)}
-                                    onEdit={() => handleEdit(org)}
-                                />
-                            </div>
-                        ))}
-                    </div>
+                    viewMode === 'grid' ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+                            {filteredOrgs.map(org => (
+                                <div key={org.id} className="w-full max-w-[350px]">
+                                    <OrganizationCard 
+                                        org={org} 
+                                        onDelete={() => removeOrg(org.id)}
+                                        onEdit={() => handleEdit(org)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <DataTable 
+                            columns={[
+                                { 
+                                    header: 'Organization', 
+                                    key: 'name',
+                                    render: (name, org) => (
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center font-black text-xs text-slate-400 overflow-hidden shadow-sm uppercase tracking-tighter">
+                                                {org.logo ? <img src={org.logo} alt="" className="w-full h-full object-cover" /> : org.name.substring(0, 2)}
+                                            </div>
+                                            <div className="flex flex-col gap-0.5">
+                                                <span className="text-[13px] font-black text-slate-900 leading-none">{name}</span>
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{org.type || 'Enterprise'}</span>
+                                            </div>
+                                        </div>
+                                    )
+                                },
+                                { 
+                                    header: 'Industry', 
+                                    key: 'industry',
+                                    render: (val) => (
+                                        <Badge variant="soft" className="!text-[10px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest">
+                                            {val}
+                                        </Badge>
+                                    )
+                                },
+                                { 
+                                    header: 'Region', 
+                                    key: 'region',
+                                    render: (val) => <span className="text-[12px] font-bold text-slate-600">{val}</span>
+                                },
+                                { 
+                                    header: 'Deployment', 
+                                    key: 'stats',
+                                    className: 'text-center',
+                                    render: (stats) => (
+                                        <div className="flex items-center justify-center gap-4">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[13px] font-black text-slate-900">{stats?.sites || 0}</span>
+                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Sites</span>
+                                            </div>
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[13px] font-black text-slate-900">{stats?.coordinators || 0}</span>
+                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Coordinators</span>
+                                            </div>
+                                        </div>
+                                    )
+                                },
+                                { 
+                                    header: 'Status', 
+                                    key: 'status',
+                                    render: (status) => (
+                                        <div className="flex items-center gap-2">
+                                            <DotStatus status={status === 'ACTIVE' ? 'active' : 'inactive'} />
+                                            <span className={`text-[11px] font-black uppercase tracking-widest ${status === 'ACTIVE' ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                                {status}
+                                            </span>
+                                        </div>
+                                    )
+                                },
+                                { 
+                                    header: 'Actions', 
+                                    key: 'id',
+                                    className: 'text-right',
+                                    render: (_, org) => (
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); handleEdit(org); }}
+                                                className="p-2 text-slate-400 hover:text-primary transition-colors hover:bg-slate-50 rounded-lg"
+                                            >
+                                                <FiEdit2 size={15} />
+                                            </button>
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); removeOrg(org.id); }}
+                                                className="p-2 text-slate-400 hover:text-rose-500 transition-colors hover:bg-slate-50 rounded-lg"
+                                            >
+                                                <FiTrash2 size={15} />
+                                            </button>
+                                        </div>
+                                    )
+                                }
+                            ]}
+                            data={filteredOrgs}
+                            onRowClick={(org) => handleEdit(org)}
+                        />
+                    )
                 ) : (
                     <div className="flex flex-col items-center justify-center py-24 bg-white/40 border-2 border-dashed border-slate-100 rounded-3xl animate-in zoom-in duration-300">
                         <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-5 rotate-3">
