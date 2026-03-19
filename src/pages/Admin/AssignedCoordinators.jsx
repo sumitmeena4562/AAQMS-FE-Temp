@@ -4,30 +4,38 @@ import CoordinatorCard from '../../components/UI/CoordinatorCard';
 import PageHeader from '../../components/UI/PageHeader';
 import useUserStore from '../../store/userStore';
 import { generateSitePlansForCoordinator } from '../../utils/mockSiteData';
-
-const DashboardIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
-const FolderIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>;
+import { useBreadcrumb } from '../../hooks/useBreadcrumb';
+import { FiHome, FiBriefcase, FiGrid } from 'react-icons/fi';
 
 const AssignedCoordinators = () => {
   const location = useLocation();
-  const selectedOrg = location.state?.org || null;
-  const orgName = selectedOrg?.name || "Organization";
-  
+  const params = new URLSearchParams(location.search);
+  const orgName = location.state?.org?.name || params.get('org') || "Organization";
+
   const users = useUserStore(state => state.users);
   const fetchUsers = useUserStore(state => state.fetchUsers);
 
+  const { setBreadcrumbs } = useBreadcrumb();
+
   useEffect(() => {
-    // If we land directly here and store is empty, fetch the users
+    // 1. Fetch users if needed
     if (users.length === 0) {
       fetchUsers();
     }
-  }, [users.length, fetchUsers]);
+
+    // 2. Set Global Premium Breadcrumbs for this page
+    setBreadcrumbs([
+      { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+      { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
+      { label: orgName, path: location.pathname + location.search, isActive: true }
+    ]);
+  }, [users.length, fetchUsers, orgName, setBreadcrumbs, location.pathname, location.search]);
 
   // Derived logic from User Management:
   // We grab everyone matching this organization.
   // The User table has 'role', 'status' ('active' / 'inactive'), etc.
   const orgUsers = users.filter(u => u.organization === orgName);
-  
+
   const coordinatorsList = orgUsers.map(user => {
     const plans = generateSitePlansForCoordinator(user.id);
     const totalZones = plans.reduce((acc, plan) => acc + plan.stats.zones, 0);
@@ -37,7 +45,7 @@ const AssignedCoordinators = () => {
       id: `USER-${user.id.toString().padStart(3, '0')}`,
       status: user.status === 'active' ? 'ACTIVE' : 'AWAY', // Maps status UI
       sites: plans.length,
-      zones: totalZones, 
+      zones: totalZones,
       sitePlans: plans,
       image: null
     };
@@ -45,33 +53,25 @@ const AssignedCoordinators = () => {
 
   const activeCoordinatorsCount = coordinatorsList.filter(c => c.status === 'ACTIVE').length;
 
-  const breadcrumbItems = [
-    { label: "Dashboard", path: "/admin", icon: DashboardIcon },
-    { label: "Organization Management", path: "/admin/organizations", icon: FolderIcon },
-    { label: "Organizations", path: "/admin/organizations", icon: null },
-    { label: orgName, path: "/admin/coordinators", icon: null, isActive: true }
-  ];
-
   return (
-    <div className="min-h-screen bg-[#F9FAFB] flex flex-col font-sans">
+    <div className="flex flex-col font-sans h-full">
 
       {/* HEADER */}
       <PageHeader
-        breadcrumbItems={breadcrumbItems}
         hideAddButton={true}
         onReset={() => console.log("Reset coordinators")}
         onApplyFilters={() => console.log("Filter coordinators")}
       />
 
       {/* Main Content Dashboard */}
-      <main className="flex-1 w-full !px-8 !py-4 flex flex-col">
+      <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
 
         {/* Page Title & Stats */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between !mb-6 gap-4">
-          <h1 className="text-[20px] font-bold text-[#111827] leading-none tracking-tight">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+          <h1 className="text-2xl font-bold text-primary leading-none tracking-tight">
             {orgName}: Assigned Coordinators
           </h1>
-          <span className="text-[13px] font-medium text-[#6B7280]">
+          <span className="text-sm font-medium text-secondary">
             Showing {activeCoordinatorsCount} active coordinators
           </span>
         </div>
@@ -85,7 +85,7 @@ const AssignedCoordinators = () => {
           ) : (
             <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
               <p className="text-gray-500 font-medium tracking-wide">
-                No users assigned to this organization yet. 
+                No users assigned to this organization yet.
                 <br /><span className="text-xs text-gray-400 mt-2 block">Go to User Management to create and assign users.</span>
               </p>
             </div>

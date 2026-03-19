@@ -2,17 +2,35 @@ import React from 'react'; import { useLocation, useNavigate } from 'react-route
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
 
-const DashboardIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
-const FolderIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>;
+import { useBreadcrumb } from '../../hooks/useBreadcrumb';
+import { FiHome, FiBriefcase } from 'react-icons/fi';
 
 const Zones = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const floor = location.state?.floor || null;
-    const site = location.state?.site || { name: "Site" };
-    const orgName = location.state?.orgName || "Organization";
-    const coordinator = location.state?.coordinator || { name: "Coordinator" };
+    const params = new URLSearchParams(location.search);
+    const floorName = location.state?.floor?.name || params.get('floor') || null;
+    const siteName = location.state?.site?.name || params.get('site') || "Site";
+    const orgName = location.state?.orgName || params.get('org') || "Organization";
+    const coordName = location.state?.coordinator?.name || params.get('coord') || "Coordinator";
+
+    const floor = location.state?.floor || (floorName ? { name: floorName } : null);
+    const site = location.state?.site || { name: siteName };
+    const coordinator = location.state?.coordinator || { name: coordName };
+
+    const { setBreadcrumbs } = useBreadcrumb();
+
+    React.useEffect(() => {
+        setBreadcrumbs([
+            { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+            { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
+            { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
+            { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
+            { label: site.name, path: `/admin/floor-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}&site=${encodeURIComponent(site.name)}` },
+            { label: floor?.name || "Zones", path: location.pathname + location.search, isActive: true }
+        ]);
+    }, [orgName, coordinator.name, site.name, floor?.name, location.pathname, location.search, setBreadcrumbs]);
 
     // Fallback safe state
     if (!floor) {
@@ -30,47 +48,21 @@ const Zones = () => {
         );
     }
 
-    const breadcrumbItems = [
-        { label: "Dashboard", path: "/admin", icon: DashboardIcon },
-        { label: "Organization Management", path: "/admin/organizations", icon: FolderIcon },
-        { label: "Organizations", path: "/admin/organizations", icon: null },
-        {
-            label: orgName,
-            path: "/admin/coordinators",
-            state: { org: { name: orgName } },
-            icon: null
-        },
-        {
-            label: coordinator.name,
-            path: "/admin/site-plan",
-            state: { orgName, coordinator },
-            icon: null
-        },
-        {
-            label: site.name,
-            path: "/admin/floor-plan",
-            state: { site, orgName, coordinator },
-            icon: null
-        },
-        { label: floor.name || "Zones", path: "/admin/zones", icon: null, isActive: true }
-    ];
-
     return (
-        <div className="min-h-screen bg-[#F9FAFB] flex flex-col font-sans">
+        <div className="flex flex-col font-sans h-full">
 
             {/* HEADER */}
             <PageHeader
-                breadcrumbItems={breadcrumbItems}
                 hideAddButton={true}
             // onReset={() => console.log("Reset filters")}
             // onApplyFilters={() => console.log("Apply filters")}
             />
 
             {/* MAIN BODY */}
-            <main className="flex-1 w-full !px-8 pb-12 !pt-0 flex flex-col">
+            <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
 
                 {/* Title Space reserved to match FloorPlan layout padding conventions */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 !pt-8 !mb-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-4">
                     {/* ZonesTable already has its internal title "Defined Safety Zones", so we just use this wrapper for spatial matching */}
                 </div>
 
@@ -79,7 +71,7 @@ const Zones = () => {
 
             </main>
 
-           
+
         </div>
     );
 };

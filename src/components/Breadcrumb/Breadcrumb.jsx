@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ChevronIcon = () => (
   <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -8,6 +8,7 @@ const ChevronIcon = () => (
 );
 
 const Breadcrumb = ({ items = [] }) => {
+  const navigate = useNavigate();
   if (!items.length) return null;
 
   return (
@@ -15,30 +16,42 @@ const Breadcrumb = ({ items = [] }) => {
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
 
+        const handleClick = () => {
+          if (item.path) {
+            navigate(item.path);
+          }
+        };
+
         return (
           <React.Fragment key={index}>
-            {/* Agar item active hai, to Blue Pill (Figma style) dikhayega */}
+            {/* Active Style - Simple & Nice */}
             {item.isActive ? (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 border border-blue-100 rounded-md shadow-sm">
-                {item.icon && <span className="text-gray-500 flex items-center">{item.icon}</span>}
-                <span className="text-[13px] font-medium text-gray-700 leading-none mt-[1px]">
+              <div 
+                onClick={handleClick}
+                className="flex items-center gap-1.5 px-2 py-1 bg-blue-50/50 text-primary rounded-md cursor-pointer hover:bg-blue-100/50 transition-colors"
+              >
+                {item.icon && <span className="flex items-center opacity-90">{item.icon}</span>}
+                <span className="text-[11.5px] font-bold tracking-tight">
                   {item.label}
                 </span>
               </div>
             ) : (
-              /* Normal inactive path */
-              <Link
-                to={item.path || "#"}
-                state={item.state}
-                className="flex items-center gap-1.5 text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors"
+              /* Inactive Style - Subtle */
+              <div
+                onClick={handleClick}
+                className="flex items-center gap-1.5 px-1.5 py-1 text-[11.5px] font-medium text-slate-400 hover:text-primary transition-all duration-200 group cursor-pointer"
               >
-                {item.icon && <span className="text-gray-400 flex items-center">{item.icon}</span>}
-                <span className="leading-none mt-[1px]">{item.label}</span>
-              </Link>
+                {item.icon && <span className="opacity-60 group-hover:opacity-100 flex items-center transition-opacity">{item.icon}</span>}
+                <span className="tracking-tight">{item.label}</span>
+              </div>
             )}
 
-            {/* Separator Chevron > */}
-            {!isLast && <ChevronIcon />}
+            {/* Simple Separator */}
+            {!isLast && (
+              <div className="opacity-20 text-slate-400">
+                <ChevronIcon />
+              </div>
+            )}
           </React.Fragment>
         );
       })}

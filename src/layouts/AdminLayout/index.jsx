@@ -8,7 +8,7 @@ import Navbar from "../../components/Navbar/Navbar";
 import Breadcrumb from "../../components/Breadcrumb/Breadcrumb";
 import { BreadcrumbProvider } from "../../context/BreadcrumbContext";
 import { useBreadcrumb } from "../../hooks/useBreadcrumb";
-import { generateBreadcrumbs } from "../../utils/breadcrumbUtils";
+import { generateBreadcrumbs } from "../../utils/breadcrumbUtils.jsx";
 
 import {
     FiBriefcase, FiUsers, FiAlertTriangle,
@@ -58,8 +58,19 @@ const AdminLayoutInner = () => {
     const { search, setSearch } = useUserStore();
 
     React.useEffect(() => {
-        const autoCrumbs = generateBreadcrumbs(navItems, location.pathname);
-        setBreadcrumbs(autoCrumbs);
+        // Let dynamic pages manage their own breadcrumbs
+        const dynamicRoutes = [
+            '/admin/organizations',
+            '/admin/coordinators',
+            '/admin/site-plan',
+            '/admin/floor-plan',
+            '/admin/zones'
+        ];
+        const isDynamic = dynamicRoutes.some(route => location.pathname.startsWith(route));
+        if (!isDynamic) {
+            const autoCrumbs = generateBreadcrumbs(navItems, location.pathname);
+            setBreadcrumbs(autoCrumbs);
+        }
     }, [location.pathname, setBreadcrumbs]);
 
     return (
@@ -105,15 +116,19 @@ const AdminLayoutInner = () => {
                         </div>
                     }
                 />
-                <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+
+                <main className="flex-1 overflow-y-auto">
                     <div className="w-full max-w-[1600px] mx-auto">
-                        {/* Global Breadcrumb — kab dikhana hai aur kab nahi */}
+                        {/* Global Breadcrumb (Sticky at Top) */}
                         {breadcrumbs.length > 0 && location.pathname !== '/admin/dashboard' && (
-                            <div className="mb-4">
+                            <div className="sticky top-0 z-[40] bg-slate-50/90 backdrop-blur-md px-8 py-2.5 border-b border-slate-200/50 shadow-sm">
                                 <Breadcrumb items={breadcrumbs} />
                             </div>
                         )}
-                        <Outlet />
+                        
+                        <div className="p-4 sm:p-6 lg:p-8 pt-0">
+                            <Outlet />
+                        </div>
                     </div>
                 </main>
             </div>

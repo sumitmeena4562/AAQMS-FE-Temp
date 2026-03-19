@@ -3,57 +3,69 @@ import { useLocation } from 'react-router-dom';
 import OrganizationCard from '../../components/UI/OrganizationCard';
 import PageHeader from '../../components/UI/PageHeader';
 
-const DashboardIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
-const FolderIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>;
+import useUserStore from '../../store/userStore';
+import { generateSitePlansForCoordinator } from '../../utils/mockSiteData';
+
+import { useBreadcrumb } from '../../hooks/useBreadcrumb';
+import { FiHome, FiBriefcase } from 'react-icons/fi';
 
 const SitePlan = () => {
   const location = useLocation();
-  const orgName = location.state?.orgName || "Organization";
-  const coordinator = location.state?.coordinator || { name: "Coordinator", sitePlans: [] };
-  
+  const params = new URLSearchParams(location.search);
+  const orgName = location.state?.orgName || params.get('org') || "Organization";
+  const coordName = location.state?.coordinator?.name || params.get('coord') || "Coordinator";
+
+  const users = useUserStore(state => state.users);
+  const fetchUsers = useUserStore(state => state.fetchUsers);
+  const { setBreadcrumbs } = useBreadcrumb();
+
+  React.useEffect(() => {
+    if (users.length === 0) fetchUsers();
+
+    setBreadcrumbs([
+      { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+      { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
+      { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
+      { label: coordName, path: location.pathname + location.search, isActive: true }
+    ]);
+  }, [users.length, fetchUsers, orgName, coordName, location.pathname, location.search, setBreadcrumbs]);
+
+  const matchedUser = users.find(u => u.name === coordName && u.organization === orgName);
+
+  const coordinator = location.state?.coordinator || (matchedUser ? {
+    name: matchedUser.name,
+    sitePlans: generateSitePlansForCoordinator(matchedUser.id)
+  } : { name: coordName, sitePlans: [] });
+
   const sitePlans = coordinator.sitePlans || [];
-  
-  const breadcrumbItems = [
-    { label: "Dashboard", path: "/admin", icon: DashboardIcon },
-    { label: "Organization Management", path: "/admin/organizations", icon: FolderIcon },
-    { label: "Organizations", path: "/admin/organizations", icon: null },
-    { 
-      label: orgName, 
-      path: "/admin/coordinators", 
-      state: { org: { name: orgName } },
-      icon: null 
-    },
-    { label: coordinator.name, path: "/admin/site-plan", icon: null, isActive: true }
-  ];
 
   const totalPlans = sitePlans.length;
   const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] flex flex-col font-sans">
-      
+    <div className="flex flex-col font-sans h-full">
+
       {/* HEADER */}
-      <PageHeader 
-        breadcrumbItems={breadcrumbItems}
+      <PageHeader
         hideAddButton={true}
         onReset={() => console.log("Reset filters")}
         onApplyFilters={() => console.log("Apply filters")}
       />
 
       {/* MAIN BODY */}
-      <main className="flex-1 w-full !px-8 pb-12 !pt-0 flex flex-col">
-        
+      <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
+
         {/* Title & Stats */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 !pt-8 !mb-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
           <div className="flex items-center gap-4">
-            <h1 className="text-[24px] font-bold text-gray-900 leading-none">
+            <h1 className="text-2xl font-bold text-primary leading-none">
               Site Plan Selection
             </h1>
             <span className="px-3 py-1 bg-blue-100/50 text-blue-600 text-[11px] font-bold rounded-full top-0.5 relative">
               {activePlansCount} Active Plans
             </span>
           </div>
-          <span className="text-[13px] font-medium text-gray-500 mb-0.5">
+          <span className="text-sm font-medium text-secondary mb-0.5">
             Showing {totalPlans} assigned sites
           </span>
         </div>
@@ -63,10 +75,10 @@ const SitePlan = () => {
           {sitePlans.map((item, index) => (
             <div key={item.id || index} className="w-full max-w-[340px]">
               {/* Reuse OrganizationCard with isSiteCard flag */}
-              <OrganizationCard 
-                org={item} 
-                isSiteCard={true} 
-                coordinatorContext={coordinator} 
+              <OrganizationCard
+                org={item}
+                isSiteCard={true}
+                coordinatorContext={coordinator}
               />
             </div>
           ))}
