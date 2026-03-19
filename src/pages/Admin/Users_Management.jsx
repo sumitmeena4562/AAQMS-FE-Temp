@@ -175,13 +175,13 @@ export default function Users() {
         {
             header: 'Personnel Profile',
             accessor: 'name',
-            width: '26%',
+            width: '24%',
             render: (_, row) => (
-                <div className="flex items-center gap-3 py-0.5 group-hover:px-0.5 transition-all">
-                    <UserAvatar name={row?.name} size="36px" className="shadow-sm border-2 border-white ring-1 ring-slate-100 shrink-0" />
+                <div className="flex items-center gap-2.5 py-0.5 group-hover:px-0.5 transition-all">
+                    <UserAvatar name={row?.name} size="32px" className="shadow-sm border-2 border-white ring-1 ring-slate-100 shrink-0" />
                     <div className="flex flex-col min-w-0">
-                        <div className="text-[13px] font-black text-slate-900 leading-tight truncate">{row?.name}</div>
-                        <div className="text-[10px] font-bold text-slate-400 mt-0.5 truncate uppercase tracking-widest">{row?.email?.split('@')[0]}</div>
+                        <div className="text-[12px] font-black text-slate-900 leading-tight truncate">{row?.name}</div>
+                        <div className="text-[9px] font-bold text-slate-400 mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email?.split('@')[0]}</div>
                     </div>
                 </div>
             )
@@ -189,22 +189,23 @@ export default function Users() {
         {
             header: 'Organization',
             accessor: 'organization',
-            width: '18%',
+            width: '16%',
             render: (value) => (
                 <div className="flex flex-col min-w-0">
-                    <span className="text-[13px] font-black text-slate-800 truncate leading-none">{value || 'Contractor'}</span>
-                    <span className="text-[8px] text-slate-400 font-black uppercase tracking-[0.1em] mt-1 truncate">Primary Unit</span>
+                    <span className="text-[12px] font-black text-slate-800 truncate leading-none">{value || 'Contractor'}</span>
+                    <span className="text-[8px] text-slate-400 font-black uppercase tracking-[0.1em] mt-1 truncate">Unit</span>
                 </div>
             )
         },
         {
             header: 'Role',
             accessor: 'role',
-            width: '14%',
+            width: '12%',
             align: 'center',
+            className: 'hidden md:table-cell',
             render: (value) => (
                 <div className="flex justify-center">
-                    <Badge variant="soft" className="!text-[9px] !px-2.5 !py-1 !font-black !uppercase !tracking-widest border border-current/10 text-primary bg-primary/5">
+                    <Badge variant="soft" className="!text-[8px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest border border-current/10 text-primary bg-primary/5">
                         {value}
                     </Badge>
                 </div>
@@ -213,17 +214,17 @@ export default function Users() {
         {
             header: 'Status',
             accessor: 'assignment',
-            width: '14%',
+            width: '12%',
             align: 'center',
             render: (value) => {
                 const isAssigned = value === 'assigned';
                 return (
-                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border ${
+                    <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-xl border ${
                         isAssigned ? 'bg-emerald-50/50 border-emerald-100/50 text-emerald-700' : 
                         'bg-slate-50 border-slate-100 text-slate-500'
                     }`}>
                         <DotStatus status={isAssigned ? 'active' : 'inactive'} />
-                        <span className="text-[9px] font-black uppercase tracking-widest leading-none">
+                        <span className="text-[8px] font-black uppercase tracking-widest leading-none">
                             {isAssigned ? 'Assigned' : 'Standby'}
                         </span>
                     </div>
@@ -233,28 +234,28 @@ export default function Users() {
         {
             header: 'Actions',
             accessor: 'id',
-            width: '14%',
+            width: '12%',
             align: 'right',
             render: (_, row) => (
-                <div className="flex items-center justify-end gap-1.5 pr-1">
+                <div className="flex items-center justify-end gap-1 pr-1">
                     <button 
                         onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }}
-                        className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-xl shadow-sm active:scale-95"
+                        className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-xl shadow-sm active:scale-95"
                         title="View Details"
                     >
-                        <FiExternalLink size={13} />
+                        <FiExternalLink size={12} />
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
-                        className="px-4 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-xl shadow-sm active:scale-95 font-black uppercase tracking-widest text-[9px] hidden md:flex"
+                        className="px-3 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-xl shadow-sm active:scale-95 font-black uppercase tracking-widest text-[8px] hidden md:flex"
                     >
                         Edit
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
-                        className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-xl shadow-sm active:scale-95 md:hidden"
+                        className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-xl shadow-sm active:scale-95 md:hidden"
                     >
-                        <FiEdit2 size={13} />
+                        <FiEdit2 size={12} />
                     </button>
                 </div>
             )

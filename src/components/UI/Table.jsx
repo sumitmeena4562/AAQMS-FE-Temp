@@ -56,11 +56,11 @@ const Table = ({
         <div className={`w-full ${className}`}>
             {/* Table View */}
             <div className="overflow-x-auto custom-scrollbar">
-                <table className="w-full border-collapse min-w-[1000px] lg:min-w-full">
+                <table className="w-full border-collapse min-w-[700px] lg:min-w-full">
                     <thead>
                         <tr className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200/60">
                             {selectable && (
-                                <th className="px-4 sm:px-6 py-5 w-14 text-left">
+                                <th className="px-3 sm:px-4 py-5 w-14 text-left">
                                     <div className="flex items-center">
                                         <input
                                             type="checkbox"
@@ -75,8 +75,9 @@ const Table = ({
                                 <th
                                     key={i}
                                     className={`
-                                        px-4 sm:px-6 py-5 text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em] whitespace-nowrap
+                                        px-3 sm:px-4 py-5 text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em] whitespace-nowrap
                                         ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
+                                        ${col.className || ''}
                                     `}
                                     style={{ width: col.width || 'auto' }}
                                 >
@@ -105,7 +106,7 @@ const Table = ({
                                         `}
                                     >
                                         {selectable && (
-                                            <td className="px-4 sm:px-6 py-4 w-10 relative">
+                                            <td className="px-3 sm:px-4 py-4 w-10 relative">
                                                 {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary shadow-[2px_0_12px_rgba(var(--color-primary-rgb),0.3)]" />}
                                                 <div className="flex items-center">
                                                     <input
@@ -122,8 +123,9 @@ const Table = ({
                                             <td
                                                 key={ci}
                                                 className={`
-                                                    px-4 sm:px-6 py-4 text-[13px] font-medium text-slate-600 vertical-middle
+                                                    px-3 sm:px-4 py-4 text-[13px] font-medium text-slate-600 vertical-middle
                                                     ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
+                                                    ${col.className || ''}
                                                 `}
                                             >
                                                 {col.render ? col.render(row[col.accessor], row) : (row[col.accessor] || '-')}

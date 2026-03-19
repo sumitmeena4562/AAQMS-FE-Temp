@@ -126,7 +126,13 @@ const Organizations = () => {
                         />
 
                         <div className="h-6 w-[1.5px] bg-slate-100 shrink-0 mx-2" />
-
+ <button 
+                            onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
+                            className="ml-auto h-10 flex items-center gap-2 px-4 text-slate-400 hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/50 group"
+                        >
+                            <FiRefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
+                            Reset
+                        </button>
                         {/* View Toggle (Relocated) */}
                         <div className="flex items-center bg-slate-50/80 p-1 rounded-xl border border-slate-100 shadow-inner group">
                             <button 
@@ -147,13 +153,7 @@ const Organizations = () => {
                             </button>
                         </div>
 
-                        <button 
-                            onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
-                            className="ml-auto h-10 flex items-center gap-2 px-4 text-slate-400 hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/50 group"
-                        >
-                            <FiRefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
-                            Reset
-                        </button>
+                       
                     </div>
                 </div>
 
@@ -179,9 +179,10 @@ const Organizations = () => {
                                 { 
                                     header: 'Organization', 
                                     accessor: 'name',
+                                    width: '25%',
                                     render: (name, org) => (
-                                        <div className="flex items-center gap-3.5 py-1">
-                                            <div className="w-10 h-10 bg-slate-100/50 border border-slate-200/50 rounded-xl flex items-center justify-center font-black text-[13px] text-slate-500 overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
+                                        <div className="flex items-center gap-3 py-0.5">
+                                            <div className="w-9 h-9 bg-slate-100/50 border border-slate-200/50 rounded-xl flex items-center justify-center font-black text-[12px] text-slate-500 overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
                                                 {org.logo ? (
                                                     <img src={org.logo} alt="" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all" />
                                                 ) : (
@@ -190,17 +191,15 @@ const Organizations = () => {
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="flex flex-col gap-1.5">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-[14px] font-black text-slate-900 leading-none tracking-tight">{name}</span>
+                                            <div className="flex flex-col min-w-0">
+                                                <div className="flex items-center gap-1.5 line-clamp-1">
+                                                    <span className="text-[13px] font-black text-slate-900 leading-tight tracking-tight truncate">{name}</span>
                                                     {org.stats?.sites > 5 && (
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" title="High Activity" />
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)] shrink-0" title="High Activity" />
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-[0.08em] leading-none">
-                                                    <span className="bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">{org.type || 'Enterprise'}</span>
-                                                    <span className="w-1 h-1 rounded-full bg-slate-200" />
-                                                    <span>{org.industry || 'General'}</span>
+                                                <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">
+                                                    <span className="truncate">{org.industry || 'General'}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -209,15 +208,17 @@ const Organizations = () => {
                                 { 
                                     header: 'Industry', 
                                     accessor: 'industry',
+                                    width: '15%',
+                                    className: 'hidden xl:table-cell',
                                     render: (val) => (
                                         <div className="flex">
                                             <Badge 
                                                 variant="soft" 
-                                                className={`!text-[10px] !px-2.5 !py-1 !font-black !uppercase !tracking-widest border border-current/10 ${
+                                                className={`!text-[9px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest border border-current/10 ${
                                                     !val ? 'text-slate-400 bg-slate-50' : 'text-primary bg-primary/5'
                                                 }`}
                                             >
-                                                {val || 'Not Classified'}
+                                                {val || 'General'}
                                             </Badge>
                                         </div>
                                     )
@@ -225,27 +226,30 @@ const Organizations = () => {
                                 { 
                                     header: 'Region', 
                                     accessor: 'region',
+                                    width: '15%',
+                                    className: 'hidden lg:table-cell',
                                     render: (val) => (
-                                        <div className="flex items-center gap-2 text-[12px] font-bold text-slate-600">
-                                            <FiGlobe className="text-slate-300 shrink-0" size={14} />
-                                            <span>{val || 'Global (HQ)'}</span>
+                                        <div className="flex items-center gap-1.5 text-[11px] font-black text-slate-600 truncate">
+                                            <FiGlobe className="text-slate-300 shrink-0" size={12} />
+                                            <span>{val || 'Global'}</span>
                                         </div>
                                     )
                                 },
                                 { 
-                                    header: 'Deployment Health', 
+                                    header: 'Oversight', 
                                     accessor: 'stats',
+                                    width: '18%',
                                     className: 'text-center',
                                     render: (stats) => (
-                                        <div className="flex items-center justify-center gap-5">
-                                            <div className="flex flex-col items-center group/stat cursor-help">
-                                                <span className="text-[15px] font-black text-slate-900 group-hover/stat:text-primary transition-colors">{stats?.sites || 0}</span>
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Sites</span>
+                                        <div className="flex items-center justify-center gap-4">
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[14px] font-black text-slate-900 leading-none">{stats?.sites || 0}</span>
+                                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Sites</span>
                                             </div>
-                                            <div className="h-6 w-[1px] bg-slate-100 shrink-0" />
-                                            <div className="flex flex-col items-center group/stat cursor-help">
-                                                <span className="text-[15px] font-black text-slate-900 group-hover/stat:text-indigo-600 transition-colors">{stats?.coordinators || 0}</span>
-                                                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Captains</span>
+                                            <div className="h-5 w-[1px] bg-slate-100 shrink-0" />
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-[14px] font-black text-slate-900 leading-none">{stats?.coordinators || 0}</span>
+                                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Units</span>
                                             </div>
                                         </div>
                                     )
@@ -253,17 +257,19 @@ const Organizations = () => {
                                 { 
                                     header: 'Status', 
                                     accessor: 'status',
+                                    width: '15%',
+                                    className: 'hidden sm:table-cell',
                                     render: (status) => {
                                         const isActive = status === 'ACTIVE';
                                         const isMaint = status === 'MAINTENANCE';
                                         return (
-                                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border ${
+                                            <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border ${
                                                 isActive ? 'bg-emerald-50/50 border-emerald-100/50 text-emerald-700' : 
                                                 isMaint ? 'bg-orange-50/50 border-orange-100/50 text-orange-700' :
                                                 'bg-slate-50 border-slate-100 text-slate-500'
                                             }`}>
                                                 <DotStatus status={isActive ? 'active' : isMaint ? 'warning' : 'inactive'} />
-                                                <span className="text-[11px] font-black uppercase tracking-widest leading-none">
+                                                <span className="text-[9px] font-black uppercase tracking-widest leading-none">
                                                     {status || 'PENDING'}
                                                 </span>
                                             </div>
@@ -273,22 +279,23 @@ const Organizations = () => {
                                 { 
                                     header: 'Actions', 
                                     accessor: 'id',
+                                    width: '12%',
                                     className: 'text-right',
                                     render: (_, org) => (
-                                        <div className="flex items-center justify-end gap-2 pr-2">
+                                        <div className="flex items-center justify-end gap-1.5 pr-1">
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); handleEdit(org); }}
-                                                className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-xl shadow-sm hover:shadow-md active:scale-95"
-                                                title="Edit Blueprint"
+                                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-xl shadow-sm active:scale-95"
+                                                title="Edit"
                                             >
-                                                <FiEdit2 size={15} />
+                                                <FiEdit2 size={13} />
                                             </button>
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); removeOrg(org.id); }}
-                                                className="p-2 text-slate-400 hover:text-rose-500 transition-colors hover:bg-slate-50 rounded-lg group"
-                                                title="Decommission"
+                                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 transition-all rounded-xl hover:bg-rose-50 active:scale-95"
+                                                title="Delete"
                                             >
-                                                <FiTrash2 size={15} className="group-hover:rotate-12 transition-transform" />
+                                                <FiTrash2 size={13} />
                                             </button>
                                         </div>
                                     )
