@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import OrganizationCard from '../../components/organization/OrganizationCard';
+import OrganizationCard from '../../components/UI/OrganizationCard';
 import PageHeader from '../../components/UI/PageHeader';
-import CreateOrganization from '../../components/organization/CreateOrganization';
+import CreateOrganization from '../../components/UI/CreateOrganization';
 import { useOrgStore } from '../../store/useOrgStore';
 import useUserStore from '../../store/userStore';
 

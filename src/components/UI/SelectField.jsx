@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertCircle } from 'react-icons/fi';
 import { t } from '../../theme/theme';
 
-const SelectField = ({
+const SelectField = forwardRef(({
     label,
     options = [],
     value,
@@ -14,7 +14,7 @@ const SelectField = ({
     className = '',
     containerStyle = {},
     ...props
-}) => {
+}, ref) => {
     const [isFocused, setIsFocused] = useState(false);
 
     // Shake animation variant
@@ -62,6 +62,7 @@ const SelectField = ({
                 )}
 
                 <select
+                    ref={ref}
                     value={value}
                     onChange={onChange}
                     required={required}
@@ -89,9 +90,14 @@ const SelectField = ({
                     {...props}
                 >
                     <option value="" disabled hidden>Select an option</option>
-                    {options.map((opt, idx) => (
-                        <option key={idx} value={opt.value}>{opt.label}</option>
-                    ))}
+                    {options.map((opt, idx) => {
+                        const isString = typeof opt === 'string';
+                        const optValue = isString ? opt : opt.value;
+                        const optLabel = isString ? opt : opt.label;
+                        return (
+                            <option key={idx} value={optValue}>{optLabel}</option>
+                        );
+                    })}
                 </select>
 
                 {/* Custom Dropdown Arrow */}
@@ -135,7 +141,9 @@ const SelectField = ({
             </AnimatePresence>
         </motion.div>
     );
-};
+});
+
+SelectField.displayName = 'SelectField';
 
 export default SelectField;
 

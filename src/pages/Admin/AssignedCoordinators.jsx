@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import CoordinatorCard from '../../components/organization/CoordinatorCard';
+import CoordinatorCard from '../../components/UI/CoordinatorCard';
 import PageHeader from '../../components/UI/PageHeader';
 import useUserStore from '../../store/userStore';
 import { generateSitePlansForCoordinator } from '../../utils/mockSiteData';
