@@ -1,69 +1,39 @@
 import { create } from "zustand";
-
-// Helper function to simulate network delay
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-const MOCK_USERS = {
-    'admin@aaqms.com': { 
-        password: 'Admin@123', 
-        user: { id: 1, name: 'Sumit Meena', email: 'admin@aaqms.com', role: 'admin' } 
-    },
-    'coordinator@aaqms.com': { 
-        password: 'Coord@123', 
-        user: { id: 2, name: 'Anjali Sharma', email: 'coordinator@aaqms.com', role: 'coordinator' } 
-    },
-    'officer@aaqms.com': { 
-        password: 'Officer@123', 
-        user: { id: 3, name: 'Rahul Gupta', email: 'officer@aaqms.com', role: 'field_officer' } 
-    }
-};
+import api from "../services/api"; // API interceptor ko import kar liya
 
 const useAuthStore = create((set) => ({
-    // Initialize state from localStorage
     isAuthenticated: !!localStorage.getItem('token'),
     user: JSON.parse(localStorage.getItem('user')) || null,
     isLoading: false,
     error: null,
 
-    /**
-     * Simulated Login Method
-     * @param {Object} credentials - email, password, rememberMe
-     */
     login: async ({ email, password, rememberMe }) => {
         set({ isLoading: true, error: null });
         
         try {
-            await delay(1500);
-            const userData = MOCK_USERS[email.toLowerCase()];
+            // STEP 1: Backend ki Login API ko Request bhejna
+            const response = await api.post('/accounts/api/login/', { email, password });
+            const { access, refresh } = response.data;
 
-            if (userData && userData.password === password) {
-                const mockToken = `simulated-jwt-${Date.now()}`;
-                const loggedInUser = userData.user;
+            // STEP 2: Tokens ko Browser me Save karna
+            localStorage.setItem('token', access);
+            localStorage.setItem('refresh', refresh);
 
-                // Handle Persistence for "Remember Me"
-                if (rememberMe) {
-                    localStorage.setItem('token', mockToken);
-                    localStorage.setItem('user', JSON.stringify(loggedInUser));
-                } else {
-                    // For short-lived sessions, we still use localStorage for simplicity 
-                    // in this POC, but the logic structure allows for sessionStorage later.
-                    localStorage.setItem('token', mockToken);
-                    localStorage.setItem('user', JSON.stringify(loggedInUser));
-                }
+            // STEP 3: User ki details/profile laana
+            const profileRes = await api.get('/accounts/profile/');
+            const user = profileRes.data;
 
-                set({ 
-                    isAuthenticated: true, 
-                    user: loggedInUser, 
-                    isLoading: false, 
-                    error: null 
-                });
-                
-                return { success: true, user: loggedInUser };
-            } else {
-                throw new Error('Invalid Email or Password!');
-            }
+            // STEP 4: User ka data save karna
+            localStorage.setItem('user', JSON.stringify(user));
+
+            set({ isAuthenticated: true, user: user, isLoading: false, error: null });
+            return { success: true, user: user };
+
         } catch (err) {
-            const error = err.message || 'Authentication Failed';
+            const error = err.response?.data?.detail 
+                       || err.response?.data?.error 
+                       || 'Login Failed. Check your connection or credentials.';
+            
             set({ error, isLoading: false });
             return { success: false, error };
         }
@@ -71,6 +41,7 @@ const useAuthStore = create((set) => ({
 
     logout: () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('refresh');
         localStorage.removeItem('user');
         set({ isAuthenticated: false, user: null, error: null });
     },
@@ -78,4 +49,4 @@ const useAuthStore = create((set) => ({
     setError: (error) => set({ error })
 }));
 
-export default useAuthStore;
+export default useAuthStore;
