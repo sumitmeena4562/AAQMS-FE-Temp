@@ -109,7 +109,7 @@ const AdminLayoutInner = () => {
                     }
                 />
 
-                <main className="flex-1 overflow-y-auto p-5">
+                <main className="flex-1 overflow-y-auto ">
                     <div className="w-full max-w-[1400px] mx-auto">
                         <Outlet />
                     </div>
