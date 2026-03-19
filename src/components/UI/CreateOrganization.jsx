@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, X, AlignLeft } from 'lucide-react';
-import FormInput from './FormInput';
+import InputField from './InputField';
 import SelectField from './SelectField';
 import ImageUploadCard from './ImageUploadCard';
 
@@ -117,7 +117,7 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
           {/* Form */}
           <form onSubmit={handleSubmit(submitForm)} className="flex flex-col">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-[32px] gap-y-[24px] mb-8 !p-1">
-              <FormInput
+              <InputField
                 label="Name of Organization"
                 required
                 placeholder="Apex Global Solutions"
@@ -158,14 +158,14 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
                 ]}
               />
 
-              <FormInput
+              <InputField
                 label="Contact Person Name"
                 placeholder="John Doe"
                 required
                 {...register("contactPerson")}
                 error={errors.contactPerson?.message}
               />
-              <FormInput
+              <InputField
                 label="Contact Email"
                 type="email"
                 placeholder="email@company.com"
@@ -174,14 +174,14 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
                 error={errors.contactEmail?.message}
               />
 
-              <FormInput
+              <InputField
                 label="Full address"
                 placeholder="address"
                 required
                 {...register("address")}
                 error={errors.address?.message}
               />
-              <FormInput
+              <InputField
                 label="Other Information (Option)"
                 placeholder="----"
                 {...register("otherInfo")}

@@ -1,0 +1,58 @@
+import { Fuel, Truck, Layout } from 'lucide-react';
+
+export const ZONES_DATA = [
+    {
+        id: 'Z-101',
+        name: 'Main Warehouse',
+        type: 'Storage',
+        icon: Fuel,
+        iconBgClass: 'bg-green-50',
+        iconTextClass: 'text-green-600',
+        count: '42 Items',
+    },
+    {
+        id: 'Z-102',
+        name: 'Processing Area',
+        type: 'Loading Bay',
+        icon: Truck,
+        iconBgClass: 'bg-orange-50',
+        iconTextClass: 'text-orange-600',
+        count: '18 Items',
+    },
+    {
+        id: 'Z-103',
+        name: 'Office A',
+        type: 'Office',
+        icon: Layout,
+        iconBgClass: 'bg-blue-50',
+        iconTextClass: 'text-blue-600',
+        count: '14 Items',
+    },
+    {
+        id: 'Z-101',
+        name: 'Main Warehouse',
+        type: 'Storage',
+        icon: Fuel,
+        iconBgClass: 'bg-green-50',
+        iconTextClass: 'text-green-600',
+        count: '42 Items',
+    },
+    {
+        id: 'Z-102',
+        name: 'Processing Area',
+        type: 'Loading Bay',
+        icon: Truck,
+        iconBgClass: 'bg-orange-50',
+        iconTextClass: 'text-orange-600',
+        count: '18 Items',
+    },
+    {
+        id: 'Z-103',
+        name: 'Office A',
+        type: 'Office',
+        icon: Layout,
+        iconBgClass: 'bg-blue-50',
+        iconTextClass: 'text-blue-600',
+        count: '14 Items',
+    },
+];

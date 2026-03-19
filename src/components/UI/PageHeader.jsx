@@ -6,7 +6,8 @@ const PageHeader = ({
   onReset, 
   onApplyFilters, 
   onAdd, 
-  addButtonText = "Add New Org"
+  addButtonText = "Add New Org",
+  hideAddButton = false
 }) => {
   return (
     <div className="bg-[#F9FAFB] border-b border-gray-200 sticky top-0 z-20">
@@ -40,15 +41,17 @@ const PageHeader = ({
             Apply Filters
           </button>
           
-          <button 
-            onClick={onAdd}
-            className="h-[36px] flex items-center gap-2 px-4 bg-[#111827] border border-transparent rounded-lg font-semibold text-[13px] text-white hover:bg-gray-800 transition-colors shadow-sm"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-            </svg>
-            {addButtonText}
-          </button>
+          {!hideAddButton && (
+            <button 
+              onClick={onAdd}
+              className="h-[36px] flex items-center gap-2 px-4 bg-[#111827] border border-transparent rounded-lg font-semibold text-[13px] text-white hover:bg-gray-800 transition-colors shadow-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+              </svg>
+              {addButtonText}
+            </button>
+          )}
         </div>
         
       </div>
@@ -178,8 +181,6 @@ export default PageHeader;
           
 //         </div>
 //       </div>
-//     </div>
-//   );
-// };
-
+//     </d 
+//   
 // export default PageHeader;
