@@ -175,12 +175,13 @@ export default function Users() {
         {
             header: 'Personnel Profile',
             accessor: 'name',
+            width: '26%',
             render: (_, row) => (
-                <div className="flex items-center gap-3 py-1.5 focus:opacity-80 transition-opacity">
-                    <UserAvatar name={row?.name} size="40px" className="shadow-sm border-2 border-white ring-1 ring-slate-100" />
-                    <div className="min-w-0">
-                        <div className="text-[14px] font-bold text-slate-800 leading-tight truncate">{row?.name}</div>
-                        <div className="text-[11px] font-medium text-slate-400 mt-0.5 truncate">{row?.email}</div>
+                <div className="flex items-center gap-3 py-0.5 group-hover:px-0.5 transition-all">
+                    <UserAvatar name={row?.name} size="36px" className="shadow-sm border-2 border-white ring-1 ring-slate-100 shrink-0" />
+                    <div className="flex flex-col min-w-0">
+                        <div className="text-[13px] font-black text-slate-900 leading-tight truncate">{row?.name}</div>
+                        <div className="text-[10px] font-bold text-slate-400 mt-0.5 truncate uppercase tracking-widest">{row?.email?.split('@')[0]}</div>
                     </div>
                 </div>
             )
@@ -188,51 +189,73 @@ export default function Users() {
         {
             header: 'Organization',
             accessor: 'organization',
+            width: '18%',
             render: (value) => (
-                <div className="flex flex-col">
-                    <span className="text-[13px] font-bold text-slate-700">{value || 'Contractor'}</span>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Primary Unit</span>
+                <div className="flex flex-col min-w-0">
+                    <span className="text-[13px] font-black text-slate-800 truncate leading-none">{value || 'Contractor'}</span>
+                    <span className="text-[8px] text-slate-400 font-black uppercase tracking-[0.1em] mt-1 truncate">Primary Unit</span>
                 </div>
             )
         },
         {
             header: 'Role',
             accessor: 'role',
+            width: '14%',
             align: 'center',
             render: (value) => (
-                <Badge color={value} variant="light" size="sm" className="font-bold uppercase tracking-wider text-[9px] px-2.5">
-                    {value}
-                </Badge>
+                <div className="flex justify-center">
+                    <Badge variant="soft" className="!text-[9px] !px-2.5 !py-1 !font-black !uppercase !tracking-widest border border-current/10 text-primary bg-primary/5">
+                        {value}
+                    </Badge>
+                </div>
             )
         },
         {
             header: 'Status',
             accessor: 'assignment',
+            width: '14%',
             align: 'center',
-            render: (value) => (
-                <DotStatus type={value} text={value === 'assigned' ? 'Assigned' : 'Standby'} size="sm" className="font-bold uppercase tracking-wider text-[10px]" />
-            )
+            render: (value) => {
+                const isAssigned = value === 'assigned';
+                return (
+                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border ${
+                        isAssigned ? 'bg-emerald-50/50 border-emerald-100/50 text-emerald-700' : 
+                        'bg-slate-50 border-slate-100 text-slate-500'
+                    }`}>
+                        <DotStatus status={isAssigned ? 'active' : 'inactive'} />
+                        <span className="text-[9px] font-black uppercase tracking-widest leading-none">
+                            {isAssigned ? 'Assigned' : 'Standby'}
+                        </span>
+                    </div>
+                );
+            }
         },
         {
             header: 'Actions',
-            accessor: 'actions',
+            accessor: 'id',
+            width: '14%',
             align: 'right',
             render: (_, row) => (
-                <div className="flex items-center justify-end gap-2">
-                    <Button
-                        variant="ghost"
+                <div className="flex items-center justify-end gap-1.5 pr-1">
+                    <button 
                         onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }}
-                        className="!p-2 !h-9 !w-9 !rounded-xl text-slate-400 hover:!text-primary hover:!bg-primary/5"
-                        icon={FiExternalLink}
-                    />
-                    <Button
-                        variant="primary"
+                        className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-xl shadow-sm active:scale-95"
+                        title="View Details"
+                    >
+                        <FiExternalLink size={13} />
+                    </button>
+                    <button 
                         onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
-                        className="!h-9 !px-4 !rounded-lg !text-[11px] !font-bold !uppercase !tracking-wider shadow-sm"
-                        icon={FiEdit2}
+                        className="px-4 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-xl shadow-sm active:scale-95 font-black uppercase tracking-widest text-[9px] hidden md:flex"
                     >
                         Edit
-                    </Button>
+                    </button>
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
+                        className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-xl shadow-sm active:scale-95 md:hidden"
+                    >
+                        <FiEdit2 size={13} />
+                    </button>
                 </div>
             )
         }

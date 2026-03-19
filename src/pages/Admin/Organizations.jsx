@@ -69,40 +69,6 @@ const Organizations = () => {
         label: r === 'all' ? 'All Regions' : r 
     }));
 
-    const statsData = [
-        {
-            label: 'Total Organizations',
-            value: orgs.length,
-            icon: FiBriefcase,
-            iconBgClass: 'bg-emerald-50',
-            iconColorClass: 'text-emerald-600',
-            description: 'Across all industries'
-        },
-        {
-            label: 'Active Entities',
-            value: orgs.filter(o => o.status === 'ACTIVE').length,
-            icon: FiTrendingUp,
-            iconBgClass: 'bg-blue-50',
-            iconColorClass: 'text-blue-600',
-            description: 'Live & Operational'
-        },
-        {
-            label: 'Under Maintenance',
-            value: orgs.filter(o => o.status === 'MAINTENANCE').length,
-            icon: FiActivity,
-            iconBgClass: 'bg-orange-50',
-            iconColorClass: 'text-orange-600',
-            description: 'Service in progress'
-        },
-        {
-            label: 'Total Sites',
-            value: orgs.reduce((acc, o) => acc + (parseInt(o.stats?.sites) || 0), 0),
-            icon: FiGlobe,
-            iconBgClass: 'bg-indigo-50',
-            iconColorClass: 'text-indigo-600',
-            description: 'Deployed globally'
-        }
-    ];
 
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-12">
@@ -123,9 +89,6 @@ const Organizations = () => {
                     </button>
                 }
             />
-
-            {/* 2. STATS ROW */}
-            <StatsRow items={statsData} columns={4} />
 
             {/* 3. GRID CONTENT WITH FILTERS */}
             <div className="flex flex-col gap-6">
