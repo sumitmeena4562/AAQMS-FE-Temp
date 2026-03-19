@@ -6,6 +6,7 @@ import CreateOrganization from '../../components/UI/CreateOrganization';
 import PageHeader from '../../components/UI/PageHeader';
 import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 import useUserStore from '../../store/userStore';
+import FilterDropdown from '../../components/UI/FilterDropdown';
 
 const Organizations = () => {
     const orgs = useOrgStore(state => state.orgs);
@@ -14,7 +15,7 @@ const Organizations = () => {
     const removeOrg = useOrgStore(state => state.removeOrg);
     
     const [searchQuery, setSearchQuery] = useState("");
-    const [filters, setFilters] = useState({ industry: 'all', status: 'all' });
+    const [filters, setFilters] = useState({ industry: 'all', status: 'all', region: 'all' });
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingOrg, setEditingOrg] = useState(null);
 
@@ -36,7 +37,8 @@ const Organizations = () => {
         const matchesSearch = (org.name || "").toLowerCase().includes(searchQuery.toLowerCase());
         const matchesIndustry = filters.industry === 'all' || (org.industry || "") === filters.industry;
         const matchesStatus = filters.status === 'all' || (org.status || "") === filters.status;
-        return matchesSearch && matchesIndustry && matchesStatus;
+        const matchesRegion = filters.region === 'all' || (org.region || "") === filters.region;
+        return matchesSearch && matchesIndustry && matchesStatus && matchesRegion;
     });
 
     const handleEdit = (org) => {
@@ -54,39 +56,92 @@ const Organizations = () => {
         setEditingOrg(null);
     };
 
-    const industryOptions = ['all', ...new Set(orgs.map(o => o.industry))].map(i => ({ 
+    const industryOptions = ['all', ...new Set(orgs.map(o => o.industry).filter(Boolean))].map(i => ({ 
         value: i, 
-        label: i.charAt(0).toUpperCase() + i.slice(1) 
+        label: i === 'all' ? 'All Industries' : i.charAt(0).toUpperCase() + i.slice(1) 
+    }));
+
+    const regionOptions = ['all', ...new Set(orgs.map(o => o.region).filter(Boolean))].map(r => ({ 
+        value: r, 
+        label: r === 'all' ? 'All Regions' : r 
     }));
 
     return (
         <div className="flex flex-col min-h-full font-sans animate-in fade-in duration-500">
             <PageHeader 
                 addButtonText="Add New Org" 
-                onSearch={setSearchQuery}
-                filterOptions={[
-                  { key: 'industry', label: 'Industry', options: industryOptions },
-                  { key: 'status', label: 'Status', options: [
-                    { value: 'all', label: 'All' }, 
-                    { value: 'ACTIVE', label: 'Active' }, 
-                    { value: 'MAINTENANCE', label: 'Maintenance' }
-                  ]}
-                ]}
-                onApplyFilters={setFilters}
-                onReset={() => { setSearchQuery(''); setFilters({ industry: 'all', status: 'all' }); }}
                 onAdd={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
             />
 
             <main className="flex-1 w-full pb-20">
               <div className="px-8 mt-6">
                 
-                {/* 1. SECTION HEADER */}
-                <div className="flex items-center justify-between mb-8 pt-2">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-xl font-extrabold text-[#111827] tracking-tight">Available Organizations</h2>
-                    <span className="px-2.5 py-0.5 bg-slate-200/60 text-slate-600 text-[11px] font-extrabold rounded-lg">
-                      {filteredOrgs.length}
-                    </span>
+                {/* 1. SECTION HEADER & FILTERS */}
+                <div className="flex flex-col gap-6 mb-8 pt-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-xl font-extrabold text-[#111827] tracking-tight">Available Organizations</h2>
+                      <span className="px-2.5 py-0.5 bg-slate-200/60 text-slate-600 text-[11px] font-extrabold rounded-lg">
+                        {filteredOrgs.length}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 2. FILTER BAR (Matches User Management Style) */}
+                  <div className="flex flex-wrap items-center gap-3 bg-white/40 p-1 rounded-xl">
+                    <div className="relative flex-1 max-w-sm group">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Search organizations..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="block w-full h-10 pl-10 pr-4 bg-white border border-slate-200 rounded-xl text-[13px] font-medium placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all shadow-sm"
+                      />
+                    </div>
+
+                    <div className="h-4 w-[1px] bg-slate-200 shrink-0 mx-1" />
+
+                    <FilterDropdown 
+                      label="Industry"
+                      options={industryOptions}
+                      value={filters.industry}
+                      onChange={(v) => setFilters(prev => ({ ...prev, industry: v }))}
+                    />
+
+                    <FilterDropdown 
+                      label="Region"
+                      options={regionOptions}
+                      value={filters.region}
+                      onChange={(v) => setFilters(prev => ({ ...prev, region: v }))}
+                    />
+
+                    <FilterDropdown 
+                      label="Status"
+                      options={[
+                        { value: 'all', label: 'All Status' },
+                        { value: 'ACTIVE', label: 'Active' },
+                        { value: 'MAINTENANCE', label: 'Maintenance' },
+                        { value: 'DEACTIVE', label: 'Deactive' }
+                      ]}
+                      value={filters.status}
+                      onChange={(v) => setFilters(prev => ({ ...prev, status: v }))}
+                    />
+
+                    <button 
+                      onClick={() => {
+                        setSearchQuery('');
+                        setFilters({ industry: 'all', status: 'all', region: 'all' });
+                      }}
+                      className="ml-auto h-10 flex items-center gap-2 px-4 text-slate-400 hover:text-rose-500 font-bold text-[11px] uppercase tracking-widest transition-colors rounded-xl hover:bg-rose-50"
+                    >
+                      <FiRefreshCcw size={12} />
+                      Reset Filters
+                    </button>
                   </div>
                 </div>
 
