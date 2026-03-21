@@ -151,7 +151,26 @@ const Organizations = () => {
                         />
 
                         <div className="h-6 w-[1.5px] bg-border-main/40 shrink-0 mx-2" />
- <button 
+
+                        {/* View Toggles (Relocated for proximity to filters) */}
+                        <div className="flex items-center gap-1.5 bg-base/40 p-1 rounded-xl border border-border-main/50">
+                            <button 
+                                onClick={() => setViewMode('list')}
+                                className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
+                                title="List View"
+                            >
+                                <FiList size={16} />
+                            </button>
+                            <button 
+                                onClick={() => setViewMode('grid')}
+                                className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
+                                title="Grid View"
+                            >
+                                <FiGrid size={16} />
+                            </button>
+                        </div>
+
+                        <button 
                             onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
                             className="ml-auto h-10 flex items-center gap-2 px-4 text-gray hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/10 group"
                         >

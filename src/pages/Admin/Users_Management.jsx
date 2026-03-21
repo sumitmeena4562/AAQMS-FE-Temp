@@ -303,24 +303,7 @@ export default function Users() {
                     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
                     { label: "User Management", path: "/admin/users", icon: <FiUser size={14} />, isActive: true }
                 ]}
-                rightContent={
-                    <div className="flex items-center gap-2 border-r border-border-main/50 pr-4 mr-1">
-                        <button 
-                            onClick={() => setViewMode('list')}
-                            className={`p-2 rounded-xl transition-all ${viewMode === 'list' ? 'bg-primary/10 text-primary shadow-inner' : 'text-gray hover:bg-base'}`}
-                            title="List View"
-                        >
-                            <FiList size={18} />
-                        </button>
-                        <button 
-                            onClick={() => setViewMode('grid')}
-                            className={`p-2 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-primary/10 text-primary shadow-inner' : 'text-gray hover:bg-base'}`}
-                            title="Grid View"
-                        >
-                            <FiGrid size={18} />
-                        </button>
-                    </div>
-                }
+                rightContent={null}
             />
 
             {/* 2. Stats Section — Unified Oversight Metrics */}
@@ -393,12 +376,39 @@ export default function Users() {
                         allLabel="All Time"
                         icon={<FiCalendar size={14} />}
                     />
-                    
+                      <FilterDropdown
+                        label="Status"
+                        options={filterOptions.statuses}
+                        value={filters.status}
+                        onChange={v => setFilters({ ...filters, status: v })}
+                        allLabel="All Statuses"
+                    />
+
+                    <div className="h-6 w-[1.5px] bg-border-main/40 shrink-0 mx-2 hidden sm:block" />
+
+                    {/* View Toggles (Relocated from Header) */}
+                    <div className="flex items-center gap-1.5 bg-base/40 p-1 rounded-xl border border-border-main/50">
+                        <button 
+                            onClick={() => setViewMode('list')}
+                            className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
+                            title="List View"
+                        >
+                            <FiList size={16} />
+                        </button>
+                        <button 
+                            onClick={() => setViewMode('grid')}
+                            className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
+                            title="Grid View"
+                        >
+                            <FiGrid size={16} />
+                        </button>
+                    </div>
+
                     <button 
                         onClick={resetFilters}
-                        className="ml-auto h-10 flex items-center gap-2 px-4 text-gray hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/10 group"
+                        className="ml-auto h-9 flex items-center gap-2 px-3.5 text-gray hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/10 group"
                     >
-                        <FiRefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
+                        <FiRefreshCcw size={13} className="group-hover:rotate-180 transition-transform duration-500" />
                         Reset
                     </button>
                 </div>
