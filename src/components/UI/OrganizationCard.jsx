@@ -61,7 +61,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
   return (
     <div 
-      className={`h-[360px] bg-white rounded-2xl shadow-sm hover:shadow-premium transition-all duration-300 flex flex-col border border-slate-200 overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
+      className={`h-[360px] bg-white rounded-2xl shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col border border-slate-200 overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
       onClick={handleAction}
     >
 

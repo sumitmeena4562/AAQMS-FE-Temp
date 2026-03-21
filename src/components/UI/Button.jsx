@@ -24,11 +24,11 @@ const Button = ({
 
     // Variant maps for colors - Using native Tailwind theme variables
     const variants = {
-        primary: "bg-primary text-white hover:bg-primary/90 shadow-[var(--shadow-button)] border border-transparent",
-        secondary: "bg-accent text-white hover:bg-accent/90 shadow-[var(--shadow-button)] border border-transparent",
-        success: "bg-success text-white hover:bg-success/90 shadow-[var(--shadow-button)] border border-transparent",
-        outline: "bg-white border border-[var(--color-border)] text-text-secondary hover:border-[var(--color-border-hover)] hover:text-text-primary",
-        ghost: "bg-transparent text-text-secondary hover:bg-zinc-100 hover:text-text-primary shadow-none border-none",
+        primary: "bg-primary text-white hover:bg-primary/90 shadow-[var(--shadow-btn)] border border-transparent",
+        secondary: "bg-accent text-white hover:bg-accent/90 shadow-[var(--shadow-btn)] border border-transparent",
+        success: "bg-success text-white hover:bg-success/90 shadow-[var(--shadow-btn)] border border-transparent",
+        outline: "bg-white border border-border-main text-body hover:border-border-hover hover:text-title",
+        ghost: "bg-transparent text-body hover:bg-zinc-100 hover:text-title shadow-none border-none",
         danger: "bg-rose-500 text-white hover:bg-rose-600 shadow-md border border-transparent",
     };
 

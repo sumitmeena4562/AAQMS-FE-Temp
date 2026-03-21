@@ -93,7 +93,7 @@ const Organizations = () => {
             {/* 3. GRID CONTENT WITH FILTERS */}
             <div className="flex flex-col gap-6">
                 
-                <div className="bg-bg-secondary border border-border/60 rounded-2xl p-3.5 shadow-sm">
+                <div className="bg-card border border-border-main/60 rounded-2xl p-3.5 shadow-sm">
                     <div className="flex flex-wrap items-center gap-3">
                         <FilterDropdown 
                             label="Industry"
@@ -134,7 +134,7 @@ const Organizations = () => {
                         <div className="flex items-center bg-slate-50/80 p-1 rounded-xl border border-slate-100 shadow-inner group">
                             <button 
                                 onClick={() => setViewMode('grid')}
-                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-bg-secondary text-text-primary shadow-sm border border-border' : 'text-text-muted hover:text-text-secondary'}`}
+                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-card text-title shadow-sm border border-border-main' : 'text-gray hover:text-body'}`}
                                 title="Grid View"
                             >
                                 <FiGrid size={13} className={viewMode === 'grid' ? 'text-primary' : ''} />
@@ -179,23 +179,23 @@ const Organizations = () => {
                                     width: '25%',
                                     render: (name, org) => (
                                         <div className="flex items-center gap-3 py-0.5">
-                                            <div className="w-9 h-9 bg-bg-tertiary border border-border/50 rounded-xl flex items-center justify-center font-black text-[12px] text-text-muted overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
+                                            <div className="w-9 h-9 bg-bg-tertiary border border-border-main/50 rounded-xl flex items-center justify-center font-black text-[12px] text-gray overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
                                                 {org.logo ? (
                                                     <img src={org.logo} alt="" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all" />
                                                 ) : (
-                                                    <span className="bg-gradient-to-br from-bg-tertiary to-bg-primary w-full h-full flex items-center justify-center">
+                                                    <span className="bg-gradient-to-br from-bg-tertiary to-page w-full h-full flex items-center justify-center">
                                                         {name?.substring(0, 2) || 'OR'}
                                                     </span>
                                                 )}
                                             </div>
                                             <div className="flex flex-col min-w-0">
                                                 <div className="flex items-center gap-1.5 line-clamp-1">
-                                                    <span className="text-[13px] font-black text-text-primary leading-tight tracking-tight truncate">{name}</span>
+                                                    <span className="text-[13px] font-black text-title leading-tight tracking-tight truncate">{name}</span>
                                                     {org.stats?.sites > 5 && (
                                                         <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)] shrink-0" title="High Activity" />
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-[9px] font-black text-text-muted uppercase tracking-widest leading-none mt-1">
+                                                <div className="flex items-center gap-1.5 text-[9px] font-black text-gray uppercase tracking-widest leading-none mt-1">
                                                     <span className="truncate">{org.industry || 'General'}</span>
                                                 </div>
                                             </div>

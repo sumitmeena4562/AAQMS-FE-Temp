@@ -181,8 +181,8 @@ export default function Users() {
                 <div className="flex items-center gap-2 py-0.5 group-hover:px-1 transition-all">
                     <UserAvatar name={row?.name} avatar={row?.avatar} size="32px" className="shadow-sm border-2 border-white ring-1 ring-slate-100 shrink-0" />
                     <div className="flex flex-col min-w-0">
-                        <div className="text-[12px] font-black text-text-primary leading-tight truncate">{row?.name}</div>
-                        <div className="text-[9px] font-bold text-text-muted mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email?.split('@')[0]}</div>
+                        <div className="text-[12px] font-black text-title leading-tight truncate">{row?.name}</div>
+                        <div className="text-[9px] font-bold text-gray mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email?.split('@')[0]}</div>
                     </div>
                 </div>
             )
@@ -222,7 +222,7 @@ export default function Users() {
                 return (
                     <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg border ${
                         isAssigned ? 'bg-success-bg/50 border-success/10 text-success' : 
-                        'bg-bg-tertiary border-border text-text-muted'
+                        'bg-bg-tertiary border-border-main text-gray'
                     }`}>
                         <DotStatus status={isAssigned ? 'active' : 'inactive'} />
                         <span className="text-[8px] font-black uppercase tracking-widest leading-none">

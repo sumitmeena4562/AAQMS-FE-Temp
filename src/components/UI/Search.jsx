@@ -34,7 +34,7 @@ const Search = ({
                 placeholder={placeholder}
                 onChange={(e) => setQuery(e.target.value)}
                 style={{ paddingLeft: '42px' }}
-                className="block w-full h-10 pr-10 text-[13px] font-medium rounded-full bg-bg-primary border border-border text-text-primary placeholder-text-muted focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary-50 transition-all duration-200 shadow-button"
+                className="block w-full h-10 pr-10 text-[13px] font-medium rounded-full bg-page border border-border-main text-title placeholder-text-muted focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary-50 transition-all duration-200 shadow-btn"
             />
 
             {/* Clear Button */}

@@ -67,8 +67,8 @@ const StatsCard = ({
     const finalChange = change || autoChange;
 
     return (
-        <div className={`bg-white px-6 py-5 rounded-2xl w-full border border-slate-200 shadow-pro flex flex-col min-h-[148px] 
-            hover:shadow-premium transition-all duration-300 cursor-default group relative overflow-hidden ${className}`}>
+        <div className={`bg-white px-6 py-5 rounded-2xl w-full border border-slate-200 shadow-card flex flex-col min-h-[148px] 
+            hover:shadow-card-hover transition-all duration-300 cursor-default group relative overflow-hidden ${className}`}>
             
             {/* Subtle Hover Gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />

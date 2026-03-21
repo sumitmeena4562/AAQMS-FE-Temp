@@ -47,7 +47,7 @@ const initialOrgs = [
     status: "ACTIVE",
     lastInventoryAudit: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
     stats: { sites: 8, floors: 4, zones: 32 },
-    image: "https://images.unsplash.com/photo-1523050335392-93851179ae09?q=80&w=800&auto=format&fit=crop"
+    image: "https://www.visionmanagement.org/wp-content/uploads/2023/08/Vision-scaled-600x400.jpg"
   },
   {
     id: "7",
@@ -87,7 +87,7 @@ const initialOrgs = [
     status: "MAINTENANCE",
     lastInventoryAudit: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
     stats: { sites: 9, floors: 6, zones: 54 },
-    image: "https://images.unsplash.com/photo-1503387762-592dea58ef21?q=80&w=800&auto=format&fit=crop"
+    image: "https://is1-2.housingcdn.com/4f2250e8/be11ddbc6e3f8c667d628fbd9ecf6124/v0/fs/everest_axora-bhayli-vadodara-everest_construction_company.jpeg"
   },
   {
     id: "12",

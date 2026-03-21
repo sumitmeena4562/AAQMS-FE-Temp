@@ -74,7 +74,7 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-bg-primary font-sans">
+        <div className="flex h-screen overflow-hidden bg-page font-sans">
             <Sidebar
                 navItems={navItems}
                 logo={<Logo />}
@@ -84,7 +84,7 @@ const AdminLayoutInner = () => {
                 setMobileOpen={setIsMobileOpen}
             />
 
-            <div className="flex-1 flex flex-col h-full overflow-hidden bg-bg-primary">
+            <div className="flex-1 flex flex-col h-full overflow-hidden bg-page">
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
@@ -94,7 +94,7 @@ const AdminLayoutInner = () => {
                                 <FiSearch size={16} />
                             </span>
                             <input
-                                className="pl-11 pr-10 py-2 bg-slate-100/50 border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-white focus:border-transparent focus:shadow-premium w-[320px] focus:w-[420px]"
+                                className="pl-11 pr-10 py-2 bg-slate-100/50 border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-white focus:border-transparent focus:shadow-card-hover w-[320px] focus:w-[420px]"
                                 placeholder="Search anything..."
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}

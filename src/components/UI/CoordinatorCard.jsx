@@ -8,7 +8,7 @@ const CoordinatorCard = ({ coordinator, orgName }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between !p-2 px-8 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-premium transition-all duration-300 gap-6">
+    <div className="flex flex-col md:flex-row md:items-center justify-between !p-2 px-8 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-card-hover transition-all duration-300 gap-6">
       {/* Left Section (Avatar, Name, Status) */}
       <div className="flex items-center gap-5 w-full md:w-[350px] shrink-0">
 

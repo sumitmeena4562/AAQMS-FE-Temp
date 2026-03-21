@@ -45,14 +45,14 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                                 </h2>
                                 <div className="flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <span className="text-[10px] font-bold text-gray uppercase tracking-wider">
                                         ID: {user.id || 'N/A'}
                                     </span>
                                 </div>
                             </div>
                             <button 
                                 onClick={onClose} 
-                                className="p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 rounded-lg transition-colors"
+                                className="p-2 text-gray hover:bg-base hover:text-body rounded-lg transition-colors"
                             >
                                 <FiX size={18} />
                             </button>
@@ -76,9 +76,9 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                                     )}
                                 </Motion.div>
                                 <div className="flex-1 min-w-0">
-                                    <div className="text-lg font-bold text-slate-900 truncate leading-tight mb-1">{user.name}</div>
+                                    <div className="text-lg font-bold text-title truncate leading-tight mb-1">{user.name}</div>
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <div className="text-[12px] text-slate-500 font-medium truncate">{user.email}</div>
+                                        <div className="text-[12px] text-body font-medium truncate">{user.email}</div>
                                         <div className={`
                                             px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border
                                             ${user.status === 'active' 
@@ -101,10 +101,10 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                                 ].map((item, idx) => (
                                     <div 
                                         key={idx}
-                                        className="p-3 bg-slate-50 border border-slate-100 rounded-xl"
+                                        className="p-3 bg-base border border-border-main rounded-xl"
                                     >
                                         <div className="text-primary mb-1.5 opacity-70">{item.icon}</div>
-                                        <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">{item.label}</div>
+                                        <div className="text-[9px] font-bold text-gray uppercase tracking-wider">{item.label}</div>
                                         <div className="text-[13px] font-bold text-slate-700 mt-0.5 truncate">{item.value}</div>
                                     </div>
                                 ))}
@@ -113,11 +113,11 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                             {/* Activity Section */}
                             <div className="space-y-6 mb-6">
                                 {/* Activity Summary */}
-                                <div className="p-5 bg-slate-50 border border-slate-100 rounded-2xl">
+                                <div className="p-5 bg-base border border-border-main rounded-2xl">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                                            <span className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">Activity Overview</span>
+                                            <span className="text-[10px] font-bold text-title uppercase tracking-wider">Activity Overview</span>
                                         </div>
                                         <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">LIVE</span>
                                     </div>
@@ -137,7 +137,7 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="relative z-10 p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2">
+                        <div className="relative z-10 p-5 bg-base border-t border-border-main flex items-center justify-end gap-2">
                             <Button
                                 variant="danger"
                                 onClick={() => { onClose(); onDelete(user); }}
