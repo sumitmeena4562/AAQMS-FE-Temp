@@ -96,7 +96,7 @@ export default function Users() {
 
     const handleConfirmBan = async () => {
         if (!banTarget) return;
-        const res = await store.bulkAction([banTarget.id], banActionType);
+        const res = await store.bulkAction(banActionType, [banTarget.id]);
         if (res.success) {
             toast.success(`User ${banActionType === 'ban' ? 'banned' : 'restored'} successfully`);
             setBanTarget(null);
@@ -106,7 +106,7 @@ export default function Users() {
     };
 
     const handleBulkActivate = async () => {
-        const res = await store.bulkAction(selectedIds, 'activate');
+        const res = await store.bulkAction('activate', selectedIds);
         if (res.success) {
             toast.success(`${selectedIds.length} users activated`);
         } else {
@@ -115,7 +115,7 @@ export default function Users() {
     };
 
     const handleBulkDeactivate = async () => {
-        const res = await store.bulkAction(selectedIds, 'deactivate');
+        const res = await store.bulkAction('deactivate', selectedIds);
         if (res.success) {
             toast.success(`${selectedIds.length} users deactivated`);
         } else {
@@ -124,7 +124,7 @@ export default function Users() {
     };
 
     const handleBulkBan = async () => {
-        const res = await store.bulkAction(selectedIds, bulkActionType);
+        const res = await store.bulkAction(bulkActionType, selectedIds);
         if (res.success) {
             toast.success(`${selectedIds.length} users ${bulkActionType === 'ban' ? 'banned' : 'restored'}`);
             setBulkBanOpen(false);
