@@ -304,6 +304,16 @@ export default function Users() {
                 onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
                 filterContent={
                     <>
+                        <Button
+                            variant={selectionMode ? "primary" : "outline"}
+                            onClick={() => setSelectionMode(!selectionMode)}
+                            className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : ''}`}
+                        >
+                            {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
+                            Select
+                        </Button>
+                        <div className="h-4 w-[1px] bg-border-main shrink-0 mx-1" />
+                        
                         <FilterDropdown
                             label="Role"
                             options={filterOptions.roles}
@@ -364,15 +374,6 @@ export default function Users() {
                             className="!p-2 !h-9 !w-9 !rounded-xl border-border-main"
                             icon={FiRefreshCw}
                         />
-                        <div className="h-4 w-[1px] bg-border-main shrink-0 mx-1" />
-                        <Button
-                            variant={selectionMode ? "primary" : "outline"}
-                            onClick={() => setSelectionMode(!selectionMode)}
-                            className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : ''}`}
-                        >
-                            {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
-                            Select
-                        </Button>
                     </>
                 }
                 selectionFooter={
