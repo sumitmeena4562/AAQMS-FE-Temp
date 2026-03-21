@@ -286,8 +286,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
 
                                             {/* Deployment Section */}
-                                            <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-slate-100 mt-2">
-                                                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Work Details</h3>
+                                            <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-border-main/50 mt-2">
+                                                <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Work Details</h3>
                                             </div>
 
                                             <div className="col-span-1">
@@ -350,17 +350,17 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             )}
 
                                             <div className="col-span-2">
-                                                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Operational Status</label>
+                                                <label className="block text-[11px] font-bold text-gray mb-1.5 ml-1 uppercase tracking-wider">Operational Status</label>
                                                 <div className="flex gap-2">
                                                     {STATUS_OPTIONS.map(s => (
                                                         <button 
                                                             type="button"
                                                             key={s} 
                                                             onClick={() => setValue('status', s)} 
-                                                            className={`flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase transition-all
+                                                            className={`flex-1 py-2.5 px-4 rounded-[var(--radius-button)] text-[12px] font-bold uppercase transition-all
                                                                 ${currentStatus === s 
-                                                                    ? 'bg-slate-900 text-white shadow-md'
-                                                                    : 'bg-white border border-slate-200 text-slate-400 hover:border-slate-300'}`}
+                                                                    ? 'bg-title text-white shadow-md'
+                                                                    : 'bg-white border border-border-main text-gray hover:border-border-hover'}`}
                                                         >
                                                             {s}
                                                         </button>
@@ -374,13 +374,13 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="relative z-10 p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                        <div className="relative z-10 p-5 bg-base border-t border-border-main flex items-center justify-between">
                             <div className="flex items-center">
                                 {step === 1 && !isEdit && (
                                     <button 
                                         type="button"
                                         onClick={() => setStep(0)} 
-                                        className="text-[11px] font-bold text-slate-400 uppercase tracking-wider hover:text-primary transition-colors flex items-center gap-1"
+                                        className="text-[11px] font-bold text-gray uppercase tracking-wider hover:text-primary transition-colors flex items-center gap-1"
                                     >
                                         <FiChevronLeft size={14} /> Back
                                     </button>
@@ -391,7 +391,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                 <Button 
                                     variant="ghost"
                                     onClick={onClose} 
-                                    className="!text-[11px] !font-bold !uppercase !tracking-wider !text-slate-500 hover:!text-slate-900"
+                                    className="!text-[11px] !font-bold !uppercase !tracking-wider !text-gray hover:!text-title"
                                 >
                                     Cancel
                                 </Button>

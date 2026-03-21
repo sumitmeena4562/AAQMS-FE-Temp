@@ -13,7 +13,7 @@ const Button = ({
     ...props
 }) => {
     // Base styles for the premium dashboard look
-    const baseStyles = "relative flex items-center justify-center gap-2 font-semibold rounded-full transition-all duration-200 active:scale-[0.98] whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden";
+    const baseStyles = "relative flex items-center justify-center gap-2 font-semibold rounded-[var(--radius-button)] transition-all duration-200 active:scale-[0.98] whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden";
 
     // Size maps
     const sizes = {

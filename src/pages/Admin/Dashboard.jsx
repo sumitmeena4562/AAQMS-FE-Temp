@@ -1,4 +1,4 @@
-import PageHeader from "../../components/Dashboard/pageHeader";
+import PageHeader from "../../components/UI/PageHeader";
 import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
 import RecentActivityTable from "../../components/Dashboard/RecentactivityTable";

@@ -243,7 +243,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose }) =>
                 <button
                   type="button"
                   onClick={() => setValue('imagery.extra', [...extraImages, ''], { shouldValidate: false, shouldDirty: true })}
-                  className="bg-primary hover:bg-primary/90 text-white rounded-md px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors shadow-sm"
+                  className="bg-primary hover:bg-primary/90 text-white rounded-[var(--radius-button)] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors shadow-sm"
                 >
                   <Plus size={14} strokeWidth={2.5} />
                   Add More
@@ -297,7 +297,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose }) =>
                 <button
                   onClick={handleSubmit(submitForm)}
                   disabled={!isValid}
-                  className={`h-10 px-6 rounded-[var(--radius-button)] text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-2 ${!isValid ? 'bg-base text-gray cursor-not-allowed border-transparent shadow-none' : 'bg-primary hover:bg-primary/95 text-white'}`}
+                  className={`h-10 bg-primary px-6 rounded-[var(--radius-button)] text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-2 ${!isValid ? 'bg-base text-white cursor-not-allowed border-transparent shadow-none' : 'bg-primary hover:bg-primary/95 text-white'}`}
                 >
                   {org ? 'Save Changes' : 'Create Organization'}
                 </button>

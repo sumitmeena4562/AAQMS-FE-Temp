@@ -52,7 +52,7 @@
 
     /* ── Master Universal Radius (One Place to Control All) ── */
     --radius-card: 14px;
-    --radius-button: 1px;
+    --radius-button: 10px;
     --radius-input: 8px;
     
     /* Legacy/Small tokens for internal use */
