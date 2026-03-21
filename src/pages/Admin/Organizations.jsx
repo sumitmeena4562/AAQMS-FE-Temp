@@ -69,6 +69,41 @@ const Organizations = () => {
         label: r === 'all' ? 'All Regions' : r 
     }));
 
+    const statsData = [
+        { 
+            label: "Total Entities", 
+            value: orgs.length, 
+            icon: FiBriefcase,
+            badge: `${orgs.filter(o => o.status === 'ACTIVE').length} Active / ${orgs.filter(o => o.status === 'INACTIVE').length} Inactive`,
+            badgeColor: "bg-primary/5 text-primary",
+            subValue: "all platforms"
+        },
+        { 
+            label: "Active Nodes", 
+            value: orgs.filter(o => o.status === 'ACTIVE').length, 
+            icon: FiActivity,
+            trend: "+12%",
+            trendLabel: "vs last month",
+            color: "text-emerald-500",
+            bg: "bg-emerald-50"
+        },
+        { 
+            label: "Operational Density", 
+            value: new Set(orgs.map(o => o.industry).filter(Boolean)).size, 
+            icon: FiTrendingUp,
+            badge: "Sector Count",
+            badgeColor: "bg-amber-50 text-amber-700",
+            subValue: "active sectors"
+        },
+        { 
+            label: "Geographic Spread", 
+            value: new Set(orgs.map(o => o.region).filter(Boolean)).size, 
+            icon: FiGlobe,
+            trend: "Global",
+            trendColor: "text-blue-500",
+            trendLabel: "reach"
+        }
+    ];
 
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-12">
@@ -80,6 +115,9 @@ const Organizations = () => {
                 addButtonText="Add Organization"
                 hideAddButton={false}
             />
+
+            {/* 2. Stats Section — Global Metrics */}
+            <StatsRow items={statsData} />
 
             {/* 3. GRID CONTENT WITH FILTERS */}
             <div className="flex flex-col gap-6">

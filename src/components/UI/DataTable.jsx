@@ -42,6 +42,7 @@ const DataTable = ({
     filterContent,
     footer,
     selectionFooter,
+    children,
     className = ""
 }) => {
     const hasSelection = selectable && selectedIds.length > 0;

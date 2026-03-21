@@ -10,11 +10,13 @@ import DataTable from '../../components/UI/DataTable';
 import {
     FiPlus, FiDownload, FiTrash2,
     FiUserCheck, FiUserX, FiUsers,
-    FiRefreshCw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock,
-    FiExternalLink, FiEdit2, FiSquare, FiCheckSquare
+    FiRefreshCw, FiRefreshCcw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock,
+    FiExternalLink, FiEdit2, FiSquare, FiCheckSquare,
+    FiGrid, FiList
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
+import UserCard from '../../components/UI/UserCard';
 import useDebounce from '../../hooks/useDebounce';
 import UserAvatar from '../../components/UI/UserAvatar';
 import Badge from '../../components/UI/Badge';
@@ -40,6 +42,7 @@ export default function Users() {
     const [bulkBanOpen, setBulkBanOpen] = useState(false);
     const [bulkActionType, setBulkActionType] = useState('ban');
     const [selectionMode, setSelectionMode] = useState(false);
+    const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
 
     // Search Debounce
     const debouncedSearch = useDebounce(search, 300);
@@ -314,95 +317,112 @@ export default function Users() {
                     </div>
                 }
             />
-
-            {/* Stats Section */}
+            {/* 2. Stats Section — Unified Oversight Metrics */}
             <StatsRow items={statsData} />
 
-            {/* Main Data Table Area — Unified Premium DataTable */}
-            <DataTable
-                columns={columns}
-                data={sortedUsers}
-                loading={loading}
-                selectable={selectionMode}
-                selectedIds={selectedIds}
-                onSelectionChange={(ids) => store.setSelectedIds(ids)}
-                onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
-                filterContent={
-                    <>
-                        <Button
-                            variant={selectionMode ? "primary" : "outline"}
-                            onClick={() => setSelectionMode(!selectionMode)}
-                            className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : ''}`}
+            {/* Filter & View Toggle Bar (Matches Organizations.jsx) */}
+            <div className="bg-card border border-border-main/60 rounded-2xl p-3.5 shadow-sm">
+                <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                        variant={selectionMode ? "primary" : "outline"}
+                        onClick={() => setSelectionMode(!selectionMode)}
+                        className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : ''}`}
+                    >
+                        {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
+                        Select
+                    </Button>
+                    <div className="h-6 w-[1.5px] bg-border-main/40 shrink-0 mx-2 hidden sm:block" />
+                    
+                    <FilterDropdown
+                        label="Role"
+                        options={filterOptions.roles}
+                        value={filters.role}
+                        onChange={v => setFilters({ ...filters, role: v })}
+                        allLabel="All Roles"
+                    />
+                    <FilterDropdown
+                        label="Organization"
+                        options={filterOptions.organizations}
+                        value={filters.organization}
+                        onChange={v => setFilters({ ...filters, organization: v, region: '' })}
+                        allLabel="All Organizations"
+                    />
+                    <FilterDropdown
+                        label="Status"
+                        options={[
+                            { value: 'active', label: 'Active Only' },
+                            { value: 'inactive', label: 'Inactive Only' },
+                            { value: 'banned', label: 'Banned' }
+                        ]}
+                        value={filters.status}
+                        onChange={v => setFilters({ ...filters, status: v })}
+                        allLabel="All Statuses"
+                    />
+                    <FilterDropdown
+                        label="Zone"
+                        options={filterOptions.regions}
+                        value={filters.region}
+                        onChange={v => setFilters({ ...filters, region: v })}
+                        allLabel="All Zones"
+                    />
+                    <FilterDropdown
+                        label="Assignment"
+                        options={[
+                            { value: 'assigned', label: 'Assigned' },
+                            { value: 'unassigned', label: 'Unassigned' }
+                        ]}
+                        value={filters.assignment}
+                        onChange={v => setFilters({ ...filters, assignment: v })}
+                        allLabel="All Assignments"
+                    />
+                    <FilterDropdown
+                        label="Time Range"
+                        options={[
+                            { value: 'today', label: 'Today' },
+                            { value: '7d', label: 'Last 7 Days' },
+                            { value: '30d', label: 'Last 30 Days' }
+                        ]}
+                        value={filters.timeRange}
+                        onChange={v => setFilters({ ...filters, timeRange: v })}
+                        allLabel="All Time"
+                        icon={<FiCalendar size={14} />}
+                    />
+                    
+                    <div className="h-6 w-[1.5px] bg-border-main/40 shrink-0 mx-2 hidden xl:block" />
+                    
+                    <button 
+                        onClick={resetFilters}
+                        className="ml-auto h-10 flex items-center gap-2 px-4 text-gray hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/10 group"
+                    >
+                        <FiRefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
+                        Reset
+                    </button>
+
+                    {/* View Toggle (Right Aligned) */}
+                    <div className="flex items-center bg-base/80 p-1 rounded-xl border border-border-main shadow-inner group">
+                        <button 
+                            onClick={() => setViewMode('grid')}
+                            className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-card text-title shadow-sm border border-border-main' : 'text-gray hover:text-body'}`}
+                            title="Grid View"
                         >
-                            {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
-                            Select
-                        </Button>
-                        <div className="h-4 w-[1px] bg-border-main shrink-0 mx-1" />
-                        
-                        <FilterDropdown
-                            label="Role"
-                            options={filterOptions.roles}
-                            value={filters.role}
-                            onChange={v => setFilters({ ...filters, role: v })}
-                            allLabel="All"
-                        />
-                        <FilterDropdown
-                            label="Organization"
-                            options={filterOptions.organizations}
-                            value={filters.organization}
-                            onChange={v => setFilters({ ...filters, organization: v, region: '' })}
-                            allLabel="All"
-                        />
-                        <FilterDropdown
-                            label="Zone"
-                            options={filterOptions.regions}
-                            value={filters.region}
-                            onChange={v => setFilters({ ...filters, region: v })}
-                            allLabel="All"
-                        />
-                        <FilterDropdown
-                            label="Status"
-                            options={[
-                                { value: 'active', label: 'Active Only' },
-                                { value: 'inactive', label: 'Inactive Only' },
-                                { value: 'banned', label: 'Banned' }
-                            ]}
-                            value={filters.status}
-                            onChange={v => setFilters({ ...filters, status: v })}
-                            allLabel="All"
-                        />
-                        <FilterDropdown
-                            label="Assignment"
-                            options={[
-                                { value: 'assigned', label: 'Assigned' },
-                                { value: 'unassigned', label: 'Unassigned' }
-                            ]}
-                            value={filters.assignment}
-                            onChange={v => setFilters({ ...filters, assignment: v })}
-                            allLabel="All"
-                        />
-                        <FilterDropdown
-                            label="Time Range"
-                            options={[
-                                { value: 'today', label: 'Today' },
-                                { value: '7d', label: 'Last 7 Days' },
-                                { value: '30d', label: 'Last 30 Days' }
-                            ]}
-                            value={filters.timeRange}
-                            onChange={v => setFilters({ ...filters, timeRange: v })}
-                            allLabel="All"
-                            icon={<FiCalendar size={14} />}
-                        />
-                        <div className="h-4 w-[1px] bg-border-main shrink-0 mx-1" />
-                        <Button
-                            variant="outline"
-                            onClick={fetchUsers}
-                            className="!p-2 !h-9 !w-9 !rounded-xl border-border-main"
-                            icon={FiRefreshCw}
-                        />
-                    </>
-                }
-                selectionFooter={
+                            <FiGrid size={13} className={viewMode === 'grid' ? 'text-primary' : ''} />
+                            <span className={viewMode === 'grid' ? 'block' : 'hidden'}>Grid</span>
+                        </button>
+                            <button 
+                                onClick={() => setViewMode('list')}
+                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'list' ? 'bg-card text-title shadow-sm border border-border-main' : 'text-gray hover:text-body'}`}
+                                title="List View"
+                            >
+                                <FiList size={13} className={viewMode === 'list' ? 'text-primary' : ''} />
+                                <span className={viewMode === 'list' ? 'block' : 'hidden'}>List</span>
+                            </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* SELECTION ACTION BAR FOR GRID VIEW (Mirrors DataTable's top selection bar) */}
+            {viewMode === 'grid' && selectionMode && selectedIds.length > 0 && (
+                <div className="flex items-center justify-between py-3 px-4 sm:px-6 bg-primary/[0.04] border border-primary/20 rounded-[var(--radius-card)] animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="flex flex-col md:flex-row items-center justify-between w-full gap-3">
                         <div className="flex items-center gap-2.5">
                             <div className="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center text-[11px] font-black shadow-lg shadow-primary/20">
@@ -456,22 +476,125 @@ export default function Users() {
                             </Button>
                         </div>
                     </div>
-                }
-                footer={
-                    <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                                {sortedUsers.length} of {stats.total} entries cached
-                            </span>
-                        </div>
-                        <span className="text-[10px] font-black text-gray/40 uppercase tracking-widest">
-                            Database Sync: Live
-                        </span>
+                </div>
+            )}
+
+            {/* Main Content Area */}
+
+            {sortedUsers.length > 0 ? (
+                viewMode === 'grid' ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 w-full animate-in fade-in duration-500">
+                        {sortedUsers.map(user => (
+                            <UserCard 
+                                key={user.id}
+                                user={user}
+                                selectable={selectionMode}
+                                isSelected={selectedIds.includes(user.id)}
+                                onSelect={(id) => store.toggleSelectRow(id)}
+                                onEdit={handleEditUser}
+                                onView={(u) => { setPeekUser(u); setIsPeekOpen(true); }}
+                            />
+                        ))}
                     </div>
-                }
-                emptyMessage="No personnel records discovered matching your search"
-            />
+                ) : (
+                    <DataTable
+                        columns={columns}
+                        data={sortedUsers}
+                        loading={loading}
+                        selectable={selectionMode}
+                        selectedIds={selectedIds}
+                        onSelectionChange={(ids) => store.setSelectedIds(ids)}
+                        onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
+                        selectionFooter={
+                            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-3">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center text-[11px] font-black shadow-lg shadow-primary/20">
+                                        {selectedIds.length}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[12px] font-black text-title uppercase tracking-tight leading-none">Selected</span>
+                                        <span className="text-[8px] font-bold text-gray uppercase tracking-widest mt-0.5">Bulk Actions</span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-wrap items-center justify-center md:justify-end gap-1.5">
+                                    <Button
+                                        onClick={handleBulkActivate}
+                                        icon={FiUserCheck}
+                                        variant="outline"
+                                        className="!h-8 !px-3 !text-[10px] !font-bold !bg-emerald-50 !text-emerald-700 !border-emerald-100/50 hover:!bg-emerald-100 !rounded-lg"
+                                    >
+                                        Activate
+                                    </Button>
+                                    <Button
+                                        onClick={handleBulkDeactivate}
+                                        icon={FiUserX}
+                                        variant="outline"
+                                        className="!h-8 !px-3 !text-[10px] !font-bold !bg-amber-50 !text-amber-700 !border-amber-100/50 hover:!bg-amber-100 !rounded-lg"
+                                    >
+                                        Deactivate
+                                    </Button>
+                                    <Button
+                                        onClick={() => { setBulkActionType('ban'); setBulkBanOpen(true); }}
+                                        icon={FiAlertCircle}
+                                        variant="outline"
+                                        className="!h-8 !px-3 !text-[10px] !font-bold !bg-rose-50 !text-rose-700 !border-rose-100/50 hover:!bg-rose-100 !rounded-lg"
+                                    >
+                                        Ban
+                                    </Button>
+                                    <Button
+                                        onClick={() => { setBulkActionType('unban'); setBulkBanOpen(true); }}
+                                        icon={FiCheckCircle}
+                                        variant="outline"
+                                        className="!h-8 !px-3 !text-[10px] !font-bold !bg-blue-50 !text-blue-700 !border-blue-100/50 hover:!bg-blue-100 !rounded-lg"
+                                    >
+                                        Unban
+                                    </Button>
+                                    <div className="hidden sm:block w-px h-5 bg-border-main/50 mx-1" />
+                                    <Button
+                                        variant="ghost"
+                                        onClick={clearSelection}
+                                        className="!h-8 !px-3 !text-[10px] !font-black !text-gray hover:!text-body !uppercase !tracking-widest"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </div>
+                        }
+                        footer={
+                            <div className="flex items-center justify-between w-full">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-[10px] font-black text-gray uppercase tracking-widest">
+                                        {sortedUsers.length} of {stats.total} entries cached
+                                    </span>
+                                </div>
+                                <span className="text-[10px] font-black text-gray/40 uppercase tracking-widest">
+                                    Database Sync: Live
+                                </span>
+                            </div>
+                        }
+                        emptyMessage="No personnel records discovered matching your search"
+                    />
+                )
+            ) : (
+                <div className="flex flex-col items-center justify-center py-24 bg-card/40 border-2 border-dashed border-border-main rounded-3xl animate-in zoom-in duration-300">
+                    <div className="w-16 h-16 bg-base rounded-2xl flex items-center justify-center mb-5 rotate-3">
+                        <FiUserX className="w-7 h-7 text-gray/40" />
+                    </div>
+                    <h3 className="text-lg font-black text-title mb-1">No Personnel Found</h3>
+                    <p className="text-gray text-xs mb-8 text-center max-w-xs px-6 font-medium leading-relaxed">
+                        We couldn't find any users matching your selection. Try clearing your filters.
+                    </p>
+                    <button 
+                        onClick={resetFilters}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-card border border-border-main rounded-xl text-xs font-black text-body hover:bg-base hover:border-border-hover transition-all shadow-sm active:scale-95"
+                    >
+                        <FiRefreshCw className="w-3.5 h-3.5" />
+                        Clear Criteria
+                    </button>
+                </div>
+            )}
+
 
             {/* Modals */}
             <UserPeekView
