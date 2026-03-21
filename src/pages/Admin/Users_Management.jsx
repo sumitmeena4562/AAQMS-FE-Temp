@@ -179,7 +179,7 @@ export default function Users() {
             width: '22%',
             render: (_, row) => (
                 <div className="flex items-center gap-2 py-0.5 group-hover:px-1 transition-all">
-                    <UserAvatar name={row?.name} avatar={row?.avatar} size="32px" className="shadow-sm border-2 border-white ring-1 ring-slate-100 shrink-0" />
+                    <UserAvatar name={row?.name} avatar={row?.avatar} size="32px" className="shadow-sm border-2 border-white ring-1 ring-base shrink-0" />
                     <div className="flex flex-col min-w-0">
                         <div className="text-[12px] font-black text-title leading-tight truncate">{row?.name}</div>
                         <div className="text-[9px] font-bold text-gray mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email?.split('@')[0]}</div>
@@ -193,8 +193,8 @@ export default function Users() {
             width: '15%',
             render: (value) => (
                 <div className="flex flex-col min-w-0">
-                    <span className="text-[12px] font-black text-slate-800 truncate leading-none">{value || 'Contractor'}</span>
-                    <span className="text-[8px] text-slate-400 font-black uppercase tracking-[0.1em] mt-1 truncate">Unit</span>
+                    <span className="text-[12px] font-black text-title truncate leading-none">{value || 'Contractor'}</span>
+                    <span className="text-[8px] text-gray font-black uppercase tracking-[0.1em] mt-1 truncate">Unit</span>
                 </div>
             )
         },
@@ -222,7 +222,7 @@ export default function Users() {
                 return (
                     <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg border ${
                         isAssigned ? 'bg-success-bg/50 border-success/10 text-success' : 
-                        'bg-bg-tertiary border-border-main text-gray'
+                        'bg-base border-border-main text-gray'
                     }`}>
                         <DotStatus status={isAssigned ? 'active' : 'inactive'} />
                         <span className="text-[8px] font-black uppercase tracking-widest leading-none">
@@ -241,20 +241,20 @@ export default function Users() {
                 <div className="flex items-center justify-end gap-1 pr-0.5">
                     <button 
                         onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }}
-                        className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-lg shadow-sm active:scale-95"
+                        className="w-7 h-7 flex items-center justify-center text-gray hover:text-white hover:bg-title transition-all rounded-lg shadow-sm active:scale-95"
                         title="View Details"
                     >
                         <FiExternalLink size={11} />
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
-                        className="px-2.5 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-lg shadow-sm active:scale-95 font-black uppercase tracking-widest text-[8px] hidden md:flex"
+                        className="px-2.5 h-7 flex items-center justify-center text-gray hover:text-white hover:bg-primary transition-all rounded-lg shadow-sm active:scale-95 font-black uppercase tracking-widest text-[8px] hidden md:flex"
                     >
                         Edit
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
-                        className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-lg shadow-sm active:scale-95 md:hidden"
+                        className="w-7 h-7 flex items-center justify-center text-gray hover:text-white hover:bg-primary transition-all rounded-lg shadow-sm active:scale-95 md:hidden"
                     >
                         <FiEdit2 size={11} />
                     </button>
@@ -358,14 +358,14 @@ export default function Users() {
                             allLabel="All"
                             icon={<FiCalendar size={14} />}
                         />
-                        <div className="h-4 w-[1px] bg-border shrink-0 mx-1" />
+                        <div className="h-4 w-[1px] bg-border-main shrink-0 mx-1" />
                         <Button
                             variant="outline"
                             onClick={fetchUsers}
-                            className="!p-2 !h-9 !w-9 !rounded-xl border-border"
+                            className="!p-2 !h-9 !w-9 !rounded-xl border-border-main"
                             icon={FiRefreshCw}
                         />
-                        <div className="h-4 w-[1px] bg-border shrink-0 mx-1" />
+                        <div className="h-4 w-[1px] bg-border-main shrink-0 mx-1" />
                         <Button
                             variant={selectionMode ? "primary" : "outline"}
                             onClick={() => setSelectionMode(!selectionMode)}
@@ -383,8 +383,8 @@ export default function Users() {
                                 {selectedIds.length}
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-[12px] font-black text-slate-800 uppercase tracking-tight leading-none">Selected</span>
-                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Bulk Actions</span>
+                                <span className="text-[12px] font-black text-title uppercase tracking-tight leading-none">Selected</span>
+                                <span className="text-[8px] font-bold text-gray uppercase tracking-widest mt-0.5">Bulk Actions</span>
                             </div>
                         </div>
                         <div className="flex flex-wrap items-center justify-center md:justify-end gap-1.5">
@@ -412,11 +412,11 @@ export default function Users() {
                             >
                                 Delete
                             </Button>
-                            <div className="hidden sm:block w-px h-5 bg-slate-200 mx-1" />
+                            <div className="hidden sm:block w-px h-5 bg-border-main/50 mx-1" />
                             <Button
                                 variant="ghost"
                                 onClick={clearSelection}
-                                className="!h-8 !px-3 !text-[10px] !font-black !text-slate-400 hover:!text-slate-600 !uppercase !tracking-widest"
+                                className="!h-8 !px-3 !text-[10px] !font-black !text-gray hover:!text-body !uppercase !tracking-widest"
                             >
                                 Cancel
                             </Button>
@@ -427,11 +427,11 @@ export default function Users() {
                     <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            <span className="text-[10px] font-black text-gray uppercase tracking-widest">
                                 {sortedUsers.length} of {stats.total} entries cached
                             </span>
                         </div>
-                        <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+                        <span className="text-[10px] font-black text-gray/40 uppercase tracking-widest">
                             Database Sync: Live
                         </span>
                     </div>

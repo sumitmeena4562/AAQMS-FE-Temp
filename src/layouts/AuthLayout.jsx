@@ -4,11 +4,11 @@ import Logo from '../components/Branding/Logo';
 
 const AuthLayout = ({ children }) => {
     return (
-        <div className="flex h-[100dvh] w-full bg-slate-50 relative overflow-hidden font-sans selection:bg-primary/20">
+        <div className="flex h-[100dvh] w-full bg-base relative overflow-hidden font-sans selection:bg-primary/20">
             {/* --- Elite Background System --- */}
             <div className="absolute inset-0 z-0">
                 {/* Mesh Gradient Base */}
-                <div className="absolute inset-0 bg-[#f8fafc] opacity-80" />
+                <div className="absolute inset-0 bg-base opacity-80" />
                 
                 {/* Animated Mesh Blobs */}
                 <motion.div 
@@ -39,11 +39,11 @@ const AuthLayout = ({ children }) => {
 
             {/* --- Left Side: Enterprise Sidebar (Hidden on Mobile) --- */}
             <div 
-                className="hidden lg:flex flex-1.2 bg-slate-900 p-12 lg:p-16 flex-col justify-between relative overflow-hidden z-10"
+                className="hidden lg:flex flex-1.2 bg-title p-12 lg:p-16 flex-col justify-between relative overflow-hidden z-10"
                 style={{ clipPath: 'polygon(0 0, 100% 0, 90% 100%, 0 100%)' }}
             >
                 {/* Side Content Background Decoration */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-900 to-primary/20 opacity-100" />
+                <div className="absolute inset-0 bg-gradient-to-br from-title via-title to-primary/20 opacity-100" />
                 
                 {/* Angled Cut Decoration */}
                 <div className="absolute top-0 right-0 bottom-0 w-24 bg-gradient-to-l from-black/20 to-transparent pointer-events-none" />
@@ -78,7 +78,7 @@ const AuthLayout = ({ children }) => {
                         </span>
                     </h1>
 
-                    <p className="text-lg text-slate-400 leading-relaxed max-w-md font-medium">
+                    <p className="text-lg text-gray/80 leading-relaxed max-w-md font-medium">
                         Seamlessly manage environmental compliance and asset audits with our next-gen predictive engine.
                     </p>
 
@@ -86,12 +86,12 @@ const AuthLayout = ({ children }) => {
                     <div className="mt-12 flex gap-8">
                         <div>
                             <div className="text-2xl font-black text-white leading-none">99.9%</div>
-                            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Uptime SLA</div>
+                            <div className="text-[10px] text-gray font-bold uppercase tracking-widest mt-1">Uptime SLA</div>
                         </div>
                         <div className="w-px h-10 bg-white/10" />
                         <div>
                             <div className="text-2xl font-black text-white leading-none">256-bit</div>
-                            <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">AES Encryption</div>
+                            <div className="text-[10px] text-gray font-bold uppercase tracking-widest mt-1">AES Encryption</div>
                         </div>
                     </div>
                 </motion.div>

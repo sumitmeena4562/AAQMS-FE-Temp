@@ -70,7 +70,7 @@ const NotificationCenter = () => {
             {/* Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`p-2 rounded-xl text-slate-400 hover:text-slate-900 transition-all duration-200 relative group ${isOpen ? 'bg-slate-100 text-slate-900' : ''}`}
+                className={`p-2 rounded-xl text-gray hover:text-title transition-all duration-200 relative group ${isOpen ? 'bg-base text-title' : ''}`}
             >
                 <FiBell size={20} />
                 {unreadCount > 0 && (
@@ -82,12 +82,12 @@ const NotificationCenter = () => {
 
             {/* Dropdown Container */}
             {isOpen && (
-                <div className="absolute right-0 top-[calc(100%+12px)] w-[360px] bg-white border border-slate-200 rounded-2xl shadow-[0_20px_60px_rgba(7,34,103,0.15)] z-[2000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="absolute right-0 top-[calc(100%+12px)] w-[360px] bg-card border border-border-main rounded-2xl shadow-[0_20px_60px_rgba(7,34,103,0.15)] z-[2000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                     {/* Header */}
-                    <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white sticky top-0 z-10">
+                    <div className="p-4 border-b border-border-main/50 flex items-center justify-between bg-card sticky top-0 z-10">
                         <div>
-                            <h3 className="text-slate-900 font-extrabold text-base">Notifications</h3>
-                            <p className="text-slate-500 text-xs font-semibold mt-0.5">You have {unreadCount} unread alerts</p>
+                            <h3 className="text-title font-extrabold text-base">Notifications</h3>
+                            <p className="text-gray text-xs font-semibold mt-0.5">You have {unreadCount} unread alerts</p>
                         </div>
                         <button 
                             onClick={markAllRead}
@@ -105,7 +105,7 @@ const NotificationCenter = () => {
                                 return (
                                     <div 
                                         key={notif.id}
-                                        className={`px-4 py-4 flex gap-4 transition-colors cursor-pointer hover:bg-slate-50 relative group ${!notif.read ? 'bg-blue-50/20' : ''}`}
+                                        className={`px-4 py-4 flex gap-4 transition-colors cursor-pointer hover:bg-base relative group ${!notif.read ? 'bg-primary/5' : ''}`}
                                     >
                                         {!notif.read && (
                                             <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />
@@ -115,12 +115,12 @@ const NotificationCenter = () => {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between gap-2 mb-1">
-                                                <h4 className={`text-sm tracking-tight truncate ${!notif.read ? 'font-extrabold text-slate-900' : 'font-bold text-slate-700'}`}>
+                                                <h4 className={`text-sm tracking-tight truncate ${!notif.read ? 'font-extrabold text-title' : 'font-bold text-body'}`}>
                                                     {notif.title}
                                                 </h4>
-                                                <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap">{notif.time}</span>
+                                                <span className="text-[10px] font-bold text-gray/60 whitespace-nowrap">{notif.time}</span>
                                             </div>
-                                            <p className="text-xs text-slate-500 font-medium leading-relaxed line-clamp-2">
+                                            <p className="text-xs text-gray font-medium leading-relaxed line-clamp-2">
                                                 {notif.message}
                                             </p>
                                         </div>
@@ -129,14 +129,14 @@ const NotificationCenter = () => {
                             })
                         ) : (
                             <div className="p-8 text-center">
-                                <p className="text-slate-400 text-sm font-bold">No notifications yet</p>
+                                <p className="text-gray/40 text-sm font-bold">No notifications yet</p>
                             </div>
                         )}
                     </div>
 
                     {/* Footer */}
-                    <div className="p-3 border-t border-slate-100 bg-slate-50/50">
-                        <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-slate-600 hover:text-slate-900 text-sm font-bold transition-all group">
+                    <div className="p-3 border-t border-border-main/50 bg-base/50">
+                        <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-body hover:text-title text-sm font-bold transition-all group">
                             <span>View all activities</span>
                             <FiArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                         </button>

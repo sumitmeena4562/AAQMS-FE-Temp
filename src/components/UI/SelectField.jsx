@@ -75,7 +75,7 @@ const SelectField = forwardRef(({
                         color: t.color.text,
                         backgroundColor: isFocused ? t.color.bg : t.color.bgHover,
                         border: `1.5px solid ${error ? t.color.danger : (isFocused ? t.color.primary : t.color.border)}`,
-                        borderRadius: t.radius.xl,
+                        borderRadius: 'var(--radius-input)',
                         outline: 'none',
                         appearance: 'none', 
                         cursor: 'pointer',

@@ -90,11 +90,11 @@ const AdminLayoutInner = () => {
                     onMenuClick={() => setIsMobileOpen(true)}
                     leftContent={
                         <div className="relative group hidden sm:block">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray group-focus-within:text-primary transition-colors pointer-events-none">
                                 <FiSearch size={16} />
                             </span>
                             <input
-                                className="pl-11 pr-10 py-2 bg-slate-100/50 border border-slate-200/50 rounded-2xl text-sm font-bold text-slate-700 outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-white focus:border-transparent focus:shadow-card-hover w-[320px] focus:w-[420px]"
+                                className="pl-11 pr-10 py-2 bg-base/50 border border-border-main/50 rounded-[var(--radius-input)] text-sm font-bold text-body outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-card focus:border-transparent focus:shadow-card-hover w-[320px] focus:w-[420px]"
                                 placeholder="Search anything..."
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
@@ -102,7 +102,7 @@ const AdminLayoutInner = () => {
                             {search && (
                                 <button
                                     onClick={() => setSearch('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray hover:text-rose-500 transition-colors"
                                 >
                                     <FiX size={14} />
                                 </button>
@@ -121,7 +121,7 @@ const AdminLayoutInner = () => {
                     <div className="w-full max-w-[1600px] mx-auto">
                         {/* Global Breadcrumb (Sticky at Top) */}
                         {breadcrumbs.length > 0 && location.pathname !== '/admin/dashboard' && (
-                            <div className="sticky top-0 z-[40] bg-slate-50/90 backdrop-blur-md px-8 py-2.5 border-b border-slate-200/50 shadow-sm">
+                            <div className="sticky top-0 z-[40] bg-base/90 backdrop-blur-md px-8 py-2.5 border-b border-border-main/50 shadow-sm">
                                 <Breadcrumb items={breadcrumbs} />
                             </div>
                         )}

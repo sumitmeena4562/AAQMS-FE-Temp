@@ -60,8 +60,8 @@ const ACTIVITY = [
         id: '5',
         type: 'System Config',
         icon: FiSettings,
-        iconBgClass: 'bg-slate-100',
-        iconTextClass: 'text-slate-500',
+        iconBgClass: 'bg-base',
+        iconTextClass: 'text-gray',
         user: 'Admin User',
         entity: 'Global Settings',
         details: 'Updated API rate limits',
@@ -81,7 +81,7 @@ const columns = [
                     <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${row.iconBgClass} ${row.iconTextClass}`}>
                         <Icon size={16} />
                     </div>
-                    <span className="text-[13px] font-semibold text-slate-900 whitespace-nowrap">
+                    <span className="text-[13px] font-semibold text-title whitespace-nowrap">
                         {row.type}
                     </span>
                 </div>
@@ -92,28 +92,28 @@ const columns = [
         header: 'User / Source',
         accessor: 'user',
         render: (value) => (
-            <span className="text-[13px] text-slate-800 font-medium whitespace-nowrap">{value}</span>
+            <span className="text-[13px] text-body font-medium whitespace-nowrap">{value}</span>
         ),
     },
     {
         header: 'Entity',
         accessor: 'entity',
         render: (value) => (
-            <span className="text-[13px] text-slate-600 whitespace-nowrap">{value}</span>
+            <span className="text-[13px] text-body whitespace-nowrap">{value}</span>
         ),
     },
     {
         header: 'Details',
         accessor: 'details',
         render: (value) => (
-            <span className="text-[13px] text-slate-500 min-w-[200px] block">{value}</span>
+            <span className="text-[13px] text-gray min-w-[200px] block">{value}</span>
         ),
     },
     {
         header: 'Time',
         accessor: 'time',
         render: (value) => (
-            <span className="text-[13px] text-slate-400 font-medium whitespace-nowrap">{value}</span>
+            <span className="text-[13px] text-gray font-medium whitespace-nowrap">{value}</span>
         ),
     },
 ];

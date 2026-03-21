@@ -35,12 +35,12 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                         initial={{ opacity: 0, scale: 0.98, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                        className="relative w-full max-w-[520px] max-h-[85vh] bg-white border border-slate-200 rounded-3xl shadow-xl flex flex-col overflow-hidden"
+                        className="relative w-full max-w-[520px] max-h-[85vh] bg-card border border-border-main rounded-[var(--radius-card)] shadow-xl flex flex-col overflow-hidden"
                     >
                         {/* Modal Header */}
                         <div className="relative z-10 p-6 pb-2 flex items-start justify-between">
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-none mb-1.5">
+                                <h2 className="text-xl font-bold text-title tracking-tight leading-none mb-1.5">
                                     User Profile
                                 </h2>
                                 <div className="flex items-center gap-2">
@@ -101,11 +101,11 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                                 ].map((item, idx) => (
                                     <div 
                                         key={idx}
-                                        className="p-3 bg-base border border-border-main rounded-xl"
+                                        className="p-3 bg-base border border-border-main rounded-[var(--radius-card)]"
                                     >
                                         <div className="text-primary mb-1.5 opacity-70">{item.icon}</div>
                                         <div className="text-[9px] font-bold text-gray uppercase tracking-wider">{item.label}</div>
-                                        <div className="text-[13px] font-bold text-slate-700 mt-0.5 truncate">{item.value}</div>
+                                        <div className="text-[13px] font-bold text-body mt-0.5 truncate">{item.value}</div>
                                     </div>
                                 ))}
                             </div>
@@ -113,7 +113,7 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                             {/* Activity Section */}
                             <div className="space-y-6 mb-6">
                                 {/* Activity Summary */}
-                                <div className="p-5 bg-base border border-border-main rounded-2xl">
+                                <div className="p-5 bg-base border border-border-main rounded-[var(--radius-card)]">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -127,7 +127,7 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                                                 <Motion.div 
                                                     initial={{ height: 0 }}
                                                     animate={{ height: `${h}%` }}
-                                                    className={`w-full rounded-sm ${i === 5 ? 'bg-primary' : 'bg-slate-200'}`}
+                                                    className={`w-full rounded-sm ${i === 5 ? 'bg-primary' : 'bg-border-main'}`}
                                                 />
                                             </div>
                                         ))}
@@ -148,7 +148,7 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                             <Button
                                 variant="primary"
                                 onClick={() => { onClose(); onEdit(user); }}
-                                className="!h-10 !px-6 !rounded-xl !text-[11px] !font-bold !uppercase !tracking-wider shadow-lg shadow-primary/10"
+                                className="!h-10 !px-6 !rounded-[var(--radius-button)] !text-[11px] !font-bold !uppercase !tracking-wider shadow-lg shadow-primary/10"
                             >
                                 Edit Profile
                             </Button>

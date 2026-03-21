@@ -23,14 +23,14 @@ export const MatricCard = ({
 
     return (
         <div
-            className="bg-white border border-slate-200 rounded-[15px] !py-[21px] !px-[24px] flex flex-col gap-3 min-h-[148px] h-auto shadow-card hover:shadow-card-hover transition-all duration-200 cursor-default"
+            className="bg-card border border-border-main rounded-[var(--radius-card)] !py-[21px] !px-[24px] flex flex-col gap-3 min-h-[148px] h-auto shadow-card hover:shadow-card-hover transition-all duration-200 cursor-default"
         >
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                    <p className="text-[11px] font-semibold tracking-wider text-slate-400 uppercase !mb-1">
+                    <p className="text-[11px] font-semibold tracking-wider text-gray uppercase !mb-1">
                         {title}
                     </p>
-                    <div className="text-2xl font-bold text-slate-900 leading-none">
+                    <div className="text-2xl font-bold text-title leading-none">
                         {value}
                     </div>
                 </div>

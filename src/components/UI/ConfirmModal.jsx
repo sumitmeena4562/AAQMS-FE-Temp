@@ -44,15 +44,15 @@ const ConfirmModal = ({
                             top: '50%', left: '50%',
                             transform: 'translate(-50%, -50%)',
                             width: 'min(400px, 90vw)',
-                            background: '#fff',
-                            borderRadius: 24,
+                            background: 'var(--color-bg-card)',
+                            borderRadius: 'var(--radius-card)',
                             boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
                             zIndex: t.zIndex.modal,
                             overflow: 'hidden',
                         }}
                     >
                         {/* Header */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px', borderBottom: '1px solid #F1F5F9' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px', borderBottom: '1px solid var(--border-main-50)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <div style={{ 
                                     width: 32, height: 32, borderRadius: 10, 
@@ -79,7 +79,7 @@ const ConfirmModal = ({
                                 variant="outline"
                                 onClick={onClose}
                                 disabled={loading}
-                                className="!h-10 !px-5 !rounded-xl !text-[12px] !font-black"
+                                className="!h-10 !px-5 !rounded-[var(--radius-button)] !text-[12px] !font-black"
                             >
                                 {cancelText}
                             </Button>
@@ -87,7 +87,7 @@ const ConfirmModal = ({
                                 variant={danger ? 'danger' : 'primary'}
                                 onClick={onConfirm}
                                 loading={loading}
-                                className="!h-10 !px-6 !rounded-xl !text-[12px] !font-black"
+                                className="!h-10 !px-6 !rounded-[var(--radius-button)] !text-[12px] !font-black"
                             >
                                 {confirmText}
                             </Button>

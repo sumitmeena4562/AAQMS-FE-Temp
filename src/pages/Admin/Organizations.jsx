@@ -122,16 +122,16 @@ const Organizations = () => {
                             allLabel="All Statuses"
                         />
 
-                        <div className="h-6 w-[1.5px] bg-slate-100 shrink-0 mx-2" />
+                        <div className="h-6 w-[1.5px] bg-border-main/40 shrink-0 mx-2" />
  <button 
                             onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
-                            className="ml-auto h-10 flex items-center gap-2 px-4 text-slate-400 hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/50 group"
+                            className="ml-auto h-10 flex items-center gap-2 px-4 text-gray hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/10 group"
                         >
                             <FiRefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
                             Reset
                         </button>
                         {/* View Toggle (Relocated) */}
-                        <div className="flex items-center bg-slate-50/80 p-1 rounded-xl border border-slate-100 shadow-inner group">
+                        <div className="flex items-center bg-base/80 p-1 rounded-xl border border-border-main shadow-inner group">
                             <button 
                                 onClick={() => setViewMode('grid')}
                                 className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-card text-title shadow-sm border border-border-main' : 'text-gray hover:text-body'}`}
@@ -142,7 +142,7 @@ const Organizations = () => {
                             </button>
                             <button 
                                 onClick={() => setViewMode('list')}
-                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'list' ? 'bg-card text-title shadow-sm border border-border-main' : 'text-gray hover:text-body'}`}
                                 title="List View"
                             >
                                 <FiList size={13} className={viewMode === 'list' ? 'text-primary' : ''} />
@@ -179,11 +179,11 @@ const Organizations = () => {
                                     width: '25%',
                                     render: (name, org) => (
                                         <div className="flex items-center gap-3 py-0.5">
-                                            <div className="w-9 h-9 bg-bg-tertiary border border-border-main/50 rounded-xl flex items-center justify-center font-black text-[12px] text-gray overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
+                                            <div className="w-9 h-9 bg-base border border-border-main/50 rounded-xl flex items-center justify-center font-black text-[12px] text-gray overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
                                                 {org.logo ? (
                                                     <img src={org.logo} alt="" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all" />
                                                 ) : (
-                                                    <span className="bg-gradient-to-br from-bg-tertiary to-page w-full h-full flex items-center justify-center">
+                                                    <span className="bg-gradient-to-br from-base to-page w-full h-full flex items-center justify-center">
                                                         {name?.substring(0, 2) || 'OR'}
                                                     </span>
                                                 )}
@@ -212,7 +212,7 @@ const Organizations = () => {
                                             <Badge 
                                                 variant="soft" 
                                                 className={`!text-[9px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest border border-current/10 ${
-                                                    !val ? 'text-text-muted bg-bg-tertiary' : 'text-primary bg-primary/5'
+                                                    !val ? 'text-gray bg-base' : 'text-primary bg-primary/5'
                                                 }`}
                                             >
                                                 {val || 'General'}
@@ -226,8 +226,8 @@ const Organizations = () => {
                                     width: '15%',
                                     className: 'hidden lg:table-cell',
                                     render: (val) => (
-                                        <div className="flex items-center gap-1.5 text-[11px] font-black text-slate-600 truncate">
-                                            <FiGlobe className="text-slate-300 shrink-0" size={12} />
+                                        <div className="flex items-center gap-1.5 text-[11px] font-black text-body truncate">
+                                            <FiGlobe className="text-gray/50 shrink-0" size={12} />
                                             <span>{val || 'Global'}</span>
                                         </div>
                                     )
@@ -240,13 +240,13 @@ const Organizations = () => {
                                     render: (stats) => (
                                         <div className="flex items-center justify-center gap-4">
                                             <div className="flex flex-col items-center">
-                                                <span className="text-[14px] font-black text-slate-900 leading-none">{stats?.sites || 0}</span>
-                                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Sites</span>
+                                                <span className="text-[14px] font-black text-title leading-none">{stats?.sites || 0}</span>
+                                                <span className="text-[8px] font-black text-gray uppercase tracking-widest mt-1">Sites</span>
                                             </div>
-                                            <div className="h-5 w-[1px] bg-slate-100 shrink-0" />
+                                            <div className="h-5 w-[1px] bg-border-main/60 shrink-0" />
                                             <div className="flex flex-col items-center">
-                                                <span className="text-[14px] font-black text-slate-900 leading-none">{stats?.coordinators || 0}</span>
-                                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Units</span>
+                                                <span className="text-[14px] font-black text-title leading-none">{stats?.coordinators || 0}</span>
+                                                <span className="text-[8px] font-black text-gray uppercase tracking-widest mt-1">Units</span>
                                             </div>
                                         </div>
                                     )
@@ -279,14 +279,14 @@ const Organizations = () => {
                                         <div className="flex items-center justify-end gap-1.5 pr-1">
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); handleEdit(org); }}
-                                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-xl shadow-sm active:scale-95"
+                                                className="w-8 h-8 flex items-center justify-center text-gray hover:text-white hover:bg-title transition-all rounded-xl shadow-sm active:scale-95"
                                                 title="Edit"
                                             >
                                                 <FiEdit2 size={13} />
                                             </button>
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); removeOrg(org.id); }}
-                                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 transition-all rounded-xl hover:bg-rose-50 active:scale-95"
+                                                className="w-8 h-8 flex items-center justify-center text-gray hover:text-rose-500 transition-all rounded-xl hover:bg-rose-50/10 active:scale-95"
                                                 title="Delete"
                                             >
                                                 <FiTrash2 size={13} />
@@ -300,17 +300,17 @@ const Organizations = () => {
                         />
                     )
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-24 bg-white/40 border-2 border-dashed border-slate-100 rounded-3xl animate-in zoom-in duration-300">
-                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-5 rotate-3">
-                            <FiInbox className="w-7 h-7 text-slate-300" />
+                    <div className="flex flex-col items-center justify-center py-24 bg-card/40 border-2 border-dashed border-border-main rounded-3xl animate-in zoom-in duration-300">
+                        <div className="w-16 h-16 bg-base rounded-2xl flex items-center justify-center mb-5 rotate-3">
+                            <FiInbox className="w-7 h-7 text-gray/40" />
                         </div>
-                        <h3 className="text-lg font-black text-slate-800 mb-1">No Organizations Found</h3>
-                        <p className="text-slate-400 text-xs mb-8 text-center max-w-xs px-6 font-medium leading-relaxed">
+                        <h3 className="text-lg font-black text-title mb-1">No Organizations Found</h3>
+                        <p className="text-gray text-xs mb-8 text-center max-w-xs px-6 font-medium leading-relaxed">
                             We couldn't find any organization matching your selection. Try clearing your filters.
                         </p>
                         <button 
                             onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
-                            className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-2 px-6 py-2.5 bg-card border border-border-main rounded-xl text-xs font-black text-body hover:bg-base hover:border-border-hover transition-all shadow-sm active:scale-95"
                         >
                             <FiRefreshCcw className="w-3.5 h-3.5" />
                             Clear Criteria

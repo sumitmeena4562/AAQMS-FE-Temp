@@ -32,17 +32,17 @@ const UserTable = ({
                             className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm transition-transform duration-300 group-hover/avatar:scale-110
                             ${row?.status?.toLowerCase?.() === 'active'
                                     ? 'bg-emerald-500'
-                                    : 'bg-slate-300'
+                                    : 'bg-border-main'
                                 }`}
                         />
                     </div>
 
                     <div className="min-w-0">
-                        <div className="text-[14px] font-bold text-slate-800 tracking-[-0.01em] leading-tight truncate transition-colors duration-300">
+                        <div className="text-[14px] font-bold text-title tracking-[-0.01em] leading-tight truncate transition-colors duration-300">
                             {row?.name}
                         </div>
 
-                        <div className="text-[11px] font-medium text-slate-400 tracking-normal mt-0.5 truncate transition-colors duration-300">
+                        <div className="text-[11px] font-medium text-gray tracking-normal mt-0.5 truncate transition-colors duration-300">
                             {row?.email}
                         </div>
                     </div>
@@ -57,8 +57,8 @@ const UserTable = ({
             render: (value) => (
                 <div className="flex flex-col py-1">
                     <span className={`text-[13px] font-bold truncate ${value
-                        ? 'text-slate-700'
-                        : 'text-slate-400 italic font-medium'
+                        ? 'text-body'
+                        : 'text-gray italic font-medium'
                         }`}>
                         {value || 'Contractor'}
                     </span>
@@ -117,7 +117,7 @@ const UserTable = ({
                             e.stopPropagation();
                             onRowClick && onRowClick(row);
                         }}
-                        className="!h-11 sm:!h-9 !w-full sm:!w-9 !rounded-xl text-slate-500 hover:!text-primary hover:!bg-primary/5 transition-all duration-300 border border-slate-100 sm:border-none shadow-sm sm:shadow-none bg-slate-50/30 sm:bg-transparent"
+                        className="!h-11 sm:!h-9 !w-full sm:!w-9 !rounded-[var(--radius-button)] text-gray hover:!text-primary hover:!bg-primary/5 transition-all duration-300 border border-border-main/20 sm:border-none shadow-sm sm:shadow-none bg-base sm:bg-transparent"
                         icon={FiExternalLink}
                         iconSize={18}
                     >
@@ -131,7 +131,7 @@ const UserTable = ({
                             e.stopPropagation();
                             onEdit && onEdit(row);
                         }}
-                        className="!h-11 sm:!h-9 !px-4 sm:!px-5 !w-full sm:!w-auto !rounded-xl sm:!rounded-lg !text-[11px] !font-bold !uppercase !tracking-wider shadow-[0_4px_12px_rgba(var(--color-primary-rgb),0.15)] hover:shadow-[0_6px_16px_rgba(var(--color-primary-rgb),0.25)] transition-all duration-300"
+                        className="!h-11 sm:!h-9 !px-4 sm:!px-5 !w-full sm:!w-auto !rounded-[var(--radius-button)] sm:!rounded-[var(--radius-button)] !text-[11px] !font-bold !uppercase !tracking-wider shadow-[0_4px_12px_rgba(var(--color-primary-rgb),0.15)] hover:shadow-[0_6px_16px_rgba(var(--color-primary-rgb),0.25)] transition-all duration-300"
                         icon={FiEdit2}
                         iconSize={14}
                     >

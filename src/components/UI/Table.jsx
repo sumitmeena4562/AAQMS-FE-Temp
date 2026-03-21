@@ -58,12 +58,12 @@ const Table = ({
             <div className="overflow-x-auto custom-scrollbar">
                 <table className="w-full border-collapse min-w-[700px] lg:min-w-full">
                     <thead>
-                        <tr className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200/60">
+                        <tr className="bg-base/80 backdrop-blur-sm border-b border-border-main/60">
                             {columns.map((col, i) => (
                                 <th
                                     key={i}
                                     className={`
-                                        px-2.5 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-[0.12em] whitespace-nowrap
+                                        px-2.5 py-3 text-[10px] font-bold text-gray uppercase tracking-[0.12em] whitespace-nowrap
                                         ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
                                         ${col.className || ''}
                                     `}
@@ -77,7 +77,7 @@ const Table = ({
                                     <div className="flex items-center justify-end">
                                         <input
                                             type="checkbox"
-                                            className="w-3.5 h-3.5 rounded-[4px] border-slate-300 text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50"
+                                            className="w-3.5 h-3.5 rounded-[4px] border-border-main text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50"
                                             checked={isAllSelected}
                                             onChange={handleToggleAll}
                                         />
@@ -86,7 +86,7 @@ const Table = ({
                             )}
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100/80 bg-white">
+                    <tbody className="divide-y divide-border-main/80 bg-card">
                         {data.length > 0 ? (
                             data.map((row, ri) => {
                                 const isSelected = selectedIdSet.has(String(row.id));
@@ -101,7 +101,7 @@ const Table = ({
                                         onClick={() => onRowClick && onRowClick(row)}
                                         className={`
                                             group transition-all duration-300
-                                            ${isSelected ? 'bg-primary/[0.04]' : 'hover:bg-slate-50/70'}
+                                            ${isSelected ? 'bg-primary/[0.04]' : 'hover:bg-base/70'}
                                             ${isClickable ? 'cursor-pointer' : 'cursor-default'}
                                         `}
                                     >
@@ -109,7 +109,7 @@ const Table = ({
                                             <td
                                                 key={ci}
                                                 className={`
-                                                    px-2.5 py-1.5 text-[12px] font-medium text-slate-600 vertical-middle
+                                                    px-2.5 py-1.5 text-[12px] font-medium text-body vertical-middle
                                                     ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
                                                     ${col.className || ''}
                                                 `}
@@ -123,7 +123,7 @@ const Table = ({
                                                 <div className="flex items-center justify-end">
                                                     <input
                                                         type="checkbox"
-                                                        className="w-3.5 h-3.5 rounded-[4px] border-slate-300 text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50"
+                                                        className="w-3.5 h-3.5 rounded-[4px] border-border-main text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50"
                                                         checked={isSelected}
                                                         onChange={e => handleToggleRow(e, row.id)}
                                                         onClick={e => e.stopPropagation()}
@@ -138,10 +138,10 @@ const Table = ({
                             <tr>
                                 <td colSpan={columns.length + (selectable ? 1 : 0)} className="py-24 text-center">
                                     <div className="flex flex-col items-center justify-center space-y-3 opacity-60">
-                                        <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+                                        <div className="w-12 h-12 rounded-full bg-base flex items-center justify-center">
                                             <p className="text-xl">📊</p>
                                         </div>
-                                        <p className="text-slate-400 font-bold text-sm tracking-tight">{emptyMessage}</p>
+                                        <p className="text-gray font-bold text-sm tracking-tight">{emptyMessage}</p>
                                     </div>
                                 </td>
                             </tr>

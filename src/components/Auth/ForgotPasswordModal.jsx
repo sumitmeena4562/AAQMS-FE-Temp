@@ -109,7 +109,7 @@ function ForgotPasswordModal({ isOpen, onClose }) {
                 {/* Modal Container */}
                 <motion.div
                     variants={modalVariants}
-                    className="bg-white/90 backdrop-blur-2xl p-8 md:p-10 rounded-[32px] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-slate-200/50 w-full max-w-md z-10"
+                    className="bg-card/90 backdrop-blur-2xl p-8 md:p-10 rounded-[var(--radius-card)] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-border-main/50 w-full max-w-md z-10"
                 >
                     {/* Close Button */}
                     <button 
@@ -182,7 +182,7 @@ function EmailStep({ onSubmit, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
+                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
                         Send OTP
                     </Button>
                 </motion.div>
@@ -220,7 +220,7 @@ function OtpStep({ email, onSubmit, onResend, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
+                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
                         Verify OTP
                     </Button>
                 </motion.div>
@@ -273,7 +273,7 @@ function ResetStep({ onSubmit, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
+                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
                         Reset Password
                     </Button>
                 </motion.div>
@@ -308,7 +308,7 @@ function SuccessStep({ onClose }) {
             </motion.p>
 
             <motion.div variants={itemVariants} initial="hidden" animate="visible" className="w-full mt-4">
-                <Button onClick={onClose} variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20">
+                <Button onClick={onClose} variant="primary" size="lg" className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20">
                     Sign In Now
                 </Button>
             </motion.div>

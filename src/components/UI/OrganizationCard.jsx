@@ -61,12 +61,12 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
   return (
     <div 
-      className={`h-[360px] bg-white rounded-2xl shadow-sm hover:shadow-card-hover transition-all duration-300 flex flex-col border border-slate-200 overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
+      className={`h-[360px] bg-card rounded-[var(--radius-card)] shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col border border-border-main overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
       onClick={handleAction}
     >
 
       {/* Top Image Section */}
-      <div className="relative h-[140px] w-full shrink-0 bg-gray-100 overflow-hidden">
+      <div className="relative h-[140px] w-full shrink-0 bg-base overflow-hidden">
         <img
           src={org.imagery?.profile || org.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop'}
           alt={org.name}
@@ -90,7 +90,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
           <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 translate-y-[-10px] opacity-0 group-hover/card:translate-y-0 group-hover/card:opacity-100 transition-all duration-300">
             <button
               onClick={(e) => { e.stopPropagation(); onEdit?.(org); }}
-              className="w-6 h-6 rounded-lg bg-white shadow-md flex items-center justify-center text-slate-600 hover:text-primary transition-all border border-slate-100"
+              className="w-6 h-6 rounded-lg bg-card shadow-md flex items-center justify-center text-body hover:text-primary transition-all border border-border-main"
               title="Edit Organization"
             >
               <FiEdit2 size={11} />
@@ -117,7 +117,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
           {isSiteCard ? (
             <div className="flex items-start gap-1.5 mt-1.5">
-              <svg className="w-3 h-3 text-gray-400 shrink-0 relative top-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-3 h-3 text-gray shrink-0 relative top-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -126,7 +126,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               </p>
             </div>
           ) : (
-            <p className="text-[9px] text-secondary font-bold tracking-widest uppercase opacity-80">
+            <p className="text-[9px] text-gray font-bold tracking-widest uppercase opacity-80">
               {org.industry} • {org.region}
             </p>
           )}
@@ -135,26 +135,26 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         {/* Stats Section */}
         <div className="grid grid-cols-3 gap-2 mt-5">
           <div className="flex flex-col">
-            <p className="text-[7.5px] text-secondary uppercase font-bold tracking-wider mb-1 opacity-70">
+            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider mb-1 opacity-70">
               {isSiteCard ? 'FLOORS' : 'COORDS'}
             </p>
-            <p className="text-[15px] font-bold text-slate-800 leading-none">
+            <p className="text-[15px] font-bold text-title leading-none">
               {isSiteCard ? org.stats?.floors || 0 : orgCoordinators.length}
             </p>
           </div>
           <div className="flex flex-col">
-            <p className="text-[7.5px] text-secondary uppercase font-bold tracking-wider mb-1 opacity-70">
+            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider mb-1 opacity-70">
               {isSiteCard ? 'ZONES' : 'SITES'}
             </p>
-            <p className="text-[15px] font-bold text-slate-800 leading-none">
+            <p className="text-[15px] font-bold text-title leading-none">
               {isSiteCard ? org.stats?.zones || 0 : totalComputedSites}
             </p>
           </div>
           <div className="flex flex-col">
-            <p className="text-[7.5px] text-secondary uppercase font-bold tracking-wider mb-1 opacity-70">
+            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider mb-1 opacity-70">
               {isSiteCard ? 'ASSETS' : 'FLOORS'}
             </p>
-            <p className="text-[15px] font-bold text-slate-800 leading-none">
+            <p className="text-[15px] font-bold text-title leading-none">
               {isSiteCard ? (org.stats?.assets || 0).toLocaleString() : totalComputedFloors}
             </p>
           </div>
@@ -163,7 +163,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         {/* Bottom Button */}
         <button
           onClick={handleAction}
-          className="mt-auto w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-2 group">
+          className="mt-auto w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-2 group">
           <span>
             {isSiteCard ? 'View Floors' : 'Manage Org'}
           </span>

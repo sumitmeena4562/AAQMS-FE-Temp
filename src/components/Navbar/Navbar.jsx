@@ -10,7 +10,7 @@ const Navbar = ({
     children
 }) => {
     return (
-        <header className={`flex flex-col flex-shrink-0 sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-slate-100 h-16 justify-center box-border ${className}`}>
+        <header className={`flex flex-col flex-shrink-0 sticky top-0 z-[100] bg-card/80 backdrop-blur-md border-b border-border-main/50 h-16 justify-center box-border ${className}`}>
             <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 box-border">
                 <div className="flex items-center justify-between h-full">
                     {children ? (
@@ -22,7 +22,7 @@ const Navbar = ({
                                 {showMenuButton && (
                                     <button
                                         onClick={onMenuClick}
-                                        className="hidden max-md:flex p-2 -ml-1.5 rounded-md border-none bg-transparent cursor-pointer items-center justify-center text-slate-400 hover:text-slate-900 transition-colors"
+                                        className="hidden max-md:flex p-2 -ml-1.5 rounded-md border-none bg-transparent cursor-pointer items-center justify-center text-gray hover:text-title transition-colors"
                                         aria-label="Open menu"
                                     >
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

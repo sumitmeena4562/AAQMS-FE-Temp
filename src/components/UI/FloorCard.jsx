@@ -7,12 +7,12 @@ const FloorCard = ({ floor, site, onClick }) => {
   return (
     <div 
       onClick={onClick}
-      className="w-full max-w-[304px] h-[520px] bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-blue-600 hover:shadow-card-hover transition-all duration-300 flex flex-col group overflow-hidden cursor-pointer relative"
+      className="w-full max-w-[304px] h-[520px] bg-card rounded-[var(--radius-card)] border border-border-main shadow-card hover:border-blue-600 hover:shadow-card-hover transition-all duration-300 flex flex-col group overflow-hidden cursor-pointer relative"
     >
       
       {/* Visual Image Area (Blue Line Art Style Placeholder) */}
-      <div className="h-[240px] bg-white flex items-center justify-center relative border-b border-gray-100 group-hover:bg-[#F8FAFC] transition-colors p-8">
-        <div className="absolute top-3 right-3 px-2 py-[2px] bg-white rounded-md text-[11px] font-bold text-gray-600 shadow-sm border border-gray-100 uppercase">
+      <div className="h-[240px] bg-card flex items-center justify-center relative border-b border-border-main group-hover:bg-base transition-colors p-8">
+        <div className="absolute top-3 right-3 px-2 py-[2px] bg-card rounded-md text-[11px] font-bold text-gray shadow-sm border border-border-main uppercase">
           {level}
         </div>
         
@@ -34,7 +34,7 @@ const FloorCard = ({ floor, site, onClick }) => {
       <div className="p-6 flex-1 flex flex-col pt-8">
         
         <div className="flex items-center justify-between mb-1.5">
-          <h3 className="text-xl font-bold text-primary leading-tight">
+          <h3 className="text-xl font-bold text-title leading-tight">
             {name}
           </h3>
           {status === 'ACTIVE' && (
@@ -42,33 +42,33 @@ const FloorCard = ({ floor, site, onClick }) => {
           )}
         </div>
         
-        <p className="text-sm text-secondary font-medium mb-8 leading-relaxed truncate">
+        <p className="text-sm text-body font-medium mb-8 leading-relaxed truncate">
           {description || 'Functional Spaces & Zones'}
         </p>
         
         <div className="flex items-center justify-between gap-3 mb-auto">
-          <div className="flex-1 bg-[#F9FAFB] rounded-[16px] py-4 px-2 flex flex-col items-center justify-center group-hover:bg-[#F0F6FF] transition-colors border border-transparent">
-            <span className="text-[10px] font-bold text-secondary group-hover:text-blue-500 uppercase tracking-[0.15em] mb-1.5 transition-colors">
+          <div className="flex-1 bg-gray-50 rounded-[16px] py-4 px-2 flex flex-col items-center justify-center group-hover:bg-blue-50 transition-colors border border-transparent">
+            <span className="text-[10px] font-bold text-body group-hover:text-blue-500 uppercase tracking-[0.15em] mb-1.5 transition-colors">
               ZONES
             </span>
-            <span className="text-2xl font-bold text-primary leading-none group-hover:text-blue-800 transition-colors">
+            <span className="text-2xl font-bold text-title leading-none group-hover:text-blue-800 transition-colors">
               {stats?.zones || 0}
             </span>
           </div>
-          <div className="flex-1 bg-[#F9FAFB] rounded-[16px] py-4 px-2 flex flex-col items-center justify-center group-hover:bg-[#F0F6FF] transition-colors border border-transparent">
-            <span className="text-[10px] font-bold text-secondary group-hover:text-blue-500 uppercase tracking-[0.15em] mb-1.5 transition-colors">
+          <div className="flex-1 bg-gray-50 rounded-[16px] py-4 px-2 flex flex-col items-center justify-center group-hover:bg-blue-50 transition-colors border border-transparent">
+            <span className="text-[10px] font-bold text-body group-hover:text-blue-500 uppercase tracking-[0.15em] mb-1.5 transition-colors">
               ASSETS
             </span>
-            <span className="text-2xl font-bold text-primary leading-none group-hover:text-blue-800 transition-colors">
+            <span className="text-2xl font-bold text-title leading-none group-hover:text-blue-800 transition-colors">
               {stats?.assets || 0}
             </span>
           </div>
         </div>
 
         {/* Action Button */}
-        <button className="mt-8 w-full py-[14px] px-4 bg-white border border-slate-200 rounded-2xl text-[14px] font-semibold text-primary flex items-center justify-center gap-2 group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all overflow-hidden relative">
+        <button className="mt-8 w-full py-[14px] px-4 bg-card border border-border-main rounded-2xl text-[14px] font-semibold text-primary flex items-center justify-center gap-2 group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all overflow-hidden relative">
           <span className="relative z-10 transition-colors">View Zone Mapping</span>
-          <ArrowRight className="w-[18px] h-[18px] ml-2 text-secondary group-hover:opacity-0 absolute right-5 transition-all" strokeWidth={2} />
+          <ArrowRight className="w-[18px] h-[18px] ml-2 text-gray group-hover:opacity-0 absolute right-5 transition-all" strokeWidth={2} />
           <Map className="w-[18px] h-[18px] ml-2 text-white opacity-0 group-hover:opacity-100 absolute right-5 transition-all" strokeWidth={2} />
         </button>
 
