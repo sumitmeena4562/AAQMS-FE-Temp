@@ -168,18 +168,18 @@ export const userService = {
     },
 
     /**
-     * Bulk action — activate, deactivate, or delete multiple users
+     * Bulk action — activate, deactivate, ban, or unban multiple users
      */
     bulkAction: async (ids, action) => {
         await delay(300);
         let users = loadUsers();
 
-        if (action === 'delete') {
-            users = users.filter(u => !ids.includes(u.id));
-        } else if (action === 'activate') {
+        if (action === 'activate' || action === 'unban') {
             users = users.map(u => ids.includes(u.id) ? { ...u, status: 'active' } : u);
         } else if (action === 'deactivate') {
             users = users.map(u => ids.includes(u.id) ? { ...u, status: 'inactive' } : u);
+        } else if (action === 'ban') {
+            users = users.map(u => ids.includes(u.id) ? { ...u, status: 'banned' } : u);
         }
 
         saveUsers(users);

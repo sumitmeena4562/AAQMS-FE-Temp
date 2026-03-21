@@ -35,8 +35,10 @@ export default function Users() {
     const [isPeekOpen, setIsPeekOpen] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
-    const [deleteTarget, setDeleteTarget] = useState(null);
-    const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+    const [banTarget, setBanTarget] = useState(null);
+    const [banActionType, setBanActionType] = useState('ban'); // 'ban' or 'unban'
+    const [bulkBanOpen, setBulkBanOpen] = useState(false);
+    const [bulkActionType, setBulkActionType] = useState('ban');
     const [selectionMode, setSelectionMode] = useState(false);
 
     // Search Debounce
@@ -86,24 +88,25 @@ export default function Users() {
         return res;
     };
 
-    const handleDeleteUser = (user) => {
-        setDeleteTarget(user);
+    const handleBanUser = (user, type = 'ban') => {
+        setBanTarget(user);
+        setBanActionType(type);
         setIsPeekOpen(false);
     };
 
-    const handleConfirmDelete = async () => {
-        if (!deleteTarget) return;
-        const res = await store.deleteUser(deleteTarget.id);
+    const handleConfirmBan = async () => {
+        if (!banTarget) return;
+        const res = await store.bulkAction([banTarget.id], banActionType);
         if (res.success) {
-            toast.success('User deleted successfully');
-            setDeleteTarget(null);
+            toast.success(`User ${banActionType === 'ban' ? 'banned' : 'restored'} successfully`);
+            setBanTarget(null);
         } else {
-            toast.error(res.error || 'Failed to delete user');
+            toast.error(res.error || `Failed to ${banActionType} user`);
         }
     };
 
     const handleBulkActivate = async () => {
-        const res = await store.bulkAction('activate');
+        const res = await store.bulkAction(selectedIds, 'activate');
         if (res.success) {
             toast.success(`${selectedIds.length} users activated`);
         } else {
@@ -112,7 +115,7 @@ export default function Users() {
     };
 
     const handleBulkDeactivate = async () => {
-        const res = await store.bulkAction('deactivate');
+        const res = await store.bulkAction(selectedIds, 'deactivate');
         if (res.success) {
             toast.success(`${selectedIds.length} users deactivated`);
         } else {
@@ -120,13 +123,13 @@ export default function Users() {
         }
     };
 
-    const handleBulkDelete = async () => {
-        const res = await store.bulkAction('delete');
+    const handleBulkBan = async () => {
+        const res = await store.bulkAction(selectedIds, bulkActionType);
         if (res.success) {
-            toast.success(`${selectedIds.length} users deleted`);
-            setBulkDeleteOpen(false);
+            toast.success(`${selectedIds.length} users ${bulkActionType === 'ban' ? 'banned' : 'restored'}`);
+            setBulkBanOpen(false);
         } else {
-            toast.error(res.error || 'Bulk deletion failed');
+            toast.error(res.error || `Bulk ${bulkActionType} failed`);
         }
     };
 
@@ -213,7 +216,7 @@ export default function Users() {
             )
         },
         {
-            header: 'Status',
+            header: 'Assignment',
             accessor: 'assignment',
             width: '12%',
             align: 'center',
@@ -227,6 +230,28 @@ export default function Users() {
                         <DotStatus status={isAssigned ? 'active' : 'inactive'} />
                         <span className="text-[8px] font-black uppercase tracking-widest leading-none">
                             {isAssigned ? 'Assigned' : 'Standby'}
+                        </span>
+                    </div>
+                );
+            }
+        },
+        {
+            header: 'Account',
+            accessor: 'status',
+            width: '10%',
+            align: 'center',
+            render: (value) => {
+                const isBanned = value === 'banned';
+                const isActive = value === 'active';
+                return (
+                    <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border ${
+                        isBanned ? 'bg-rose-50 border-rose-100 text-rose-600' : 
+                        isActive ? 'bg-emerald-50 border-emerald-100 text-emerald-600' :
+                        'bg-slate-50 border-slate-200 text-slate-500'
+                    }`}>
+                        <DotStatus status={isActive ? 'active' : isBanned ? 'inactive' : 'inactive'} />
+                        <span className="text-[8px] font-black uppercase tracking-widest leading-none">
+                            {value}
                         </span>
                     </div>
                 );
@@ -339,7 +364,8 @@ export default function Users() {
                             label="Status"
                             options={[
                                 { value: 'active', label: 'Active Only' },
-                                { value: 'inactive', label: 'Inactive Only' }
+                                { value: 'inactive', label: 'Inactive Only' },
+                                { value: 'banned', label: 'Banned' }
                             ]}
                             value={filters.status}
                             onChange={v => setFilters({ ...filters, status: v })}
@@ -405,12 +431,20 @@ export default function Users() {
                                 Deactivate
                             </Button>
                             <Button
-                                onClick={() => setBulkDeleteOpen(true)}
-                                icon={FiTrash2}
+                                onClick={() => { setBulkActionType('ban'); setBulkBanOpen(true); }}
+                                icon={FiAlertCircle}
                                 variant="outline"
                                 className="!h-8 !px-3 !text-[10px] !font-bold !bg-rose-50 !text-rose-700 !border-rose-100/50 hover:!bg-rose-100 !rounded-lg"
                             >
-                                Delete
+                                Ban
+                            </Button>
+                            <Button
+                                onClick={() => { setBulkActionType('unban'); setBulkBanOpen(true); }}
+                                icon={FiCheckCircle}
+                                variant="outline"
+                                className="!h-8 !px-3 !text-[10px] !font-bold !bg-blue-50 !text-blue-700 !border-blue-100/50 hover:!bg-blue-100 !rounded-lg"
+                            >
+                                Unban
                             </Button>
                             <div className="hidden sm:block w-px h-5 bg-border-main/50 mx-1" />
                             <Button
@@ -445,7 +479,7 @@ export default function Users() {
                 onClose={() => setIsPeekOpen(false)}
                 user={peekUser}
                 onEdit={handleEditUser}
-                onDelete={handleDeleteUser}
+                onBan={handleBanUser}
             />
 
             <UserFormModal
@@ -457,24 +491,28 @@ export default function Users() {
             />
 
             <ConfirmModal
-                isOpen={!!deleteTarget}
-                onClose={() => setDeleteTarget(null)}
-                onConfirm={handleConfirmDelete}
-                title="Delete User"
-                message={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
-                confirmText="Delete Profile"
-                danger={true}
+                isOpen={!!banTarget}
+                onClose={() => setBanTarget(null)}
+                onConfirm={handleConfirmBan}
+                title={banActionType === 'ban' ? "Ban User" : "Unban User"}
+                message={banActionType === 'ban' 
+                    ? `Are you sure you want to ban "${banTarget?.name}"? This will restrict their access to the platform.`
+                    : `Are you sure you want to restore access for "${banTarget?.name}"?`}
+                confirmText={banActionType === 'ban' ? "Confirm Ban" : "Confirm Unban"}
+                danger={banActionType === 'ban'}
                 loading={loading}
             />
 
             <ConfirmModal
-                isOpen={bulkDeleteOpen}
-                onClose={() => setBulkDeleteOpen(false)}
-                onConfirm={handleBulkDelete}
-                title="Bulk Delete"
-                message={`You are about to permanently delete ${selectedIds.length} users. This action is irreversible.`}
-                confirmText={`Confirm Delete (${selectedIds.length})`}
-                danger={true}
+                isOpen={bulkBanOpen}
+                onClose={() => setBulkBanOpen(false)}
+                onConfirm={handleBulkBan}
+                title={bulkActionType === 'ban' ? "Bulk Ban" : "Bulk Unban"}
+                message={bulkActionType === 'ban'
+                    ? `You are about to ban ${selectedIds.length} users. Continue?`
+                    : `You are about to unban ${selectedIds.length} users. Continue?`}
+                confirmText={bulkActionType === 'ban' ? `Ban (${selectedIds.length})` : `Unban (${selectedIds.length})`}
+                danger={bulkActionType === 'ban'}
                 loading={loading}
             />
         </div>

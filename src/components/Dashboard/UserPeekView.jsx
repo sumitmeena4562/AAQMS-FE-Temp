@@ -13,7 +13,7 @@ function getAvatar(name) {
 
 import Button from '../UI/Button';
 
-const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
+const UserPeekView = ({ isOpen, onClose, user, onEdit, onBan }) => {
     if (!user) return null;
     const { initials, colors } = getAvatar(user.name);
 
@@ -83,7 +83,9 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                                             px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border
                                             ${user.status === 'active' 
                                                 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
-                                                : 'bg-rose-50 text-rose-600 border-rose-100'}
+                                                : user.status === 'banned'
+                                                    ? 'bg-rose-50 text-rose-600 border-rose-600/20'
+                                                    : 'bg-slate-50 text-slate-600 border-slate-200'}
                                         `}>{user.status}</div>
                                     </div>
                                 </div>
@@ -138,13 +140,23 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
 
                         {/* Modal Footer */}
                         <div className="relative z-10 p-5 bg-base border-t border-border-main flex items-center justify-end gap-2">
-                            <Button
-                                variant="danger"
-                                onClick={() => { onClose(); onDelete(user); }}
-                                className="!h-10 !px-5 !text-[11px] !font-bold !uppercase !tracking-wider"
-                            >
-                                Remove User
-                            </Button>
+                            {user.status === 'banned' ? (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => { onClose(); onBan(user, 'unban'); }}
+                                    className="!h-10 !px-5 !text-[11px] !font-bold !uppercase !tracking-wider !text-emerald-600 !border-emerald-200 hover:!bg-emerald-50"
+                                >
+                                    Unban User
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant="danger"
+                                    onClick={() => { onClose(); onBan(user, 'ban'); }}
+                                    className="!h-10 !px-5 !text-[11px] !font-bold !uppercase !tracking-wider"
+                                >
+                                    Ban User
+                                </Button>
+                            )}
                             <Button
                                 variant="primary"
                                 onClick={() => { onClose(); onEdit(user); }}
