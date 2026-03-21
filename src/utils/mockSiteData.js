@@ -58,7 +58,12 @@ export const generateSitePlansForCoordinator = (userId) => {
 }
 
 export const generateFloorsForSite = (site) => {
-  const { floors, zones, assets } = site.stats;
+  // Defensive check for missing stats (prevents crash on page refresh/direct nav)
+  const { floors = 1, zones = 1, assets = 10 } = site?.stats || { 
+    floors: 1, 
+    zones: 1, 
+    assets: 10 
+  };
   
   const generatedFloors = [];
   let remainingZones = zones;

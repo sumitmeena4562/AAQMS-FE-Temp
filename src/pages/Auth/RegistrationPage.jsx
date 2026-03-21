@@ -15,15 +15,35 @@ function RegistrationPage() {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
-    const onSubmit = async () => {
+    const onSubmit = async (data) => {
         setIsLoading(true);
         try {
+            // Simulated delay for premium feel
             await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Check if user already exists in mock store
+            const users = JSON.parse(localStorage.getItem('aaqms_users') || '[]');
+            if (users.some(u => u.email === data.email)) {
+                throw new Error("User with this email already exists!");
+            }
+
+            // Create new mock user
+            const newUser = {
+                id: Date.now(),
+                name: data.fullName,
+                email: data.email,
+                role: data.role,
+                status: 'active',
+                createdAt: new Date().toISOString().split('T')[0]
+            };
+            
+            localStorage.setItem('aaqms_users', JSON.stringify([...users, newUser]));
+
             toast.success("Account created successfully!");
             navigate('/login');
         } catch (error) {
             console.error("Registration error:", error);
-            toast.error("An error occurred during registration.");
+            toast.error(error.message || "An error occurred during registration.");
         } finally {
             setIsLoading(false);
         }

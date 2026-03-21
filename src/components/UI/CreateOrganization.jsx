@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, X, AlignLeft } from 'lucide-react';
-import FormInput from './FormInput';
+import { Plus, X } from 'lucide-react';
+import InputField from './InputField';
 import SelectField from './SelectField';
 import ImageUploadCard from './ImageUploadCard';
 
@@ -44,8 +45,8 @@ const orgSchema = z.object({
   })
 });
 
-const CreateOrganization = ({ onSubmit, onClose }) => {
-  const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, trigger } = useForm({
+const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose }) => {
+  const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, reset, trigger } = useForm({
     resolver: zodResolver(orgSchema),
     mode: "all",
     defaultValues: {
@@ -68,6 +69,31 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
     }
   });
 
+  useEffect(() => {
+    if (org) {
+      reset(org);
+    } else {
+      reset({
+        name: '',
+        industry: 'Manufacturing & Heavy Industry',
+        occupancyType: 'Industrial Factory',
+        classification: 'Group H - High Hazard',
+        contactPerson: '',
+        contactEmail: '',
+        address: '',
+        otherInfo: '',
+        imagery: {
+          north: '',
+          south: '',
+          east: '',
+          west: '',
+          profile: '',
+          extra: []
+        }
+      });
+    }
+  }, [org, reset, isOpen]);
+
   const imageryValues = watch('imagery');
   const nameValue = watch('name');
   const extraImages = imageryValues?.extra || [];
@@ -79,11 +105,11 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
   const submitForm = (data) => {
     if (onSubmit) {
       onSubmit({
-        id: String(Date.now()),
+        id: org?.id || String(Date.now()),
         ...data,
-        status: "ACTIVE",
-        lastInventoryAudit: new Date().toISOString(),
-        stats: { sites: 0, floors: 0, zones: 0 }
+        status: org?.status || "ACTIVE",
+        lastInventoryAudit: org?.lastInventoryAudit || new Date().toISOString(),
+        stats: org?.stats || { sites: 0, floors: 0, zones: 0 }
       });
     }
   };
@@ -91,33 +117,52 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
   const isNameValid = nameValue?.trim()?.length > 0 && !errors.name;
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-[#0a1128]/60 p-4 sm:p-6 backdrop-blur-md !p-45">
-      <div
-        className="w-full bg-white rounded-[16px] shadow-2xl flex flex-col mx-auto max-h-[95vh] overflow-y-auto !p-5"
-        style={{ maxWidth: '800px' }}
-      >
-        <div className="p-8">
-          {/* Header Section */}
-          <div className="flex flex-col mb-8 p-1">
-            <div className="flex flex-row items-center justify-between pb-4 border-b border-gray-100 !mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100 !mb-1">
-                  <BuildingIcon />
-                </div>
-                <h2 className="text-[22px] font-bold text-gray-900 leading-none">Create Organization</h2>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+          <Motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+          />
+
+          <Motion.div
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 10 }}
+            className="relative w-full max-w-[800px] max-h-[90vh] sm:max-h-[85vh] bg-white border border-slate-200 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col overflow-hidden"
+          >
+            {/* Modal Header */}
+            <div className="relative z-10 p-6 pb-2 flex items-start justify-between">
+              <div>
+                  <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-none mb-1.5 flex items-center gap-2">
+                      <BuildingIcon /> {org ? 'Update Organization' : 'Create Organization'}
+                  </h2>
+                  <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                          {org ? 'Modify Details' : 'New Setup'}
+                      </span>
+                  </div>
               </div>
               {onClose && (
-                <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-700 transition">
-                  <X size={24} />
+                <button 
+                  type="button" 
+                  onClick={onClose} 
+                  className="p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 rounded-lg transition-colors"
+                >
+                  <X size={18} />
                 </button>
               )}
             </div>
-          </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit(submitForm)} className="flex flex-col">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-[32px] gap-y-[24px] mb-8 !p-1">
-              <FormInput
+            {/* Modal Body */}
+            <div className="relative z-10 flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar mt-4 pt-1">
+              <form onSubmit={handleSubmit(submitForm)} className="flex flex-col">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-7 mb-8">
+              <InputField
                 label="Name of Organization"
                 required
                 placeholder="Apex Global Solutions"
@@ -158,14 +203,14 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
                 ]}
               />
 
-              <FormInput
+              <InputField
                 label="Contact Person Name"
                 placeholder="John Doe"
                 required
                 {...register("contactPerson")}
                 error={errors.contactPerson?.message}
               />
-              <FormInput
+              <InputField
                 label="Contact Email"
                 type="email"
                 placeholder="email@company.com"
@@ -174,31 +219,31 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
                 error={errors.contactEmail?.message}
               />
 
-              <FormInput
-                label="Full address"
-                placeholder="address"
+              <InputField
+                label="Full Address"
+                placeholder="Enter full address"
                 required
                 {...register("address")}
                 error={errors.address?.message}
               />
-              <FormInput
-                label="Other Information (Option)"
-                placeholder="----"
+              <InputField
+                label="Other Information (Optional)"
+                placeholder="Any additional details..."
                 {...register("otherInfo")}
               />
             </div>
 
             {/* Site Imagery Section */}
-            <div className="mt-8 mb-6 p-1">
-              <div className="flex items-center justify-between mb-6 border-b border-gray-100 !pb-3 !pt-3">
-                <div className="flex items-center gap-3">
-                  <h3 className="text-[15px] font-bold text-gray-900">Site Imagery</h3>
-                  <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-[4px] uppercase tracking-wider">Required</span>
+            <div className="mt-8 mb-6">
+              <div className="col-span-2 flex items-center justify-between pb-1 border-b border-slate-100 mt-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Site Imagery</h3>
+                  <span className="text-[9px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full uppercase tracking-wider">Required</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setValue('imagery.extra', [...extraImages, ''], { shouldValidate: false, shouldDirty: true })}
-                  className="bg-[#0F172A] hover:bg-gray-800 text-white rounded-[6px] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors shadow-sm"
+                  className="bg-slate-900 hover:bg-slate-800 text-white rounded-md px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors shadow-sm"
                 >
                   <Plus size={14} strokeWidth={2.5} />
                   Add More
@@ -206,7 +251,7 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
               </div>
 
               {/* Upload Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-[24px] !pt-2">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-[24px] pt-2">
                 <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url) => handleImage('north', url)} error={errors.imagery?.north?.message} />
                 <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url) => handleImage('south', url)} error={errors.imagery?.south?.message} />
                 <ImageUploadCard label="East View →" value={imageryValues?.east} onUpload={(url) => handleImage('east', url)} error={errors.imagery?.east?.message} />
@@ -228,30 +273,40 @@ const CreateOrganization = ({ onSubmit, onClose }) => {
             </div>
 
             {/* Profile Section */}
-            <div className="mt-6 mb-4 p-1">
-              <div className="mb-6 border-b border-gray-100 !p-3">
-                <h3 className="text-[15px] font-bold text-gray-900">Add Profile</h3>
+            <div className="mt-6 mb-2">
+              <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-slate-100 mt-2">
+                  <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Add Profile Logo</h3>
               </div>
-              <div className="w-full lg:w-[calc(25%-18px)] !pb-10 !pt-2">
+              <div className="w-full lg:w-1/4 pb-4 pt-3">
                 <ImageUploadCard value={imageryValues?.profile} onUpload={(url) => handleImage('profile', url)} error={errors.imagery?.profile?.message} />
               </div>
             </div>
-
-            <div className="flex items-center justify-end pt-6 mt-4 border-t border-gray-100 !p-2">
-              <button
-                type="submit"
-                disabled={!isValid}
-                className={`h-[44px] px-[24px] pr-[28px] rounded-[10px] text-[15px] font-medium transition-colors shadow-lg flex items-center shadow-[#0F172A]/20 ${!isValid ? 'bg-gray-300 text-gray-500 cursor-not-allowed border-transparent shadow-none' : 'bg-[#0F172A] hover:bg-gray-800 text-white'
-                  }`}
-              >
-                <CreateButtonIcon />
-                Create Organization
-              </button>
-            </div>
           </form>
         </div>
-      </div>
-    </div>
+
+        {/* Modal Footer */}
+        <div className="relative z-10 p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-end">
+            <div className="flex items-center gap-2">
+                <button 
+                    type="button"
+                    onClick={onClose} 
+                    className="h-10 px-4 hover:bg-slate-200/50 rounded-xl text-[11px] font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 transition-colors flex items-center justify-center"
+                >
+                    Cancel
+                </button>
+                <button
+                  onClick={handleSubmit(submitForm)}
+                  disabled={!isValid}
+                  className={`h-10 px-6 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-2 ${!isValid ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-transparent shadow-none' : 'bg-primary hover:bg-primary/95 text-white'}`}
+                >
+                  {org ? 'Save Changes' : 'Create Organization'}
+                </button>
+            </div>
+        </div>
+          </Motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 };
 

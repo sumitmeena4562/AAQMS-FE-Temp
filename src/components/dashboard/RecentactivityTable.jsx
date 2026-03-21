@@ -1,5 +1,6 @@
 import React from 'react';
-import { Table, Button, ConfigProvider } from 'antd';
+import DataTable from '../UI/DataTable';
+import Button from '../UI/Button';
 import {
     FiAlertTriangle,
     FiUserPlus,
@@ -9,21 +10,21 @@ import {
     FiFilter,
 } from 'react-icons/fi';
 
+// ── Static Activity Data ──
 const ACTIVITY = [
     {
-        key: '1',
+        id: '1',
         type: 'Inventory Mismatch',
         icon: FiAlertTriangle,
         iconBgClass: 'bg-red-50',
         iconTextClass: 'text-red-600',
         user: 'System AI',
         entity: 'Zone B-12',
-
         details: 'Fire Extinguisher missing in Zone 15-12',
         time: '2 mins ago',
     },
     {
-        key: '2',
+        id: '2',
         type: 'User Onboarding',
         icon: FiUserPlus,
         iconBgClass: 'bg-blue-50',
@@ -34,7 +35,7 @@ const ACTIVITY = [
         time: '15 mins ago',
     },
     {
-        key: '3',
+        id: '3',
         type: 'Inventory Update',
         icon: FiPackage,
         iconBgClass: 'bg-orange-50',
@@ -45,7 +46,7 @@ const ACTIVITY = [
         time: '1 hour ago',
     },
     {
-        key: '4',
+        id: '4',
         type: 'Report Approval',
         icon: FiCheckCircle,
         iconBgClass: 'bg-purple-50',
@@ -56,11 +57,11 @@ const ACTIVITY = [
         time: '2 hours ago',
     },
     {
-        key: '5',
+        id: '5',
         type: 'System Config',
         icon: FiSettings,
-        iconBgClass: 'bg-gray-100',
-        iconTextClass: 'text-gray-500',
+        iconBgClass: 'bg-slate-100',
+        iconTextClass: 'text-slate-500',
         user: 'Admin User',
         entity: 'Global Settings',
         details: 'Updated API rate limits',
@@ -68,133 +69,74 @@ const ACTIVITY = [
     },
 ];
 
+// ── Column definitions ──
 const columns = [
     {
-        title: 'EVENT TYPE',
-        dataIndex: 'type',
-        key: 'type',
-        render: (text, record) => {
-            const Icon = record.icon;
+        header: 'Event Type',
+        accessor: 'type',
+        render: (_, row) => {
+            const Icon = row.icon;
             return (
                 <div className="flex items-center gap-3">
-                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${record.iconBgClass} ${record.iconTextClass}`}>
+                    <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${row.iconBgClass} ${row.iconTextClass}`}>
                         <Icon size={16} />
                     </div>
-                    <span className="text-sm font-semibold text-gray-900 whitespace-nowrap">
-                        {text}
+                    <span className="text-[13px] font-semibold text-slate-900 whitespace-nowrap">
+                        {row.type}
                     </span>
                 </div>
             );
         },
     },
     {
-        title: 'USER / SOURCE',
-        dataIndex: 'user',
-        key: 'user',
-        render: (text, record) => (
-            <div className="flex items-center gap-2">
-                {record.userBadge && (
-                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${record.userBadge.bgClass} ${record.userBadge.textClass}`}>
-                        {record.userBadge.text}
-                    </span>
-                )}
-                <span className="text-sm text-gray-900 font-medium whitespace-nowrap">{text}</span>
-            </div>
+        header: 'User / Source',
+        accessor: 'user',
+        render: (value) => (
+            <span className="text-[13px] text-slate-800 font-medium whitespace-nowrap">{value}</span>
         ),
     },
     {
-        title: 'ENTITY',
-        dataIndex: 'entity',
-        key: 'entity',
-        render: (text, record) => (
-            <div className="flex items-center gap-2">
-                {record.entityBadge ? (
-                    <span className="text-xs font-medium px-2.5 py-1 bg-gray-100 text-gray-600 rounded-[4px] whitespace-nowrap">
-                        {text}
-                    </span>
-                ) : (
-                    <span className="text-sm text-gray-700 whitespace-nowrap">{text}</span>
-                )}
-            </div>
+        header: 'Entity',
+        accessor: 'entity',
+        render: (value) => (
+            <span className="text-[13px] text-slate-600 whitespace-nowrap">{value}</span>
         ),
     },
     {
-        title: 'DETAILS',
-        dataIndex: 'details',
-        key: 'details',
-        render: (text) => <span className="text-sm text-gray-500 min-w-[200px] block">{text}</span>,
+        header: 'Details',
+        accessor: 'details',
+        render: (value) => (
+            <span className="text-[13px] text-slate-500 min-w-[200px] block">{value}</span>
+        ),
     },
     {
-        title: 'TIME',
-        dataIndex: 'time',
-        key: 'time',
-        render: (text) => <span className="text-sm text-gray-500 whitespace-nowrap">{text}</span>,
+        header: 'Time',
+        accessor: 'time',
+        render: (value) => (
+            <span className="text-[13px] text-slate-400 font-medium whitespace-nowrap">{value}</span>
+        ),
     },
 ];
 
 const RecentActivityTable = () => {
     return (
-        <ConfigProvider
-            theme={{
-                token: {
-                    fontFamily: 'Inter, system-ui, sans-serif',
-                    colorBorderSecondary: '#F3F4F6', // Lighter border color for table rows
-                },
-                components: {
-                    Table: {
-                        headerBg: '#F9FAFBCC',
-                        headerColor: '#7B8393',
-                        headerSplitColor: 'transparent',
-                        cellPaddingBlock: 16,
-                    },
-                },
-            }}
-        >
-            <div className="  bg-white border border-[#E5E7EB] rounded-xl shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] flex flex-col w-full ">
-                {/* Header Section */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between py-4 !px-6 border-b border-gray-100 gap-4 !h-[71px] ">
-                    {/* Left Container */}
-                    <div className="flex items-center gap-3 h-7">
-                        <h3 className="text-[18px] font-bold text-[#111827] leading-none m-0">
-                            Recent Activity
-                        </h3>
-                        {/* Live Feed Container */}
-                        <div className="flex items-center justify-center w-[77.22px] h-[22px] pt-[2px] pr-[10px] pb-[2px] pl-[10px] bg-gray-100 border border-gray-200 rounded-full">
-                            {/* Live Feed Text */}
-                            <span className="flex items-center justify-center w-[55.22px] h-[16px] text-xs font-medium text-gray-500 leading-none">
-                                Live Feed
-                            </span>
-                        </div>
-                    </div>
-                    {/* Right Container */}
-                    <div className="flex items-center gap-2 h-7.5">
-                        {/* Filter Button */}
-                        <button className="flex items-center justify-center w-[54.95px] h-[30px] pt-[6px] pr-[12px] pb-[6px] pl-[12px] bg-white border border-[#D1D5DB] rounded-[6px] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-gray-50 transition-colors cursor-pointer outline-none">
-                            <span className="flex items-center justify-center w-[28.95px] h-[16px] font-['Inter'] font-medium text-[12px] leading-[16px] tracking-[0px] text-center align-middle text-[#374151]">
-                                Filter
-                            </span>
-                        </button>
-                        {/* View All Logs Button */}
-                        <button className="flex items-center justify-center w-[103.22px] h-[30px] pt-[6px] pr-[12px] pb-[6px] pl-[12px] bg-[#EFF6FF] border border-[#BFDBFE] rounded-[6px] shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-[#DBEAFE] transition-colors cursor-pointer outline-none">
-                            <span className="flex items-center justify-center w-[77.22px] h-[16px] font-['Inter'] font-medium text-[12px] leading-[16px] tracking-[0px] text-center align-middle text-[#2563EB] whitespace-nowrap">
-                                View All Logs
-                            </span>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Table Section */}
-                <div className="w-full px-[24px] pb-[8px]">
-                    <Table
-                        columns={columns}
-                        dataSource={ACTIVITY}
-                        pagination={false}
-                        scroll={{ x: 'max-content' }}
-                        className="w-full [&_.ant-table-thead>tr>th]:!font-['Inter'] [&_.ant-table-thead>tr>th]:!font-bold [&_.ant-table-thead>tr>th]:!text-[12px] [&_.ant-table-thead>tr>th]:!leading-[16px] [&_.ant-table-thead>tr>th]:!tracking-[0.6px] [&_.ant-table-thead>tr>th]:!uppercase [&_.ant-table-thead>tr>th]:!align-middle [&_.ant-table-thead>tr>th]:!text-[#7B8393] [&_.ant-table-thead>tr>th:first-child]:pl-0 [&_.ant-table-tbody>tr>td:first-child]:pl-0 [&_.ant-table-thead>tr>th:last-child]:pr-0 [&_.ant-table-tbody>tr>td:last-child]:pr-0 [&_.ant-table-tbody>tr:last-child>td]:border-b-0"
-                    />
-                </div>
-            </div>
-        </ConfigProvider>
+        <DataTable
+            title="Recent Activity"
+            subtitle="Live Feed"
+            rightContent={
+                <>
+                    <Button variant="outline" size="sm" icon={FiFilter} className="!rounded-md !h-[30px] !text-[12px]">
+                        Filter
+                    </Button>
+                    <Button variant="ghost" size="sm" className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10">
+                        View All Logs
+                    </Button>
+                </>
+            }
+            columns={columns}
+            data={ACTIVITY}
+            emptyMessage="No recent activity"
+        />
     );
 };
 

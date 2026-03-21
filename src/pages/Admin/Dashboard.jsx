@@ -1,5 +1,5 @@
 import PageHeader from "../../components/Dashboard/pageHeader";
-import { StatGrid } from "../../components/Dashboard/StatsGrid";
+import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
 import RecentActivityTable from "../../components/Dashboard/RecentactivityTable";
 import { FiBox, FiClock, FiAlertTriangle } from "react-icons/fi";
@@ -30,17 +30,17 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="!space-y-6">
+        <div className="flex flex-col gap-6">
             <PageHeader
                 title="System Overview"
                 subtitle={
                     <>
                         Real-time metrics for{' '}
-                        <span className="font-semibold text-gray-700">February 26, 2026</span>
+                        <span className="font-semibold text-slate-700">February 26, 2026</span>
                     </>
                 }
                 rightContent={
-                    <span className="inline-flex items-center !px-3 !py-1.5 text-xs text-gray-500 bg-white border border-gray-200 rounded-md shadow-sm whitespace-nowrap">
+                    <span className="inline-flex items-center !px-3 !py-1.5 text-xs text-slate-500 bg-white border border-slate-200 rounded-md shadow-sm whitespace-nowrap">
                         Last updated: Just now
                     </span>
                 }

@@ -1,58 +1,118 @@
 import React from 'react';
 import { FiArrowUpRight, FiArrowDownRight } from 'react-icons/fi';
-import { getChangeStyles } from '../../utils/cardStyles';
 
 /**
- * Global StatsCard — Reusable across all pages.
+ * ═══════════════════════════════════════════════════════════════
+ *  StatsCard — THE unified stats card for the entire app.
+ *  Used by: Dashboard (StatGrid), User Management, etc.
+ * ═══════════════════════════════════════════════════════════════
+ *
+ *  This is the "big" card style with:
+ *  - Title + Value + Icon box
+ *  - Divider
+ *  - Change indicator + description footer
+ *
+ *  Props:
+ *    title / label   — Small uppercase header text
+ *    value           — Big number/text
+ *    icon            — React element (e.g. <FiUsers />)
+ *    iconBgClass     — Tailwind bg class for icon box
+ *    iconColorClass  — Tailwind text class for icon color
+ *    change          — ReactNode for change display (e.g. <>+12%</>)
+ *    changeType      — 'positive' | 'neutral' | 'warning' | 'negative'
+ *    description     — Footnote text (e.g. "vs last month")
+ *    trend           — Number for automatic trend badge (positive = green)
+ *    subValue        — Alternative to change+description for simple text
  */
+
+const CHANGE_STYLES = {
+    positive: { text: 'text-emerald-700', bg: 'bg-emerald-50' },
+    neutral:  { text: 'text-slate-600',   bg: 'bg-slate-100' },
+    warning:  { text: 'text-orange-700',  bg: 'bg-orange-50' },
+    negative: { text: 'text-red-700',     bg: 'bg-red-50' },
+};
+
 const StatsCard = ({
+    title,
     label,
     value,
     icon,
-    iconBg = 'bg-slate-100',
-    iconColor = 'text-slate-600',
+    iconBgClass = 'bg-slate-100',
+    iconColorClass = 'text-slate-600',
+    iconBg,
+    iconColor,
+    change,
+    changeType = 'neutral',
+    description,
     trend,
     subValue,
     className = ""
 }) => {
+    // Support both naming conventions
+    const displayTitle = title || label;
+    const bgClass = iconBgClass || iconBg || 'bg-slate-100';
+    const colorClass = iconColorClass || iconColor || 'text-slate-600';
+    const changeStyle = CHANGE_STYLES[changeType] || CHANGE_STYLES.neutral;
+
+    // Auto-generate change from trend if provided
+    const autoChange = trend !== undefined ? (
+        <span className="flex items-center gap-0.5">
+            {trend > 0 ? <FiArrowUpRight size={14} /> : <FiArrowDownRight size={14} />}
+            {trend > 0 ? '+' : ''}{trend}%
+        </span>
+    ) : null;
+
+    const autoChangeType = trend !== undefined ? (trend > 0 ? 'positive' : 'negative') : changeType;
+    const finalChangeStyle = trend !== undefined ? (CHANGE_STYLES[autoChangeType] || CHANGE_STYLES.neutral) : changeStyle;
+    const finalChange = change || autoChange;
+
     return (
-        <div
-            className={`flex items-center gap-4 p-5 bg-white border border-slate-200/60 rounded-2xl cursor-default relative overflow-hidden group 
-                transition-all duration-500 hover:-translate-y-1.5 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-12px_rgba(7,34,103,0.12)] ${className}`}
-        >
-            {/* Subtle Gradient Hover Effect */}
+        <div className={`bg-white px-6 py-5 rounded-2xl w-full border border-slate-200 shadow-pro flex flex-col min-h-[148px] 
+            hover:shadow-premium transition-all duration-300 cursor-default group relative overflow-hidden ${className}`}>
+            
+            {/* Subtle Hover Gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-            {/* Icon Container */}
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border border-black/5 transition-transform group-hover:scale-110 duration-300 ${iconBg} ${iconColor}`}>
-                {icon && (() => {
-                    const IconComponent = icon;
-                    return React.isValidElement(icon)
-                        ? React.cloneElement(icon, { size: 20 })
-                        : <IconComponent size={20} />;
-                })()}
-            </div>
-
-            {/* Content Container */}
-            <div className="min-w-0 flex-1 relative z-10">
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 font-sans">
-                    {label}
-                </div>
-                <div className="flex items-baseline gap-2">
-                    <div className="text-2xl font-black text-slate-900 leading-none font-sans tracking-tight">
+            {/* Header Area */}
+            <div className="flex items-start justify-between gap-4 relative z-10">
+                <div className="flex flex-col min-w-0 flex-1">
+                    <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1 truncate">
+                        {displayTitle}
+                    </p>
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 leading-none tabular-nums mt-1 tracking-tight truncate">
                         {value}
-                    </div>
-                    {trend !== undefined && (
-                        <div className={`text-[11px] font-black flex items-center gap-0.5 px-1.5 py-0.5 rounded-lg ${trend > 0 ? 'text-emerald-600 bg-emerald-50/50' : 'text-rose-600 bg-rose-50/50'}`}>
-                            {trend > 0 ? <FiArrowUpRight size={12} /> : <FiArrowDownRight size={12} />}
-                            {Math.abs(trend)}%
-                        </div>
+                    </h2>
+                </div>
+
+                {/* Icon Box */}
+                <div className={`w-10 h-10 flex items-center justify-center rounded-xl shrink-0 border border-black/5 
+                    transition-transform group-hover:scale-110 duration-300 ${bgClass} ${colorClass}`}>
+                    {icon && (React.isValidElement(icon)
+                        ? React.cloneElement(icon, { size: icon.props?.size || 18 })
+                        : React.createElement(icon, { size: 18 })
                     )}
                 </div>
-                {subValue && (
-                    <div className="text-[11px] font-semibold text-slate-500 mt-1 truncate">
+            </div>
+
+            {/* Divider */}
+            <div className="h-[1.5px] w-full bg-slate-100 my-4 relative z-10" />
+
+            {/* Footer — Change + Description OR SubValue */}
+            <div className="flex items-center gap-2 justify-between flex-wrap pt-0.5 relative z-10">
+                {finalChange && (
+                    <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full whitespace-nowrap ${finalChangeStyle.text} ${finalChangeStyle.bg}`}>
+                        {finalChange}
+                    </span>
+                )}
+                {subValue && !finalChange && (
+                    <span className="text-[12px] font-semibold text-slate-500 truncate">
                         {subValue}
-                    </div>
+                    </span>
+                )}
+                {description && (
+                    <span className="text-[12px] font-medium text-slate-400 truncate flex-1 text-right">
+                        {description}
+                    </span>
                 )}
             </div>
         </div>
@@ -78,48 +138,5 @@ export const StatsRow = ({ items = [], columns = 4, className = "" }) => {
         </div>
     );
 };
-{/* 
-// ==========================================
-// 2. FOR STATS GRID (Large Dashboard Cards)
-// ========================================== */}
-export const StatCard = ({ title, value, change, description, icon, iconBgClass, iconColorClass, changeType = 'neutral' }) => {
-    const changeStyle = getChangeStyles(changeType);
-    return (
-        <div className="bg-white !px-6 !py-5 rounded-2xl w-full border border-gray-300 shadow-stat-card flex flex-col min-h-[148px] hover:shadow-2xl transition-all duration-200 cursor-default min-w-[236px]">
 
-            {/* Header Area */}
-            <div className="flex items-start justify-between gap-4 ">
-                <div className="flex flex-col min-w-0 flex-1">
-                    <p className="text-[11px] font-semibold tracking-wider text-gray-400 uppercase mb-1 truncate">
-                        {title}
-                    </p>
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 leading-none tabular-nums !mt-1">
-                        {value}
-                    </h2>
-                </div>
-
-                {/* Icon Box */}
-                <div className={`w-10 h-10 flex items-center justify-center rounded-xl shrink-0 ${iconBgClass} ${iconColorClass}`}>
-                    {icon}
-                </div>
-            </div>
-
-            {/* Divider */}
-            <div className="h-[2px] w-full bg-gray-200 !my-4"></div>
-
-
-            <div className=" flex items-center gap-2 justify-between flex-wrap pt-1">
-                <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap ${changeStyle.text} ${changeStyle.bg}`}>
-                    {change}
-                </span>
-                <span className="text-[12px] font-medium text-gray-400 truncate flex-1 text-right">
-                    {description}
-                </span>
-            </div>
-        </div>
-    );
-};
-
-export default StatCard;
-
-{/* // ========================================== */ }
+export default StatsCard;

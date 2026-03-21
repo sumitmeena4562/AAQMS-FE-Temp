@@ -19,7 +19,7 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur }) => {
   return (
     <div className="flex flex-col w-full">
       {label && (
-        <label className="text-[#374151] text-[13px] font-bold mb-[8px]">
+        <label className="text-secondary text-[13px] font-bold mb-2">
           {label}
         </label>
       )}
@@ -35,7 +35,7 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur }) => {
           type="button"
           onClick={handleClick}
           onBlur={onBlur}
-          className={`w-full h-full rounded-[12px] border border-dashed ${error ? 'border-red-500 bg-red-50' : 'border-[#D1D5DB] bg-[#FAFAFA] hover:bg-gray-50'} flex flex-col items-center justify-center gap-2 transition-colors relative overflow-hidden`}
+          className={`w-full h-full rounded-xl border border-dashed ${error ? 'border-red-500 bg-red-50/50' : 'border-slate-300 bg-slate-50/50 hover:bg-slate-50 hover:border-blue-400'} flex flex-col items-center justify-center gap-2 transition-colors relative overflow-hidden`}
         >
           {value ? (
             <img src={value} alt={label || "Profile"} className="absolute inset-0 w-full h-full object-cover" />

@@ -25,7 +25,7 @@ const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
                 className="w-full max-w-[420px] p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] bg-white border border-white/40 shadow-xl sm:shadow-2xl transition-all hover:shadow-primary/5 relative cursor-pointer overflow-hidden group ring-1 ring-slate-100/50"
             >
                 {/* Grain Texture Overlay - Static */}
-                <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay bg-[url('https://grain-y.vercel.app/noise.svg')]" />
+                <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay bg-[url('/noise.svg')]" />
 
 
                 <div className="relative z-10">

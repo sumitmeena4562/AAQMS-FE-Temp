@@ -1,19 +1,34 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
-import FloorCard from '../../components/organization/FloorCard';
+import FloorCard from '../../components/UI/FloorCard';
 import { generateFloorsForSite } from '../../utils/mockSiteData';
 
-const DashboardIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
-const FolderIcon = <svg className="w-[14px] h-[14px]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>;
+import { useBreadcrumb } from '../../hooks/useBreadcrumb';
+import { FiHome, FiBriefcase } from 'react-icons/fi';
 
 const FloorPlan = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const site = location.state?.site || null;
-  const orgName = location.state?.orgName || "Organization";
-  const coordinator = location.state?.coordinator || { name: "Coordinator" };
+  const params = new URLSearchParams(location.search);
+  const siteName = location.state?.site?.name || params.get('site') || "Site";
+  const orgName = location.state?.orgName || params.get('org') || "Organization";
+  const coordName = location.state?.coordinator?.name || params.get('coord') || "Coordinator";
+  const site = location.state?.site || { name: siteName, id: 'SITE-UNKNOWN' };
+  const coordinator = location.state?.coordinator || { name: coordName };
+
+  const { setBreadcrumbs } = useBreadcrumb();
+
+  useEffect(() => {
+    setBreadcrumbs([
+      { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+      { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
+      { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
+      { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
+      { label: site.name, path: location.pathname + location.search, isActive: true }
+    ]);
+  }, [orgName, coordinator.name, site.name, location.pathname, location.search, setBreadcrumbs]);
 
   // Fallback safe state
   if (!site) {
@@ -34,47 +49,27 @@ const FloorPlan = () => {
   const floorsList = generateFloorsForSite(site);
   const activePlansCount = floorsList.filter(f => f.status === 'ACTIVE').length;
 
-  const breadcrumbItems = [
-    { label: "Dashboard", path: "/admin", icon: DashboardIcon },
-    { label: "Organization Management", path: "/admin/organizations", icon: FolderIcon },
-    { label: "Organizations", path: "/admin/organizations", icon: null },
-    { 
-      label: orgName, 
-      path: "/admin/coordinators", 
-      state: { org: { name: orgName } },
-      icon: null 
-    },
-    { 
-      label: coordinator.name, 
-      path: "/admin/site-plan", 
-      state: { orgName, coordinator },
-      icon: null 
-    },
-    { label: site.name, path: "/admin/floor-plan", icon: null, isActive: true }
-  ];
-
   const handleFloorClick = (floor) => {
-    navigate('/admin/zones', { state: { floor, site, orgName, coordinator } });
+    navigate(`/admin/zones?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}&site=${encodeURIComponent(site.name)}&floor=${encodeURIComponent(floor.name)}`, { state: { floor, site, orgName, coordinator } });
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] flex flex-col font-sans">
+    <div className="flex flex-col font-sans h-full">
       
       {/* HEADER */}
       <PageHeader 
-        breadcrumbItems={breadcrumbItems}
         hideAddButton={true}
         onReset={() => console.log("Reset filters")}
         onApplyFilters={() => console.log("Apply filters")}
       />
 
       {/* MAIN BODY */}
-      <main className="flex-1 w-full !px-8 pb-12 !pt-0 flex flex-col">
+      <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
         
         {/* Title & Stats */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 !pt-8 !mb-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-2">
           <div className="flex items-center gap-4">
-            <h1 className="text-[24px] font-bold text-gray-900 leading-none">
+            <h1 className="text-2xl font-bold text-primary leading-none">
               Floor Plan Selection
             </h1>
             <span className="px-3 py-1 bg-blue-100/50 text-blue-600 text-[11px] font-bold rounded-full top-0.5 relative">
@@ -82,7 +77,7 @@ const FloorPlan = () => {
             </span>
           </div>
         </div>
-        <p className="text-[13px] text-gray-500 mb-8 max-w-3xl">
+        <p className="text-sm text-secondary mb-8 max-w-3xl">
           Select a floor to view detailed zone mapping and inventory distribution for {site.name}.
         </p>
 
