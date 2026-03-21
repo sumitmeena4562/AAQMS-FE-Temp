@@ -2,7 +2,7 @@ import PageHeader from "../../components/UI/PageHeader";
 import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
 import RecentActivityTable from "../../components/Dashboard/RecentactivityTable";
-import { FiBox, FiClock, FiAlertTriangle } from "react-icons/fi";
+import { FiBox, FiClock, FiAlertTriangle, FiHome } from "react-icons/fi";
 
 const Dashboard = () => {
     const metricCards = [
@@ -33,16 +33,16 @@ const Dashboard = () => {
         <div className="flex flex-col gap-6">
             <PageHeader
                 title="System Overview"
-                subtitle={
-                    <>
-                        Real-time metrics for{' '}
-                        <span className="font-semibold text-body italic">February 26, 2026</span>
-                    </>
-                }
+                subtitle="Monitoring real-time operational metrics and AI risk triggers"
+                breadcrumbs={[
+                    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} />, isActive: true }
+                ]}
                 rightContent={
-                    <span className="inline-flex items-center !px-3 !py-1.5 text-xs text-gray bg-card border border-border-main rounded-md shadow-sm whitespace-nowrap">
-                        Last updated: Just now
-                    </span>
+                    <div className="px-3 py-1.5 bg-base/50 border border-border-main/50 rounded-lg shadow-inner">
+                        <span className="text-[10px] font-black text-gray uppercase tracking-widest">
+                            Last Sync: <span className="text-primary italic">Just now</span>
+                        </span>
+                    </div>
                 }
             />
             <StatGrid />

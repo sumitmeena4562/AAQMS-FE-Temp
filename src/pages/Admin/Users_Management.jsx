@@ -12,7 +12,7 @@ import {
     FiUserCheck, FiUserX, FiUsers,
     FiRefreshCw, FiRefreshCcw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock,
     FiExternalLink, FiEdit2, FiSquare, FiCheckSquare,
-    FiGrid, FiList
+    FiGrid, FiList, FiHome, FiUser
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
@@ -21,6 +21,7 @@ import useDebounce from '../../hooks/useDebounce';
 import UserAvatar from '../../components/UI/UserAvatar';
 import Badge from '../../components/UI/Badge';
 import DotStatus from '../../components/UI/DotStatus';
+import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 
 export default function Users() {
     const store = useUserStore();
@@ -46,6 +47,7 @@ export default function Users() {
 
     // Search Debounce
     const debouncedSearch = useDebounce(search, 300);
+    const { setBreadcrumbs } = useBreadcrumb();
 
     useEffect(() => {
         fetchUsers();
@@ -152,7 +154,7 @@ export default function Users() {
             value: stats.active,
             icon: FiCheckCircle,
             iconColorClass: 'text-success',
-            iconBgClass: 'bg-success-bg',
+            iconBgClass: 'bg-emerald-50',
             trend: 12,
             description: 'vs last month'
         },
@@ -161,7 +163,7 @@ export default function Users() {
             value: stats.inactive,
             icon: FiAlertCircle,
             iconColorClass: 'text-danger',
-            iconBgClass: 'bg-danger-bg',
+            iconBgClass: 'bg-rose-50',
             trend: -5,
             description: 'vs last month'
         },
@@ -170,7 +172,7 @@ export default function Users() {
             value: stats.unassigned,
             icon: FiClock,
             iconColorClass: 'text-warning',
-            iconBgClass: 'bg-warning-bg',
+            iconBgClass: 'bg-amber-50',
             change: 'Needs Assignment',
             changeType: 'warning',
             description: 'pending review'
@@ -188,7 +190,7 @@ export default function Users() {
                     <UserAvatar name={row?.name} avatar={row?.avatar} size="32px" className="shadow-sm border-2 border-white ring-1 ring-base shrink-0" />
                     <div className="flex flex-col min-w-0">
                         <div className="text-[12px] font-black text-title leading-tight truncate">{row?.name}</div>
-                        <div className="text-[9px] font-bold text-gray mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email?.split('@')[0]}</div>
+                        <div className="text-[9px] font-bold text-gray mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email}</div>
                     </div>
                 </div>
             )
@@ -212,7 +214,11 @@ export default function Users() {
             className: 'hidden lg:table-cell',
             render: (value) => (
                 <div className="flex justify-center">
-                    <Badge variant="soft" className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest border border-current/10 text-primary bg-primary/5">
+                    <Badge 
+                        variant="solid" 
+                        color={value === 'Coordinator' ? 'coordinator' : value === 'Admin' ? 'admin' : 'fieldOfficer'}
+                        className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
+                    >
                         {value}
                     </Badge>
                 </div>
@@ -226,14 +232,14 @@ export default function Users() {
             render: (value) => {
                 const isAssigned = value === 'assigned';
                 return (
-                    <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg border ${
-                        isAssigned ? 'bg-success-bg/50 border-success/10 text-success' : 
-                        'bg-base border-border-main text-gray'
-                    }`}>
-                        <DotStatus status={isAssigned ? 'active' : 'inactive'} />
-                        <span className="text-[8px] font-black uppercase tracking-widest leading-none">
+                    <div className="flex justify-center">
+                        <Badge 
+                            variant="light" 
+                            color={isAssigned ? 'success' : 'neutral'}
+                            className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
+                        >
                             {isAssigned ? 'Assigned' : 'Standby'}
-                        </span>
+                        </Badge>
                     </div>
                 );
             }
@@ -244,18 +250,17 @@ export default function Users() {
             width: '10%',
             align: 'center',
             render: (value) => {
-                const isBanned = value === 'banned';
-                const isActive = value === 'active';
+                const isBanned = value.toLowerCase() === 'banned';
+                const isActive = value.toLowerCase() === 'active';
                 return (
-                    <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border ${
-                        isBanned ? 'bg-rose-50 border-rose-100 text-rose-600' : 
-                        isActive ? 'bg-emerald-50 border-emerald-100 text-emerald-600' :
-                        'bg-slate-50 border-slate-200 text-slate-500'
-                    }`}>
-                        <DotStatus status={isActive ? 'active' : isBanned ? 'inactive' : 'inactive'} />
-                        <span className="text-[8px] font-black uppercase tracking-widest leading-none">
+                    <div className="flex justify-center">
+                        <Badge 
+                            variant="light" 
+                            color={isActive ? 'success' : isBanned ? 'danger' : 'neutral'}
+                            className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
+                        >
                             {value}
-                        </span>
+                        </Badge>
                     </div>
                 );
             }
@@ -280,12 +285,6 @@ export default function Users() {
                     >
                         Edit
                     </button>
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
-                        className="w-7 h-7 flex items-center justify-center text-gray hover:text-white hover:bg-primary transition-all rounded-lg shadow-sm active:scale-95 md:hidden"
-                    >
-                        <FiEdit2 size={11} />
-                    </button>
                 </div>
             )
         }
@@ -295,28 +294,35 @@ export default function Users() {
         <div className="flex flex-col gap-6 w-full">
             <PageHeader
                 title="User Management"
-                subtitle="Manage platform users, roles & enterprise permissions"
+                subtitle={`Managing ${users.length} active platform identities and permissions`}
+                onAdd={handleAddUser}
+                addButtonText="Add User"
+                hideAddButton={false}
+                onExport={exportCSV}
+                breadcrumbs={[
+                    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+                    { label: "User Management", path: "/admin/users", icon: <FiUser size={14} />, isActive: true }
+                ]}
                 rightContent={
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant="outline"
-                            onClick={exportCSV}
-                            icon={FiDownload}
-                            className="!h-10 !px-4 !text-[13px] !font-bold"
+                    <div className="flex items-center gap-2 border-r border-border-main/50 pr-4 mr-1">
+                        <button 
+                            onClick={() => setViewMode('list')}
+                            className={`p-2 rounded-xl transition-all ${viewMode === 'list' ? 'bg-primary/10 text-primary shadow-inner' : 'text-gray hover:bg-base'}`}
+                            title="List View"
                         >
-                            Export
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={handleAddUser}
-                            icon={FiPlus}
-                            className="!h-10 !px-5 !text-[13px] !font-black !bg-primary hover:!bg-primary/95"
+                            <FiList size={18} />
+                        </button>
+                        <button 
+                            onClick={() => setViewMode('grid')}
+                            className={`p-2 rounded-xl transition-all ${viewMode === 'grid' ? 'bg-primary/10 text-primary shadow-inner' : 'text-gray hover:bg-base'}`}
+                            title="Grid View"
                         >
-                            Add User
-                        </Button>
+                            <FiGrid size={18} />
+                        </button>
                     </div>
                 }
             />
+
             {/* 2. Stats Section — Unified Oversight Metrics */}
             <StatsRow items={statsData} />
 
@@ -388,8 +394,6 @@ export default function Users() {
                         icon={<FiCalendar size={14} />}
                     />
                     
-                    <div className="h-6 w-[1.5px] bg-border-main/40 shrink-0 mx-2 hidden xl:block" />
-                    
                     <button 
                         onClick={resetFilters}
                         className="ml-auto h-10 flex items-center gap-2 px-4 text-gray hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/10 group"
@@ -397,30 +401,10 @@ export default function Users() {
                         <FiRefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
                         Reset
                     </button>
-
-                    {/* View Toggle (Right Aligned) */}
-                    <div className="flex items-center bg-base/80 p-1 rounded-xl border border-border-main shadow-inner group">
-                        <button 
-                            onClick={() => setViewMode('grid')}
-                            className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-card text-title shadow-sm border border-border-main' : 'text-gray hover:text-body'}`}
-                            title="Grid View"
-                        >
-                            <FiGrid size={13} className={viewMode === 'grid' ? 'text-primary' : ''} />
-                            <span className={viewMode === 'grid' ? 'block' : 'hidden'}>Grid</span>
-                        </button>
-                            <button 
-                                onClick={() => setViewMode('list')}
-                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'list' ? 'bg-card text-title shadow-sm border border-border-main' : 'text-gray hover:text-body'}`}
-                                title="List View"
-                            >
-                                <FiList size={13} className={viewMode === 'list' ? 'text-primary' : ''} />
-                                <span className={viewMode === 'list' ? 'block' : 'hidden'}>List</span>
-                            </button>
-                    </div>
                 </div>
             </div>
 
-            {/* SELECTION ACTION BAR FOR GRID VIEW (Mirrors DataTable's top selection bar) */}
+            {/* SELECTION ACTION BAR FOR GRID VIEW */}
             {viewMode === 'grid' && selectionMode && selectedIds.length > 0 && (
                 <div className="flex items-center justify-between py-3 px-4 sm:px-6 bg-primary/[0.04] border border-primary/20 rounded-[var(--radius-card)] animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="flex flex-col md:flex-row items-center justify-between w-full gap-3">
@@ -480,7 +464,6 @@ export default function Users() {
             )}
 
             {/* Main Content Area */}
-
             {sortedUsers.length > 0 ? (
                 viewMode === 'grid' ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 w-full animate-in fade-in duration-500">

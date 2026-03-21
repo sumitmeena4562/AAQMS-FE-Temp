@@ -21,16 +21,18 @@ const Zones = () => {
 
     const { setBreadcrumbs } = useBreadcrumb();
 
+    const breadcrumbs = [
+        { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+        { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
+        { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
+        { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
+        { label: site.name, path: `/admin/floor-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}&site=${encodeURIComponent(site.name)}` },
+        { label: floor?.name || "Zones", path: location.pathname + location.search, isActive: true }
+    ];
+
     React.useEffect(() => {
-        setBreadcrumbs([
-            { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-            { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-            { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
-            { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
-            { label: site.name, path: `/admin/floor-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}&site=${encodeURIComponent(site.name)}` },
-            { label: floor?.name || "Zones", path: location.pathname + location.search, isActive: true }
-        ]);
-    }, [orgName, coordinator.name, site.name, floor?.name, location.pathname, location.search, setBreadcrumbs]);
+        // Dynamic PageHeader takes care of breadcrumbs now
+    }, [orgName, coordinator.name, site.name, floor?.name, location.pathname, location.search]);
 
     // Fallback safe state
     if (!floor) {
@@ -53,9 +55,10 @@ const Zones = () => {
 
             {/* HEADER */}
             <PageHeader
+                title={`Zones in ${floor.name}`}
+                subtitle={`Operational safety zones for ${site.name} — ${orgName}`}
+                breadcrumbs={breadcrumbs}
                 hideAddButton={true}
-            // onReset={() => console.log("Reset filters")}
-            // onApplyFilters={() => console.log("Apply filters")}
             />
 
             {/* MAIN BODY */}

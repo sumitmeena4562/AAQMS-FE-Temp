@@ -119,14 +119,7 @@ const AdminLayoutInner = () => {
 
                 <main className="flex-1 overflow-y-auto">
                     <div className="w-full max-w-[1600px] mx-auto">
-                        {/* Global Breadcrumb (Sticky at Top) */}
-                        {breadcrumbs.length > 0 && location.pathname !== '/admin/dashboard' && (
-                            <div className="sticky top-0 z-[40] bg-base/90 backdrop-blur-md px-8 py-2.5 border-b border-border-main/50 shadow-sm">
-                                <Breadcrumb items={breadcrumbs} />
-                            </div>
-                        )}
-                        
-                        <div className="p-4 sm:p-6 lg:p-8 pt-0">
+                        <div className="p-4 sm:p-6 lg:p-8">
                             <Outlet />
                         </div>
                     </div>

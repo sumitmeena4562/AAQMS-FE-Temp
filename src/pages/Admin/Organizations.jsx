@@ -30,12 +30,7 @@ const Organizations = () => {
         if (users.length === 0) {
             fetchUsers();
         }
-
-        setBreadcrumbs([
-            { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-            { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} />, isActive: true }
-        ]);
-    }, [users.length, fetchUsers, setBreadcrumbs]);
+    }, [users.length, fetchUsers]);
 
     const filteredOrgs = orgs.filter(org => {
         const matchesIndustry = filters.industry === 'all' || (org.industry || "") === filters.industry;
@@ -110,10 +105,14 @@ const Organizations = () => {
             
             <PageHeader 
                 title="Organizations" 
-                subtitle={`Manage ${filteredOrgs.length} client entities and their operational density`}
+                subtitle={`Managing ${filteredOrgs.length} strategic client entities and operational density`}
                 onAdd={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
                 addButtonText="Add Organization"
                 hideAddButton={false}
+                breadcrumbs={[
+                    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+                    { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} />, isActive: true }
+                ]}
             />
 
             {/* 2. Stats Section — Global Metrics */}

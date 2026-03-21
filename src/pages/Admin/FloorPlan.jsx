@@ -20,15 +20,17 @@ const FloorPlan = () => {
 
   const { setBreadcrumbs } = useBreadcrumb();
 
+  const breadcrumbs = [
+    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+    { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
+    { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
+    { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
+    { label: site.name, path: location.pathname + location.search, isActive: true }
+  ];
+
   useEffect(() => {
-    setBreadcrumbs([
-      { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-      { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-      { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
-      { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
-      { label: site.name, path: location.pathname + location.search, isActive: true }
-    ]);
-  }, [orgName, coordinator.name, site.name, location.pathname, location.search, setBreadcrumbs]);
+    // Breadcrumbs managed by PageHeader
+  }, [orgName, coordinator.name, site.name, location.pathname, location.search]);
 
   // Fallback safe state
   if (!site) {
@@ -58,28 +60,19 @@ const FloorPlan = () => {
       
       {/* HEADER */}
       <PageHeader 
+        title="Floor Plan Selection"
+        subtitle={`Managing ${activePlansCount} active floor plans for ${site.name}`}
+        breadcrumbs={breadcrumbs}
         hideAddButton={true}
-        onReset={() => console.log("Reset filters")}
-        onApplyFilters={() => console.log("Apply filters")}
+        rightContent={
+            <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
+                {floorsList.length} Total Levels
+            </span>
+        }
       />
 
       {/* MAIN BODY */}
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
-        
-        {/* Title & Stats */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-2">
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold text-primary leading-none">
-              Floor Plan Selection
-            </h1>
-            <span className="px-3 py-1 bg-blue-100/50 text-blue-600 text-[11px] font-bold rounded-full top-0.5 relative">
-              {activePlansCount} Active Plans
-            </span>
-          </div>
-        </div>
-        <p className="text-sm text-secondary mb-8 max-w-3xl">
-          Select a floor to view detailed zone mapping and inventory distribution for {site.name}.
-        </p>
 
         {/* CARDS LIST/GRID */}
         <div className="flex flex-wrap gap-6">

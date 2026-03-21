@@ -17,19 +17,19 @@ const AssignedCoordinators = () => {
 
   const { setBreadcrumbs } = useBreadcrumb();
 
+  const breadcrumbs = [
+    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+    { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
+    { label: orgName, path: location.pathname + location.search, isActive: true }
+  ];
+
   useEffect(() => {
     // 1. Fetch users if needed
     if (users.length === 0) {
       fetchUsers();
     }
-
-    // 2. Set Global Premium Breadcrumbs for this page
-    setBreadcrumbs([
-      { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-      { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-      { label: orgName, path: location.pathname + location.search, isActive: true }
-    ]);
-  }, [users.length, fetchUsers, orgName, setBreadcrumbs, location.pathname, location.search]);
+    // Breadcrumbs managed by PageHeader
+  }, [users.length, fetchUsers, orgName, location.pathname, location.search]);
 
   // Derived logic from User Management:
   // We grab everyone matching this organization.
@@ -58,23 +58,19 @@ const AssignedCoordinators = () => {
 
       {/* HEADER */}
       <PageHeader
+        title={`${orgName}: Assigned Coordinators`}
+        subtitle={`Managing ${activeCoordinatorsCount} active platform coordinators for this entity`}
+        breadcrumbs={breadcrumbs}
         hideAddButton={true}
-        onReset={() => console.log("Reset coordinators")}
-        onApplyFilters={() => console.log("Filter coordinators")}
+        rightContent={
+            <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
+                {coordinatorsList.length} Total Users
+            </span>
+        }
       />
 
       {/* Main Content Dashboard */}
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
-
-        {/* Page Title & Stats */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-          <h1 className="text-2xl font-bold text-primary leading-none tracking-tight">
-            {orgName}: Assigned Coordinators
-          </h1>
-          <span className="text-sm font-medium text-secondary">
-            Showing {activeCoordinatorsCount} active coordinators
-          </span>
-        </div>
 
         {/* Coordinator Cards Container */}
         <div className="w-full flex flex-col gap-4">
