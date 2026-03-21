@@ -145,8 +145,8 @@ export default function Users() {
             title: 'Active Users',
             value: stats.active,
             icon: FiCheckCircle,
-            iconColorClass: 'text-emerald-500',
-            iconBgClass: 'bg-emerald-50',
+            iconColorClass: 'text-success',
+            iconBgClass: 'bg-success-bg',
             trend: 12,
             description: 'vs last month'
         },
@@ -154,8 +154,8 @@ export default function Users() {
             title: 'Inactive',
             value: stats.inactive,
             icon: FiAlertCircle,
-            iconColorClass: 'text-rose-500',
-            iconBgClass: 'bg-rose-50',
+            iconColorClass: 'text-danger',
+            iconBgClass: 'bg-danger-bg',
             trend: -5,
             description: 'vs last month'
         },
@@ -163,8 +163,8 @@ export default function Users() {
             title: 'Unassigned',
             value: stats.unassigned,
             icon: FiClock,
-            iconColorClass: 'text-amber-500',
-            iconBgClass: 'bg-amber-50',
+            iconColorClass: 'text-warning',
+            iconBgClass: 'bg-warning-bg',
             change: 'Needs Assignment',
             changeType: 'warning',
             description: 'pending review'
@@ -181,8 +181,8 @@ export default function Users() {
                 <div className="flex items-center gap-2 py-0.5 group-hover:px-1 transition-all">
                     <UserAvatar name={row?.name} avatar={row?.avatar} size="32px" className="shadow-sm border-2 border-white ring-1 ring-slate-100 shrink-0" />
                     <div className="flex flex-col min-w-0">
-                        <div className="text-[12px] font-black text-slate-900 leading-tight truncate">{row?.name}</div>
-                        <div className="text-[9px] font-bold text-slate-400 mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email?.split('@')[0]}</div>
+                        <div className="text-[12px] font-black text-text-primary leading-tight truncate">{row?.name}</div>
+                        <div className="text-[9px] font-bold text-text-muted mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email?.split('@')[0]}</div>
                     </div>
                 </div>
             )
@@ -221,8 +221,8 @@ export default function Users() {
                 const isAssigned = value === 'assigned';
                 return (
                     <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg border ${
-                        isAssigned ? 'bg-emerald-50/50 border-emerald-100/50 text-emerald-700' : 
-                        'bg-slate-50 border-slate-100 text-slate-500'
+                        isAssigned ? 'bg-success-bg/50 border-success/10 text-success' : 
+                        'bg-bg-tertiary border-border text-text-muted'
                     }`}>
                         <DotStatus status={isAssigned ? 'active' : 'inactive'} />
                         <span className="text-[8px] font-black uppercase tracking-widest leading-none">
@@ -358,14 +358,14 @@ export default function Users() {
                             allLabel="All"
                             icon={<FiCalendar size={14} />}
                         />
-                        <div className="h-4 w-[1px] bg-slate-200 shrink-0 mx-1" />
+                        <div className="h-4 w-[1px] bg-border shrink-0 mx-1" />
                         <Button
                             variant="outline"
                             onClick={fetchUsers}
-                            className="!p-2 !h-9 !w-9 !rounded-xl border-slate-200"
+                            className="!p-2 !h-9 !w-9 !rounded-xl border-border"
                             icon={FiRefreshCw}
                         />
-                        <div className="h-4 w-[1px] bg-slate-200 shrink-0 mx-1" />
+                        <div className="h-4 w-[1px] bg-border shrink-0 mx-1" />
                         <Button
                             variant={selectionMode ? "primary" : "outline"}
                             onClick={() => setSelectionMode(!selectionMode)}

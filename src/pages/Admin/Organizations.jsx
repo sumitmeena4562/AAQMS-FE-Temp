@@ -80,7 +80,7 @@ const Organizations = () => {
                 rightContent={
                     <button 
                         onClick={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
-                        className="h-10 flex items-center gap-2 px-5 bg-slate-900 text-white rounded-xl font-black text-[13px] hover:bg-slate-800 transition-all shadow-sm active:scale-95 shrink-0"
+                        className="h-10 flex items-center gap-2 px-5 bg-primary text-white rounded-xl font-black text-[13px] hover:bg-primary/95 transition-all shadow-sm active:scale-95 shrink-0"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
@@ -93,7 +93,7 @@ const Organizations = () => {
             {/* 3. GRID CONTENT WITH FILTERS */}
             <div className="flex flex-col gap-6">
                 
-                <div className="bg-white border border-slate-200/60 rounded-2xl p-3.5 shadow-sm">
+                <div className="bg-bg-secondary border border-border/60 rounded-2xl p-3.5 shadow-sm">
                     <div className="flex flex-wrap items-center gap-3">
                         <FilterDropdown 
                             label="Industry"
@@ -134,7 +134,7 @@ const Organizations = () => {
                         <div className="flex items-center bg-slate-50/80 p-1 rounded-xl border border-slate-100 shadow-inner group">
                             <button 
                                 onClick={() => setViewMode('grid')}
-                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-bg-secondary text-text-primary shadow-sm border border-border' : 'text-text-muted hover:text-text-secondary'}`}
                                 title="Grid View"
                             >
                                 <FiGrid size={13} className={viewMode === 'grid' ? 'text-primary' : ''} />
@@ -179,23 +179,23 @@ const Organizations = () => {
                                     width: '25%',
                                     render: (name, org) => (
                                         <div className="flex items-center gap-3 py-0.5">
-                                            <div className="w-9 h-9 bg-slate-100/50 border border-slate-200/50 rounded-xl flex items-center justify-center font-black text-[12px] text-slate-500 overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
+                                            <div className="w-9 h-9 bg-bg-tertiary border border-border/50 rounded-xl flex items-center justify-center font-black text-[12px] text-text-muted overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
                                                 {org.logo ? (
                                                     <img src={org.logo} alt="" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all" />
                                                 ) : (
-                                                    <span className="bg-gradient-to-br from-slate-200 to-slate-100 w-full h-full flex items-center justify-center">
+                                                    <span className="bg-gradient-to-br from-bg-tertiary to-bg-primary w-full h-full flex items-center justify-center">
                                                         {name?.substring(0, 2) || 'OR'}
                                                     </span>
                                                 )}
                                             </div>
                                             <div className="flex flex-col min-w-0">
                                                 <div className="flex items-center gap-1.5 line-clamp-1">
-                                                    <span className="text-[13px] font-black text-slate-900 leading-tight tracking-tight truncate">{name}</span>
+                                                    <span className="text-[13px] font-black text-text-primary leading-tight tracking-tight truncate">{name}</span>
                                                     {org.stats?.sites > 5 && (
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)] shrink-0" title="High Activity" />
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)] shrink-0" title="High Activity" />
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">
+                                                <div className="flex items-center gap-1.5 text-[9px] font-black text-text-muted uppercase tracking-widest leading-none mt-1">
                                                     <span className="truncate">{org.industry || 'General'}</span>
                                                 </div>
                                             </div>
@@ -212,7 +212,7 @@ const Organizations = () => {
                                             <Badge 
                                                 variant="soft" 
                                                 className={`!text-[9px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest border border-current/10 ${
-                                                    !val ? 'text-slate-400 bg-slate-50' : 'text-primary bg-primary/5'
+                                                    !val ? 'text-text-muted bg-bg-tertiary' : 'text-primary bg-primary/5'
                                                 }`}
                                             >
                                                 {val || 'General'}
@@ -260,7 +260,7 @@ const Organizations = () => {
                                         const isActive = status === 'ACTIVE';
                                         return (
                                             <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border ${
-                                                isActive ? 'bg-emerald-50/50 border-emerald-100/50 text-emerald-700' : 'bg-rose-50/50 border-rose-100/50 text-rose-700'
+                                                isActive ? 'bg-success-bg/50 border-success/10 text-success' : 'bg-danger-bg/50 border-danger/10 text-danger'
                                             }`}>
                                                 <DotStatus status={isActive ? 'active' : 'inactive'} />
                                                 <span className="text-[9px] font-black uppercase tracking-widest leading-none">

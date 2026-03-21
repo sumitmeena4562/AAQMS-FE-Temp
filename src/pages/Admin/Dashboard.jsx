@@ -36,11 +36,11 @@ const Dashboard = () => {
                 subtitle={
                     <>
                         Real-time metrics for{' '}
-                        <span className="font-semibold text-slate-700">February 26, 2026</span>
+                        <span className="font-semibold text-text-secondary italic">February 26, 2026</span>
                     </>
                 }
                 rightContent={
-                    <span className="inline-flex items-center !px-3 !py-1.5 text-xs text-slate-500 bg-white border border-slate-200 rounded-md shadow-sm whitespace-nowrap">
+                    <span className="inline-flex items-center !px-3 !py-1.5 text-xs text-text-muted bg-bg-secondary border border-border rounded-md shadow-sm whitespace-nowrap">
                         Last updated: Just now
                     </span>
                 }
