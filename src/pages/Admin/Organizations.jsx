@@ -7,7 +7,7 @@ import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 import useUserStore from '../../store/userStore';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
-import PageHeader from '../../components/Dashboard/pageHeader';
+import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import DotStatus from '../../components/UI/DotStatus';
 import Badge from '../../components/UI/Badge';
@@ -73,21 +73,12 @@ const Organizations = () => {
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-12">
             
-            {/* 1. Page Header (Unified) */}
             <PageHeader 
                 title="Organizations" 
                 subtitle={`Manage ${filteredOrgs.length} client entities and their operational density`}
-                rightContent={
-                    <button 
-                        onClick={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
-                        className="h-10 flex items-center gap-2 px-5 bg-primary text-white rounded-xl font-black text-[13px] hover:bg-primary/95 transition-all shadow-sm active:scale-95 shrink-0"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Add Organization
-                    </button>
-                }
+                onAdd={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
+                addButtonText="Add Organization"
+                hideAddButton={false}
             />
 
             {/* 3. GRID CONTENT WITH FILTERS */}

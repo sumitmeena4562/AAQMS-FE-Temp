@@ -5,7 +5,7 @@ import UserPeekView from '../../components/Dashboard/UserPeekView';
 import UserFormModal from '../../components/Dashboard/UserFormModal';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
-import PageHeader from '../../components/Dashboard/pageHeader';
+import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import {
     FiPlus, FiDownload, FiTrash2,
@@ -265,7 +265,6 @@ export default function Users() {
 
     return (
         <div className="flex flex-col gap-6 w-full">
-            {/* Header Section — uses shared PageHeader */}
             <PageHeader
                 title="User Management"
                 subtitle="Manage platform users, roles & enterprise permissions"
