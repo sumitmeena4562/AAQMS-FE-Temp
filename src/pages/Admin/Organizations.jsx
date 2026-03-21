@@ -11,6 +11,30 @@ import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import DotStatus from '../../components/UI/DotStatus';
 import Badge from '../../components/UI/Badge';
+import FilterBar from '../../components/UI/FilterBar';
+
+// Resilient Logo Component for DataTable
+const OrgLogo = ({ org }) => {
+    const [imgError, setImgError] = useState(false);
+    const name = org?.name || 'OR';
+
+    return (
+        <div className="w-9 h-9 bg-base border border-border-main/50 rounded-xl flex items-center justify-center font-black text-[12px] text-gray overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
+            {org?.logo && !imgError ? (
+                <img 
+                    src={org.logo} 
+                    alt={name} 
+                    className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all" 
+                    onError={() => setImgError(true)} 
+                />
+            ) : (
+                <span className="bg-gradient-to-br from-base to-page w-full h-full flex items-center justify-center">
+                    {name.substring(0, 2)}
+                </span>
+            )}
+        </div>
+    );
+};
 
 const Organizations = () => {
     const orgs = useOrgStore(state => state.orgs);
@@ -121,8 +145,8 @@ const Organizations = () => {
             {/* 3. GRID CONTENT WITH FILTERS */}
             <div className="flex flex-col gap-6">
                 
-                <div className="bg-card border border-border-main/60 rounded-2xl p-3.5 shadow-sm">
-                    <div className="flex flex-wrap items-center gap-3">
+                <FilterBar>
+                    <div className="flex flex-wrap items-center gap-2 flex-1">
                         <FilterDropdown 
                             label="Industry"
                             options={industryOptions}
@@ -149,57 +173,26 @@ const Organizations = () => {
                             onChange={(v) => setFilters(prev => ({ ...prev, status: v || 'all' }))}
                             allLabel="All Statuses"
                         />
-
-                        <div className="h-6 w-[1.5px] bg-border-main/40 shrink-0 mx-2" />
-
-                        {/* View Toggles (Relocated for proximity to filters) */}
-                        <div className="flex items-center gap-1.5 bg-base/40 p-1 rounded-xl border border-border-main/50">
-                            <button 
-                                onClick={() => setViewMode('list')}
-                                className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
-                                title="List View"
-                            >
-                                <FiList size={16} />
-                            </button>
-                            <button 
-                                onClick={() => setViewMode('grid')}
-                                className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
-                                title="Grid View"
-                            >
-                                <FiGrid size={16} />
-                            </button>
-                        </div>
-
-                        <button 
-                            onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
-                            className="ml-auto h-10 flex items-center gap-2 px-4 text-gray hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/10 group"
-                        >
-                            <FiRefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
-                            Reset
-                        </button>
-                        {/* View Toggle (Relocated) */}
-                        <div className="flex items-center bg-base/80 p-1 rounded-xl border border-border-main shadow-inner group">
-                            <button 
-                                onClick={() => setViewMode('grid')}
-                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-card text-title shadow-sm border border-border-main' : 'text-gray hover:text-body'}`}
-                                title="Grid View"
-                            >
-                                <FiGrid size={13} className={viewMode === 'grid' ? 'text-primary' : ''} />
-                                <span className={viewMode === 'grid' ? 'block' : 'hidden'}>Grid</span>
-                            </button>
-                            <button 
-                                onClick={() => setViewMode('list')}
-                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'list' ? 'bg-card text-title shadow-sm border border-border-main' : 'text-gray hover:text-body'}`}
-                                title="List View"
-                            >
-                                <FiList size={13} className={viewMode === 'list' ? 'text-primary' : ''} />
-                                <span className={viewMode === 'list' ? 'block' : 'hidden'}>List</span>
-                            </button>
-                        </div>
-
-                       
                     </div>
-                </div>
+
+                    <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
+                        {/* View Toggles (Modular component) */}
+                        <FilterBar.ViewToggle mode={viewMode} onChange={setViewMode} />
+
+                        {Object.values(filters).filter(v => v !== 'all' && v !== '').length > 0 && (
+                            <button 
+                                onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
+                                className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 shadow-sm border border-transparent hover:border-rose-100 animate-in zoom-in duration-300 group"
+                            >
+                                <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                                Reset
+                                <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px] ml-1">
+                                    {Object.values(filters).filter(v => v !== 'all' && v !== '').length}
+                                </span>
+                            </button>
+                        )}
+                    </div>
+                </FilterBar>
 
                 {/* THE GRID (Properly Aligned) */}
 
@@ -226,15 +219,7 @@ const Organizations = () => {
                                     width: '25%',
                                     render: (name, org) => (
                                         <div className="flex items-center gap-3 py-0.5">
-                                            <div className="w-9 h-9 bg-base border border-border-main/50 rounded-xl flex items-center justify-center font-black text-[12px] text-gray overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
-                                                {org.logo ? (
-                                                    <img src={org.logo} alt="" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all" />
-                                                ) : (
-                                                    <span className="bg-gradient-to-br from-base to-page w-full h-full flex items-center justify-center">
-                                                        {name?.substring(0, 2) || 'OR'}
-                                                    </span>
-                                                )}
-                                            </div>
+                                            <OrgLogo org={org} />
                                             <div className="flex flex-col min-w-0">
                                                 <div className="flex items-center gap-1.5 line-clamp-1">
                                                     <span className="text-[13px] font-black text-title leading-tight tracking-tight truncate">{name}</span>

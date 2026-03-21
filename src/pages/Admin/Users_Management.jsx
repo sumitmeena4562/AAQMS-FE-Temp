@@ -22,6 +22,7 @@ import UserAvatar from '../../components/UI/UserAvatar';
 import Badge from '../../components/UI/Badge';
 import DotStatus from '../../components/UI/DotStatus';
 import { useBreadcrumb } from '../../hooks/useBreadcrumb';
+import FilterBar from '../../components/UI/FilterBar';
 
 export default function Users() {
     const store = useUserStore();
@@ -308,10 +309,9 @@ export default function Users() {
 
             {/* 2. Stats Section — Unified Oversight Metrics */}
             <StatsRow items={statsData} />
-
             {/* Filter & View Toggle Bar (Matches Organizations.jsx) */}
-            <div className="bg-card border border-border-main/60 rounded-2xl p-3.5 shadow-sm">
-                <div className="flex flex-wrap items-center gap-3">
+            <FilterBar>
+                <div className="flex items-center gap-3">
                     <Button
                         variant={selectionMode ? "primary" : "outline"}
                         onClick={() => setSelectionMode(!selectionMode)}
@@ -320,8 +320,10 @@ export default function Users() {
                         {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
                         Select
                     </Button>
-                    <div className="h-6 w-[1.5px] bg-border-main/40 shrink-0 mx-2 hidden sm:block" />
-                    
+                    <FilterBar.Separator />
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-2 flex-1">
                     <FilterDropdown
                         label="Role"
                         options={filterOptions.roles}
@@ -334,18 +336,7 @@ export default function Users() {
                         options={filterOptions.organizations}
                         value={filters.organization}
                         onChange={v => setFilters({ ...filters, organization: v, region: '' })}
-                        allLabel="All Organizations"
-                    />
-                    <FilterDropdown
-                        label="Status"
-                        options={[
-                            { value: 'active', label: 'Active Only' },
-                            { value: 'inactive', label: 'Inactive Only' },
-                            { value: 'banned', label: 'Banned' }
-                        ]}
-                        value={filters.status}
-                        onChange={v => setFilters({ ...filters, status: v })}
-                        allLabel="All Statuses"
+                        allLabel="All Orgs"
                     />
                     <FilterDropdown
                         label="Zone"
@@ -366,53 +357,37 @@ export default function Users() {
                     />
                     <FilterDropdown
                         label="Time Range"
-                        options={[
-                            { value: 'today', label: 'Today' },
-                            { value: '7d', label: 'Last 7 Days' },
-                            { value: '30d', label: 'Last 30 Days' }
-                        ]}
+                        options={filterOptions.timeRanges}
                         value={filters.timeRange}
                         onChange={v => setFilters({ ...filters, timeRange: v })}
                         allLabel="All Time"
                         icon={<FiCalendar size={14} />}
                     />
-                      <FilterDropdown
+                    <FilterDropdown
                         label="Status"
                         options={filterOptions.statuses}
                         value={filters.status}
                         onChange={v => setFilters({ ...filters, status: v })}
                         allLabel="All Statuses"
                     />
-
-                    <div className="h-6 w-[1.5px] bg-border-main/40 shrink-0 mx-2 hidden sm:block" />
-
-                    {/* View Toggles (Relocated from Header) */}
-                    <div className="flex items-center gap-1.5 bg-base/40 p-1 rounded-xl border border-border-main/50">
-                        <button 
-                            onClick={() => setViewMode('list')}
-                            className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
-                            title="List View"
-                        >
-                            <FiList size={16} />
-                        </button>
-                        <button 
-                            onClick={() => setViewMode('grid')}
-                            className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
-                            title="Grid View"
-                        >
-                            <FiGrid size={16} />
-                        </button>
-                    </div>
-
-                    <button 
-                        onClick={resetFilters}
-                        className="ml-auto h-9 flex items-center gap-2 px-3.5 text-gray hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/10 group"
-                    >
-                        <FiRefreshCcw size={13} className="group-hover:rotate-180 transition-transform duration-500" />
-                        Reset
-                    </button>
                 </div>
-            </div>
+
+                <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
+                    {/* View Toggles (Modular component) */}
+                    <FilterBar.ViewToggle mode={viewMode} onChange={setViewMode} />
+
+                    {activeFilterCount > 0 && (
+                        <button 
+                            onClick={resetFilters}
+                            className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 shadow-sm border border-transparent hover:border-rose-100 animate-in zoom-in duration-300 group"
+                        >
+                            <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                            Reset
+                            <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px] ml-1">{activeFilterCount}</span>
+                        </button>
+                    )}
+                </div>
+            </FilterBar>
 
             {/* SELECTION ACTION BAR FOR GRID VIEW */}
             {viewMode === 'grid' && selectionMode && selectedIds.length > 0 && (

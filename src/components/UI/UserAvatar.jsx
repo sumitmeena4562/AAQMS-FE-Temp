@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { t } from '../../theme/theme';
 
 const UserAvatar = ({ name, avatar, size = "40px", fontSize = "14px", className = "" }) => {
+    const [imgError, setImgError] = useState(false);
+
+    // Reset error state if avatar prop changes
+    useEffect(() => {
+        setImgError(false);
+    }, [avatar]);
+
     const getInitials = (name) => {
         if (!name) return "??";
         const parts = name.split(' ');
@@ -28,8 +35,13 @@ const UserAvatar = ({ name, avatar, size = "40px", fontSize = "14px", className 
             className={`flex items-center justify-center rounded-full text-white font-bold shadow-sm shrink-0 overflow-hidden ${className}`}
             style={{ width: size, height: size, fontSize: fontSize, ...getGradientStyle(name) }}
         >
-            {avatar ? (
-                <img src={avatar} alt={name} className="w-full h-full object-cover" />
+            {avatar && !imgError ? (
+                <img 
+                    src={avatar} 
+                    alt={name} 
+                    className="w-full h-full object-cover" 
+                    onError={() => setImgError(true)} 
+                />
             ) : (
                 getInitials(name)
             )}
