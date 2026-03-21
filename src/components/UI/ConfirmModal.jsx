@@ -2,16 +2,15 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiX } from 'react-icons/fi';
 import { t } from '../../theme/theme';
-
 import Button from './Button';
 
 const ConfirmModal = ({
     isOpen,
     onClose,
     onConfirm,
-    title = 'Confirm Action',
-    message = 'Are you sure you want to proceed?',
-    confirmText = 'Confirm',
+    title = 'Confirm User Delete',
+    message = 'Are you sure you want to proceed? This action cannot be undone.',
+    confirmText = 'Delete Profile',
     cancelText = 'Cancel',
     danger = false,
     loading = false,
@@ -19,7 +18,9 @@ const ConfirmModal = ({
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
+                <div 
+                    style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+                >
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -27,59 +28,64 @@ const ConfirmModal = ({
                         exit={{ opacity: 0 }}
                         onClick={onClose}
                         style={{
-                            position: 'fixed', inset: 0,
-                            background: 'rgba(0,0,0,0.1)',
-                            backdropFilter: 'blur(4px)',
-                            zIndex: t.zIndex.overlay,
+                            position: 'absolute', inset: 0,
+                            background: 'rgba(0,0,0,0.2)',
+                            backdropFilter: 'blur(8px)',
                         }}
                     />
 
-                    {/* Dialog */}
+                    {/* Elite Warning Dialog (Left Aligned Based on Reference) */}
                     <motion.div 
-                        initial={{ opacity: 0, scale: 0.95, y: -20 }}
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
                         style={{
-                            position: 'fixed',
-                            top: '50%', left: '50%',
-                            transform: 'translate(-50%, -50%)',
-                            width: 'min(400px, 90vw)',
-                            background: '#fff',
-                            borderRadius: 24,
-                            boxShadow: '0 20px 50px rgba(0,0,0,0.1)',
-                            zIndex: t.zIndex.modal,
+                            position: 'relative',
+                            width: 'min(440px, 100%)',
+                            background: 'white',
+                            borderRadius: 16,
+                            boxShadow: '0 20px 50px -12px rgba(0,0,0,0.15)',
                             overflow: 'hidden',
                         }}
                     >
-                        {/* Header */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '24px 32px', borderBottom: '1px solid #F1F5F9' }}>
+                        {/* Header Section */}
+                        <div style={{ padding: '24px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <div style={{ 
-                                    width: 32, height: 32, borderRadius: 10, 
-                                    background: danger ? '#FEF2F2' : t.color.primaryBg, 
+                                    width: 36, height: 36, borderRadius: 10, 
+                                    background: danger ? '#FEF2F2' : '#EFF6FF', 
                                     display: 'flex', alignItems: 'center', justifyContent: 'center' 
                                 }}>
-                                    <FiAlertTriangle size={16} color={danger ? t.color.danger : t.color.primary} />
+                                    <FiAlertTriangle size={18} color={danger ? '#E11D48' : t.color.primary} strokeWidth={2.5} />
                                 </div>
-                                <span style={{ fontSize: 14, fontWeight: 900, color: t.color.text }}>{title}</span>
+                                <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', margin: 0, letterSpacing: '-0.02em' }}>
+                                    {title}
+                                </h3>
                             </div>
-                            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: t.color.textPlaceholder, display: 'flex', padding: 4 }}>
-                                <FiX size={18} />
+                            <button 
+                                onClick={onClose} 
+                                style={{ 
+                                    border: 'none', background: 'transparent', cursor: 'pointer', 
+                                    color: '#94A3B8', display: 'flex', padding: 4 
+                                }}
+                                className="hover:text-rose-500 transition-colors"
+                            >
+                                <FiX size={20} />
                             </button>
                         </div>
 
-                        {/* Body */}
-                        <div style={{ padding: '32px', fontSize: 14, color: t.color.textSecondary, lineHeight: 1.6, fontWeight: 500 }}>
+                        {/* Body Section */}
+                        <div style={{ padding: '20px 24px 32px', fontSize: 14, color: '#475569', lineHeight: 1.6, fontWeight: 500 }}>
                             {message}
                         </div>
 
-                        {/* Footer */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, padding: '0 32px 24px' }}>
+                        {/* Elite Footer Actions */}
+                        <div style={{ padding: '0 24px 24px', display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
                             <Button
                                 variant="outline"
                                 onClick={onClose}
                                 disabled={loading}
-                                className="!h-10 !px-5 !rounded-xl !text-[12px] !font-black"
+                                className="!h-10 !px-5 !rounded-lg !text-[12px] !font-black !uppercase !tracking-widest !bg-white !border-slate-200"
                             >
                                 {cancelText}
                             </Button>
@@ -87,13 +93,13 @@ const ConfirmModal = ({
                                 variant={danger ? 'danger' : 'primary'}
                                 onClick={onConfirm}
                                 loading={loading}
-                                className="!h-10 !px-6 !rounded-xl !text-[12px] !font-black"
+                                className={`!h-10 !px-6 !rounded-lg !text-[12px] !font-black !uppercase !tracking-widest ${danger ? 'shadow-lg shadow-rose-200' : 'shadow-lg shadow-primary/20'}`}
                             >
                                 {confirmText}
                             </Button>
                         </div>
                     </motion.div>
-                </>
+                </div>
             )}
         </AnimatePresence>
     );

@@ -42,6 +42,7 @@ const DataTable = ({
     filterContent,
     footer,
     selectionFooter,
+    children,
     className = ""
 }) => {
     const hasSelection = selectable && selectedIds.length > 0;
@@ -76,18 +77,18 @@ const DataTable = ({
     };
 
     return (
-        <div className={`bg-white border border-slate-100 rounded-[24px] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.04)] flex flex-col w-full transition-all duration-300 ${className}`}>
+        <div className={`bg-card border border-border-main rounded-[var(--radius-card)] overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.04)] flex flex-col w-full transition-all duration-300 ${className}`}>
             
             {/* 1. Main Header / Selection Header */}
             {hasSelection && selectionFooter ? (
-                <div className="flex items-center justify-between py-5 px-4 sm:px-6 bg-primary/[0.04] border-b border-primary/20 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="flex items-center justify-between py-3 px-4 sm:px-6 bg-primary/[0.04] border-b border-primary/20 animate-in fade-in slide-in-from-top-4 duration-300">
                     {selectionFooter}
                 </div>
             ) : (title || rightContent) && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between py-5 px-4 sm:px-6 border-b border-slate-100/80 gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between py-5 px-4 sm:px-6 border-b border-border-main/80 gap-4">
                     <div className="flex items-center gap-3">
                         {title && (
-                            <h3 className="text-xl font-black text-slate-900 leading-none m-0 tracking-tight">
+                            <h3 className="text-xl font-black text-title leading-none m-0 tracking-tight">
                                 {title}
                             </h3>
                         )}
@@ -108,16 +109,16 @@ const DataTable = ({
 
             {/* 2. Secondary Header: Search & Filters (Optional) */}
             {(searchProps || filterContent) && (
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between py-4 px-4 sm:px-6 bg-slate-50/40 border-b border-slate-100/60 gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between py-4 px-4 sm:px-6 bg-base/40 border-b border-border-main/60 gap-4">
                     {searchProps && (
                         <div className="relative w-full lg:max-w-md group shrink-0">
-                            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={16} />
+                            <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray group-focus-within:text-primary transition-colors" size={16} />
                             <input
                                 type="text"
                                 value={searchProps.value}
                                 onChange={searchProps.onChange}
                                 placeholder={searchProps.placeholder || "Search..."}
-                                className="w-full h-11 pl-10 pr-4 bg-white border border-slate-200 rounded-xl text-[13px] font-semibold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all shadow-sm shadow-slate-200/50"
+                                className="w-full h-11 pl-10 pr-4 bg-card border border-border-main rounded-[var(--radius-input)] text-[13px] font-semibold text-body placeholder:text-gray focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
                             />
                         </div>
                     )}
@@ -131,7 +132,7 @@ const DataTable = ({
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-slate-50 to-transparent pointer-events-none z-10" 
+                                        className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-base to-transparent pointer-events-none z-10" 
                                     />
                                 )}
                             </AnimatePresence>
@@ -154,9 +155,9 @@ const DataTable = ({
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-[1] flex items-center justify-end" 
+                                        className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-base to-transparent pointer-events-none z-[1] flex items-center justify-end" 
                                     >
-                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-200 mr-2 animate-pulse" />
+                                        <div className="w-1.5 h-1.5 rounded-full bg-border-main mr-2 animate-pulse" />
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -168,8 +169,8 @@ const DataTable = ({
             {/* 3. Table Body */}
             <div className="w-full flex-1 relative min-h-[300px]">
                 {loading ? (
-                    <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
-                        <div className="w-10 h-10 border-4 border-slate-200 border-t-primary rounded-full animate-spin" />
+                    <div className="absolute inset-0 bg-card/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                        <div className="w-10 h-10 border-4 border-border-main border-t-primary rounded-full animate-spin" />
                     </div>
                 ) : null}
                 
@@ -186,7 +187,7 @@ const DataTable = ({
 
             {/* 4. Standard Footer (Optional) */}
             {!hasSelection && footer && (
-                <div className="px-7 py-3 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+                <div className="px-7 py-3 bg-base/50 border-t border-border-main flex items-center justify-between">
                     {footer}
                 </div>
             )}

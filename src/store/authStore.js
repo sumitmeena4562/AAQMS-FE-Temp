@@ -75,7 +75,55 @@ const useAuthStore = create((set) => ({
         set({ isAuthenticated: false, user: null, error: null });
     },
 
-    setError: (error) => set({ error })
+    setError: (error) => set({ error }),
+
+    /**
+     * PASSWORD RECOVERY LIFECYCLE
+     */
+
+    requestPasswordReset: async (email) => {
+        set({ isLoading: true, error: null });
+        try {
+            await delay(1200);
+            // In a real app, this would hit /auth/forgot-password
+            set({ isLoading: false });
+            return { success: true };
+        } catch (err) {
+            set({ error: err.message, isLoading: false });
+            return { success: false, error: err.message };
+        }
+    },
+
+    verifyOtp: async (email, otp) => {
+        set({ isLoading: true, error: null });
+        try {
+            await delay(1200);
+            if (otp !== '123456') { // Mock OTP for testing
+                throw new Error('Invalid or Expired OTP!');
+            }
+            set({ isLoading: false });
+            return { success: true };
+        } catch (err) {
+            set({ error: err.message, isLoading: false });
+            return { success: false, error: err.message };
+        }
+    },
+
+    resetPassword: async (email, password) => {
+        set({ isLoading: true, error: null });
+        try {
+            await delay(1500);
+            // Update MOCK_USERS password for the session
+            if (MOCK_USERS[email.toLowerCase()]) {
+                MOCK_USERS[email.toLowerCase()].password = password;
+            }
+            set({ isLoading: false });
+            return { success: true };
+        } catch (err) {
+            set({ error: err.message, isLoading: false });
+            return { success: false, error: err.message };
+        }
+    }
 }));
 
 export default useAuthStore;

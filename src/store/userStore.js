@@ -71,13 +71,13 @@ const useUserStore = create(
         }
     },
 
-    bulkAction: async (action) => {
-        const { selectedIds } = get();
-        if (selectedIds.length === 0) return;
+    bulkAction: async (action, targetIds = null) => {
+        const ids = targetIds || get().selectedIds;
+        if (ids.length === 0) return;
         set({ loading: true, error: null });
         try {
-            await userService.bulkAction(selectedIds, action);
-            set({ selectedIds: [] });
+            await userService.bulkAction(ids, action);
+            if (!targetIds) set({ selectedIds: [] }); // Only clear if it was a global bulk action
             await get().fetchUsers();
             return { success: true };
         } catch (err) {

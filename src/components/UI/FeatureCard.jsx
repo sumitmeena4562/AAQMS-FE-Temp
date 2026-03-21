@@ -14,7 +14,7 @@ const FeatureCard = ({ title, description, icon: Icon, colorTheme = 'primary' })
     return (
         <Card
             padding="32px"
-            borderRadius="20px"
+            borderRadius="var(--radius-card)"
             hoverEffect={true}
             style={{
                 display: 'flex',

@@ -21,23 +21,24 @@
     --color-info-bg: #EFF6FF;
 
     /* ── Backgrounds ── */
-    --color-bg-primary: #FAFAFA;
-    --color-bg-secondary: #FFFFFF;
+    --color-page: #FAFAFA;
+    --color-card: #FFFFFF;
+    --color-base: #F8FAFC;
     --color-bg-tertiary: #F1F3F5;
     --color-bg-light: rgba(243, 243, 243, 0.99);
     --color-bg-hover: #F9FAFB;
     --color-bg-sidebar: #FFFFFF;
 
     /* ── Text ── */
-    --color-text-primary: #000000;
-    --color-text-secondary: #666666;
-    --color-text-muted: #A1A1AA;
+    --color-title: #000000;
+    --color-body: #666666;
+    --color-gray: #A1A1AA;
 
     /* ── Borders & Shadows (Minimalist) ── */
-    --color-border: #EAEAEA;
+    --color-border-main: #EAEAEA;
     --color-border-hover: #D1D1D1;
-    --shadow-pro: 0 4px 12px rgba(0, 0, 0, 0.03);
-    --shadow-button: 0 2px 4px rgba(0, 0, 0, 0.02);
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.20);
+    --shadow-btn: 0 2px 4px rgba(0, 0, 0, 0.10);
 
     /* ── Strict Spacing Scale (8px Base) ── */
     --spacing-1: 4px;
@@ -49,11 +50,15 @@
     --spacing-12: 48px;
     --spacing-16: 64px;
 
-    /* ── Standard Radii ── */
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --radius-card: 20px;
+    /* ── Master Universal Radius (One Place to Control All) ── */
+    --radius-card: 14px;
+    --radius-button: 10px;
+    --radius-input: 8px;
+    
+    /* Legacy/Small tokens for internal use */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
     --radius-full: 9999px;
 
     /* ── Typography Scale ── */
@@ -76,7 +81,7 @@
     --color-bg-auth-side: #072267;
     --color-border-light: #F3F4F6;
     --color-border-dark: #D1D5DB;
-    --shadow-premium: 0 10px 32px rgba(0, 0, 0, 0.08);
+    --shadow-card-hover: 0 10px 32px rgba(0, 0, 0, 0.30);
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 
     /* ── Role-specific colors ── */

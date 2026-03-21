@@ -58,7 +58,7 @@ function AuthForm({
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
-                className="bg-white/80 backdrop-blur-2xl p-8 md:p-10 rounded-[32px] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-slate-200/50"
+                className="bg-card/80 backdrop-blur-2xl p-8 md:p-10 rounded-[var(--radius-card)] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-border-main/50"
             >
                 {/* Grain Texture Overlay */}
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('/noise.svg')]" />
@@ -69,13 +69,13 @@ function AuthForm({
                 <div className="text-center mb-10 relative z-10">
                     <motion.h2
                         variants={itemVariants}
-                        className="text-[clamp(1.5rem,4vw,1.8rem)] font-black text-slate-900 tracking-tight leading-none mb-3"
+                        className="text-[clamp(1.5rem,4vw,1.8rem)] font-black text-title tracking-tight leading-none mb-3"
                     >
                         {title}
                     </motion.h2>
                     <motion.p
                         variants={itemVariants}
-                        className="text-sm text-slate-500 font-medium leading-relaxed max-w-[280px] mx-auto"
+                        className="text-sm text-body font-medium leading-relaxed max-w-[280px] mx-auto"
                     >
                         {subtitle}
                     </motion.p>
@@ -91,7 +91,7 @@ function AuthForm({
                             type="submit" 
                             variant="primary" 
                             size="lg" 
-                            className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20 transition-all active:scale-95" 
+                            className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20 transition-all active:scale-95" 
                             loading={isLoading}
                         >
                             {isLoading ? loadingText : submitText}
@@ -102,7 +102,7 @@ function AuthForm({
                 {/* Trust Badge */}
                 <motion.div
                     variants={itemVariants}
-                    className="mt-8 flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest relative z-10"
+                    className="mt-8 flex items-center justify-center gap-2 text-[10px] font-black text-gray uppercase tracking-widest relative z-10"
                 >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -120,7 +120,7 @@ function AuthForm({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.6 }}
-                    className="text-center mt-8 text-sm text-slate-500 font-medium relative z-10"
+                    className="text-center mt-8 text-sm text-gray font-medium relative z-10"
                 >
                     {footer}
                 </motion.div>

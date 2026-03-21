@@ -19,7 +19,7 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur }) => {
   return (
     <div className="flex flex-col w-full">
       {label && (
-        <label className="text-secondary text-[13px] font-bold mb-2">
+        <label className="text-body text-[13px] font-bold mb-2">
           {label}
         </label>
       )}
@@ -35,16 +35,16 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur }) => {
           type="button"
           onClick={handleClick}
           onBlur={onBlur}
-          className={`w-full h-full rounded-xl border border-dashed ${error ? 'border-red-500 bg-red-50/50' : 'border-slate-300 bg-slate-50/50 hover:bg-slate-50 hover:border-blue-400'} flex flex-col items-center justify-center gap-2 transition-colors relative overflow-hidden`}
+          className={`w-full h-full rounded-[var(--radius-card)] border border-dashed ${error ? 'border-red-500 bg-red-50/50' : 'border-border-main bg-base/50 hover:bg-base hover:border-blue-400'} flex flex-col items-center justify-center gap-2 transition-colors relative overflow-hidden`}
         >
           {value ? (
             <img src={value} alt={label || "Profile"} className="absolute inset-0 w-full h-full object-cover" />
           ) : (
             <>
-              <div className={`${error ? 'text-red-400' : 'text-gray-400'} mb-1`}>
+              <div className={`${error ? 'text-red-400' : 'text-gray'} mb-1`}>
                 <ImagePlus size={24} strokeWidth={1.5} />
               </div>
-              <span className={`text-[13px] font-medium ${error ? 'text-red-400' : 'text-gray-400'}`}>Upload Image</span>
+              <span className={`text-[13px] font-medium ${error ? 'text-red-400' : 'text-gray'}`}>Upload Image</span>
             </>
         )}
         </button>
@@ -58,7 +58,7 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur }) => {
                 fileInputRef.current.value = '';
               }
             }}
-            className="absolute top-2 right-2 bg-white/90 hover:bg-red-500 text-gray-700 hover:text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all z-10 shadow-sm"
+            className="absolute top-2 right-2 bg-card/90 hover:bg-red-500 text-body hover:text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-all z-10 shadow-sm"
           >
             <X size={16} strokeWidth={2.5} />
           </button>

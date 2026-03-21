@@ -40,6 +40,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const isEdit = !!user;
     const [step, setStep] = useState(0);
     const [submitError, setSubmitError] = useState('');
+        // Image selection state
+    const [imagePreview, setImagePreview] = useState(user?.avatar || null);
+    const fileInputRef = useRef(null); // Ye hidden file input ko trigger karne ke liye hai
+
     const lastProcessedRef = useRef('');
 
     const orgs = useOrgStore(state => state.orgs);
@@ -87,16 +91,19 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 employeeId: user.employeeId || '',
                 equipmentId: user.equipmentId || '',
                 phoneNumber: user.phoneNumber || '',
-                designation: user.designation || ''
+                designation: user.designation || '',
+                avatar: user.avatar || ''
             });
+            setImagePreview(user.avatar || null);
             setStep(1);
         } else {
             reset({ 
                 name: '', email: '', organization: '', role: '', 
                 assignment: 'unassigned', status: 'active',
                 region: '', employeeId: '', equipmentId: '',
-                phoneNumber: '', designation: ''
+                phoneNumber: '', designation: '', avatar: ''
             });
+            setImagePreview(null);
             setStep(0);
         }
         setSubmitError('');
@@ -112,16 +119,28 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         }
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // URL.createObjectURL temporarily browser mein image ka address banata hai
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+            
+            // React Hook Form ko batao ki 'avatar' value change ho gayi hai
+            setValue('avatar', previewUrl); 
+        }
+    };
+
     const handleRoleSelect = (roleId) => {
         setValue('role', roleId);
         setStep(1);
     };
 
     const inputClasses = (hasError) => `
-        w-full px-4 py-2.5 text-[13px] font-medium rounded-xl border outline-none transition-all duration-200
+        w-full px-4 py-2.5 text-[13px] font-medium rounded-[var(--radius-input)] border outline-none transition-all duration-200
         ${hasError 
             ? 'bg-rose-50/50 border-rose-200 text-rose-900 focus:border-rose-400' 
-            : 'bg-white border-slate-200 text-slate-700 focus:border-primary/50 focus:ring-2 focus:ring-primary/5'}
+            : 'bg-card border-border-main text-body focus:border-primary/50 focus:ring-2 focus:ring-primary/5'}
     `;
 
     return (
@@ -133,32 +152,32 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+                        className="absolute inset-0 bg-title/40 backdrop-blur-md"
                     />
                     
                     <Motion.div
                         initial={{ opacity: 0, scale: 0.98, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98, y: 10 }}
-                        className="relative w-full max-w-[520px] max-h-[90vh] sm:max-h-[85vh] bg-white border border-slate-200 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col overflow-hidden"
+                        className="relative w-full max-w-[520px] max-h-[90vh] sm:max-h-[85vh] bg-card border border-border-main rounded-[var(--radius-card)] shadow-xl flex flex-col overflow-hidden"
                     >
 
                         {/* Modal Header */}
                         <div className="relative z-10 p-6 pb-2 flex items-start justify-between">
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-none mb-1.5">
+                                <h2 className="text-xl font-bold text-title tracking-tight leading-none mb-1.5">
                                     {isEdit ? 'Edit User' : 'Add New User'}
                                 </h2>
                                 <div className="flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    <span className="text-[10px] font-bold text-gray uppercase tracking-wider">
                                         {step === 0 ? 'Select Role' : `Details: ${currentRole}`}
                                     </span>
                                 </div>
                             </div>
                             <button 
                                 onClick={onClose} 
-                                className="p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 rounded-lg transition-colors"
+                                className="p-2 text-gray hover:bg-base hover:text-body rounded-lg transition-colors"
                             >
                                 <FiX size={18} />
                             </button>
@@ -175,21 +194,21 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                         exit={{ opacity: 0, y: -10 }} 
                                         className="space-y-3 pt-3"
                                     >
-                                        <div className="text-[12px] font-medium text-slate-500 mb-4 px-1">Select user role type</div>
+                                        <div className="text-[12px] font-medium text-body mb-4 px-1">Select user role type</div>
                                         {ROLE_DETAILS.map(role => (
                                             <div
                                                 key={role.id}
                                                 onClick={() => handleRoleSelect(role.id)}
-                                                className={`group relative p-4 bg-white border border-slate-100 rounded-2xl cursor-pointer flex items-center gap-4 transition-all hover:border-slate-200 hover:bg-slate-50/50`}
+                                                className={`group relative p-4 bg-card border border-border-main/50 rounded-[var(--radius-card)] cursor-pointer flex items-center gap-4 transition-all hover:border-border-main hover:bg-base`}
                                             >
                                                 <div className={`w-12 h-12 rounded-xl ${role.bg} ${role.color} flex items-center justify-center border border-current/10 shrink-0`}>
                                                     {role.icon}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="text-[15px] font-bold text-slate-900">{role.name}</div>
-                                                    <div className="text-[12px] font-medium text-slate-400 truncate mt-0.5">{role.desc}</div>
+                                                    <div className="text-[15px] font-bold text-title">{role.name}</div>
+                                                    <div className="text-[12px] font-medium text-gray truncate mt-0.5">{role.desc}</div>
                                                 </div>
-                                                <FiChevronRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                                                <FiChevronRight size={18} className="text-border-main group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                                             </div>
                                         ))}
                                     </Motion.div>
@@ -207,9 +226,42 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                         )}
 
                                         <form onSubmit={handleSubmit(onFormSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 sm:gap-y-5">
+                                            
+                                            {/* Avatar Section at the top of Form */}
+                                            <div className="col-span-2 flex flex-col items-center justify-center mb-6 pt-2">
+                                                <div 
+                                                    onClick={() => fileInputRef.current?.click()} 
+                                                    className="group relative w-24 h-24 rounded-full border-2 border-dashed border-slate-200 cursor-pointer overflow-hidden hover:border-primary transition-all shadow-sm"
+                                                >
+                                                    {imagePreview ? (
+                                                        <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-base flex flex-col items-center justify-center text-gray">
+                                                            <span className="text-2xl mb-1">📷</span>
+                                                            <span className="text-[10px] font-bold uppercase tracking-widest text-gray">Upload</span>
+                                                        </div>
+                                                    )}
+                                                    {/* Overlay on hover */}
+                                                    <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                                                        <span className="text-[10px] font-black uppercase">Change</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Hidden Input File */}
+                                                <input 
+                                                    type="file" 
+                                                    ref={fileInputRef} 
+                                                    className="hidden" 
+                                                    accept="image/*" 
+                                                    onChange={handleImageChange} 
+                                                />
+                                                
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-3">Profile Picture</p>
+                                            </div>
+
                                             {/* Section Header */}
-                                            <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-slate-100">
-                                                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Basic Information</h3>
+                                            <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-border-main/50">
+                                                <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Basic Information</h3>
                                             </div>
 
                                             <div className="col-span-2">
@@ -234,8 +286,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
 
                                             {/* Deployment Section */}
-                                            <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-slate-100 mt-2">
-                                                <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Work Details</h3>
+                                            <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-border-main/50 mt-2">
+                                                <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Work Details</h3>
                                             </div>
 
                                             <div className="col-span-1">
@@ -298,17 +350,17 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             )}
 
                                             <div className="col-span-2">
-                                                <label className="block text-[11px] font-bold text-slate-500 mb-1.5 ml-1 uppercase tracking-wider">Operational Status</label>
+                                                <label className="block text-[11px] font-bold text-gray mb-1.5 ml-1 uppercase tracking-wider">Operational Status</label>
                                                 <div className="flex gap-2">
                                                     {STATUS_OPTIONS.map(s => (
                                                         <button 
                                                             type="button"
                                                             key={s} 
                                                             onClick={() => setValue('status', s)} 
-                                                            className={`flex-1 py-2.5 px-4 rounded-xl text-[12px] font-bold uppercase transition-all
+                                                            className={`flex-1 py-2.5 px-4 rounded-[var(--radius-button)] text-[12px] font-bold uppercase transition-all
                                                                 ${currentStatus === s 
-                                                                    ? 'bg-slate-900 text-white shadow-md'
-                                                                    : 'bg-white border border-slate-200 text-slate-400 hover:border-slate-300'}`}
+                                                                    ? 'bg-title text-white shadow-md'
+                                                                    : 'bg-white border border-border-main text-gray hover:border-border-hover'}`}
                                                         >
                                                             {s}
                                                         </button>
@@ -322,13 +374,13 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="relative z-10 p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                        <div className="relative z-10 p-5 bg-base border-t border-border-main flex items-center justify-between">
                             <div className="flex items-center">
                                 {step === 1 && !isEdit && (
                                     <button 
                                         type="button"
                                         onClick={() => setStep(0)} 
-                                        className="text-[11px] font-bold text-slate-400 uppercase tracking-wider hover:text-primary transition-colors flex items-center gap-1"
+                                        className="text-[11px] font-bold text-gray uppercase tracking-wider hover:text-primary transition-colors flex items-center gap-1"
                                     >
                                         <FiChevronLeft size={14} /> Back
                                     </button>
@@ -339,7 +391,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                 <Button 
                                     variant="ghost"
                                     onClick={onClose} 
-                                    className="!text-[11px] !font-bold !uppercase !tracking-wider !text-slate-500 hover:!text-slate-900"
+                                    className="!text-[11px] !font-bold !uppercase !tracking-wider !text-gray hover:!text-title"
                                 >
                                     Cancel
                                 </Button>
@@ -347,7 +399,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                     <Button 
                                         onClick={handleSubmit(onFormSubmit)} 
                                         loading={loading} 
-                                        className="!px-6 !rounded-xl !text-[11px] !font-bold !uppercase !tracking-wider"
+                                        className="!px-6 !rounded-[var(--radius-button)] !text-[11px] !font-bold !uppercase !tracking-wider"
                                     >
                                         {isEdit ? 'Save Changes' : 'Create User'}
                                     </Button>

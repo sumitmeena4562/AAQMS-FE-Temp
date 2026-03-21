@@ -67,8 +67,8 @@ const StatsCard = ({
     const finalChange = change || autoChange;
 
     return (
-        <div className={`bg-white px-6 py-5 rounded-2xl w-full border border-slate-200 shadow-pro flex flex-col min-h-[148px] 
-            hover:shadow-premium transition-all duration-300 cursor-default group relative overflow-hidden ${className}`}>
+        <div className={`bg-card px-6 py-5 rounded-[var(--radius-card)] w-full border border-border-main shadow-card flex flex-col min-h-[148px] 
+            hover:shadow-card-hover transition-all duration-300 cursor-default group relative overflow-hidden ${className}`}>
             
             {/* Subtle Hover Gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
@@ -76,10 +76,10 @@ const StatsCard = ({
             {/* Header Area */}
             <div className="flex items-start justify-between gap-4 relative z-10">
                 <div className="flex flex-col min-w-0 flex-1">
-                    <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-1 truncate">
+                    <p className="text-[10px] font-bold tracking-widest text-gray uppercase mb-1 truncate">
                         {displayTitle}
                     </p>
-                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 leading-none tabular-nums mt-1 tracking-tight truncate">
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-title leading-none tabular-nums mt-1 tracking-tight truncate">
                         {value}
                     </h2>
                 </div>
@@ -95,7 +95,7 @@ const StatsCard = ({
             </div>
 
             {/* Divider */}
-            <div className="h-[1.5px] w-full bg-slate-100 my-4 relative z-10" />
+            <div className="h-[1.5px] w-full bg-border-main/50 my-4 relative z-10" />
 
             {/* Footer — Change + Description OR SubValue */}
             <div className="flex items-center gap-2 justify-between flex-wrap pt-0.5 relative z-10">
@@ -105,12 +105,12 @@ const StatsCard = ({
                     </span>
                 )}
                 {subValue && !finalChange && (
-                    <span className="text-[12px] font-semibold text-slate-500 truncate">
+                    <span className="text-[12px] font-semibold text-body truncate">
                         {subValue}
                     </span>
                 )}
                 {description && (
-                    <span className="text-[12px] font-medium text-slate-400 truncate flex-1 text-right">
+                    <span className="text-[12px] font-medium text-gray truncate flex-1 text-right">
                         {description}
                     </span>
                 )}

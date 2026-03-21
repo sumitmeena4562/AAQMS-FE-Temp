@@ -20,6 +20,7 @@ export const userSchema = z.object({
     phoneNumber: z.string().optional(),
     equipmentId: z.string().optional(),
     assignment: z.string().default('unassigned'),
+    avatar: z.string().optional(),
 }).superRefine((data, ctx) => {
     if (data.role === 'Coordinator' && (!data.region || data.region.trim() === '')) {
         ctx.addIssue({

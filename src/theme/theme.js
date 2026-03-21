@@ -79,11 +79,11 @@ const color = {
     adminBorder:      '#FED7AA',
 
     // Sidebar
-    sidebarBg:        '#FFFFFF',
+    sidebarBg:        '#F8FAFC',
     sidebarBorder:    '#E5E7EB',
     sidebarLabelBorder:'#F3F4F6',
     sidebarActive:    '#072267',
-    sidebarActiveBg:  '#F0F7FF',
+    sidebarActiveBg:  'rgba(7, 34, 103, 0.05)',
 
     // Navbar
     navbarBg:         '#FFFFFF',

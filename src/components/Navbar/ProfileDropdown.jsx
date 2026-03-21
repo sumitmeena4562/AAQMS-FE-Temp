@@ -37,19 +37,19 @@ const ProfileDropdown = () => {
 
             {/* Dropdown */}
             {isOpen && (
-                <div className="absolute right-0 top-[calc(100%+12px)] w-[240px] bg-white border border-slate-200 rounded-2xl shadow-[0_20px_60px_rgba(7,34,103,0.15)] z-[2000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 top-[calc(100%+12px)] w-[240px] bg-card border border-border-main rounded-2xl shadow-[0_20px_60px_rgba(7,34,103,0.15)] z-[2000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     {/* User Info Section */}
-                    <div className="p-4 flex items-center gap-3.5 bg-gradient-to-br from-primary/[0.05] to-transparent border-b border-slate-100">
+                    <div className="p-4 flex items-center gap-3.5 bg-gradient-to-br from-primary/[0.05] to-transparent border-b border-border-main/50">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-[#6366F1] flex items-center justify-center text-white text-[15px] font-extrabold shadow-md relative shrink-0">
                             {name.charAt(0).toUpperCase()}
                             <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
                         </div>
                         <div className="overflow-hidden">
                             <div className="flex items-center gap-1.5 mb-0.5">
-                                <p className="text-slate-900 text-sm font-extrabold truncate leading-tight">{name}</p>
+                                <p className="text-title text-sm font-extrabold truncate leading-tight">{name}</p>
                                 <span className="text-[9px] font-black bg-primary text-white px-1.5 py-0.5 rounded uppercase tracking-wider">ADMIN</span>
                             </div>
-                            <p className="text-slate-500 text-[11px] font-semibold truncate">{email.toLowerCase()}</p>
+                            <p className="text-gray text-[11px] font-semibold truncate">{email.toLowerCase()}</p>
                         </div>
                     </div>
 
@@ -58,7 +58,7 @@ const ProfileDropdown = () => {
                         {menuItems.map((item, i) => (
                             <button
                                 key={i}
-                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-slate-600 transition-all duration-150 hover:bg-primary/[0.04] hover:text-primary group text-left"
+                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-body transition-all duration-150 hover:bg-primary/[0.04] hover:text-primary group text-left"
                             >
                                 <span className="text-primary/60 group-hover:text-primary transition-colors">{item.icon}</span>
                                 {item.label}
@@ -67,7 +67,7 @@ const ProfileDropdown = () => {
                     </div>
 
                     {/* Logout Section */}
-                    <div className="border-t border-slate-100 p-2">
+                    <div className="border-t border-border-main/50 p-2">
                         <button
                             onClick={handleLogout}
                             className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold text-rose-500 rounded-xl transition-all duration-150 hover:bg-rose-50 group text-left"

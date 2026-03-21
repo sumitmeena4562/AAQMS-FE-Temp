@@ -7,10 +7,34 @@ import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 import useUserStore from '../../store/userStore';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
-import PageHeader from '../../components/Dashboard/pageHeader';
+import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import DotStatus from '../../components/UI/DotStatus';
 import Badge from '../../components/UI/Badge';
+import FilterBar from '../../components/UI/FilterBar';
+
+// Resilient Logo Component for DataTable
+const OrgLogo = ({ org }) => {
+    const [imgError, setImgError] = useState(false);
+    const name = org?.name || 'OR';
+
+    return (
+        <div className="w-9 h-9 bg-base border border-border-main/50 rounded-xl flex items-center justify-center font-black text-[12px] text-gray overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
+            {org?.logo && !imgError ? (
+                <img 
+                    src={org.logo} 
+                    alt={name} 
+                    className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all" 
+                    onError={() => setImgError(true)} 
+                />
+            ) : (
+                <span className="bg-gradient-to-br from-base to-page w-full h-full flex items-center justify-center">
+                    {name.substring(0, 2)}
+                </span>
+            )}
+        </div>
+    );
+};
 
 const Organizations = () => {
     const orgs = useOrgStore(state => state.orgs);
@@ -30,12 +54,7 @@ const Organizations = () => {
         if (users.length === 0) {
             fetchUsers();
         }
-
-        setBreadcrumbs([
-            { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-            { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} />, isActive: true }
-        ]);
-    }, [users.length, fetchUsers, setBreadcrumbs]);
+    }, [users.length, fetchUsers]);
 
     const filteredOrgs = orgs.filter(org => {
         const matchesIndustry = filters.industry === 'all' || (org.industry || "") === filters.industry;
@@ -69,33 +88,65 @@ const Organizations = () => {
         label: r === 'all' ? 'All Regions' : r 
     }));
 
+    const statsData = [
+        { 
+            label: "Total Entities", 
+            value: orgs.length, 
+            icon: FiBriefcase,
+            badge: `${orgs.filter(o => o.status === 'ACTIVE').length} Active / ${orgs.filter(o => o.status === 'INACTIVE').length} Inactive`,
+            badgeColor: "bg-primary/5 text-primary",
+            subValue: "all platforms"
+        },
+        { 
+            label: "Active Nodes", 
+            value: orgs.filter(o => o.status === 'ACTIVE').length, 
+            icon: FiActivity,
+            trend: "+12%",
+            trendLabel: "vs last month",
+            color: "text-emerald-500",
+            bg: "bg-emerald-50"
+        },
+        { 
+            label: "Operational Density", 
+            value: new Set(orgs.map(o => o.industry).filter(Boolean)).size, 
+            icon: FiTrendingUp,
+            badge: "Sector Count",
+            badgeColor: "bg-amber-50 text-amber-700",
+            subValue: "active sectors"
+        },
+        { 
+            label: "Geographic Spread", 
+            value: new Set(orgs.map(o => o.region).filter(Boolean)).size, 
+            icon: FiGlobe,
+            trend: "Global",
+            trendColor: "text-blue-500",
+            trendLabel: "reach"
+        }
+    ];
 
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-12">
             
-            {/* 1. Page Header (Unified) */}
             <PageHeader 
                 title="Organizations" 
-                subtitle={`Manage ${filteredOrgs.length} client entities and their operational density`}
-                rightContent={
-                    <button 
-                        onClick={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
-                        className="h-10 flex items-center gap-2 px-5 bg-slate-900 text-white rounded-xl font-black text-[13px] hover:bg-slate-800 transition-all shadow-sm active:scale-95 shrink-0"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Add Organization
-                    </button>
-                }
+                subtitle={`Managing ${filteredOrgs.length} strategic client entities and operational density`}
+                onAdd={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
+                addButtonText="Add Organization"
+                hideAddButton={false}
+                breadcrumbs={[
+                    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+                    { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} />, isActive: true }
+                ]}
             />
+
+            {/* 2. Stats Section — Global Metrics */}
+            <StatsRow items={statsData} />
 
             {/* 3. GRID CONTENT WITH FILTERS */}
             <div className="flex flex-col gap-6">
                 
-                {/* 2.5 PREMIUM FILTER WELL (DataTable Style) */}
-                <div className="bg-white border border-slate-200/60 rounded-2xl p-3.5 shadow-sm">
-                    <div className="flex flex-wrap items-center gap-3">
+                <FilterBar>
+                    <div className="flex flex-wrap items-center gap-2 flex-1">
                         <FilterDropdown 
                             label="Industry"
                             options={industryOptions}
@@ -115,47 +166,33 @@ const Organizations = () => {
                         <FilterDropdown 
                             label="Status"
                             options={[
-                                { value: 'all', label: 'All Status' },
                                 { value: 'ACTIVE', label: 'Active Only' },
-                                { value: 'MAINTENANCE', label: 'Maintenance Only' },
-                                { value: 'DEACTIVE', label: 'Deactive Only' }
+                                { value: 'INACTIVE', label: 'Inactive Only' }
                             ]}
                             value={filters.status}
-                            onChange={(v) => setFilters(prev => ({ ...prev, status: v }))}
-                            allLabel="All"
+                            onChange={(v) => setFilters(prev => ({ ...prev, status: v || 'all' }))}
+                            allLabel="All Statuses"
                         />
-
-                        <div className="h-6 w-[1.5px] bg-slate-100 shrink-0 mx-2" />
- <button 
-                            onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
-                            className="ml-auto h-10 flex items-center gap-2 px-4 text-slate-400 hover:text-rose-600 font-bold text-[11px] uppercase tracking-widest transition-all rounded-xl hover:bg-rose-50/50 group"
-                        >
-                            <FiRefreshCcw size={14} className="group-hover:rotate-180 transition-transform duration-500" />
-                            Reset
-                        </button>
-                        {/* View Toggle (Relocated) */}
-                        <div className="flex items-center bg-slate-50/80 p-1 rounded-xl border border-slate-100 shadow-inner group">
-                            <button 
-                                onClick={() => setViewMode('grid')}
-                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'grid' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
-                                title="Grid View"
-                            >
-                                <FiGrid size={13} className={viewMode === 'grid' ? 'text-primary' : ''} />
-                                <span className={viewMode === 'grid' ? 'block' : 'hidden'}>Grid</span>
-                            </button>
-                            <button 
-                                onClick={() => setViewMode('list')}
-                                className={`h-8 px-3 flex items-center gap-2 rounded-lg transition-all font-black text-[10px] uppercase tracking-widest ${viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
-                                title="List View"
-                            >
-                                <FiList size={13} className={viewMode === 'list' ? 'text-primary' : ''} />
-                                <span className={viewMode === 'list' ? 'block' : 'hidden'}>List</span>
-                            </button>
-                        </div>
-
-                       
                     </div>
-                </div>
+
+                    <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
+                        {/* View Toggles (Modular component) */}
+                        <FilterBar.ViewToggle mode={viewMode} onChange={setViewMode} />
+
+                        {Object.values(filters).filter(v => v !== 'all' && v !== '').length > 0 && (
+                            <button 
+                                onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
+                                className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 shadow-sm border border-transparent hover:border-rose-100 animate-in zoom-in duration-300 group"
+                            >
+                                <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                                Reset
+                                <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px] ml-1">
+                                    {Object.values(filters).filter(v => v !== 'all' && v !== '').length}
+                                </span>
+                            </button>
+                        )}
+                    </div>
+                </FilterBar>
 
                 {/* THE GRID (Properly Aligned) */}
 
@@ -182,23 +219,15 @@ const Organizations = () => {
                                     width: '25%',
                                     render: (name, org) => (
                                         <div className="flex items-center gap-3 py-0.5">
-                                            <div className="w-9 h-9 bg-slate-100/50 border border-slate-200/50 rounded-xl flex items-center justify-center font-black text-[12px] text-slate-500 overflow-hidden shadow-sm uppercase tracking-tighter shrink-0 select-none">
-                                                {org.logo ? (
-                                                    <img src={org.logo} alt="" className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all" />
-                                                ) : (
-                                                    <span className="bg-gradient-to-br from-slate-200 to-slate-100 w-full h-full flex items-center justify-center">
-                                                        {name?.substring(0, 2) || 'OR'}
-                                                    </span>
-                                                )}
-                                            </div>
+                                            <OrgLogo org={org} />
                                             <div className="flex flex-col min-w-0">
                                                 <div className="flex items-center gap-1.5 line-clamp-1">
-                                                    <span className="text-[13px] font-black text-slate-900 leading-tight tracking-tight truncate">{name}</span>
+                                                    <span className="text-[13px] font-black text-title leading-tight tracking-tight truncate">{name}</span>
                                                     {org.stats?.sites > 5 && (
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)] shrink-0" title="High Activity" />
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)] shrink-0" title="High Activity" />
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mt-1">
+                                                <div className="flex items-center gap-1.5 text-[9px] font-black text-gray uppercase tracking-widest leading-none mt-1">
                                                     <span className="truncate">{org.industry || 'General'}</span>
                                                 </div>
                                             </div>
@@ -215,7 +244,7 @@ const Organizations = () => {
                                             <Badge 
                                                 variant="soft" 
                                                 className={`!text-[9px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest border border-current/10 ${
-                                                    !val ? 'text-slate-400 bg-slate-50' : 'text-primary bg-primary/5'
+                                                    !val ? 'text-gray bg-base' : 'text-primary bg-primary/5'
                                                 }`}
                                             >
                                                 {val || 'General'}
@@ -229,8 +258,8 @@ const Organizations = () => {
                                     width: '15%',
                                     className: 'hidden lg:table-cell',
                                     render: (val) => (
-                                        <div className="flex items-center gap-1.5 text-[11px] font-black text-slate-600 truncate">
-                                            <FiGlobe className="text-slate-300 shrink-0" size={12} />
+                                        <div className="flex items-center gap-1.5 text-[11px] font-black text-body truncate">
+                                            <FiGlobe className="text-gray/50 shrink-0" size={12} />
                                             <span>{val || 'Global'}</span>
                                         </div>
                                     )
@@ -243,13 +272,13 @@ const Organizations = () => {
                                     render: (stats) => (
                                         <div className="flex items-center justify-center gap-4">
                                             <div className="flex flex-col items-center">
-                                                <span className="text-[14px] font-black text-slate-900 leading-none">{stats?.sites || 0}</span>
-                                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Sites</span>
+                                                <span className="text-[14px] font-black text-title leading-none">{stats?.sites || 0}</span>
+                                                <span className="text-[8px] font-black text-gray uppercase tracking-widest mt-1">Sites</span>
                                             </div>
-                                            <div className="h-5 w-[1px] bg-slate-100 shrink-0" />
+                                            <div className="h-5 w-[1px] bg-border-main/60 shrink-0" />
                                             <div className="flex flex-col items-center">
-                                                <span className="text-[14px] font-black text-slate-900 leading-none">{stats?.coordinators || 0}</span>
-                                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">Units</span>
+                                                <span className="text-[14px] font-black text-title leading-none">{stats?.coordinators || 0}</span>
+                                                <span className="text-[8px] font-black text-gray uppercase tracking-widest mt-1">Units</span>
                                             </div>
                                         </div>
                                     )
@@ -261,16 +290,13 @@ const Organizations = () => {
                                     className: 'hidden sm:table-cell',
                                     render: (status) => {
                                         const isActive = status === 'ACTIVE';
-                                        const isMaint = status === 'MAINTENANCE';
                                         return (
                                             <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border ${
-                                                isActive ? 'bg-emerald-50/50 border-emerald-100/50 text-emerald-700' : 
-                                                isMaint ? 'bg-orange-50/50 border-orange-100/50 text-orange-700' :
-                                                'bg-slate-50 border-slate-100 text-slate-500'
+                                                isActive ? 'bg-success-bg/50 border-success/10 text-success' : 'bg-danger-bg/50 border-danger/10 text-danger'
                                             }`}>
-                                                <DotStatus status={isActive ? 'active' : isMaint ? 'warning' : 'inactive'} />
+                                                <DotStatus status={isActive ? 'active' : 'inactive'} />
                                                 <span className="text-[9px] font-black uppercase tracking-widest leading-none">
-                                                    {status || 'PENDING'}
+                                                    {isActive ? 'ACTIVE' : 'INACTIVE'}
                                                 </span>
                                             </div>
                                         );
@@ -285,14 +311,14 @@ const Organizations = () => {
                                         <div className="flex items-center justify-end gap-1.5 pr-1">
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); handleEdit(org); }}
-                                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-xl shadow-sm active:scale-95"
+                                                className="w-8 h-8 flex items-center justify-center text-gray hover:text-white hover:bg-title transition-all rounded-xl shadow-sm active:scale-95"
                                                 title="Edit"
                                             >
                                                 <FiEdit2 size={13} />
                                             </button>
                                             <button 
                                                 onClick={(e) => { e.stopPropagation(); removeOrg(org.id); }}
-                                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-rose-500 transition-all rounded-xl hover:bg-rose-50 active:scale-95"
+                                                className="w-8 h-8 flex items-center justify-center text-gray hover:text-rose-500 transition-all rounded-xl hover:bg-rose-50/10 active:scale-95"
                                                 title="Delete"
                                             >
                                                 <FiTrash2 size={13} />
@@ -306,17 +332,17 @@ const Organizations = () => {
                         />
                     )
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-24 bg-white/40 border-2 border-dashed border-slate-100 rounded-3xl animate-in zoom-in duration-300">
-                        <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-5 rotate-3">
-                            <FiInbox className="w-7 h-7 text-slate-300" />
+                    <div className="flex flex-col items-center justify-center py-24 bg-card/40 border-2 border-dashed border-border-main rounded-3xl animate-in zoom-in duration-300">
+                        <div className="w-16 h-16 bg-base rounded-2xl flex items-center justify-center mb-5 rotate-3">
+                            <FiInbox className="w-7 h-7 text-gray/40" />
                         </div>
-                        <h3 className="text-lg font-black text-slate-800 mb-1">No Organizations Found</h3>
-                        <p className="text-slate-400 text-xs mb-8 text-center max-w-xs px-6 font-medium leading-relaxed">
+                        <h3 className="text-lg font-black text-title mb-1">No Organizations Found</h3>
+                        <p className="text-gray text-xs mb-8 text-center max-w-xs px-6 font-medium leading-relaxed">
                             We couldn't find any organization matching your selection. Try clearing your filters.
                         </p>
                         <button 
                             onClick={() => setFilters({ industry: 'all', status: 'all', region: 'all' })}
-                            className="flex items-center gap-2 px-6 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm active:scale-95"
+                            className="flex items-center gap-2 px-6 py-2.5 bg-card border border-border-main rounded-xl text-xs font-black text-body hover:bg-base hover:border-border-hover transition-all shadow-sm active:scale-95"
                         >
                             <FiRefreshCcw className="w-3.5 h-3.5" />
                             Clear Criteria

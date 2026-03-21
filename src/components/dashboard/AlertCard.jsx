@@ -11,7 +11,7 @@ const VARIANTS = {
 const AlertCard = ({ label, variant = 'info' }) => {
     const v = VARIANTS[variant] || VARIANTS.info;
     return (
-        <div className={`w-full h-[34px] flex items-center gap-2 rounded-2xl !px-3 ${v.classes}`}>
+        <div className={`w-full h-[34px] flex items-center gap-2 rounded-[var(--radius-card)] !px-3 ${v.classes}`}>
             <span className="shrink-0">{v.icon}</span>
             <span className="font-['Inter'] text-[12px] font-semibold leading-[16px] tracking-[0px]  whitespace-nowrap">
                 {label}

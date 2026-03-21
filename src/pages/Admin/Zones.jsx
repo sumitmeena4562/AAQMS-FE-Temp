@@ -21,26 +21,28 @@ const Zones = () => {
 
     const { setBreadcrumbs } = useBreadcrumb();
 
+    const breadcrumbs = [
+        { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+        { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
+        { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
+        { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
+        { label: site.name, path: `/admin/floor-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}&site=${encodeURIComponent(site.name)}` },
+        { label: floor?.name || "Zones", path: location.pathname + location.search, isActive: true }
+    ];
+
     React.useEffect(() => {
-        setBreadcrumbs([
-            { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-            { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-            { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
-            { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
-            { label: site.name, path: `/admin/floor-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}&site=${encodeURIComponent(site.name)}` },
-            { label: floor?.name || "Zones", path: location.pathname + location.search, isActive: true }
-        ]);
-    }, [orgName, coordinator.name, site.name, floor?.name, location.pathname, location.search, setBreadcrumbs]);
+        // Dynamic PageHeader takes care of breadcrumbs now
+    }, [orgName, coordinator.name, site.name, floor?.name, location.pathname, location.search]);
 
     // Fallback safe state
     if (!floor) {
         return (
-            <div className="p-8 text-center text-gray-500 font-sans mt-20">
-                <h2 className="text-xl font-bold mb-4 text-gray-800">No Floor Selected</h2>
+            <div className="p-8 text-center text-gray font-sans mt-20">
+                <h2 className="text-xl font-bold mb-4 text-title">No Floor Selected</h2>
                 <p className="mb-6">Please start from the Organization Dashboard and select a Floor Plan.</p>
                 <button
                     onClick={() => navigate('/admin/organizations')}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
                 >
                     Go to Organizations
                 </button>
@@ -53,9 +55,10 @@ const Zones = () => {
 
             {/* HEADER */}
             <PageHeader
+                title={`Zones in ${floor.name}`}
+                subtitle={`Operational safety zones for ${site.name} — ${orgName}`}
+                breadcrumbs={breadcrumbs}
                 hideAddButton={true}
-            // onReset={() => console.log("Reset filters")}
-            // onApplyFilters={() => console.log("Apply filters")}
             />
 
             {/* MAIN BODY */}

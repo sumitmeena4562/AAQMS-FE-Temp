@@ -6,8 +6,8 @@ export const getChangeStyles = (changeType) => {
             bg: 'bg-green-50',
         },
         neutral: {
-            text: 'text-slate-600',
-            bg: 'bg-slate-100',
+            text: 'text-body',
+            bg: 'bg-base',
         },
         warning: {
             text: 'text-orange-700',

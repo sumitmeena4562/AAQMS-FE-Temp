@@ -11,6 +11,7 @@ import {
 } from '../../schema/authSchema';
 import InputField from '../UI/InputField';
 import Button from '../UI/Button';
+import useAuthStore from '../../store/authStore';
 import { MailIcon, LockIcon } from '../../assets/icon';
 
 const STEPS = {
@@ -52,8 +53,16 @@ const itemVariants = {
 };
 
 function ForgotPasswordModal({ isOpen, onClose }) {
+    const { 
+        requestPasswordReset, 
+        verifyOtp, 
+        resetPassword,
+        isLoading,
+        error,
+        setError
+    } = useAuthStore();
+
     const [step, setStep] = useState(STEPS.EMAIL);
-    const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
 
     // Reset state when modal is closed/opened
@@ -61,32 +70,39 @@ function ForgotPasswordModal({ isOpen, onClose }) {
         if (isOpen) {
             setStep(STEPS.EMAIL);
             setEmail('');
+            setError(null);
         }
-    }, [isOpen]);
+    }, [isOpen, setError]);
 
     const handleEmailSubmit = async (data) => {
-        setIsLoading(true);
-        setEmail(data.email);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        setStep(STEPS.OTP);
-        toast.success("OTP sent to your email!");
+        const res = await requestPasswordReset(data.email);
+        if (res.success) {
+            setEmail(data.email);
+            setStep(STEPS.OTP);
+            toast.success("OTP sent to your email!");
+        } else {
+            toast.error(res.error || "Failed to send OTP");
+        }
     };
 
-    const handleOtpSubmit = async () => {
-        setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        setStep(STEPS.RESET);
-        toast.success("OTP verified!");
+    const handleOtpSubmit = async (data) => {
+        const res = await verifyOtp(email, data.otp);
+        if (res.success) {
+            setStep(STEPS.RESET);
+            toast.success("OTP verified!");
+        } else {
+            toast.error(res.error || "Invalid OTP");
+        }
     };
 
-    const handleResetSubmit = async () => {
-        setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        setStep(STEPS.SUCCESS);
-        toast.success("Password reset successful!");
+    const handleResetSubmit = async (data) => {
+        const res = await resetPassword(email, data.password);
+        if (res.success) {
+            setStep(STEPS.SUCCESS);
+            toast.success("Password reset successful!");
+        } else {
+            toast.error(res.error || "Reset failed");
+        }
     };
 
     if (!isOpen) return null;
@@ -109,7 +125,7 @@ function ForgotPasswordModal({ isOpen, onClose }) {
                 {/* Modal Container */}
                 <motion.div
                     variants={modalVariants}
-                    className="bg-white/90 backdrop-blur-2xl p-8 md:p-10 rounded-[32px] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-slate-200/50 w-full max-w-md z-10"
+                    className="bg-card/90 backdrop-blur-2xl p-8 md:p-10 rounded-[var(--radius-card)] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-border-main/50 w-full max-w-md z-10"
                 >
                     {/* Close Button */}
                     <button 
@@ -182,7 +198,7 @@ function EmailStep({ onSubmit, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
+                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
                         Send OTP
                     </Button>
                 </motion.div>
@@ -220,7 +236,7 @@ function OtpStep({ email, onSubmit, onResend, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
+                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
                         Verify OTP
                     </Button>
                 </motion.div>
@@ -273,7 +289,7 @@ function ResetStep({ onSubmit, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
+                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
                         Reset Password
                     </Button>
                 </motion.div>
@@ -308,7 +324,7 @@ function SuccessStep({ onClose }) {
             </motion.p>
 
             <motion.div variants={itemVariants} initial="hidden" animate="visible" className="w-full mt-4">
-                <Button onClick={onClose} variant="primary" size="lg" className="w-full h-12 rounded-2xl font-black tracking-tight text-sm shadow-xl shadow-primary/20">
+                <Button onClick={onClose} variant="primary" size="lg" className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20">
                     Sign In Now
                 </Button>
             </motion.div>

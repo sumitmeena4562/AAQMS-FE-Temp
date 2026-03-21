@@ -67,13 +67,13 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                         maxWidth: 220,
                         zIndex: 9999
                     }}
-                    className="bg-white border border-slate-200 rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.12)] overflow-hidden p-1.5"
+                    className="bg-card border border-border-main rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.12)] overflow-hidden p-1.5"
                     role="listbox"
                 >
                     <button
                         onClick={() => { onChange(''); setIsOpen(false); }}
                         className={`w-full px-2.5 py-1.5 text-left rounded-lg transition-all duration-200 text-[12px] font-bold group flex items-center justify-between
-                            ${!isFilterActive ? 'bg-primary cursor-default' : 'hover:bg-slate-50 text-slate-600'}`}
+                            ${!isFilterActive ? 'bg-primary cursor-default' : 'hover:bg-base text-body'}`}
                     >
                         <span className={!isFilterActive ? 'text-white' : 'truncate'}>{allLabel}</span>
                         {!isFilterActive && <FiCheck className="text-white shrink-0" size={13} />}
@@ -90,7 +90,7 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                                     id={`option-${val}`}
                                     onClick={() => { onChange(val); setIsOpen(false); }}
                                     className={`w-full px-2.5 py-1.5 text-left rounded-lg transition-all duration-200 text-[12px] font-bold mt-0.5 group flex items-center justify-between gap-3
-                                        ${isSelected ? 'bg-primary cursor-default' : 'hover:bg-slate-50 text-slate-600'}`}
+                                        ${isSelected ? 'bg-primary cursor-default' : 'hover:bg-base text-body'}`}
                                     role="option"
                                     aria-selected={isSelected}
                                 >
@@ -109,12 +109,12 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
         <div ref={containerRef} className="relative inline-block">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-1.5 px-2 py-0.5 bg-white border rounded-md cursor-pointer transition-all duration-300 group whitespace-nowrap
+                className={`flex items-center gap-1.5 px-2 py-0.5 bg-card border rounded-md cursor-pointer transition-all duration-300 group whitespace-nowrap
                     ${isOpen
                         ? 'border-primary ring-4 ring-primary/5 shadow-md scale-[1.01]'
                         : isFilterActive
                             ? 'border-blue-300 bg-blue-50/80 hover:border-blue-400 hover:bg-blue-100/50 shadow-sm'
-                            : 'border-slate-200 hover:border-slate-300 shadow-sm'}`}
+                            : 'border-border-main hover:border-border-hover shadow-sm'}`}
             >
                 {isFilterActive ? (
                     <>
@@ -135,8 +135,8 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                     </>
                 ) : (
                     <>
-                        <span className="text-[11px] font-bold text-slate-700">{label}</span>
-                        <FiChevronDown className={`text-slate-400 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'group-hover:text-slate-600'}`} size={11} />
+                        <span className="text-[11px] font-bold text-body">{label}</span>
+                        <FiChevronDown className={`text-gray transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'group-hover:text-body'}`} size={11} />
                     </>
                 )}
             </button>

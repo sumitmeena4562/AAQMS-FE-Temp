@@ -1,56 +1,94 @@
 import React from 'react';
+import { FiPlus, FiDownload, FiRefreshCw } from 'react-icons/fi';
 import Breadcrumb from '../Breadcrumb/Breadcrumb';
+import Button from './Button';
 
 const PageHeader = ({ 
+  title,
+  subtitle,
+  breadcrumbs = [],
+  rightContent,
   onReset, 
-  onApplyFilters, 
   onAdd, 
-  addButtonText = "Add New Org",
-  hideAddButton = false
+  onExport,
+  addButtonText = "Add New",
+  hideAddButton = true,
+  className = ""
 }) => {
   return (
-    <div className="bg-[#F9FAFB] border-b border-gray-200">
-      
-      <div className="w-full !px-8 !py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        
-        {/* ACTION BUTTONS (Shifted left or spread as needed) */}
-        <div className="flex-1 hidden md:block" />
+    <div className={`bg-card border-b border-border-main/50 ${className}`}>
+        {/* 1. BREADCRUMB STRIP (Internalized for Cohesion) */}
+        {breadcrumbs.length > 0 && (
+            <div className="w-full px-4 sm:px-8 pt-4 pb-1">
+                <Breadcrumb items={breadcrumbs} />
+            </div>
+        )}
 
-        {/* 2. ACTION BUTTONS */}
-        <div className="flex flex-wrap items-center gap-3">
-          <button 
-            onClick={onReset}
-            className="h-[36px] flex items-center gap-2 px-4 bg-white border border-gray-200 rounded-lg font-semibold text-[13px] text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
-          >
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            Reset
-          </button>
-          
-          <button 
-            onClick={onApplyFilters}
-            className="h-[36px] flex items-center gap-2 px-4 bg-[#2563EB] border border-transparent rounded-lg font-semibold text-[13px] text-white hover:bg-blue-700 transition-colors shadow-sm"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
-            Apply Filters
-          </button>
-          
-          {!hideAddButton && (
-            <button 
-              onClick={onAdd}
-              className="h-[36px] flex items-center gap-2 px-4 bg-[#111827] border border-transparent rounded-lg font-semibold text-[13px] text-white hover:bg-gray-800 transition-colors shadow-sm"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-              </svg>
-              {addButtonText}
-            </button>
-          )}
-        </div>
+      <div className="w-full px-4 sm:px-8 py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         
+        {/* 2. TITLE & SUBTITLE — High Density Typography */}
+        {title && (
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-black text-title leading-tight tracking-tight truncate">
+              {title}
+            </h1>
+            {subtitle && (
+              <div className="text-[11px] sm:text-[12px] font-bold text-gray uppercase tracking-widest leading-none opacity-80">
+                {subtitle}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 3. ACTION CONTENT / BUTTONS */}
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          {/* Custom Right Content Area (e.g., Filter Toggles) */}
+          {rightContent && (
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+              {rightContent}
+            </div>
+          )}
+
+          {/* Standardized Actions */}
+          <div className="flex items-center gap-2">
+            {onReset && (
+              <Button 
+                onClick={onReset}
+                variant="outline"
+                size="sm"
+                className="!h-[38px] bg-card flex items-center gap-2"
+              >
+                <FiRefreshCw size={14} className="text-gray" />
+                Reset
+              </Button>
+            )}
+
+            {onExport && (
+              <Button 
+                onClick={onExport}
+                variant="outline"
+                size="sm"
+                className="!h-[38px] bg-card shadow-sm hover:shadow transition-all flex items-center gap-2 px-4"
+              >
+                <FiDownload size={15} className="text-gray" />
+                <span className="font-black text-[11px] uppercase tracking-widest">Export</span>
+              </Button>
+            )}
+            
+            {!hideAddButton && onAdd && (
+              <Button 
+                onClick={onAdd}
+                size="sm"
+                className="!h-[38px] !bg-primary shadow-lg hover:shadow-primary/20 transition-all flex items-center gap-2 px-4"
+              >
+                <FiPlus size={16} className="text-white" />
+                <span className="font-black text-[11px] text-white uppercase tracking-widest leading-none">
+                    {addButtonText}
+                </span>
+              </Button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
