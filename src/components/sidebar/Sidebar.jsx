@@ -35,19 +35,21 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         const act = isActive(item.path);
         return (
             <div key={item.path} className="relative mb-0.5 group">
-                {act && <div className="absolute left-[-10px] top-2 bottom-2 w-[3px] bg-primary rounded-r-[3px]" />}
+                {act && <div className="absolute left-[-10px] top-1.5 bottom-1.5 w-[3px] bg-primary rounded-r-full shadow-[0_0_8px_rgba(7,34,103,0.3)] transition-all duration-300" />}
                 <NavLink
                     to={item.path}
                     className={() => `
-                        flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] transition-all duration-150
+                        flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-200
                         ${collapsed ? 'justify-center px-0' : 'justify-start'}
-                        ${act ? 'bg-primary/[0.06] text-primary font-semibold' : 'text-gray hover:bg-base font-medium'}
+                        ${act 
+                            ? 'bg-primary/5 text-slate-900 font-bold shadow-sm' 
+                            : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
                     `}
                 >
-                    <span className={`flex items-center shrink-0 transition-opacity ${act ? 'opacity-100 text-primary' : 'opacity-60 text-gray group-hover:opacity-100 group-hover:text-body'}`}>
+                    <span className={`flex items-center shrink-0 transition-colors ${act ? 'text-primary' : 'text-slate-400 group-hover:text-slate-900'}`}>
                         {item.icon}
                     </span>
-                    {!collapsed && <span className="truncate">{item.label}</span>}
+                    {!collapsed && <span className="truncate tracking-tight">{item.label}</span>}
                 </NavLink>
             </div>
         );
@@ -63,26 +65,28 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 <button
                     onClick={() => toggleMenu(item.label)}
                     className={`
-                        w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] transition-all duration-150 border-none outline-none cursor-pointer
+                        w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-200 border-none outline-none cursor-pointer
                         ${collapsed ? 'justify-center px-0' : 'justify-start'}
-                        ${activeOrOpen ? 'bg-primary/[0.06] text-primary font-semibold' : 'text-gray hover:bg-base font-medium'}
+                        ${activeOrOpen 
+                            ? 'bg-primary/5 text-slate-900 font-bold' 
+                            : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
                     `}
                 >
-                    <span className={`flex items-center shrink-0 transition-opacity ${activeOrOpen ? 'opacity-100 text-primary' : 'opacity-60 text-gray group-hover:opacity-100 group-hover:text-body'}`}>
+                    <span className={`flex items-center shrink-0 transition-colors ${activeOrOpen ? 'text-primary' : 'text-slate-400 group-hover:text-slate-900'}`}>
                         {item.icon}
                     </span>
-                    {!collapsed && <span className="flex-1 text-left truncate">{item.label}</span>}
+                    {!collapsed && <span className="flex-1 text-left truncate tracking-tight">{item.label}</span>}
                     {!collapsed && (
                         <svg 
                             xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" 
-                            className={`shrink-0 transition-transform duration-300 opacity-40 ${isOpen ? 'rotate-180' : 'rotate-0'}`}
+                            className={`shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'rotate-0 text-slate-400'}`}
                         >
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
                     )}
                 </button>
                 <CollapsibleSection isOpen={isOpen && !collapsed}>
-                    <div className="ml-8 pl-2.5 border-l-1.5 border-border-main/40 mt-0.5 mb-1.5 flex flex-col gap-0.5 transition-all">
+                    <div className="ml-8 pl-3 border-l-2 border-slate-200 mt-1 mb-2 flex flex-col gap-1 transition-all">
                         {item.children.map(child => {
                             const cAct = isActive(child.path);
                             return (
@@ -90,16 +94,18 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                                     key={child.path}
                                     to={child.path}
                                     className={`
-                                        flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-[12px] transition-all duration-150 text-gray
-                                        ${cAct ? 'bg-primary/[0.06] text-primary font-semibold' : 'hover:bg-base hover:text-title font-medium'}
+                                        flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-200
+                                        ${cAct 
+                                            ? 'bg-slate-200/50 text-slate-900 font-bold' 
+                                            : 'text-slate-500 hover:text-slate-950 font-medium'}
                                     `}
                                 >
                                     {child.icon && (
-                                        <span className={`flex items-center shrink-0 transition-opacity ${cAct ? 'opacity-100 text-primary' : 'opacity-50 text-gray group-hover:opacity-100'}`}>
+                                        <span className={`flex items-center shrink-0 transition-colors ${cAct ? 'text-primary' : 'text-slate-400'}`}>
                                             {child.icon}
                                         </span>
                                     )}
-                                    <span className="truncate">{child.label}</span>
+                                    <span className="truncate tracking-tight">{child.label}</span>
                                 </NavLink>
                             );
                         })}
@@ -154,8 +160,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
                     {/* Section Label */}
                     {!collapsed && (
-                        <div className="text-[10px] font-semibold text-gray uppercase tracking-[0.08em] px-6 pt-3 pb-2 select-none">
-                            Main Menu
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.12em] px-6 pt-5 pb-2 select-none">
+                            Oversight Hub
                         </div>
                     )}
 
@@ -170,23 +176,23 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 </div>
 
                 {/* User Card */}
-                <div className="mt-auto p-2.5 border-t border-border-main/50 bg-card sticky bottom-0 z-10">
+                <div className="mt-auto p-3 border-t border-slate-200 bg-slate-50/50 sticky bottom-0 z-10">
                     {user && (
                         <div
                             className={`
-                                flex items-center rounded-xl bg-card border border-border-main/60 transition-all duration-200 cursor-pointer group hover:border-primary/30 hover:shadow-sm
+                                flex items-center rounded-xl bg-white border border-slate-200 transition-all duration-300 cursor-pointer group hover:border-primary/40 hover:shadow-md
                                 ${collapsed ? 'p-2 justify-center' : 'p-2.5 gap-3 justify-start'}
                             `}
                         >
-                            <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white text-[13px] font-bold shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-[13px] font-black shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
                                 {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'U'}
                             </div>
                             {!collapsed && (
                                 <div className="overflow-hidden flex-1">
-                                    <p className="text-title text-[13px] font-semibold truncate leading-tight group-hover:text-primary transition-colors">
+                                    <p className="text-slate-900 text-[13px] font-bold truncate leading-tight group-hover:text-primary transition-colors">
                                         {user.name || 'System User'}
                                     </p>
-                                    <p className="text-gray text-[10px] font-medium truncate mt-0.5">
+                                    <p className="text-slate-500 text-[10px] font-bold truncate mt-0.5 tracking-tight">
                                         {user.email || 'user@system.com'}
                                     </p>
                                 </div>
