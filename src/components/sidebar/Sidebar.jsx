@@ -35,18 +35,18 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         const act = isActive(item.path);
         return (
             <div key={item.path} className="relative mb-0.5 group">
-                {act && <div className="absolute left-[-10px] top-1.5 bottom-1.5 w-[3px] bg-primary rounded-r-full shadow-[0_0_8px_rgba(7,34,103,0.3)] transition-all duration-300" />}
+                {act && <div className="absolute left-[-10px] top-2 bottom-2 w-[3px] bg-primary rounded-r-full shadow-[0_0_8px_rgba(7,34,103,0.2)] transition-all duration-300" />}
                 <NavLink
                     to={item.path}
                     className={() => `
-                        flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-200
-                        ${collapsed ? 'justify-center px-0' : 'justify-start'}
+                        flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200
+                        ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
                         ${act 
-                            ? 'bg-primary/5 text-slate-900 font-bold shadow-sm' 
-                            : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
+                            ? 'bg-primary/10 text-primary font-bold shadow-sm' 
+                            : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
                     `}
                 >
-                    <span className={`flex items-center shrink-0 transition-colors ${act ? 'text-primary' : 'text-slate-400 group-hover:text-slate-900'}`}>
+                    <span className={`flex items-center shrink-0 transition-colors ${act ? 'text-primary' : 'text-slate-500 group-hover:text-slate-900'}`}>
                         {item.icon}
                     </span>
                     {!collapsed && <span className="truncate tracking-tight">{item.label}</span>}
@@ -65,14 +65,14 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 <button
                     onClick={() => toggleMenu(item.label)}
                     className={`
-                        w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] transition-all duration-200 border-none outline-none cursor-pointer
-                        ${collapsed ? 'justify-center px-0' : 'justify-start'}
+                        w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 border-none outline-none cursor-pointer
+                        ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'justify-start'}
                         ${activeOrOpen 
-                            ? 'bg-primary/5 text-slate-900 font-bold' 
-                            : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
+                            ? 'bg-primary/10 text-primary font-bold' 
+                            : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
                     `}
                 >
-                    <span className={`flex items-center shrink-0 transition-colors ${activeOrOpen ? 'text-primary' : 'text-slate-400 group-hover:text-slate-900'}`}>
+                    <span className={`flex items-center shrink-0 transition-colors ${activeOrOpen ? 'text-primary' : 'text-slate-500 group-hover:text-slate-900'}`}>
                         {item.icon}
                     </span>
                     {!collapsed && <span className="flex-1 text-left truncate tracking-tight">{item.label}</span>}
@@ -86,7 +86,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     )}
                 </button>
                 <CollapsibleSection isOpen={isOpen && !collapsed}>
-                    <div className="ml-8 pl-3 border-l-2 border-slate-200 mt-1 mb-2 flex flex-col gap-1 transition-all">
+                    <div className="ml-8 pl-3 border-l-2 border-slate-300 mt-1 mb-2 flex flex-col gap-0.5 transition-all">
                         {item.children.map(child => {
                             const cAct = isActive(child.path);
                             return (
@@ -94,10 +94,10 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                                     key={child.path}
                                     to={child.path}
                                     className={`
-                                        flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12.5px] transition-all duration-200
+                                        flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
                                         ${cAct 
-                                            ? 'bg-slate-200/50 text-slate-900 font-bold' 
-                                            : 'text-slate-500 hover:text-slate-950 font-medium'}
+                                            ? 'bg-slate-200 text-slate-950 font-bold' 
+                                            : 'text-slate-600 hover:text-slate-950 font-medium'}
                                     `}
                                 >
                                     {child.icon && (
