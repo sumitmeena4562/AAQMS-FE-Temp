@@ -179,7 +179,7 @@ export default function Users() {
             width: '22%',
             render: (_, row) => (
                 <div className="flex items-center gap-2 py-0.5 group-hover:px-1 transition-all">
-                    <UserAvatar name={row?.name} size="32px" className="shadow-sm border-2 border-white ring-1 ring-slate-100 shrink-0" />
+                    <UserAvatar name={row?.name} avatar={row?.avatar} size="32px" className="shadow-sm border-2 border-white ring-1 ring-slate-100 shrink-0" />
                     <div className="flex flex-col min-w-0">
                         <div className="text-[12px] font-black text-slate-900 leading-tight truncate">{row?.name}</div>
                         <div className="text-[9px] font-bold text-slate-400 mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email?.split('@')[0]}</div>

@@ -128,7 +128,8 @@ export const userService = {
             verified: false,
             lastActive: 'Never',
             createdAt: new Date().toISOString().split('T')[0],
-            region: userData.region || 'North Zone'
+            region: userData.region || 'North Zone',
+            avatar: userData.avatar || null
         };
 
         users.push(newUser);

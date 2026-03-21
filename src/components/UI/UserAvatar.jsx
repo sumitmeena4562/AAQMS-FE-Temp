@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UserAvatar = ({ name, size = "40px", fontSize = "14px" }) => {
+const UserAvatar = ({ name, avatar, size = "40px", fontSize = "14px", className = "" }) => {
     const getInitials = (name) => {
         if (!name) return "??";
         const parts = name.split(' ');
@@ -19,19 +19,24 @@ const UserAvatar = ({ name, size = "40px", fontSize = "14px" }) => {
             'from-[#F59E0B] to-[#D946EF]', // Amber to Fuchsia
         ];
         
+        const nameKey = name || "unknown";
         let hash = 0;
-        for (let i = 0; i < name.length; i++) {
-            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        for (let i = 0; i < nameKey.length; i++) {
+            hash = nameKey.charCodeAt(i) + ((hash << 5) - hash);
         }
         return colors[Math.abs(hash) % colors.length];
     };
 
     return (
         <div 
-            className={`flex items-center justify-center rounded-full bg-gradient-to-br ${getGradient(name)} text-white font-bold shadow-sm shrink-0`}
+            className={`flex items-center justify-center rounded-full bg-gradient-to-br ${getGradient(name)} text-white font-bold shadow-sm shrink-0 overflow-hidden ${className}`}
             style={{ width: size, height: size, fontSize: fontSize }}
         >
-            {getInitials(name)}
+            {avatar ? (
+                <img src={avatar} alt={name} className="w-full h-full object-cover" />
+            ) : (
+                getInitials(name)
+            )}
         </div>
     );
 };

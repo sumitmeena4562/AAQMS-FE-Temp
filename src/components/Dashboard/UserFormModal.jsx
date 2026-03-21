@@ -40,6 +40,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const isEdit = !!user;
     const [step, setStep] = useState(0);
     const [submitError, setSubmitError] = useState('');
+        // Image selection state
+    const [imagePreview, setImagePreview] = useState(user?.avatar || null);
+    const fileInputRef = useRef(null); // Ye hidden file input ko trigger karne ke liye hai
+
     const lastProcessedRef = useRef('');
 
     const orgs = useOrgStore(state => state.orgs);
@@ -87,16 +91,19 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 employeeId: user.employeeId || '',
                 equipmentId: user.equipmentId || '',
                 phoneNumber: user.phoneNumber || '',
-                designation: user.designation || ''
+                designation: user.designation || '',
+                avatar: user.avatar || ''
             });
+            setImagePreview(user.avatar || null);
             setStep(1);
         } else {
             reset({ 
                 name: '', email: '', organization: '', role: '', 
                 assignment: 'unassigned', status: 'active',
                 region: '', employeeId: '', equipmentId: '',
-                phoneNumber: '', designation: ''
+                phoneNumber: '', designation: '', avatar: ''
             });
+            setImagePreview(null);
             setStep(0);
         }
         setSubmitError('');
@@ -109,6 +116,18 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             onClose();
         } else {
             setSubmitError(result?.error || 'Something went wrong');
+        }
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // URL.createObjectURL temporarily browser mein image ka address banata hai
+            const previewUrl = URL.createObjectURL(file);
+            setImagePreview(previewUrl);
+            
+            // React Hook Form ko batao ki 'avatar' value change ho gayi hai
+            setValue('avatar', previewUrl); 
         }
     };
 
@@ -207,6 +226,39 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                         )}
 
                                         <form onSubmit={handleSubmit(onFormSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4 sm:gap-y-5">
+                                            
+                                            {/* Avatar Section at the top of Form */}
+                                            <div className="col-span-2 flex flex-col items-center justify-center mb-6 pt-2">
+                                                <div 
+                                                    onClick={() => fileInputRef.current?.click()} 
+                                                    className="group relative w-24 h-24 rounded-full border-2 border-dashed border-slate-200 cursor-pointer overflow-hidden hover:border-primary transition-all shadow-sm"
+                                                >
+                                                    {imagePreview ? (
+                                                        <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center text-slate-400">
+                                                            <span className="text-2xl mb-1">📷</span>
+                                                            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Upload</span>
+                                                        </div>
+                                                    )}
+                                                    {/* Overlay on hover */}
+                                                    <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                                                        <span className="text-[10px] font-black uppercase">Change</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Hidden Input File */}
+                                                <input 
+                                                    type="file" 
+                                                    ref={fileInputRef} 
+                                                    className="hidden" 
+                                                    accept="image/*" 
+                                                    onChange={handleImageChange} 
+                                                />
+                                                
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-3">Profile Picture</p>
+                                            </div>
+
                                             {/* Section Header */}
                                             <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-slate-100">
                                                 <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Basic Information</h3>

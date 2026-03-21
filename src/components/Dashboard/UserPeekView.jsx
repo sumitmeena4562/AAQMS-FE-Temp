@@ -66,10 +66,14 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDelete }) => {
                                 <Motion.div 
                                     initial={{ scale: 0.9, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
-                                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-lg border-2 border-white shrink-0"
+                                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-lg border-2 border-white shrink-0 overflow-hidden"
                                     style={{ background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})` }}
                                 >
-                                    {initials}
+                                    {user.avatar ? (
+                                        <img src={user.avatar} className="w-full h-full object-cover" alt={user.name} />
+                                    ) : (
+                                        initials
+                                    )}
                                 </Motion.div>
                                 <div className="flex-1 min-w-0">
                                     <div className="text-lg font-bold text-slate-900 truncate leading-tight mb-1">{user.name}</div>
