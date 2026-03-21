@@ -59,23 +59,11 @@ const Table = ({
                 <table className="w-full border-collapse min-w-[700px] lg:min-w-full">
                     <thead>
                         <tr className="bg-slate-50/80 backdrop-blur-sm border-b border-slate-200/60">
-                            {selectable && (
-                                <th className="px-3 sm:px-4 py-5 w-14 text-left">
-                                    <div className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            className="w-4.5 h-4.5 rounded-[6px] border-slate-300 text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50"
-                                            checked={isAllSelected}
-                                            onChange={handleToggleAll}
-                                        />
-                                    </div>
-                                </th>
-                            )}
                             {columns.map((col, i) => (
                                 <th
                                     key={i}
                                     className={`
-                                        px-3 sm:px-4 py-5 text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em] whitespace-nowrap
+                                        px-2.5 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-[0.12em] whitespace-nowrap
                                         ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
                                         ${col.className || ''}
                                     `}
@@ -84,6 +72,18 @@ const Table = ({
                                     {col.header}
                                 </th>
                             ))}
+                            {selectable && (
+                                <th className="px-2 py-3 w-7 text-right">
+                                    <div className="flex items-center justify-end">
+                                        <input
+                                            type="checkbox"
+                                            className="w-3.5 h-3.5 rounded-[4px] border-slate-300 text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50"
+                                            checked={isAllSelected}
+                                            onChange={handleToggleAll}
+                                        />
+                                    </div>
+                                </th>
+                            )}
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100/80 bg-white">
@@ -105,25 +105,11 @@ const Table = ({
                                             ${isClickable ? 'cursor-pointer' : 'cursor-default'}
                                         `}
                                     >
-                                        {selectable && (
-                                            <td className="px-3 sm:px-4 py-4 w-10 relative">
-                                                {isSelected && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary shadow-[2px_0_12px_rgba(var(--color-primary-rgb),0.3)]" />}
-                                                <div className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="w-4.5 h-4.5 rounded-[6px] border-slate-300 text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50"
-                                                        checked={isSelected}
-                                                        onChange={e => handleToggleRow(e, row.id)}
-                                                        onClick={e => e.stopPropagation()}
-                                                    />
-                                                </div>
-                                            </td>
-                                        )}
                                         {columns.map((col, ci) => (
                                             <td
                                                 key={ci}
                                                 className={`
-                                                    px-3 sm:px-4 py-4 text-[13px] font-medium text-slate-600 vertical-middle
+                                                    px-2.5 py-1.5 text-[12px] font-medium text-slate-600 vertical-middle
                                                     ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
                                                     ${col.className || ''}
                                                 `}
@@ -131,6 +117,20 @@ const Table = ({
                                                 {col.render ? col.render(row[col.accessor], row) : (row[col.accessor] || '-')}
                                             </td>
                                         ))}
+                                        {selectable && (
+                                            <td className="px-2 py-1.5 w-7 relative">
+                                                {isSelected && <div className="absolute right-0 top-0 bottom-0 w-[3px] bg-primary shadow-[-1px_0_8px_rgba(var(--color-primary-rgb),0.2)]" />}
+                                                <div className="flex items-center justify-end">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="w-3.5 h-3.5 rounded-[4px] border-slate-300 text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50"
+                                                        checked={isSelected}
+                                                        onChange={e => handleToggleRow(e, row.id)}
+                                                        onClick={e => e.stopPropagation()}
+                                                    />
+                                                </div>
+                                            </td>
+                                        )}
                                     </motion.tr>
                                 );
                             })

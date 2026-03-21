@@ -80,7 +80,7 @@ const DataTable = ({
             
             {/* 1. Main Header / Selection Header */}
             {hasSelection && selectionFooter ? (
-                <div className="flex items-center justify-between py-5 px-4 sm:px-6 bg-primary/[0.04] border-b border-primary/20 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="flex items-center justify-between py-3 px-4 sm:px-6 bg-primary/[0.04] border-b border-primary/20 animate-in fade-in slide-in-from-top-4 duration-300">
                     {selectionFooter}
                 </div>
             ) : (title || rightContent) && (

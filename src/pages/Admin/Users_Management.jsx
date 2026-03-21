@@ -11,7 +11,7 @@ import {
     FiPlus, FiDownload, FiTrash2,
     FiUserCheck, FiUserX, FiUsers,
     FiRefreshCw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock,
-    FiExternalLink, FiEdit2
+    FiExternalLink, FiEdit2, FiSquare, FiCheckSquare
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
@@ -37,6 +37,7 @@ export default function Users() {
     const [editingUser, setEditingUser] = useState(null);
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+    const [selectionMode, setSelectionMode] = useState(false);
 
     // Search Debounce
     const debouncedSearch = useDebounce(search, 300);
@@ -175,9 +176,9 @@ export default function Users() {
         {
             header: 'Personnel Profile',
             accessor: 'name',
-            width: '24%',
+            width: '22%',
             render: (_, row) => (
-                <div className="flex items-center gap-2.5 py-0.5 group-hover:px-0.5 transition-all">
+                <div className="flex items-center gap-2 py-0.5 group-hover:px-1 transition-all">
                     <UserAvatar name={row?.name} size="32px" className="shadow-sm border-2 border-white ring-1 ring-slate-100 shrink-0" />
                     <div className="flex flex-col min-w-0">
                         <div className="text-[12px] font-black text-slate-900 leading-tight truncate">{row?.name}</div>
@@ -189,7 +190,7 @@ export default function Users() {
         {
             header: 'Organization',
             accessor: 'organization',
-            width: '16%',
+            width: '15%',
             render: (value) => (
                 <div className="flex flex-col min-w-0">
                     <span className="text-[12px] font-black text-slate-800 truncate leading-none">{value || 'Contractor'}</span>
@@ -202,10 +203,10 @@ export default function Users() {
             accessor: 'role',
             width: '12%',
             align: 'center',
-            className: 'hidden md:table-cell',
+            className: 'hidden lg:table-cell',
             render: (value) => (
                 <div className="flex justify-center">
-                    <Badge variant="soft" className="!text-[8px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest border border-current/10 text-primary bg-primary/5">
+                    <Badge variant="soft" className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest border border-current/10 text-primary bg-primary/5">
                         {value}
                     </Badge>
                 </div>
@@ -219,7 +220,7 @@ export default function Users() {
             render: (value) => {
                 const isAssigned = value === 'assigned';
                 return (
-                    <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-xl border ${
+                    <div className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg border ${
                         isAssigned ? 'bg-emerald-50/50 border-emerald-100/50 text-emerald-700' : 
                         'bg-slate-50 border-slate-100 text-slate-500'
                     }`}>
@@ -234,28 +235,28 @@ export default function Users() {
         {
             header: 'Actions',
             accessor: 'id',
-            width: '12%',
+            width: '100px',
             align: 'right',
             render: (_, row) => (
-                <div className="flex items-center justify-end gap-1 pr-1">
+                <div className="flex items-center justify-end gap-1 pr-0.5">
                     <button 
                         onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }}
-                        className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-xl shadow-sm active:scale-95"
+                        className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-900 transition-all rounded-lg shadow-sm active:scale-95"
                         title="View Details"
                     >
-                        <FiExternalLink size={12} />
+                        <FiExternalLink size={11} />
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
-                        className="px-3 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-xl shadow-sm active:scale-95 font-black uppercase tracking-widest text-[8px] hidden md:flex"
+                        className="px-2.5 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-lg shadow-sm active:scale-95 font-black uppercase tracking-widest text-[8px] hidden md:flex"
                     >
                         Edit
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); handleEditUser(row); }}
-                        className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-xl shadow-sm active:scale-95 md:hidden"
+                        className="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-white hover:bg-primary transition-all rounded-lg shadow-sm active:scale-95 md:hidden"
                     >
-                        <FiEdit2 size={12} />
+                        <FiEdit2 size={11} />
                     </button>
                 </div>
             )
@@ -298,7 +299,7 @@ export default function Users() {
                 columns={columns}
                 data={sortedUsers}
                 loading={loading}
-                selectable
+                selectable={selectionMode}
                 selectedIds={selectedIds}
                 onSelectionChange={(ids) => store.setSelectedIds(ids)}
                 onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
@@ -359,38 +360,39 @@ export default function Users() {
                         />
                         <div className="h-4 w-[1px] bg-slate-200 shrink-0 mx-1" />
                         <Button
-                            variant="ghost"
-                            onClick={resetFilters}
-                            className="!h-9 !px-3 !text-[11px] !font-black !text-slate-400 hover:!text-rose-500 !uppercase !tracking-widest flex items-center gap-1.5 shrink-0"
-                        >
-                            <FiRefreshCw size={12} className={loading ? 'animate-spin' : ''} />
-                            Reset
-                        </Button>
-                        <Button
                             variant="outline"
                             onClick={fetchUsers}
-                            className="!p-2 !h-11 !w-11 !rounded-xl border-slate-200"
+                            className="!p-2 !h-9 !w-9 !rounded-xl border-slate-200"
                             icon={FiRefreshCw}
                         />
+                        <div className="h-4 w-[1px] bg-slate-200 shrink-0 mx-1" />
+                        <Button
+                            variant={selectionMode ? "primary" : "outline"}
+                            onClick={() => setSelectionMode(!selectionMode)}
+                            className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : ''}`}
+                        >
+                            {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
+                            Select
+                        </Button>
                     </>
                 }
                 selectionFooter={
-                    <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center text-[12px] font-black shadow-lg shadow-primary/20">
+                    <div className="flex flex-col md:flex-row items-center justify-between w-full gap-3">
+                        <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center text-[11px] font-black shadow-lg shadow-primary/20">
                                 {selectedIds.length}
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-[13px] font-black text-slate-800 uppercase tracking-tight leading-none">Profiles Selected</span>
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Ready for bulk actions</span>
+                                <span className="text-[12px] font-black text-slate-800 uppercase tracking-tight leading-none">Selected</span>
+                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Bulk Actions</span>
                             </div>
                         </div>
-                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-1.5">
                             <Button
                                 onClick={handleBulkActivate}
                                 icon={FiUserCheck}
                                 variant="outline"
-                                className="!h-10 !px-4 !text-[11px] !font-bold !bg-emerald-50 !text-emerald-700 !border-emerald-100/50 hover:!bg-emerald-100 !rounded-xl"
+                                className="!h-8 !px-3 !text-[10px] !font-bold !bg-emerald-50 !text-emerald-700 !border-emerald-100/50 hover:!bg-emerald-100 !rounded-lg"
                             >
                                 Activate
                             </Button>
@@ -398,7 +400,7 @@ export default function Users() {
                                 onClick={handleBulkDeactivate}
                                 icon={FiUserX}
                                 variant="outline"
-                                className="!h-10 !px-4 !text-[11px] !font-bold !bg-amber-50 !text-amber-700 !border-amber-100/50 hover:!bg-amber-100 !rounded-xl"
+                                className="!h-8 !px-3 !text-[10px] !font-bold !bg-amber-50 !text-amber-700 !border-amber-100/50 hover:!bg-amber-100 !rounded-lg"
                             >
                                 Deactivate
                             </Button>
@@ -406,15 +408,15 @@ export default function Users() {
                                 onClick={() => setBulkDeleteOpen(true)}
                                 icon={FiTrash2}
                                 variant="outline"
-                                className="!h-10 !px-4 !text-[11px] !font-bold !bg-rose-50 !text-rose-700 !border-rose-100/50 hover:!bg-rose-100 !rounded-xl"
+                                className="!h-8 !px-3 !text-[10px] !font-bold !bg-rose-50 !text-rose-700 !border-rose-100/50 hover:!bg-rose-100 !rounded-lg"
                             >
                                 Delete
                             </Button>
-                            <div className="hidden sm:block w-px h-6 bg-slate-200 mx-2" />
+                            <div className="hidden sm:block w-px h-5 bg-slate-200 mx-1" />
                             <Button
                                 variant="ghost"
                                 onClick={clearSelection}
-                                className="!h-10 !px-4 !text-[11px] !font-black !text-slate-400 hover:!text-slate-600 !uppercase !tracking-widest"
+                                className="!h-8 !px-3 !text-[10px] !font-black !text-slate-400 hover:!text-slate-600 !uppercase !tracking-widest"
                             >
                                 Cancel
                             </Button>

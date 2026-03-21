@@ -93,7 +93,6 @@ const Organizations = () => {
             {/* 3. GRID CONTENT WITH FILTERS */}
             <div className="flex flex-col gap-6">
                 
-                {/* 2.5 PREMIUM FILTER WELL (DataTable Style) */}
                 <div className="bg-white border border-slate-200/60 rounded-2xl p-3.5 shadow-sm">
                     <div className="flex flex-wrap items-center gap-3">
                         <FilterDropdown 
@@ -115,14 +114,12 @@ const Organizations = () => {
                         <FilterDropdown 
                             label="Status"
                             options={[
-                                { value: 'all', label: 'All Status' },
                                 { value: 'ACTIVE', label: 'Active Only' },
-                                { value: 'MAINTENANCE', label: 'Maintenance Only' },
-                                { value: 'DEACTIVE', label: 'Deactive Only' }
+                                { value: 'INACTIVE', label: 'Inactive Only' }
                             ]}
                             value={filters.status}
-                            onChange={(v) => setFilters(prev => ({ ...prev, status: v }))}
-                            allLabel="All"
+                            onChange={(v) => setFilters(prev => ({ ...prev, status: v || 'all' }))}
+                            allLabel="All Statuses"
                         />
 
                         <div className="h-6 w-[1.5px] bg-slate-100 shrink-0 mx-2" />
@@ -261,16 +258,13 @@ const Organizations = () => {
                                     className: 'hidden sm:table-cell',
                                     render: (status) => {
                                         const isActive = status === 'ACTIVE';
-                                        const isMaint = status === 'MAINTENANCE';
                                         return (
                                             <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border ${
-                                                isActive ? 'bg-emerald-50/50 border-emerald-100/50 text-emerald-700' : 
-                                                isMaint ? 'bg-orange-50/50 border-orange-100/50 text-orange-700' :
-                                                'bg-slate-50 border-slate-100 text-slate-500'
+                                                isActive ? 'bg-emerald-50/50 border-emerald-100/50 text-emerald-700' : 'bg-rose-50/50 border-rose-100/50 text-rose-700'
                                             }`}>
-                                                <DotStatus status={isActive ? 'active' : isMaint ? 'warning' : 'inactive'} />
+                                                <DotStatus status={isActive ? 'active' : 'inactive'} />
                                                 <span className="text-[9px] font-black uppercase tracking-widest leading-none">
-                                                    {status || 'PENDING'}
+                                                    {isActive ? 'ACTIVE' : 'INACTIVE'}
                                                 </span>
                                             </div>
                                         );
