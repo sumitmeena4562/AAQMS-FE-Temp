@@ -2,7 +2,7 @@ import React from 'react';
 import { QrCode } from 'lucide-react';
 import { ZONES_DATA } from '../../data/zones';
 
-const ZonesTable = () => {
+const ZonesTable = ({ showQRCode = false }) => {
     return (
         <div className="bg-card border border-border-main rounded-xl shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] flex flex-col w-full overflow-hidden">
             {/* Header Section */}
@@ -28,13 +28,13 @@ const ZonesTable = () => {
             <div className="w-full overflow-x-auto pb-2 px-6 shadow-2xl">
                 <table className="w-full text-left border-collapse min-w-max ">
                     <thead>
-                        <tr className="border-b-[1.5px] border-border-main/60 bg-base">
-                            <th className="py-4 pr-6 text-[11px] font-bold text-gray uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE ID</th>
-                            <th className="py-4 px-6 text-[11px] font-bold text-gray uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE NAME</th>
-                            <th className="py-4 px-6 text-[11px] font-bold text-gray uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE TYPE</th>
-                            <th className="py-4 px-6 text-[11px] font-bold text-gray uppercase tracking-[0.8px] whitespace-nowrap align-middle">INVENTORY COUNT</th>
-                            <th className="py-4 px-6 text-[11px] font-bold text-gray uppercase tracking-[0.8px] whitespace-nowrap align-middle">QR CODE</th>
-                            <th className="py-4 pl-6 text-[11px] font-bold text-gray uppercase tracking-[0.8px] whitespace-nowrap align-middle">ACTIONS</th>
+                        <tr className="border-b-[1.5px] border-gray-100 bg-gray-50">
+                            <th className="py-4 pr-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE ID</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE NAME</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE TYPE</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">INVENTORY COUNT</th>
+                            {showQRCode && <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">QR CODE</th>}
+                            <th className="py-4 pl-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border-main/60">
@@ -79,11 +79,13 @@ const ZonesTable = () => {
                                             {zone.count}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-6 align-middle">
-                                        <button className="text-gray hover:text-body cursor-pointer transition-colors outline-none bg-transparent border-none p-0">
-                                            <QrCode size={20} />
-                                        </button>
-                                    </td>
+                                    {showQRCode && (
+                                        <td className="py-4 px-6 align-middle">
+                                            <button className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors outline-none bg-transparent border-none p-0">
+                                                <QrCode size={20} />
+                                            </button>
+                                        </td>
+                                    )}
                                     <td className="py-4 pl-6 align-middle">
                                         <button className="flex items-center justify-center h-[32px] px-4 bg-card border border-border-main rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-red-300  transition-colors cursor-pointer outline-none">
                                             <span className="text-xs font-semibold text-body whitespace-nowrap">
