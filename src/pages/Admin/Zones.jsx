@@ -1,5 +1,4 @@
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React from 'react'; import { useLocation, useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
 
@@ -72,7 +71,7 @@ const Zones = () => {
 
             </main>
 
-
+           
         </div>
     );
 };

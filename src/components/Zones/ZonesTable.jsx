@@ -2,7 +2,7 @@ import React from 'react';
 import { QrCode } from 'lucide-react';
 import { ZONES_DATA } from '../../data/zones';
 
-const ZonesTable = ({ showQRCode = false }) => {
+const ZonesTable = () => {
     return (
         <div className="bg-white border border-gray-200 rounded-xl shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] flex flex-col w-full overflow-hidden">
             {/* Header Section */}
@@ -33,7 +33,7 @@ const ZonesTable = ({ showQRCode = false }) => {
                             <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE NAME</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE TYPE</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">INVENTORY COUNT</th>
-                            {showQRCode && <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">QR CODE</th>}
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">QR CODE</th>
                             <th className="py-4 pl-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ACTIONS</th>
                         </tr>
                     </thead>
@@ -79,13 +79,11 @@ const ZonesTable = ({ showQRCode = false }) => {
                                             {zone.count}
                                         </span>
                                     </td>
-                                    {showQRCode && (
-                                        <td className="py-4 px-6 align-middle">
-                                            <button className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors outline-none bg-transparent border-none p-0">
-                                                <QrCode size={20} />
-                                            </button>
-                                        </td>
-                                    )}
+                                    <td className="py-4 px-6 align-middle">
+                                        <button className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors outline-none bg-transparent border-none p-0">
+                                            <QrCode size={20} />
+                                        </button>
+                                    </td>
                                     <td className="py-4 pl-6 align-middle">
                                         <button className="flex items-center justify-center h-[32px] px-4 bg-white border border-gray-200 rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-red-300  transition-colors cursor-pointer outline-none">
                                             <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">
