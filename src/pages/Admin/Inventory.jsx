@@ -16,6 +16,8 @@ import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Search from '../../components/UI/Search';
 import { useOrgStore } from '../../store/useOrgStore';
+import AssetDrawer from '../../components/Admin/Inventory/AssetDrawer';
+import EmptyState from '../../components/Admin/Inventory/EmptyState';
 
 const AssetIcon = ({ type, className = "" }) => {
     switch (type?.toLowerCase()) {
@@ -42,6 +44,10 @@ const Inventory = () => {
     const [searchParams] = useSearchParams();
     const orgs = useOrgStore(state => state.orgs);
     
+    // Drawer State
+    const [selectedAsset, setSelectedAsset] = useState(null);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    
     // Initial data load: Global if no params, else specific
     const initialData = useMemo(() => generateGlobalInventory(orgs), [orgs]);
     
@@ -50,8 +56,8 @@ const Inventory = () => {
         org: 'all', 
         floor: 'all', 
         zone: 'all',
-        type: 'all', 
-        status: 'all' 
+        type: [], 
+        status: [] 
     });
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -60,16 +66,25 @@ const Inventory = () => {
         const zoneParam = searchParams.get('zone');
         const orgParam = searchParams.get('org');
         const floorParam = searchParams.get('floor');
+        const typeParam = searchParams.get('type');
+        const statusParam = searchParams.get('status');
 
-        if (zoneParam || orgParam || floorParam) {
+        if (zoneParam || orgParam || floorParam || typeParam || statusParam) {
             setFilters(prev => ({
                 ...prev,
-                zone: zoneParam || 'all',
-                org: orgParam || 'all',
-                floor: floorParam || 'all'
+                zone: zoneParam || prev.zone,
+                org: orgParam || prev.org,
+                floor: floorParam || prev.floor,
+                type: typeParam ? typeParam.split(',') : prev.type,
+                status: statusParam ? statusParam.split(',') : prev.status
             }));
         }
     }, [searchParams]);
+
+    const handleReset = () => {
+        setFilters({ org: 'all', floor: 'all', zone: 'all', type: [], status: [] }); 
+        setSearchQuery('');
+    };
 
     const filteredInventory = useMemo(() => {
         return initialData.filter(item => {
@@ -81,8 +96,8 @@ const Inventory = () => {
             const matchesOrg = filters.org === 'all' || item.org === filters.org;
             const matchesFloor = filters.floor === 'all' || item.floor === filters.floor;
             const matchesZone = filters.zone === 'all' || item.zoneId === filters.zone;
-            const matchesType = filters.type === 'all' || item.type === filters.type;
-            const matchesStatus = filters.status === 'all' || item.status === filters.status;
+            const matchesType = filters.type.length === 0 || filters.type.includes(item.type);
+            const matchesStatus = filters.status.length === 0 || filters.status.includes(item.status);
             
             return matchesSearch && matchesOrg && matchesFloor && matchesZone && matchesType && matchesStatus;
         });
@@ -129,6 +144,11 @@ const Inventory = () => {
             { label: "Pending", value: pending, icon: FiClock, iconBgClass: "bg-amber-50", iconColorClass: "text-amber-500" }
         ];
     }, [filteredInventory]);
+
+    const handleOpenDrawer = (asset) => {
+        setSelectedAsset(asset);
+        setIsDrawerOpen(true);
+    };
 
     const columns = useMemo(() => [
         {
@@ -219,11 +239,15 @@ const Inventory = () => {
             accessor: 'id',
             width: '10%',
             align: 'right',
-            render: () => (
+            render: (_, row) => (
                 <div className="flex justify-end pr-2">
                     <Button
                         variant="outline"
                         icon={FiExternalLink}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenDrawer(row);
+                        }}
                         className="h-7 px-3 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 border-rose-200"
                     >
                         VIEW
@@ -286,6 +310,7 @@ const Inventory = () => {
                             value={filters.type}
                             onChange={(v) => setFilters(prev => ({ ...prev, type: v }))}
                             allLabel="All Types"
+                            multiple={true}
                         />
 
                         <FilterDropdown 
@@ -294,16 +319,14 @@ const Inventory = () => {
                             value={filters.status}
                             onChange={(v) => setFilters(prev => ({ ...prev, status: v }))}
                             allLabel="All Statuses"
+                            multiple={true}
                         />
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
-                        {(filters.org !== 'all' || filters.floor !== 'all' || filters.zone !== 'all' || filters.type !== 'all' || filters.status !== 'all' || searchQuery !== '') && (
+                        {(filters.org !== 'all' || filters.floor !== 'all' || filters.zone !== 'all' || filters.type.length > 0 || filters.status.length > 0 || searchQuery !== '') && (
                             <button 
-                                onClick={() => { 
-                                    setFilters({ org: 'all', floor: 'all', zone: 'all', type: 'all', status: 'all' }); 
-                                    setSearchQuery(''); 
-                                }}
+                                onClick={handleReset}
                                 className="h-8 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-lg bg-rose-50/50 shadow-sm border border-rose-100"
                             >
                                 <FiRefreshCcw size={12} />
@@ -316,6 +339,8 @@ const Inventory = () => {
                 <DataTable
                     columns={columns}
                     data={displayedInventory}
+                    onRowClick={handleOpenDrawer}
+                    emptyMessage={<EmptyState onReset={handleReset} />}
                     footer={
                         <div className="flex items-center justify-between w-full px-1">
                             <span className="text-[11px] font-bold text-gray tracking-tight">
@@ -329,6 +354,12 @@ const Inventory = () => {
                     }
                 />
             </div>
+
+            <AssetDrawer 
+                asset={selectedAsset}
+                isOpen={isDrawerOpen}
+                onClose={() => setIsDrawerOpen(false)}
+            />
         </div>
     );
 };

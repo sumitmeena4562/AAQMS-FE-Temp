@@ -141,10 +141,20 @@ export const generateInventoryForZone = (zoneId = '104', floorRef = 'Floor 1', s
 
 export const generateGlobalInventory = (orgs) => {
   let globalInventory = [];
-  orgs.forEach(org => {
-     // Generate some sample data for each org to simulate global view
-     const orgInventory = generateInventoryForZone(org.id, "Floor 1", "Main Site", org.name);
-     globalInventory = [...globalInventory, ...orgInventory];
+  const floors = ["Floor 1", "Floor 2", "Floor 3"];
+  
+  orgs.forEach((org, orgIdx) => {
+     // Generate data for 2-3 floors per org
+     const numFloors = (orgIdx % 2) + 1; 
+     for (let f = 0; f < numFloors; f++) {
+        const floorName = floors[f];
+        // Generate for 2 zones per floor
+        for (let z = 0; z < 2; z++) {
+            const zoneId = 100 + (orgIdx * 10) + (f * 5) + z;
+            const orgInventory = generateInventoryForZone(zoneId.toString(), floorName, "Main Site", org.name);
+            globalInventory = [...globalInventory, ...orgInventory];
+        }
+     }
   });
   return globalInventory;
 };
