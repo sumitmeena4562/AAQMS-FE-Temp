@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { QrCode, List } from 'lucide-react';
-import { ZONES_DATA } from '../../data/zones';
+import React from 'react';
+import { QrCode } from 'lucide-react';
 
-const ZonesTable = ({ showQRCode = false }) => {
-    const [activeView, setActiveView] = useState('list');
+const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false }) => {
 
     return (
         <div className="bg-card border border-border-main rounded-xl shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] flex flex-col w-full overflow-hidden">
@@ -17,33 +15,7 @@ const ZonesTable = ({ showQRCode = false }) => {
                         Manage zone details, types, and risk levels.
                     </p>
                 </div>
-                {/* View Toggles */}
-                <div className="flex items-center bg-base p-1 rounded-lg border border-border-main/60">
-                    <button 
-                        onClick={() => setActiveView('list')}
-                        className={`flex items-center justify-center gap-2 h-[38px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
-                            activeView === 'list' 
-                            ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5' 
-                            : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
-                        }`}
-                    >
-                        <List size={16} className={activeView === 'list' ? "text-title" : "text-gray"} />
-                        <span>List</span>
-                    </button>
-                    <button 
-                        onClick={() => setActiveView('drawing')}
-                        className={`flex items-center justify-center gap-2 h-[38px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
-                            activeView === 'drawing' 
-                            ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5' 
-                            : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
-                        }`}
-                    >
-                        <svg className={`w-4 h-4 ${activeView === 'drawing' ? "text-title" : "text-gray"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                        <span>Drawing</span>
-                    </button>
-                </div>
+                {/* View Toggles have been moved to Zones.jsx FilterBar */}
             </div>
 
             {/* Table Section */}
@@ -51,7 +23,8 @@ const ZonesTable = ({ showQRCode = false }) => {
                 <table className="w-full text-left border-collapse min-w-max ">
                     <thead>
                         <tr className="border-b-[1.5px] border-gray-100 bg-gray-50">
-                            <th className="py-4 pr-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE ID</th>
+                            {selectionMode && <th className="py-4 pl-6 pr-2 text-[11px] font-bold text-[#7B8393] align-middle w-10"></th>}
+                            <th className="py-4 pr-6 pl-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE ID</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE NAME</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE TYPE</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">INVENTORY COUNT</th>
@@ -60,11 +33,25 @@ const ZonesTable = ({ showQRCode = false }) => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border-main/60">
-                        {ZONES_DATA.map((zone, index) => {
+                        {data.length === 0 ? (
+                            <tr>
+                                <td colSpan={showQRCode ? (selectionMode ? 7 : 6) : (selectionMode ? 6 : 5)} className="py-16 text-center">
+                                    <div className="flex flex-col items-center justify-center text-gray animate-in fade-in duration-500">
+                                        <p className="text-sm font-semibold text-title mb-1">No zones found</p>
+                                        <p className="text-xs">Try adjusting your active filters.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        ) : data.map((zone, index) => {
                             const Icon = zone.icon;
                             return (
                                 <tr key={index} className="hover:bg-base/50 transition-colors group">
-                                    <td className="py-4 pr-6 align-middle">
+                                    {selectionMode && (
+                                        <td className="py-4 pl-6 pr-2 align-middle">
+                                            <input type="checkbox" className="w-[15px] h-[15px] rounded border-gray-300 text-primary focus:ring-primary/20 cursor-pointer shadow-sm" />
+                                        </td>
+                                    )}
+                                    <td className="py-4 pr-6 pl-6 align-middle">
                                         <span className="text-xs font-semibold px-2.5 py-1 bg-base text-gray rounded-[4px] whitespace-nowrap">
                                             {zone.id}
                                         </span>
