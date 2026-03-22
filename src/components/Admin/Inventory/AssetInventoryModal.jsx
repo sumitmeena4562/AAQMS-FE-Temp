@@ -8,41 +8,87 @@ import {
 import Badge from '../../UI/Badge';
 import Button from '../../UI/Button';
 
-const AssetInventoryModal = ({ asset, isOpen, onClose }) => {
-    if (!asset) return null;
+const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
+    const [isScanning, setIsScanning] = React.useState(false);
+    const [scanProgress, setScanProgress] = React.useState(0);
+    const [isEditing, setIsEditing] = React.useState(false);
+    const [editedAsset, setEditedAsset] = React.useState(asset);
 
-    const statusColor = asset.status === 'Verified' ? 'success' : asset.status === 'Mismatch' ? 'danger' : 'warning';
-    const StatusIcon = asset.status === 'Verified' ? FiCheckCircle : asset.status === 'Mismatch' ? FiAlertCircle : FiClock;
+    if (!isOpen || !asset) return null;
+
+    const statusColor = {
+        'Operational': 'success',
+        'Warning': 'warning',
+        'Faulty': 'danger',
+        'Repairing': 'primary'
+    }[asset.status] || 'gray';
+
+    const StatusIcon = {
+        'Operational': FiCheckCircle,
+        'Warning': FiAlertTriangle,
+        'Faulty': FiAlertCircle,
+        'Repairing': FiActivity
+    }[asset.status] || FiInfo;
+
+    const handleScan = () => {
+        setIsScanning(true);
+        setScanProgress(0);
+        const interval = setInterval(() => {
+            setScanProgress(prev => {
+                if (prev >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => setIsScanning(false), 500);
+                    return 100;
+                }
+                return prev + 5;
+            });
+        }, 100);
+    };
+
+    const handleSave = () => {
+        setIsEditing(false);
+        // Here you would typically call an API to save
+        console.log("Saving asset details:", editedAsset);
+    };
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <>
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 overflow-hidden">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-title/40 backdrop-blur-md z-[10000]"
+                        className="fixed inset-0 bg-title/60 backdrop-blur-md"
                     />
-                    
-                    {/* Unified Modal Content */}
+
+                    {/* Modal Content */}
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 30 }}
+                        initial={{ opacity: 0, scale: 0.9, y: 30 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 30 }}
-                        className="fixed inset-6 md:inset-10 lg:inset-16 bg-page rounded-[28px] border border-border-main shadow-2xl z-[10001] flex flex-col overflow-hidden max-w-5xl mx-auto"
+                        exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                        transition={{ duration: 0.3, ease: "circOut" }}
+                        className="relative w-full max-w-5xl bg-page rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/20 select-none"
                     >
-                        {/* Header - Compact & Premium */}
-                        <div className="px-6 py-4 border-b border-border-main bg-card flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-base flex items-center justify-center text-primary border border-border-main shadow-sm relative">
-                                    <FiBox size={16} />
-                                    <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-success rounded-full border-2 border-card animate-pulse" />
+                        {/* Header */}
+                        <div className="px-8 py-6 border-b border-border-main flex items-center justify-between bg-card shrink-0">
+                            <div className="flex items-center gap-4">
+                                <div className={`w-12 h-12 rounded-2xl bg-${statusColor}/10 text-${statusColor} flex items-center justify-center border border-${statusColor}/20`}>
+                                    <FiBox size={24} />
                                 </div>
                                 <div className="flex flex-col">
-                                    <h2 className="text-base font-black text-title tracking-tight leading-none">{asset.name}</h2>
+                                    {isEditing ? (
+                                        <input 
+                                            type="text" 
+                                            value={editedAsset.name}
+                                            onChange={(e) => setEditedAsset({...editedAsset, name: e.target.value})}
+                                            className="text-base font-black text-title tracking-tight leading-none bg-base border border-border-main rounded px-2 py-1 outline-none"
+                                        />
+                                    ) : (
+                                        <h2 className="text-base font-black text-title tracking-tight leading-none">{editedAsset.name}</h2>
+                                    )}
                                     <span className="text-[9px] font-bold text-gray uppercase tracking-[0.2em] mt-1 opacity-60">Asset Details & AI Report</span>
                                 </div>
                             </div>
@@ -82,7 +128,7 @@ const AssetInventoryModal = ({ asset, isOpen, onClose }) => {
                                             <div className="relative">
                                                 <div className="absolute -left-[18.5px] top-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-page" />
                                                 <p className="text-[11px] font-black text-title leading-tight">Last AI Scan</p>
-                                                <p className="text-[9px] font-bold text-gray/60 uppercase tracking-widest mt-0.5">2 Hours Ago</p>
+                                                <p className="text-[9px] font-bold text-gray/60 uppercase tracking-widest mt-0.5">{isScanning ? 'Scanning...' : '2 Hours Ago'}</p>
                                             </div>
                                             <div className="relative opacity-40">
                                                 <div className="absolute -left-[18.5px] top-1 w-2.5 h-2.5 rounded-full bg-border-main border-2 border-page" />
@@ -101,11 +147,27 @@ const AssetInventoryModal = ({ asset, isOpen, onClose }) => {
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="p-3.5 rounded-2xl bg-card border border-border-main/50 shadow-sm">
                                                 <span className="text-[8px] font-bold text-gray/40 uppercase tracking-widest block mb-1">Serial No</span>
-                                                <code className="text-[11px] font-black text-title font-mono">{asset.uniqueId}</code>
+                                                {isEditing ? (
+                                                    <input 
+                                                        value={editedAsset.uniqueId}
+                                                        onChange={(e) => setEditedAsset({...editedAsset, uniqueId: e.target.value})}
+                                                        className="text-[11px] font-black text-title font-mono bg-base rounded w-full border-none outline-none"
+                                                    />
+                                                ) : (
+                                                    <code className="text-[11px] font-black text-title font-mono">{editedAsset.uniqueId}</code>
+                                                )}
                                             </div>
                                             <div className="p-3.5 rounded-2xl bg-card border border-border-main/50 shadow-sm">
                                                 <span className="text-[8px] font-bold text-gray/40 uppercase tracking-widest block mb-1">Location</span>
-                                                <span className="text-[11px] font-black text-title uppercase font-sans">{asset.floor}</span>
+                                                {isEditing ? (
+                                                    <input 
+                                                        value={editedAsset.floor}
+                                                        onChange={(e) => setEditedAsset({...editedAsset, floor: e.target.value})}
+                                                        className="text-[11px] font-black text-title uppercase font-sans bg-base rounded w-full border-none outline-none"
+                                                    />
+                                                ) : (
+                                                    <span className="text-[11px] font-black text-title uppercase font-sans">{editedAsset.floor}</span>
+                                                )}
                                             </div>
                                             <div className="p-3.5 rounded-2xl bg-card border border-border-main/50 shadow-sm col-span-2">
                                                 <span className="text-[8px] font-bold text-gray/40 uppercase tracking-widest block mb-1">Asset Model</span>
@@ -134,8 +196,8 @@ const AssetInventoryModal = ({ asset, isOpen, onClose }) => {
                                     {/* System Health */}
                                     <div className="p-5 rounded-[24px] bg-title text-white shadow-xl shadow-title/10 space-y-3 relative overflow-hidden group">
                                         <motion.div 
-                                            animate={{ opacity: [0.1, 0.2, 0.1] }}
-                                            transition={{ duration: 3, repeat: Infinity }}
+                                            animate={{ opacity: isScanning ? [0.4, 0.8, 0.4] : [0.1, 0.2, 0.1] }}
+                                            transition={{ duration: isScanning ? 0.5 : 3, repeat: Infinity }}
                                             className="absolute top-0 right-0 p-3"
                                         >
                                             <FiShield size={60} />
@@ -155,16 +217,28 @@ const AssetInventoryModal = ({ asset, isOpen, onClose }) => {
                                 <div className="lg:col-span-8 space-y-6">
                                     
                                     {/* AI Status Bar */}
-                                    <div className="px-5 py-3 rounded-2xl bg-primary shadow-lg shadow-primary/20 flex items-center justify-between">
+                                    <div className={`px-5 py-3 rounded-2xl ${isScanning ? 'bg-amber-500' : 'bg-primary'} shadow-lg shadow-primary/20 flex items-center justify-between transition-colors duration-500`}>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                                            <span className="text-[10px] font-black text-white uppercase tracking-[0.15em]">AI Monitoring is Active</span>
+                                            <div className={`w-2 h-2 rounded-full bg-white ${isScanning ? 'animate-ping' : 'animate-pulse'}`} />
+                                            <span className="text-[10px] font-black text-white uppercase tracking-[0.15em]">
+                                                {isScanning ? `Scan in Progress: ${scanProgress}%` : 'AI Monitoring is Active'}
+                                            </span>
                                         </div>
-                                        <span className="text-[9px] font-bold text-white/60 uppercase">Working Normally</span>
+                                        <span className="text-[9px] font-bold text-white/60 uppercase">
+                                            {isScanning ? 'Scanning ROI...' : 'Working Normally'}
+                                        </span>
                                     </div>
 
                                     {/* Photo Comparison */}
-                                    <div className="bg-card rounded-[32px] border border-border-main shadow-sm flex flex-col overflow-hidden">
+                                    <div className="bg-card rounded-[32px] border border-border-main shadow-sm flex flex-col overflow-hidden relative">
+                                        {isScanning && (
+                                            <motion.div 
+                                                initial={{ left: '-100%' }}
+                                                animate={{ left: '100%' }}
+                                                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                                className="absolute top-0 bottom-0 w-1 bg-primary/30 z-10 blur-sm"
+                                            />
+                                        )}
                                         <div className="px-6 py-3.5 border-b border-border-main flex items-center justify-between bg-base/40">
                                             <h3 className="text-[10px] font-black text-title uppercase tracking-[0.2em]">Photo Comparison</h3>
                                             <span className="text-[9px] font-bold text-gray/40 uppercase tracking-widest">98.4% Match</span>
@@ -191,13 +265,19 @@ const AssetInventoryModal = ({ asset, isOpen, onClose }) => {
                                                 <div className="aspect-[2/1] rounded-2xl border-2 border-dashed border-danger/20 overflow-hidden bg-base relative">
                                                     <img 
                                                         src="https://images.unsplash.com/photo-1598018554941-0ed5d336302a?q=80&w=400&fit=crop" 
-                                                        className="w-full h-full object-cover grayscale opacity-30"
+                                                        className={`w-full h-full object-cover grayscale transition-opacity duration-300 ${isScanning ? 'opacity-10' : 'opacity-30'}`}
                                                         alt="Latest"
                                                     />
                                                     <div className="absolute inset-0 flex items-center justify-center">
                                                         <div className="flex flex-col items-center gap-1">
-                                                            <FiActivity className="text-danger" size={18} />
-                                                            <span className="text-[8px] font-black text-danger uppercase tracking-widest">Difference Detected</span>
+                                                            {isScanning ? (
+                                                                <FiCpu className="text-primary animate-spin" size={24} />
+                                                            ) : (
+                                                                <>
+                                                                    <FiActivity className="text-danger" size={18} />
+                                                                    <span className="text-[8px] font-black text-danger uppercase tracking-widest">Difference Detected</span>
+                                                                </>
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -214,8 +294,8 @@ const AssetInventoryModal = ({ asset, isOpen, onClose }) => {
                                                     <circle className="text-border-main stroke-current opacity-20" strokeWidth="8" cx="50" cy="50" r="42" fill="transparent"></circle>
                                                     <motion.circle 
                                                         initial={{ strokeDasharray: "0, 264" }}
-                                                        animate={{ strokeDasharray: "163, 264" }}
-                                                        transition={{ duration: 1.5 }}
+                                                        animate={{ strokeDasharray: isScanning ? `${(scanProgress * 1.63)}, 264` : "163, 264" }}
+                                                        transition={{ duration: 0.2 }}
                                                         className="text-danger stroke-current" 
                                                         strokeWidth="8" 
                                                         strokeLinecap="round" 
@@ -225,10 +305,14 @@ const AssetInventoryModal = ({ asset, isOpen, onClose }) => {
                                                     ></motion.circle>
                                                 </svg>
                                                 <div className="absolute inset-0 flex items-center justify-center">
-                                                    <span className="text-[20px] font-black text-title">62%</span>
+                                                    <span className="text-[20px] font-black text-title">
+                                                        {isScanning ? `${Math.floor(scanProgress * 0.62)}%` : '62%'}
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <span className="text-[8px] font-black text-danger uppercase tracking-widest">Action Needed</span>
+                                            <span className="text-[8px] font-black text-danger uppercase tracking-widest">
+                                                {isScanning ? 'Analyzing...' : 'Action Needed'}
+                                            </span>
                                         </div>
 
                                         <div className="md:col-span-8 space-y-4">
@@ -265,15 +349,23 @@ const AssetInventoryModal = ({ asset, isOpen, onClose }) => {
 
                         {/* Actions Footer */}
                         <div className="p-4 border-t border-border-main bg-base/30 shrink-0 flex items-center justify-end gap-3">
-                            <Button variant="outline" className="!h-9 !px-6 !text-[9px] !font-black !uppercase !tracking-widest rounded-xl">
-                                Edit Asset
+                            <Button 
+                                onClick={isEditing ? handleSave : () => setIsEditing(true)}
+                                variant="outline" 
+                                className="!h-9 !px-6 !text-[9px] !font-black !uppercase !tracking-widest rounded-xl"
+                            >
+                                {isEditing ? 'Save Changes' : 'Edit Asset'}
                             </Button>
-                            <Button className="!h-9 !px-6 !text-[9px] !font-black !uppercase !tracking-widest rounded-xl">
-                                Scan Now
+                            <Button 
+                                onClick={handleScan}
+                                disabled={isScanning}
+                                className="!h-9 !px-6 !text-[9px] !font-black !uppercase !tracking-widest rounded-xl disabled:opacity-50"
+                            >
+                                {isScanning ? 'Scanning...' : 'Scan Now'}
                             </Button>
                         </div>
                     </motion.div>
-                </>
+                </div>
             )}
         </AnimatePresence>
     );
