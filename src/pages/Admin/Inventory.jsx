@@ -16,6 +16,7 @@ import FilterDropdown from '../../components/UI/FilterDropdown';
 import { useOrgStore } from '../../store/useOrgStore';
 import AssetDrawer from '../../components/Admin/Inventory/AssetDrawer';
 import EmptyState from '../../components/Admin/Inventory/EmptyState';
+import AssetCard from '../../components/Admin/Inventory/AssetCard';
 
 const ASSET_ICONS = {
     chair: FiGrid,
@@ -29,7 +30,7 @@ const ASSET_ICONS = {
     box: FiBox
 };
 
-const AssetIcon = ({ type, className = "" }) => {
+export const AssetIcon = ({ type, className = "" }) => {
     const Icon = ASSET_ICONS[type?.toLowerCase()] || ASSET_ICONS.box;
     return <Icon className={className} />;
 };
@@ -55,6 +56,7 @@ const Inventory = () => {
         status: [] 
     });
     const [searchQuery, setSearchQuery] = useState('');
+    const [viewMode, setViewMode] = useState('list'); // 'list' | 'grid'
 
     // Handle URL Parameters (Initial Load)
     useEffect(() => {
@@ -369,6 +371,23 @@ const Inventory = () => {
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
+                        <div className="flex items-center bg-base p-1 rounded-lg border border-border-main mr-2">
+                            <button
+                                onClick={() => setViewMode('list')}
+                                className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-card text-primary shadow-sm ring-1 ring-border-main' : 'text-gray/40 hover:text-title'}`}
+                                title="List View"
+                            >
+                                <FiLayout size={16} />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('grid')}
+                                className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-card text-primary shadow-sm ring-1 ring-border-main' : 'text-gray/40 hover:text-title'}`}
+                                title="Grid View"
+                            >
+                                <FiGrid size={16} />
+                            </button>
+                        </div>
+
                         {(filters.org !== 'all' || filters.floor !== 'all' || filters.zone !== 'all' || filters.type.length > 0 || filters.status.length > 0 || searchQuery !== '') && (
                             <button
                                 onClick={handleReset}
@@ -381,38 +400,86 @@ const Inventory = () => {
                     </div>
                 </FilterBar>
 
-                <DataTable
-                    columns={columns}
-                    data={displayedInventory}
-                    onRowClick={handleOpenDrawer}
-                    rowClassName={handleRowStyle}
-                    emptyMessage={<EmptyState onReset={handleReset} />}
-                    footer={
-                        <div className="flex items-center justify-between w-full px-1">
-                            <span className="text-[11px] font-bold text-gray tracking-tight">
-                                Showing <span className="text-body font-black">{displayedInventory.length > 0 ? startIndex + 1 : 0} to {startIndex + displayedInventory.length}</span> of <span className="text-body font-black">{filteredInventory.length}</span> results
-                            </span>
-                            <div className="flex items-center gap-1.5">
-                                <Button 
-                                    variant="outline" 
-                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                    disabled={currentPage === 1}
-                                    className={`!h-8 !px-3 !text-[10px] !font-black !uppercase !tracking-widest ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                >
-                                    Previous
-                                </Button>
-                                <Button 
-                                    variant="outline" 
-                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                    disabled={currentPage === totalPages || totalPages === 0}
-                                    className={`!h-8 !px-4 !text-[10px] !font-black !uppercase !tracking-widest ${currentPage === totalPages || totalPages === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                >
-                                    Next
-                                </Button>
+                {viewMode === 'list' ? (
+                    <DataTable
+                        columns={columns}
+                        data={displayedInventory}
+                        onRowClick={handleOpenDrawer}
+                        rowClassName={handleRowStyle}
+                        emptyMessage={<EmptyState onReset={handleReset} />}
+                        footer={
+                            <div className="flex items-center justify-between w-full px-1">
+                                <span className="text-[11px] font-bold text-gray tracking-tight">
+                                    Showing <span className="text-body font-black">{displayedInventory.length > 0 ? startIndex + 1 : 0} to {startIndex + displayedInventory.length}</span> of <span className="text-body font-black">{filteredInventory.length}</span> results
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                        disabled={currentPage === 1}
+                                        className={`!h-8 !px-3 !text-[10px] !font-black !uppercase !tracking-widest ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                        disabled={currentPage === totalPages || totalPages === 0}
+                                        className={`!h-8 !px-4 !text-[10px] !font-black !uppercase !tracking-widest ${currentPage === totalPages || totalPages === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    }
-                />
+                        }
+                    />
+                ) : (
+                    <div className="flex flex-col gap-6">
+                        {displayedInventory.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-5 gap-5">
+                                {displayedInventory.map(asset => (
+                                    <AssetCard 
+                                        key={asset.id} 
+                                        asset={asset} 
+                                        onClick={handleOpenDrawer} 
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <EmptyState onReset={handleReset} />
+                        )}
+
+                        {/* Grid Pagination */}
+                        {totalPages > 1 && (
+                            <div className="flex items-center justify-between bg-card p-4 rounded-2xl border border-border-main shadow-sm">
+                                <span className="text-[11px] font-bold text-gray tracking-tight">
+                                    Showing <span className="text-body font-black">{startIndex + 1} to {startIndex + displayedInventory.length}</span> of <span className="text-body font-black">{filteredInventory.length}</span> results
+                                </span>
+                                <div className="flex items-center gap-2">
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                        disabled={currentPage === 1}
+                                        className="!h-9 !px-4 !text-[11px]"
+                                    >
+                                        Previous
+                                    </Button>
+                                    <div className="flex items-center gap-1 px-2 font-black text-[11px] text-title bg-base h-9 rounded-lg border border-border-main">
+                                        {currentPage} / {totalPages}
+                                    </div>
+                                    <Button 
+                                        variant="outline" 
+                                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                        disabled={currentPage === totalPages}
+                                        className="!h-9 !px-4 !text-[11px]"
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <AssetDrawer 
