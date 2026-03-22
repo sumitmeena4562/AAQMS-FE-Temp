@@ -15,11 +15,11 @@ const AssetCard = ({ asset, onClick }) => {
             animate={{ opacity: 1, y: 0 }}
             whileHover={{ y: -4, transition: { duration: 0.2 } }}
             onClick={() => onClick(asset)}
-            className="group relative bg-card border border-border-main rounded-2xl p-5 shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden"
+            className="group relative bg-card border border-border-main rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-all cursor-pointer overflow-hidden"
         >
             {/* Background Accent */}
             <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 rounded-full opacity-[0.03] transition-transform group-hover:scale-110 ${
-                asset.status === 'Mismatch' ? 'bg-rose-500' : asset.status === 'Pending' ? 'bg-amber-500' : 'bg-emerald-500'
+                asset.status === 'Mismatch' ? 'bg-danger' : asset.status === 'Pending' ? 'bg-warning' : 'bg-success'
             }`} />
 
             <div className="flex justify-between items-start mb-4 relative z-10">
