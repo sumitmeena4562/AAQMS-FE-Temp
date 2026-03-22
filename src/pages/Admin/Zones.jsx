@@ -72,6 +72,7 @@ const Zones = () => {
 
                 {/* TABLE */}
                 <ZonesTable />
+               
 
             </main>
 

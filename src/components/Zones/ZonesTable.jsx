@@ -1,8 +1,10 @@
-import React from 'react';
-import { QrCode } from 'lucide-react';
+import React, { useState } from 'react';
+import { QrCode, List } from 'lucide-react';
 import { ZONES_DATA } from '../../data/zones';
 
 const ZonesTable = ({ showQRCode = false }) => {
+    const [activeView, setActiveView] = useState('list');
+
     return (
         <div className="bg-card border border-border-main rounded-xl shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] flex flex-col w-full overflow-hidden">
             {/* Header Section */}
@@ -15,13 +17,33 @@ const ZonesTable = ({ showQRCode = false }) => {
                         Manage zone details, types, and risk levels.
                     </p>
                 </div>
-                {/* View Drawing Button */}
-                <button className="flex items-center justify-center gap-2 w-[153px] h-[46px] bg-card border border-border-main rounded-lg text-sm font-semibold text-body hover:bg-base hover:text-blue-600 hover:border-blue-200 transition-all shadow-md outline-none cursor-pointer group">
-                    <svg className="w-4 h-4 text-gray group-hover:text-blue-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                    <span>View Drawing</span>
-                </button>
+                {/* View Toggles */}
+                <div className="flex items-center bg-base p-1 rounded-lg border border-border-main/60">
+                    <button 
+                        onClick={() => setActiveView('list')}
+                        className={`flex items-center justify-center gap-2 h-[38px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
+                            activeView === 'list' 
+                            ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5' 
+                            : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
+                        }`}
+                    >
+                        <List size={16} className={activeView === 'list' ? "text-title" : "text-gray"} />
+                        <span>List</span>
+                    </button>
+                    <button 
+                        onClick={() => setActiveView('drawing')}
+                        className={`flex items-center justify-center gap-2 h-[38px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
+                            activeView === 'drawing' 
+                            ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5' 
+                            : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
+                        }`}
+                    >
+                        <svg className={`w-4 h-4 ${activeView === 'drawing' ? "text-title" : "text-gray"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        <span>Drawing</span>
+                    </button>
+                </div>
             </div>
 
             {/* Table Section */}
