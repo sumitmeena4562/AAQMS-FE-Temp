@@ -141,18 +141,41 @@ export const generateInventoryForZone = (zoneId = '104', floorRef = 'Floor 1', s
 
 export const generateGlobalInventory = (orgs) => {
   let globalInventory = [];
-  const floors = ["Floor 1", "Floor 2", "Floor 3"];
+  const types = ['Furniture', 'Network', 'IT Asset', 'Stationery', 'Safety'];
   
   orgs.forEach((org, orgIdx) => {
-     // Generate data for 2-3 floors per org
-     const numFloors = (orgIdx % 2) + 1; 
-     for (let f = 0; f < numFloors; f++) {
-        const floorName = floors[f];
-        // Generate for 2 zones per floor
-        for (let z = 0; z < 2; z++) {
-            const zoneId = 100 + (orgIdx * 10) + (f * 5) + z;
-            const orgInventory = generateInventoryForZone(zoneId.toString(), floorName, "Main Site", org.name);
-            globalInventory = [...globalInventory, ...orgInventory];
+     // Generate data for 4 floors per org
+     const numFloors = 4; 
+     for (let f = 1; f <= numFloors; f++) {
+        const floorName = `Floor ${f}`;
+        // Generate for 8 zones per floor
+        const numZones = 8;
+        for (let z = 1; z <= numZones; z++) {
+            const zoneId = (orgIdx + 1) * 100 + (f * 10) + z;
+            // Generate some assets for each zone manually instead of using generateInventoryForZone to have more random statuses
+            const numAssets = Math.floor(Math.random() * 3) + 2; // 2 to 4 assets
+            for (let i = 0; i < numAssets; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const status = Math.random() > 0.8 ? 'Mismatch' : Math.random() > 0.6 ? 'Pending' : 'Verified';
+                const id = `AST-${org.name.substring(0, 2).toUpperCase()}-${zoneId}-${Math.floor(1000 + Math.random() * 9000)}`;
+                
+                globalInventory.push({
+                    id: id,
+                    uniqueId: id,
+                    name: `${type} ${i + 1}`,
+                    model: `${type === 'IT Asset' ? 'Dell Latitude' : type === 'Furniture' ? 'Ergonomic Chair' : 'Standard ' + type}`,
+                    type: type,
+                    icon: type.toLowerCase() === 'it asset' ? 'monitor' : type.toLowerCase(),
+                    org: org.name,
+                    site: org.sites?.[0]?.name || 'Main Campus',
+                    floor: floorName,
+                    zoneId: zoneId.toString(),
+                    status: status,
+                    lastAudit: `2024-03-${Math.floor(Math.random() * 20) + 10}`,
+                    auditor: ['Nilesh G.', 'Sumit S.', 'AI System'][Math.floor(Math.random() * 3)],
+                    qr: "QR_DATA_MOCK"
+                });
+            }
         }
      }
   });
