@@ -8,7 +8,8 @@ import {
     FiHome, FiBriefcase, FiBox, FiCheckCircle, 
     FiAlertCircle, FiClock, FiExternalLink, FiGrid,
     FiMonitor, FiLayout, FiRefreshCcw, FiPrinter,
-    FiCpu, FiHardDrive, FiSmartphone, FiTablet
+    FiCpu, FiHardDrive, FiSmartphone, FiTablet,
+    FiZap, FiMousePointer
 } from 'react-icons/fi';
 import { generateGlobalInventory } from '../../utils/mockSiteData';
 import Button from '../../components/UI/Button';
@@ -40,6 +41,10 @@ const ASSET_ICONS = {
     tablet: FiTablet,
     laptop: FiMonitor,
     cpu: FiCpu,
+    ups: FiZap,
+    system: FiCpu,
+    keyboard: FiMousePointer,
+    mouse: FiMousePointer,
     box: FiBox
 };
 
