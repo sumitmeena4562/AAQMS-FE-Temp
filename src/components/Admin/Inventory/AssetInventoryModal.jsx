@@ -11,6 +11,7 @@ import Button from '../../UI/Button';
 const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
     const [isEditing, setIsEditing] = React.useState(false);
     const [editedAsset, setEditedAsset] = React.useState(asset);
+    const [showInfo, setShowInfo] = React.useState(true);
 
     // Sync state when asset prop changes or modal opens
     React.useEffect(() => {
@@ -37,7 +38,7 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
     const StatusIcon = statusTheme.icon;
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6 sm:p-12 overflow-hidden bg-slate-900/40 backdrop-blur-xl transition-all duration-300">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-12 overflow-hidden bg-slate-900/40 backdrop-blur-xl transition-all duration-300">
             {/* Main Container - Dashboard Style */}
             <div className="relative w-full max-w-6xl h-full max-h-[850px] bg-white rounded-2xl shadow-[0_32px_128px_-16px_rgba(0,0,0,0.15)] border border-white/50 flex flex-col md:flex-row overflow-hidden select-none">
                 
@@ -132,11 +133,17 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
                             </div>
                          </div>
                          <div className="flex items-center gap-3">
-                             <button className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors">
-                                 <FiInfo size={18} />
+                             <button 
+                                onClick={() => setShowInfo(!showInfo)}
+                                className={`w-10 h-10 rounded-2xl ${showInfo ? 'bg-slate-900 text-white' : 'bg-[#f8faff] text-[#94a3b8]'} border border-[#eef2ff] flex items-center justify-center hover:text-slate-50 transition-all`}
+                             >
+                                 <FiInfo size={20} />
                              </button>
-                             <button className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors">
-                                 <FiMaximize2 size={18} />
+                             <button 
+                                onClick={onClose}
+                                className="w-10 h-10 rounded-2xl bg-[#f8faff] border border-[#eef2ff] flex items-center justify-center text-[#94a3b8] hover:bg-slate-900 hover:text-white transition-all shadow-sm"
+                             >
+                                 <FiX size={20} />
                              </button>
                          </div>
                     </div>
@@ -144,29 +151,31 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
                     {/* Scrollable Body */}
                     <div className="flex-1 overflow-y-auto p-12 space-y-12 no-scrollbar bg-slate-50/30">
                         {/* Specifications Grid */}
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Specifications</h3>
-                                <div className="h-0.5 flex-1 mx-6 bg-slate-100 rounded-full" />
+                        {showInfo && (
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Specifications</h3>
+                                    <div className="h-0.5 flex-1 mx-6 bg-slate-100 rounded-full" />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm group">
+                                        <FiShield className="mb-3 text-slate-300" size={20} />
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Standard</p>
+                                        <p className="text-[13px] font-black text-slate-900">ISO 9001:2015</p>
+                                    </div>
+                                    <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm group">
+                                        <FiCpu className="mb-3 text-slate-300" size={20} />
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Model Series</p>
+                                        <p className="text-[13px] font-black text-slate-900">{asset.model}</p>
+                                    </div>
+                                    <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm group">
+                                        <FiActivity className="mb-3 text-slate-300" size={20} />
+                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Type Code</p>
+                                        <p className="text-[13px] font-black text-slate-900">{asset.type}</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm group">
-                                    <FiShield className="mb-3 text-slate-300" size={20} />
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Standard</p>
-                                    <p className="text-[13px] font-black text-slate-900">ISO 9001:2015</p>
-                                </div>
-                                <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm group">
-                                    <FiCpu className="mb-3 text-slate-300" size={20} />
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Model Series</p>
-                                    <p className="text-[13px] font-black text-slate-900">{asset.model}</p>
-                                </div>
-                                <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm group">
-                                    <FiActivity className="mb-3 text-slate-300" size={20} />
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Type Code</p>
-                                    <p className="text-[13px] font-black text-slate-900">{asset.type}</p>
-                                </div>
-                            </div>
-                        </div>
+                        )}
 
                         {/* Visual Diagnostics */}
                         <div className="space-y-6">
@@ -216,38 +225,40 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
                         </div>
 
                         {/* Recent Activity Log */}
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Activity History</h3>
-                                <div className="h-0.5 flex-1 mx-6 bg-slate-100 rounded-full" />
-                            </div>
-                            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                                <div className="p-8 space-y-6">
-                                    {[1, 2].map((log, i) => (
-                                        <div key={i} className={`flex items-start gap-6 ${i === 0 ? '' : 'pt-6 border-t border-slate-50'}`}>
-                                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${i === 0 ? 'bg-danger/10 text-danger border border-danger/10' : 'bg-success/10 text-success border border-success/10'}`}>
-                                                {i === 0 ? <FiAlertCircle size={18} /> : <FiCheckCircle size={18} />}
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center justify-between mb-1">
-                                                    <p className="text-[13px] font-black text-slate-900 uppercase">{i === 0 ? 'Safety Violation' : 'Routine Scan'}</p>
-                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{i === 0 ? '15m ago' : '1h ago'}</span>
+                        {showInfo && (
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Activity History</h3>
+                                    <div className="h-0.5 flex-1 mx-6 bg-slate-100 rounded-full" />
+                                </div>
+                                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                                    <div className="p-8 space-y-6">
+                                        {[1, 2].map((log, i) => (
+                                            <div key={i} className={`flex items-start gap-6 ${i === 0 ? '' : 'pt-6 border-t border-slate-50'}`}>
+                                                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${i === 0 ? 'bg-danger/10 text-danger border border-danger/10' : 'bg-success/10 text-success border border-success/10'}`}>
+                                                    {i === 0 ? <FiAlertCircle size={18} /> : <FiCheckCircle size={18} />}
                                                 </div>
-                                                <p className="text-[12px] font-medium text-slate-500 leading-relaxed font-sans mt-2">
-                                                    {i === 0 
-                                                        ? 'Critical mismatch detected between baseline and current audit. Asset positioned outside of defined boundary.' 
-                                                        : 'All safety parameters verified. Physical orientation matches the baseline master image.'}
-                                                </p>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <p className="text-[13px] font-black text-slate-900 uppercase">{i === 0 ? 'Safety Violation' : 'Routine Scan'}</p>
+                                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{i === 0 ? '15m ago' : '1h ago'}</span>
+                                                    </div>
+                                                    <p className="text-[12px] font-medium text-slate-500 leading-relaxed font-sans mt-2">
+                                                        {i === 0 
+                                                            ? 'Critical mismatch detected between baseline and current audit. Asset positioned outside of defined boundary.' 
+                                                            : 'All safety parameters verified. Physical orientation matches the baseline master image.'}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Showing last 2 events</span>
-                                    <button className="text-[9px] font-black text-slate-900 uppercase tracking-widest hover:underline decoration-2 underline-offset-4">Download Logs</button>
+                                        ))}
+                                    </div>
+                                    <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Showing last 2 events</span>
+                                        <button className="text-[9px] font-black text-slate-900 uppercase tracking-widest hover:underline decoration-2 underline-offset-4">Download Logs</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Footer Actions */}
