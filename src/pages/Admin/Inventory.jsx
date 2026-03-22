@@ -7,7 +7,8 @@ import Badge from '../../components/UI/Badge';
 import { 
     FiHome, FiBriefcase, FiBox, FiCheckCircle, 
     FiAlertCircle, FiClock, FiExternalLink, FiGrid,
-    FiMonitor, FiLayout, FiRefreshCcw
+    FiMonitor, FiLayout, FiRefreshCcw, FiPrinter,
+    FiCpu, FiHardDrive, FiSmartphone, FiTablet
 } from 'react-icons/fi';
 import { generateGlobalInventory } from '../../utils/mockSiteData';
 import Button from '../../components/UI/Button';
@@ -22,11 +23,23 @@ const ASSET_ICONS = {
     chair: FiGrid,
     furniture: FiGrid,
     monitor: FiMonitor,
-    peripheral: FiMonitor,
-    network: FiLayout, // Use available icons
+    display: FiMonitor,
+    screen: FiMonitor,
+    peripheral: FiCpu,
+    network: FiLayout,
     router: FiLayout,
-    printer: FiGrid,
+    switch: FiLayout,
+    printer: FiPrinter,
+    scanner: FiPrinter,
+    copier: FiPrinter,
     safety: FiBox,
+    server: FiHardDrive,
+    storage: FiHardDrive,
+    mobile: FiSmartphone,
+    phone: FiSmartphone,
+    tablet: FiTablet,
+    laptop: FiMonitor,
+    cpu: FiCpu,
     box: FiBox
 };
 

@@ -105,44 +105,48 @@ export const generateFloorsForSite = (site) => {
 };
 
 export const generateGlobalInventory = (orgs) => {
-  let globalInventory = [];
-  const types = ['Furniture', 'Network', 'IT Asset', 'Stationery', 'Safety'];
-  
-  orgs.forEach((org, orgIdx) => {
-     // Generate data for 4 floors per org
-     const numFloors = 4; 
-     for (let f = 1; f <= numFloors; f++) {
-        const floorName = `Floor ${f}`;
-        // Generate for 8 zones per floor
-        const numZones = 8;
-        for (let z = 1; z <= numZones; z++) {
-            const zoneId = (orgIdx + 1) * 100 + (f * 10) + z;
-            // Generate some assets for each zone manually instead of using generateInventoryForZone to have more random statuses
-            const numAssets = Math.floor(Math.random() * 3) + 2; // 2 to 4 assets
-            for (let i = 0; i < numAssets; i++) {
-                const type = types[Math.floor(Math.random() * types.length)];
-                const status = Math.random() > 0.8 ? 'Mismatch' : Math.random() > 0.6 ? 'Pending' : 'Verified';
-                const id = `AST-${org.name.substring(0, 2).toUpperCase()}-${zoneId}-${Math.floor(1000 + Math.random() * 9000)}`;
-                
-                globalInventory.push({
-                    id: id,
-                    uniqueId: id,
-                    name: `${type} ${i + 1}`,
-                    model: `${type === 'IT Asset' ? 'Dell Latitude' : type === 'Furniture' ? 'Ergonomic Chair' : 'Standard ' + type}`,
-                    type: type,
-                    icon: type.toLowerCase() === 'it asset' ? 'monitor' : type.toLowerCase(),
-                    org: org.name,
-                    site: org.sites?.[0]?.name || 'Main Campus',
-                    floor: floorName,
-                    zoneId: zoneId.toString(),
-                    status: status,
-                    lastAudit: `2024-03-${Math.floor(Math.random() * 20) + 10}`,
-                    auditor: ['Nilesh G.', 'Sumit S.', 'AI System'][Math.floor(Math.random() * 3)],
-                    qr: "QR_DATA_MOCK"
-                });
-            }
+    const assets = [];
+    const count = 30; // Clean, manageable count
+    const ASSET_TYPES = ['Furniture', 'Electronics', 'Network', 'Safety'];
+    
+    for (let i = 0; i < count; i++) {
+        const org = orgs[i % orgs.length]?.name || 'Unknown Org';
+        const type = ASSET_TYPES[i % ASSET_TYPES.length];
+        const status = i % 10 === 0 ? 'Mismatch' : i % 7 === 0 ? 'Pending' : 'Verified';
+        
+        // Define meaningful name and icon based on type
+        let name = "";
+        let icon = "box";
+
+        if (type === 'Furniture') {
+            name = `${['Ergonomic', 'Mesh', 'Office'][i % 3]} Chair`;
+            icon = 'chair';
+        } else if (type === 'Electronics') {
+            const device = i % 4 === 0 ? 'Printer' : i % 2 === 0 ? 'Monitor' : 'UPS';
+            name = `${['Dell', 'HP', 'Samsung'][i % 3]} ${device}`;
+            icon = device.toLowerCase();
+        } else if (type === 'Network') {
+            const device = i % 2 === 0 ? 'Router' : 'Switch';
+            name = `Cisco ${device} Pro`;
+            icon = 'network';
+        } else {
+            name = `Fire Extinguisher S${i + 1}`;
+            icon = 'safety';
         }
-     }
-  });
-  return globalInventory;
+
+        assets.push({
+            id: i + 1,
+            uniqueId: `ASSET-${2000 + i}`,
+            name: name,
+            type: type,
+            model: `V${i + 1} Edition`,
+            status: status,
+            org: org,
+            floor: `Floor ${Math.floor(i / 10) + 1}`,
+            zone: `Zone ${(i % 3) + 1}`,
+            lastAudit: `2024-03-${10 + (i % 10)}`,
+            icon: icon
+        });
+    }
+    return assets;
 };
