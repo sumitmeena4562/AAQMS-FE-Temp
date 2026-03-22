@@ -53,44 +53,48 @@ const Inventory = () => {
 
     const columns = useMemo(() => [
         {
-            header: 'Asset Name',
+            header: 'ASSET NAME',
             accessor: 'name',
             width: '28%',
             render: (name, row) => (
-                <div className="flex items-center gap-3.5 py-1.5 px-0.5">
-                    <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-base text-primary shrink-0 border border-border-main/50">
-                        <AssetIcon type={row.icon} className="w-5 h-5" />
+                <div className="flex items-center gap-3.5 py-1.5 pr-2">
+                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-card text-title shrink-0 border border-border-main shadow-sm">
+                        <AssetIcon type={row.icon} className="w-5 h-5 text-title/80" />
                     </div>
                     <div className="flex flex-col min-w-0">
-                        <span className="text-[13px] font-black text-title leading-tight truncate">{name}</span>
-                        <span className="text-[10px] font-medium text-gray mt-0.5 truncate">{row.model}</span>
+                        <span className="text-[14px] font-black text-title leading-tight truncate">{name}</span>
+                        <span className="text-[11px] font-medium text-gray mt-0.5 truncate">{row.model}</span>
                     </div>
                 </div>
             )
         },
         {
-            header: 'Unique ID',
+            header: 'UNIQUE ID',
             accessor: 'uniqueId',
-            width: '15%',
+            width: '16%',
             render: (id) => (
-                <span className="px-2 py-1 bg-base border border-border-main/50 rounded-md text-[10px] font-bold text-gray tracking-tight font-mono">
+                <span className="px-2.5 py-1 bg-base border border-border-main/60 rounded-md text-[11px] font-black text-gray/80 tracking-wide font-mono uppercase">
                     {id}
                 </span>
             )
         },
         {
-            header: 'QR Code',
+            header: 'QR CODE',
             accessor: 'qr',
             width: '10%',
             align: 'center',
             render: () => (
-                <FiLayout className="text-gray/40 hover:text-gray transition-colors cursor-pointer" size={18} />
+                <div className="flex justify-center w-full">
+                    <div className="text-gray/40 hover:text-title transition-colors cursor-pointer border border-transparent hover:border-border-main p-1 rounded-md">
+                        <FiLayout size={18} />
+                    </div>
+                </div>
             )
         },
         {
-            header: 'AI Status',
+            header: 'AI STATUS',
             accessor: 'status',
-            width: '15%',
+            width: '16%',
             align: 'center',
             render: (status) => {
                 const color = status === 'Verified' ? 'success' : status === 'Mismatch' ? 'danger' : 'warning';
@@ -99,9 +103,9 @@ const Inventory = () => {
                         <Badge 
                             variant="light" 
                             color={color} 
-                            className="!text-[9px] !px-2.5 !py-0.5 !rounded-full !font-black !uppercase !tracking-widest flex items-center gap-1"
+                            className="text-[10px] px-3 py-1.5 rounded-full font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm"
                         >
-                            <span className={`w-1 h-1 rounded-full ${status === 'Verified' ? 'bg-emerald-500' : status === 'Mismatch' ? 'bg-rose-500' : 'bg-amber-500'}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full ${status === 'Verified' ? 'bg-emerald-500' : status === 'Mismatch' ? 'bg-rose-500' : 'bg-amber-500'}`} />
                             {status}
                         </Badge>
                     </div>
@@ -109,29 +113,29 @@ const Inventory = () => {
             }
         },
         {
-            header: 'Last Audit',
+            header: 'LAST AUDIT',
             accessor: 'lastAudit',
-            width: '20%',
+            width: '18%',
             render: (date, row) => (
                 <div className="flex flex-col min-w-0">
-                    <span className="text-[11px] font-bold text-body truncate tracking-tight">{date}</span>
-                    <span className="text-[10px] font-medium text-gray mt-0.5 truncate italic">By {row.auditor}</span>
+                    <span className="text-[12px] font-bold text-title truncate tracking-tight">{date}</span>
+                    <span className="text-[11px] font-medium text-gray mt-0.5 truncate italic">By {row.auditor}</span>
                 </div>
             )
         },
         {
-            header: 'Actions',
+            header: 'ACTIONS',
             accessor: 'id',
             width: '12%',
             align: 'right',
             render: () => (
-                <div className="flex justify-end pr-1">
+                <div className="flex justify-end pr-2">
                     <Button 
-                        variant="ghost" 
+                        variant="outline" 
                         icon={FiExternalLink} 
-                        className="!h-8 !px-3 !text-[11px] !font-black !uppercase !tracking-wider !text-rose-500 hover:!bg-rose-50/50 !border !border-rose-100/50"
+                        className="h-8 px-3.5 text-[11px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 border-rose-200"
                     >
-                        View
+                        VIEW
                     </Button>
                 </div>
             )
