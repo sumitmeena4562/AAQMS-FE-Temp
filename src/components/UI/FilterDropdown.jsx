@@ -90,11 +90,11 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                                     id={`option-${val}`}
                                     onClick={() => { onChange(val); setIsOpen(false); }}
                                     className={`w-full px-2.5 py-1.5 text-left rounded-lg transition-all duration-200 text-[12px] font-bold mt-0.5 group flex items-center justify-between gap-3
-                                        ${isSelected ? 'bg-primary cursor-default' : 'hover:bg-base text-body'}`}
+                                        ${isSelected ? 'bg-primary text-white cursor-default' : 'hover:bg-base text-body'}`}
                                     role="option"
                                     aria-selected={isSelected}
                                 >
-                                    <span className={`truncate ${isSelected ? 'text-white' : ''}`}>{lbl}</span>
+                                    <span className="truncate">{lbl}</span>
                                     {isSelected && <FiCheck className="text-white shrink-0" size={13} />}
                                 </button>
                             );

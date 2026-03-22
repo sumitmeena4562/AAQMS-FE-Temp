@@ -104,8 +104,8 @@ export const generateFloorsForSite = (site) => {
   return generatedFloors;
 };
 
-export const generateInventoryForZone = (zoneId = '104') => {
-  const seed = parseInt(zoneId.replace(/\D/g, '') || '104');
+export const generateInventoryForZone = (zoneId = '104', floorRef = 'Floor 1', siteRef = 'North HQ', orgRef = 'Acme Corp') => {
+  const seed = parseInt(zoneId.toString().replace(/\D/g, '') || '104');
   const items = [
     { name: "Ergonomic Chair", model: "Herman Miller", type: "Furniture", icon: "chair" },
     { name: "LG Monitor 27\"", model: "Asset Tag: #8892", type: "Peripheral", icon: "monitor" },
@@ -129,8 +129,22 @@ export const generateInventoryForZone = (zoneId = '104') => {
       status: status,
       lastAudit: i % 3 === 0 ? "Today, 08:20 AM" : "Yesterday, 04:15 PM",
       auditor: i % 3 === 0 ? "AI Bot #4" : "Sarah J.",
-      icon: base.icon
+      icon: base.icon,
+      zoneId: zoneId,
+      floor: floorRef,
+      site: siteRef,
+      org: orgRef
     });
   }
   return inventory;
+};
+
+export const generateGlobalInventory = (orgs) => {
+  let globalInventory = [];
+  orgs.forEach(org => {
+     // Generate some sample data for each org to simulate global view
+     const orgInventory = generateInventoryForZone(org.id, "Floor 1", "Main Site", org.name);
+     globalInventory = [...globalInventory, ...orgInventory];
+  });
+  return globalInventory;
 };
