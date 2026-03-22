@@ -9,41 +9,15 @@ import Badge from '../../UI/Badge';
 import Button from '../../UI/Button';
 
 const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
-    const [isScanning, setIsScanning] = React.useState(false);
-    const [scanProgress, setScanProgress] = React.useState(0);
     const [isEditing, setIsEditing] = React.useState(false);
     const [editedAsset, setEditedAsset] = React.useState(asset);
 
-    if (!isOpen || !asset) return null;
-
-    const statusColor = {
-        'Operational': 'success',
-        'Warning': 'warning',
-        'Faulty': 'danger',
-        'Repairing': 'primary'
-    }[asset.status] || 'gray';
-
-    const StatusIcon = {
-        'Operational': FiCheckCircle,
-        'Warning': FiAlertTriangle,
-        'Faulty': FiAlertCircle,
-        'Repairing': FiActivity
-    }[asset.status] || FiInfo;
-
-    const handleScan = () => {
-        setIsScanning(true);
-        setScanProgress(0);
-        const interval = setInterval(() => {
-            setScanProgress(prev => {
-                if (prev >= 100) {
-                    clearInterval(interval);
-                    setTimeout(() => setIsScanning(false), 500);
-                    return 100;
-                }
-                return prev + 5;
-            });
-        }, 100);
-    };
+    // Sync state when asset prop changes or modal opens
+    React.useEffect(() => {
+        if (asset) {
+            setEditedAsset(asset);
+        }
+    }, [asset]);
 
     const handleSave = () => {
         setIsEditing(false);
@@ -51,323 +25,249 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
         console.log("Saving asset details:", editedAsset);
     };
 
+    if (!isOpen || !asset || !editedAsset) return null;
+
+    const statusTheme = {
+        'Operational': { color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', icon: FiCheckCircle },
+        'Warning': { color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)', icon: FiAlertTriangle },
+        'Faulty': { color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)', icon: FiAlertCircle },
+        'Repairing': { color: '#6366f1', bg: 'rgba(99, 102, 241, 0.1)', icon: FiActivity }
+    }[asset.status] || { color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.1)', icon: FiInfo };
+
+    const StatusIcon = statusTheme.icon;
+
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 overflow-hidden">
-                    {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="fixed inset-0 bg-title/60 backdrop-blur-md"
-                    />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-6 sm:p-12 overflow-hidden bg-slate-900/40 backdrop-blur-xl transition-all duration-300">
+            {/* Main Container - Dashboard Style */}
+            <div className="relative w-full max-w-6xl h-full max-h-[850px] bg-white rounded-2xl shadow-[0_32px_128px_-16px_rgba(0,0,0,0.15)] border border-white/50 flex flex-col md:flex-row overflow-hidden select-none">
+                
+                {/* Left Sidebar: Asset Identity */}
+                <div className="w-full md:w-[320px] bg-slate-50 border-r border-slate-200/60 p-10 flex flex-col shrink-0">
+                    <div className="mb-10 text-center">
+                        <div className="w-24 h-24 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center mx-auto mb-6 border border-slate-100 group">
+                            <FiBox size={40} style={{ color: statusTheme.color }} />
+                        </div>
+                        {isEditing ? (
+                            <input 
+                                value={editedAsset.name} 
+                                onChange={(e) => setEditedAsset({...editedAsset, name: e.target.value})}
+                                className="w-full text-center text-xl font-black text-slate-900 bg-white border border-slate-200 rounded-xl px-2 py-1 outline-none shadow-sm"
+                            />
+                        ) : (
+                            <h2 className="text-xl font-black text-slate-900 tracking-tight leading-tight">{editedAsset.name}</h2>
+                        )}
+                        <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 shadow-sm text-slate-500">
+                             {editedAsset.uniqueId}
+                        </div>
+                    </div>
 
-                    {/* Modal Content */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: 30 }}
-                        transition={{ duration: 0.3, ease: "circOut" }}
-                        className="relative w-full max-w-5xl bg-page rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/20 select-none"
+                    <div className="space-y-10 flex-1">
+                        {/* Health Index */}
+                        <div className="space-y-4">
+                             <div className="flex items-center justify-between">
+                                 <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Health Index</h3>
+                                 <span className="text-[10px] font-black text-slate-900 px-2 py-0.5 rounded bg-slate-200">v2.4</span>
+                             </div>
+                             <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+                                 <div className="flex items-center justify-between">
+                                     <span className="text-[28px] font-black text-slate-900">94.2<span className="text-slate-300">%</span></span>
+                                     <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: statusTheme.color }} />
+                                 </div>
+                                 <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                     <div className="h-full rounded-full" style={{ width: '94.2%', backgroundColor: statusTheme.color }} />
+                                 </div>
+                             </div>
+                        </div>
+
+                        {/* Location Context */}
+                        <div className="space-y-4">
+                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Location Context</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                                        <FiMapPin size={18} />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Organizaton</span>
+                                        <span className="text-[13px] font-black text-slate-900 leading-none mt-1">{asset.org}</span>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400">
+                                        <FiLayout size={18} />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Floor & Zone</span>
+                                        <span className="text-[13px] font-black text-slate-900 leading-none mt-1">{asset.floor} <span className="text-slate-300 mx-1">/</span> Zone {asset.zone || '104'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button 
+                         onClick={onClose}
+                         className="mt-10 w-full py-4 rounded-3xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 active:scale-95 transition-all"
                     >
-                        {/* Header */}
-                        <div className="px-8 py-6 border-b border-border-main flex items-center justify-between bg-card shrink-0">
-                            <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 rounded-2xl bg-${statusColor}/10 text-${statusColor} flex items-center justify-center border border-${statusColor}/20`}>
-                                    <FiBox size={24} />
-                                </div>
-                                <div className="flex flex-col">
-                                    {isEditing ? (
-                                        <input 
-                                            type="text" 
-                                            value={editedAsset.name}
-                                            onChange={(e) => setEditedAsset({...editedAsset, name: e.target.value})}
-                                            className="text-base font-black text-title tracking-tight leading-none bg-base border border-border-main rounded px-2 py-1 outline-none"
-                                        />
-                                    ) : (
-                                        <h2 className="text-base font-black text-title tracking-tight leading-none">{editedAsset.name}</h2>
-                                    )}
-                                    <span className="text-[9px] font-bold text-gray uppercase tracking-[0.2em] mt-1 opacity-60">Asset Details & AI Report</span>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Badge variant="light" color={statusColor} className="py-1 px-3 flex items-center gap-2 text-[9px]">
-                                    <StatusIcon size={11} /> {asset.status}
-                                </Badge>
-                                <button 
-                                    onClick={onClose}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-base text-gray transition-colors border border-border-main"
-                                >
-                                    <FiX size={16} />
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Scrollable Body - Optimized Layout */}
-                        <div className="flex-1 overflow-y-auto no-scrollbar bg-slate-50/10 p-6 md:p-8 space-y-8">
-                            
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                                
-                                {/* Left Column: Identity & History */}
-                                <div className="lg:col-span-4 space-y-8">
-                                    
-                                    {/* Asset History */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-3 w-1 bg-primary rounded-full" />
-                                            <h3 className="text-[10px] font-black text-title uppercase tracking-[0.2em]">Asset History</h3>
-                                        </div>
-                                        <div className="relative pl-4 space-y-6 before:absolute before:left-0 before:top-2 before:bottom-2 before:w-px before:bg-border-main">
-                                            <div className="relative">
-                                                <div className="absolute -left-[18.5px] top-1 w-2.5 h-2.5 rounded-full bg-success border-2 border-page" />
-                                                <p className="text-[11px] font-black text-title leading-tight">First Installed</p>
-                                                <p className="text-[9px] font-bold text-gray/60 uppercase tracking-widest mt-0.5">Aug 12, 2023</p>
-                                            </div>
-                                            <div className="relative">
-                                                <div className="absolute -left-[18.5px] top-1 w-2.5 h-2.5 rounded-full bg-primary border-2 border-page" />
-                                                <p className="text-[11px] font-black text-title leading-tight">Last AI Scan</p>
-                                                <p className="text-[9px] font-bold text-gray/60 uppercase tracking-widest mt-0.5">{isScanning ? 'Scanning...' : '2 Hours Ago'}</p>
-                                            </div>
-                                            <div className="relative opacity-40">
-                                                <div className="absolute -left-[18.5px] top-1 w-2.5 h-2.5 rounded-full bg-border-main border-2 border-page" />
-                                                <p className="text-[11px] font-black text-title leading-tight">Next Scheduled Audit</p>
-                                                <p className="text-[9px] font-bold text-gray/60 uppercase tracking-widest mt-0.5">Oct 15, 2023</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Specifications Grid */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-3 w-1 bg-amber-500 rounded-full" />
-                                            <h3 className="text-[10px] font-black text-title uppercase tracking-[0.2em]">Specifications</h3>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="p-3.5 rounded-2xl bg-card border border-border-main/50 shadow-sm">
-                                                <span className="text-[8px] font-bold text-gray/40 uppercase tracking-widest block mb-1">Serial No</span>
-                                                {isEditing ? (
-                                                    <input 
-                                                        value={editedAsset.uniqueId}
-                                                        onChange={(e) => setEditedAsset({...editedAsset, uniqueId: e.target.value})}
-                                                        className="text-[11px] font-black text-title font-mono bg-base rounded w-full border-none outline-none"
-                                                    />
-                                                ) : (
-                                                    <code className="text-[11px] font-black text-title font-mono">{editedAsset.uniqueId}</code>
-                                                )}
-                                            </div>
-                                            <div className="p-3.5 rounded-2xl bg-card border border-border-main/50 shadow-sm">
-                                                <span className="text-[8px] font-bold text-gray/40 uppercase tracking-widest block mb-1">Location</span>
-                                                {isEditing ? (
-                                                    <input 
-                                                        value={editedAsset.floor}
-                                                        onChange={(e) => setEditedAsset({...editedAsset, floor: e.target.value})}
-                                                        className="text-[11px] font-black text-title uppercase font-sans bg-base rounded w-full border-none outline-none"
-                                                    />
-                                                ) : (
-                                                    <span className="text-[11px] font-black text-title uppercase font-sans">{editedAsset.floor}</span>
-                                                )}
-                                            </div>
-                                            <div className="p-3.5 rounded-2xl bg-card border border-border-main/50 shadow-sm col-span-2">
-                                                <span className="text-[8px] font-bold text-gray/40 uppercase tracking-widest block mb-1">Asset Model</span>
-                                                <span className="text-[11px] font-black text-title uppercase tracking-tighter">{asset.model} <span className="text-gray/20 mx-1">/</span> {asset.type}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Location Info */}
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-3 w-1 bg-emerald-500 rounded-full" />
-                                            <h3 className="text-[10px] font-black text-title uppercase tracking-[0.2em]">Location Details</h3>
-                                        </div>
-                                        <div className="flex items-center gap-3 p-4 bg-card border border-border-main/50 rounded-[20px] shadow-sm group">
-                                            <div className="w-9 h-9 rounded-xl bg-primary/5 text-primary flex items-center justify-center shrink-0 border border-primary/10">
-                                                <FiMapPin size={16} />
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-[13px] font-black text-title uppercase leading-none mb-1">{asset.org}</span>
-                                                <span className="text-[9px] font-bold text-gray uppercase tracking-widest opacity-60 font-mono">Zone {asset.zone || '104'}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/* System Health */}
-                                    <div className="p-5 rounded-[24px] bg-title text-white shadow-xl shadow-title/10 space-y-3 relative overflow-hidden group">
-                                        <motion.div 
-                                            animate={{ opacity: isScanning ? [0.4, 0.8, 0.4] : [0.1, 0.2, 0.1] }}
-                                            transition={{ duration: isScanning ? 0.5 : 3, repeat: Infinity }}
-                                            className="absolute top-0 right-0 p-3"
-                                        >
-                                            <FiShield size={60} />
-                                        </motion.div>
-                                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em] block">System Health</span>
-                                        <div className="flex items-end justify-between">
-                                            <div>
-                                                <p className="text-[9px] font-bold text-white/60 mb-0.5">Last Verified</p>
-                                                <p className="text-[14px] font-black tracking-tight">{asset.lastAudit}</p>
-                                            </div>
-                                            <div className="px-2 py-0.5 rounded bg-white/10 border border-white/10 text-[8px] font-black uppercase">v2.4</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Right Column: AI Diagnostics */}
-                                <div className="lg:col-span-8 space-y-6">
-                                    
-                                    {/* AI Status Bar */}
-                                    <div className={`px-5 py-3 rounded-2xl ${isScanning ? 'bg-amber-500' : 'bg-primary'} shadow-lg shadow-primary/20 flex items-center justify-between transition-colors duration-500`}>
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-2 h-2 rounded-full bg-white ${isScanning ? 'animate-ping' : 'animate-pulse'}`} />
-                                            <span className="text-[10px] font-black text-white uppercase tracking-[0.15em]">
-                                                {isScanning ? `Scan in Progress: ${scanProgress}%` : 'AI Monitoring is Active'}
-                                            </span>
-                                        </div>
-                                        <span className="text-[9px] font-bold text-white/60 uppercase">
-                                            {isScanning ? 'Scanning ROI...' : 'Working Normally'}
-                                        </span>
-                                    </div>
-
-                                    {/* Photo Comparison */}
-                                    <div className="bg-card rounded-[32px] border border-border-main shadow-sm flex flex-col overflow-hidden relative">
-                                        {isScanning && (
-                                            <motion.div 
-                                                initial={{ left: '-100%' }}
-                                                animate={{ left: '100%' }}
-                                                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                                                className="absolute top-0 bottom-0 w-1 bg-primary/30 z-10 blur-sm"
-                                            />
-                                        )}
-                                        <div className="px-6 py-3.5 border-b border-border-main flex items-center justify-between bg-base/40">
-                                            <h3 className="text-[10px] font-black text-title uppercase tracking-[0.2em]">Photo Comparison</h3>
-                                            <span className="text-[9px] font-bold text-gray/40 uppercase tracking-widest">98.4% Match</span>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2">
-                                            {/* Baseline */}
-                                            <div className="p-6 border-r border-border-main/50 space-y-4">
-                                                <span className="text-[11px] font-black text-gray/60 flex items-center gap-2">
-                                                    <FiCheckCircle size={12} className="text-success" /> Standard View
-                                                </span>
-                                                <div className="aspect-[2/1] rounded-2xl border border-border-main overflow-hidden bg-base">
-                                                    <img 
-                                                        src="https://images.unsplash.com/photo-1598018554941-0ed5d336302a?q=80&w=400&fit=crop" 
-                                                        className="w-full h-full object-cover grayscale-[0.2]"
-                                                        alt="Standard"
-                                                    />
-                                                </div>
-                                            </div>
-                                            {/* Current */}
-                                            <div className="p-6 space-y-4 bg-danger/[0.01]">
-                                                <span className="text-[11px] font-black text-gray/60 flex items-center gap-2">
-                                                    <FiAlertTriangle size={12} className="text-danger" /> Latest Photo
-                                                </span>
-                                                <div className="aspect-[2/1] rounded-2xl border-2 border-dashed border-danger/20 overflow-hidden bg-base relative">
-                                                    <img 
-                                                        src="https://images.unsplash.com/photo-1598018554941-0ed5d336302a?q=80&w=400&fit=crop" 
-                                                        className={`w-full h-full object-cover grayscale transition-opacity duration-300 ${isScanning ? 'opacity-10' : 'opacity-30'}`}
-                                                        alt="Latest"
-                                                    />
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <div className="flex flex-col items-center gap-1">
-                                                            {isScanning ? (
-                                                                <FiCpu className="text-primary animate-spin" size={24} />
-                                                            ) : (
-                                                                <>
-                                                                    <FiActivity className="text-danger" size={18} />
-                                                                    <span className="text-[8px] font-black text-danger uppercase tracking-widest">Difference Detected</span>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* AI Scan History */}
-                                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                                        <div className="md:col-span-4 bg-card rounded-[32px] border border-border-main p-6 flex flex-col items-center justify-center text-center space-y-4 shadow-sm relative">
-                                            <h3 className="text-[10px] font-black text-gray/30 uppercase tracking-[0.2em]">Safety Score</h3>
-                                            <div className="relative w-24 h-24">
-                                                <svg className="w-full h-full" viewBox="0 0 100 100">
-                                                    <circle className="text-border-main stroke-current opacity-20" strokeWidth="8" cx="50" cy="50" r="42" fill="transparent"></circle>
-                                                    <motion.circle 
-                                                        initial={{ strokeDasharray: "0, 264" }}
-                                                        animate={{ strokeDasharray: isScanning ? `${(scanProgress * 1.63)}, 264` : "163, 264" }}
-                                                        transition={{ duration: 0.2 }}
-                                                        className="text-danger stroke-current" 
-                                                        strokeWidth="8" 
-                                                        strokeLinecap="round" 
-                                                        cx="50" cy="50" r="42" 
-                                                        fill="transparent"
-                                                        transform="rotate(-90 50 50)"
-                                                    ></motion.circle>
-                                                </svg>
-                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                    <span className="text-[20px] font-black text-title">
-                                                        {isScanning ? `${Math.floor(scanProgress * 0.62)}%` : '62%'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <span className="text-[8px] font-black text-danger uppercase tracking-widest">
-                                                {isScanning ? 'Analyzing...' : 'Action Needed'}
-                                            </span>
-                                        </div>
-
-                                        <div className="md:col-span-8 space-y-4">
-                                            <div className="p-6 bg-card rounded-[32px] border border-border-main shadow-sm flex flex-col h-full bg-topographic">
-                                                <h3 className="text-[10px] font-black text-gray/30 uppercase tracking-[0.2em] mb-4">Recent AI Scans</h3>
-                                                <div className="space-y-2.5 flex-1 overflow-y-auto max-h-[140px] no-scrollbar">
-                                                    <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-danger/[0.04] border border-border-main">
-                                                        <div className="w-8 h-8 rounded-lg bg-danger/10 text-danger flex items-center justify-center shrink-0">
-                                                            <FiAlertTriangle size={14} />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[12px] font-bold text-title">Asset missing from position.</p>
-                                                            <p className="text-[8px] font-black text-gray/40 uppercase">15 mins ago</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-4 p-3.5 rounded-2xl bg-base/30 border border-border-main">
-                                                        <div className="w-8 h-8 rounded-lg bg-success/10 text-success flex items-center justify-center shrink-0">
-                                                            <FiCheckCircle size={14} />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[12px] font-bold text-title">Safety scan completed.</p>
-                                                            <p className="text-[8px] font-black text-gray/40 uppercase">1 hour ago</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {/* Actions Footer */}
-                        <div className="p-4 border-t border-border-main bg-base/30 shrink-0 flex items-center justify-end gap-3">
-                            <Button 
-                                onClick={isEditing ? handleSave : () => setIsEditing(true)}
-                                variant="outline" 
-                                className="!h-9 !px-6 !text-[9px] !font-black !uppercase !tracking-widest rounded-xl"
-                            >
-                                {isEditing ? 'Save Changes' : 'Edit Asset'}
-                            </Button>
-                            <Button 
-                                onClick={handleScan}
-                                disabled={isScanning}
-                                className="!h-9 !px-6 !text-[9px] !font-black !uppercase !tracking-widest rounded-xl disabled:opacity-50"
-                            >
-                                {isScanning ? 'Scanning...' : 'Scan Now'}
-                            </Button>
-                        </div>
-                    </motion.div>
+                        Close Modal
+                    </button>
                 </div>
-            )}
-        </AnimatePresence>
+
+                {/* Main Content Area */}
+                <div className="flex-1 flex flex-col bg-white overflow-hidden">
+                    {/* Top Stats Bar */}
+                    <div className="px-12 py-6 border-b border-slate-100 flex items-center justify-between">
+                         <div className="flex items-center gap-10">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Last Audit</span>
+                                <span className="text-[13px] font-black text-slate-900 mt-1">{asset.lastAudit}</span>
+                            </div>
+                            <div className="w-px h-6 bg-slate-200" />
+                            <div className="flex flex-col">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Asset Status</span>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusTheme.color }} />
+                                    <span className="text-[13px] font-black text-slate-900 uppercase ">{asset.status}</span>
+                                </div>
+                            </div>
+                         </div>
+                         <div className="flex items-center gap-3">
+                             <button className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors">
+                                 <FiInfo size={18} />
+                             </button>
+                             <button className="w-10 h-10 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors">
+                                 <FiMaximize2 size={18} />
+                             </button>
+                         </div>
+                    </div>
+
+                    {/* Scrollable Body */}
+                    <div className="flex-1 overflow-y-auto p-12 space-y-12 no-scrollbar bg-slate-50/30">
+                        {/* Specifications Grid */}
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Specifications</h3>
+                                <div className="h-0.5 flex-1 mx-6 bg-slate-100 rounded-full" />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm group">
+                                    <FiShield className="mb-3 text-slate-300" size={20} />
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Standard</p>
+                                    <p className="text-[13px] font-black text-slate-900">ISO 9001:2015</p>
+                                </div>
+                                <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm group">
+                                    <FiCpu className="mb-3 text-slate-300" size={20} />
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Model Series</p>
+                                    <p className="text-[13px] font-black text-slate-900">{asset.model}</p>
+                                </div>
+                                <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm group">
+                                    <FiActivity className="mb-3 text-slate-300" size={20} />
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Type Code</p>
+                                    <p className="text-[13px] font-black text-slate-900">{asset.type}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Visual Diagnostics */}
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Visual Diagnostics</h3>
+                                <div className="h-0.5 flex-1 mx-6 bg-slate-100 rounded-full" />
+                            </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between px-2">
+                                        <span className="text-[11px] font-black text-slate-900 flex items-center gap-2 uppercase tracking-tighter">
+                                            <FiCheckCircle size={14} className="text-success" /> Baseline Standard
+                                        </span>
+                                        <span className="text-[9px] font-bold text-slate-400 uppercase font-mono">Capture Oct 22</span>
+                                    </div>
+                                    <div className="aspect-[16/10] rounded-2xl border border-slate-200 overflow-hidden bg-slate-100 shadow-lg shadow-slate-200/50">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1598018554941-0ed5d336302a?q=80&w=600&fit=crop" 
+                                            className="w-full h-full object-cover"
+                                            alt="Baseline"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between px-2">
+                                        <span className="text-[11px] font-black text-slate-900 flex items-center gap-2 uppercase tracking-tighter">
+                                            <FiAlertTriangle size={14} className="text-danger" /> Latest Audit View
+                                        </span>
+                                        <span className="text-[9px] font-bold text-danger uppercase font-mono">Discrepancy Detected</span>
+                                    </div>
+                                    <div className="relative aspect-[16/10] rounded-2xl border-2 border-dashed border-danger/30 overflow-hidden bg-danger/[0.02] flex items-center justify-center p-8 group">
+                                        <img 
+                                            src="https://images.unsplash.com/photo-1598018554941-0ed5d336302a?q=80&w=600&fit=crop" 
+                                            className="absolute inset-0 w-full h-full object-cover grayscale opacity-20 transition-opacity group-hover:opacity-40"
+                                            alt="Current"
+                                        />
+                                        <div className="relative z-10 text-center">
+                                            <div className="w-16 h-16 rounded-full bg-danger/10 text-danger flex items-center justify-center mx-auto mb-4 border border-danger/20">
+                                                <FiActivity size={32} />
+                                            </div>
+                                            <p className="text-[14px] font-black text-danger uppercase tracking-[0.1em]">AI Alert: Mismatch</p>
+                                            <p className="text-[10px] font-medium text-danger/60 mt-1 px-4 py-1 rounded-full bg-danger/5 border border-danger/10 inline-block uppercase tracking-widest">Confidence 98.4%</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Activity Log */}
+                        <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Activity History</h3>
+                                <div className="h-0.5 flex-1 mx-6 bg-slate-100 rounded-full" />
+                            </div>
+                            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+                                <div className="p-8 space-y-6">
+                                    {[1, 2].map((log, i) => (
+                                        <div key={i} className={`flex items-start gap-6 ${i === 0 ? '' : 'pt-6 border-t border-slate-50'}`}>
+                                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${i === 0 ? 'bg-danger/10 text-danger border border-danger/10' : 'bg-success/10 text-success border border-success/10'}`}>
+                                                {i === 0 ? <FiAlertCircle size={18} /> : <FiCheckCircle size={18} />}
+                                            </div>
+                                            <div className="flex-1">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <p className="text-[13px] font-black text-slate-900 uppercase">{i === 0 ? 'Safety Violation' : 'Routine Scan'}</p>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{i === 0 ? '15m ago' : '1h ago'}</span>
+                                                </div>
+                                                <p className="text-[12px] font-medium text-slate-500 leading-relaxed font-sans mt-2">
+                                                    {i === 0 
+                                                        ? 'Critical mismatch detected between baseline and current audit. Asset positioned outside of defined boundary.' 
+                                                        : 'All safety parameters verified. Physical orientation matches the baseline master image.'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="px-8 py-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Showing last 2 events</span>
+                                    <button className="text-[9px] font-black text-slate-900 uppercase tracking-widest hover:underline decoration-2 underline-offset-4">Download Logs</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="px-12 py-8 bg-white border-t border-slate-100 flex items-center justify-end gap-4 shadow-[0_-1px_0_rgba(148,163,184,0.1)]">
+                         <div className="flex-1">
+                             <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Admin Level Clearance Required</span>
+                         </div>
+                         <button 
+                             onClick={isEditing ? handleSave : () => setIsEditing(true)}
+                             className="px-8 py-4 rounded-3xl bg-white border border-slate-200 text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] shadow-sm hover:bg-slate-50 transition-all active:scale-95"
+                        >
+                            {isEditing ? 'Confirm Changes' : 'Modify Asset'}
+                         </button>
+                         <button className="px-8 py-4 rounded-3xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 active:scale-95 transition-all">
+                             Trigger Audit
+                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 
