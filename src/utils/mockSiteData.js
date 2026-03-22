@@ -57,6 +57,53 @@ export const generateSitePlansForCoordinator = (userId) => {
   return plans;
 }
 
+export const generateFloorsForSite = (site) => {
+  // Defensive check for missing stats (prevents crash on page refresh/direct nav)
+  const { floors = 1, zones = 1, assets = 10 } = site?.stats || { 
+    floors: 1, 
+    zones: 1, 
+    assets: 10 
+  };
+  
+  const generatedFloors = [];
+  let remainingZones = zones;
+  let remainingAssets = assets;
+  
+  for (let i = 0; i < floors; i++) {
+    const isGround = i === 0;
+    const isLast = i === floors - 1;
+    
+    // Distribute remaining roughly equally
+    let fZones = isLast ? remainingZones : Math.max(1, Math.floor(zones / floors));
+    let fAssets = isLast ? remainingAssets : Math.max(1, Math.floor(assets / floors));
+
+    // Slight variance
+    if (!isLast && floors > 1) {
+      const vZ = Math.floor(Math.random() * 2) - 1; // -1 to 0 variance
+      const vA = Math.floor(Math.random() * 20) - 10;
+      fZones = Math.max(1, fZones + vZ);
+      fAssets = Math.max(1, fAssets + vA);
+    }
+    
+    remainingZones -= fZones;
+    remainingAssets -= fAssets;
+    
+    generatedFloors.push({
+      id: `${site.id}-FL${i}`,
+      level: isGround ? 'G' : `L${i}`,
+      name: isGround ? 'Ground Floor' : `Level ${i}`,
+      description: isGround ? 'Reception, Lobby & Core Systems' : `Executive Suites, Offices & Workspaces`,
+      status: 'ACTIVE',
+      stats: {
+        zones: fZones,
+        assets: fAssets
+      }
+    });
+  }
+  
+  return generatedFloors;
+};
+
 export const generateGlobalInventory = (orgs) => {
   let globalInventory = [];
   const types = ['Furniture', 'Network', 'IT Asset', 'Stationery', 'Safety'];
