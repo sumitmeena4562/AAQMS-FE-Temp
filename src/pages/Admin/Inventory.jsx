@@ -16,7 +16,7 @@ import Button from '../../components/UI/Button';
 import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import { useOrgStore } from '../../store/useOrgStore';
-import AssetDrawer from '../../components/Admin/Inventory/AssetDrawer';
+import AssetInventoryModal from '../../components/Admin/Inventory/AssetInventoryModal';
 import EmptyState from '../../components/Admin/Inventory/EmptyState';
 import AssetCard from '../../components/Admin/Inventory/AssetCard';
 
@@ -58,9 +58,9 @@ const Inventory = () => {
     const [searchParams] = useSearchParams();
     const orgs = useOrgStore(state => state.orgs);
     
-    // Drawer State
+    // Modal State
     const [selectedAsset, setSelectedAsset] = useState(null);
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     
     // Initial data load: Optimized memoization
     const initialData = useMemo(() => generateGlobalInventory(orgs), [orgs.length]);
@@ -200,9 +200,16 @@ const Inventory = () => {
         return '';
     };
 
-    const handleOpenDrawer = (asset) => {
+    const handleAssetClick = (asset) => {
         setSelectedAsset(asset);
-        setIsDrawerOpen(true);
+        setIsModalOpen(true);
+    };
+
+    const handleAction = (asset, action) => {
+        if (action === 'view') {
+            setSelectedAsset(asset);
+            setIsModalOpen(true);
+        }
     };
 
     const columns = useMemo(() => [
@@ -301,7 +308,7 @@ const Inventory = () => {
                         icon={FiExternalLink}
                         onClick={(e) => {
                             e.stopPropagation();
-                            handleOpenDrawer(row);
+                            handleAssetClick(row);
                         }}
                         className="h-7 px-3 text-[10px] font-black uppercase tracking-widest text-rose-500 hover:bg-rose-50 border-rose-200"
                     >
@@ -422,7 +429,7 @@ const Inventory = () => {
                     <DataTable
                         columns={columns}
                         data={displayedInventory}
-                        onRowClick={handleOpenDrawer}
+                        onRowClick={handleAssetClick}
                         rowClassName={handleRowStyle}
                         emptyMessage={<EmptyState onReset={handleReset} />}
                         footer={
@@ -459,7 +466,7 @@ const Inventory = () => {
                                     <AssetCard 
                                         key={asset.id} 
                                         asset={asset} 
-                                        onClick={handleOpenDrawer} 
+                                        onClick={handleAssetClick}  
                                     />
                                 ))}
                             </div>
@@ -500,10 +507,11 @@ const Inventory = () => {
                 )}
             </div>
 
-            <AssetDrawer 
+            {/* Unified Asset Modal */}
+            <AssetInventoryModal
                 asset={selectedAsset}
-                isOpen={isDrawerOpen}
-                onClose={() => setIsDrawerOpen(false)}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
             />
         </div>
     );

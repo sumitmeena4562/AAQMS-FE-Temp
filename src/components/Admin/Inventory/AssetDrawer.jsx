@@ -7,8 +7,11 @@ import {
 } from 'react-icons/fi';
 import Button from '../../UI/Button';
 import Badge from '../../UI/Badge';
+import AIAnalysisModal from './AIAnalysisModal';
 
 const AssetDrawer = ({ asset, isOpen, onClose }) => {
+    const [isAnalysisModalOpen, setIsAnalysisModalOpen] = React.useState(false);
+    
     if (!asset) return null;
 
     const statusColor = asset.status === 'Verified' ? 'success' : asset.status === 'Mismatch' ? 'danger' : 'warning';
@@ -129,6 +132,33 @@ const AssetDrawer = ({ asset, isOpen, onClose }) => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* AI Insights CTA Section */}
+                        <div className="mx-6 mb-6 p-4 rounded-2xl bg-danger/[0.03] border border-danger/10 flex flex-col gap-3">
+                            <div className="flex items-center gap-2">
+                                <div className="p-1.5 rounded-md bg-danger/10 text-danger">
+                                    <FiAlertCircle size={14} />
+                                </div>
+                                <span className="text-[11px] font-black text-title uppercase tracking-wider">AI Discrepancy Detected</span>
+                            </div>
+                            <p className="text-[12px] text-gray font-medium leading-tight">62% risk score identified in recent visual audit.</p>
+                            <Button 
+                                onClick={() => setIsAnalysisModalOpen(true)}
+                                variant="outline" 
+                                color="danger"
+                                icon={FiExternalLink} 
+                                className="w-full !h-10 !text-[10px] !font-black !uppercase !tracking-widest !bg-white hover:!bg-danger/5"
+                            >
+                                View AI Detailed Analysis
+                            </Button>
+                        </div>
+
+                        {/* Analysis Modal */}
+                        <AIAnalysisModal 
+                            asset={asset} 
+                            isOpen={isAnalysisModalOpen} 
+                            onClose={() => setIsAnalysisModalOpen(false)} 
+                        />
 
                         {/* Footer - Actions */}
                         <div className="p-6 border-t border-border-main bg-base/30 grid grid-cols-2 gap-4">

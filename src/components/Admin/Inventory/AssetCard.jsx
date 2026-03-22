@@ -1,12 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { FiExternalLink, FiLayout } from 'react-icons/fi';
 import Badge from '../../UI/Badge';
 import Button from '../../UI/Button';
-import { AssetIcon } from '../../../pages/Admin/Inventory'; // We'll export AssetIcon in Inventory.jsx
+import { AssetIcon } from '../../../pages/Admin/Inventory'; 
 
 const AssetCard = ({ asset, onClick }) => {
+    const navigate = useNavigate();
     const statusColor = asset.status === 'Verified' ? 'success' : asset.status === 'Mismatch' ? 'danger' : 'warning';
+    
+    const handleDetailsClick = (e) => {
+        e.stopPropagation();
+        navigate(`/admin/inventory/analysis/${asset.id}`);
+    };
     
     return (
         <motion.div
@@ -56,10 +63,6 @@ const AssetCard = ({ asset, onClick }) => {
                 <div className="flex flex-col">
                     <span className="text-[8px] font-black text-gray/40 uppercase tracking-widest mb-0.5">Last Audit</span>
                     <span className="text-[11px] font-extrabold text-title truncate">{asset.lastAudit}</span>
-                </div>
-                <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-all transform translate-x-1 group-hover:translate-x-0">
-                    <span className="text-[10px] font-black text-primary uppercase tracking-widest">Details</span>
-                    <FiExternalLink className="text-primary" size={12} />
                 </div>
             </div>
         </motion.div>
