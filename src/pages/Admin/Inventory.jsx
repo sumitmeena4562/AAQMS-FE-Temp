@@ -7,36 +7,31 @@ import Badge from '../../components/UI/Badge';
 import { 
     FiHome, FiBriefcase, FiBox, FiCheckCircle, 
     FiAlertCircle, FiClock, FiExternalLink, FiGrid,
-    FiMonitor, FiPrinter, FiShield, FiCpu, FiLayout, FiRefreshCcw,
-    FiLayers, FiMapPin
+    FiMonitor, FiLayout, FiRefreshCcw
 } from 'react-icons/fi';
-import { generateInventoryForZone, generateGlobalInventory } from '../../utils/mockSiteData';
+import { generateGlobalInventory } from '../../utils/mockSiteData';
 import Button from '../../components/UI/Button';
 import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
-import Search from '../../components/UI/Search';
 import { useOrgStore } from '../../store/useOrgStore';
 import AssetDrawer from '../../components/Admin/Inventory/AssetDrawer';
 import EmptyState from '../../components/Admin/Inventory/EmptyState';
 
+const ASSET_ICONS = {
+    chair: FiGrid,
+    furniture: FiGrid,
+    monitor: FiMonitor,
+    peripheral: FiMonitor,
+    network: FiLayout, // Use available icons
+    router: FiLayout,
+    printer: FiGrid,
+    safety: FiBox,
+    box: FiBox
+};
+
 const AssetIcon = ({ type, className = "" }) => {
-    switch (type?.toLowerCase()) {
-        case 'chair':
-        case 'furniture':
-            return <FiGrid className={className} />;
-        case 'monitor':
-        case 'peripheral':
-            return <FiMonitor className={className} />;
-        case 'network':
-        case 'router':
-            return <FiCpu className={className} />;
-        case 'printer':
-            return <FiPrinter className={className} />;
-        case 'safety':
-            return <FiShield className={className} />;
-        default:
-            return <FiBox className={className} />;
-    }
+    const Icon = ASSET_ICONS[type?.toLowerCase()] || ASSET_ICONS.box;
+    return <Icon className={className} />;
 };
 
 const Inventory = () => {
@@ -48,8 +43,8 @@ const Inventory = () => {
     const [selectedAsset, setSelectedAsset] = useState(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     
-    // Initial data load: Global if no params, else specific
-    const initialData = useMemo(() => generateGlobalInventory(orgs), [orgs]);
+    // Initial data load: Optimized memoization
+    const initialData = useMemo(() => generateGlobalInventory(orgs), [orgs.length]);
     
     // Filter State
     const [filters, setFilters] = useState({ 
