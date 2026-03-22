@@ -1,6 +1,6 @@
 import React from 'react';
 import { FiSearch, FiRefreshCcw } from 'react-icons/fi';
-import Button from '../UI/Button';
+import Button from '../../UI/Button';
 
 const EmptyState = ({ onReset }) => {
     return (
