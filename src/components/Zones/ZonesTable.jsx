@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { QrCode } from 'lucide-react';
 import { ZONES_DATA } from '../../data/zones';
 
 const ZonesTable = () => {
+    const navigate = useNavigate();
     return (
         <div className="bg-card border border-border-main rounded-xl shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] flex flex-col w-full overflow-hidden">
             {/* Header Section */}
@@ -75,9 +77,12 @@ const ZonesTable = () => {
                                         </div>
                                     </td>
                                     <td className="py-4 px-6 align-middle">
-                                        <span className="text-sm text-body whitespace-nowrap">
+                                        <button 
+                                            onClick={() => navigate(`/admin/inventory?zone=${zone.id}`)}
+                                            className="text-sm text-blue-600 font-bold hover:underline cursor-pointer bg-transparent border-none p-0"
+                                        >
                                             {zone.count}
-                                        </span>
+                                        </button>
                                     </td>
                                     <td className="py-4 px-6 align-middle">
                                         <button className="text-gray hover:text-body cursor-pointer transition-colors outline-none bg-transparent border-none p-0">
@@ -85,11 +90,21 @@ const ZonesTable = () => {
                                         </button>
                                     </td>
                                     <td className="py-4 pl-6 align-middle">
-                                        <button className="flex items-center justify-center h-[32px] px-4 bg-card border border-border-main rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-red-300  transition-colors cursor-pointer outline-none">
-                                            <span className="text-xs font-semibold text-body whitespace-nowrap">
-                                                View media
-                                            </span>
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            <button className="flex items-center justify-center h-[32px] px-3 bg-card border border-border-main rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-base transition-colors cursor-pointer outline-none">
+                                                <span className="text-[11px] font-semibold text-body whitespace-nowrap">
+                                                    View media
+                                                </span>
+                                            </button>
+                                            <button 
+                                                onClick={() => navigate(`/admin/inventory?zone=${zone.id}`)}
+                                                className="flex items-center justify-center h-[32px] px-3 bg-primary text-white border-none rounded-md shadow-sm hover:bg-primary/90 transition-all cursor-pointer outline-none"
+                                            >
+                                                <span className="text-[11px] font-bold whitespace-nowrap">
+                                                    Manage
+                                                </span>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             );

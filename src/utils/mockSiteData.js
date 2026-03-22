@@ -103,3 +103,34 @@ export const generateFloorsForSite = (site) => {
   
   return generatedFloors;
 };
+
+export const generateInventoryForZone = (zoneId = '104') => {
+  const seed = parseInt(zoneId.replace(/\D/g, '') || '104');
+  const items = [
+    { name: "Ergonomic Chair", model: "Herman Miller", type: "Furniture", icon: "chair" },
+    { name: "LG Monitor 27\"", model: "Asset Tag: #8892", type: "Peripheral", icon: "monitor" },
+    { name: "Cisco Router", model: "Network Infra", type: "Network", icon: "network" },
+    { name: "HP LaserJet Pro", model: "Shared Resource", type: "Peripheral", icon: "printer" },
+    { name: "Fire Extinguisher A", model: "Type: CO2 Class B", type: "Safety", icon: "safety" },
+  ];
+
+  const inventory = [];
+  // Use 24 as total to match screenshot
+  for (let i = 0; i < 24; i++) {
+    const base = items[i % items.length];
+    const status = (i + seed) % 7 === 0 || (i + seed) % 8 === 0 ? 'Mismatch' : (i + seed) % 15 === 0 ? 'Pending' : 'Verified';
+    
+    inventory.push({
+      id: `ASSET-${seed}-${(i + 1).toString().padStart(3, '0')}`,
+      name: base.name,
+      model: base.model,
+      type: base.type,
+      uniqueId: `${base.name.substring(0, 2).toUpperCase()}-ZN${seed}-${(i + 1).toString().padStart(3, '0')}`,
+      status: status,
+      lastAudit: i % 3 === 0 ? "Today, 08:20 AM" : "Yesterday, 04:15 PM",
+      auditor: i % 3 === 0 ? "AI Bot #4" : "Sarah J.",
+      icon: base.icon
+    });
+  }
+  return inventory;
+};
