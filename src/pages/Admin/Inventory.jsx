@@ -139,12 +139,51 @@ const Inventory = () => {
         const pending = filteredInventory.filter(i => i.status === 'Pending').length;
 
         return [
-            { label: "Assets", value: total, icon: FiBox, iconBgClass: "bg-blue-50", iconColorClass: "text-blue-500" },
-            { label: "Verified", value: verified, icon: FiCheckCircle, iconBgClass: "bg-emerald-50", iconColorClass: "text-emerald-500" },
-            { label: "Mismatches", value: mismatches, icon: FiAlertCircle, iconBgClass: "bg-rose-50", iconColorClass: "text-rose-500" },
-            { label: "Pending", value: pending, icon: FiClock, iconBgClass: "bg-amber-50", iconColorClass: "text-amber-500" }
+            { 
+                label: "Assets", 
+                value: total, 
+                icon: FiBox, 
+                iconBgClass: "bg-blue-50", 
+                iconColorClass: "text-blue-500",
+                description: "Live system count",
+                trend: 12
+            },
+            { 
+                label: "Verified", 
+                value: verified, 
+                icon: FiCheckCircle, 
+                iconBgClass: "bg-emerald-50", 
+                iconColorClass: "text-emerald-500",
+                description: "AI confirmed",
+                trend: 8
+            },
+            { 
+                label: "Mismatches", 
+                value: mismatches, 
+                icon: FiAlertCircle, 
+                iconBgClass: "bg-rose-50", 
+                iconColorClass: "text-rose-500",
+                description: "Requires attention",
+                trend: -2,
+                changeType: 'negative'
+            },
+            { 
+                label: "Pending", 
+                value: pending, 
+                icon: FiClock, 
+                iconBgClass: "bg-amber-50", 
+                iconColorClass: "text-amber-500",
+                description: "Review queue",
+                trend: 4
+            }
         ];
     }, [filteredInventory]);
+
+    const handleRowStyle = (row) => {
+        if (row.status === 'Mismatch') return 'bg-rose-50/30';
+        if (row.status === 'Pending') return 'bg-amber-50/30';
+        return '';
+    };
 
     const handleOpenDrawer = (asset) => {
         setSelectedAsset(asset);
@@ -258,7 +297,17 @@ const Inventory = () => {
         }
     ], []);
 
-    const displayedInventory = filteredInventory.slice(0, 10);
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filters, searchQuery]);
+
+    const totalPages = Math.ceil(filteredInventory.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const displayedInventory = filteredInventory.slice(startIndex, startIndex + itemsPerPage);
 
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-16">
@@ -276,10 +325,10 @@ const Inventory = () => {
             <StatsRow items={stats} columns={4} />
 
             <div className="flex flex-col w-full gap-4 mt-2">
-                
+
                 <FilterBar className="!p-2.5">
                     <div className="flex flex-wrap items-center gap-2 flex-1">
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Organization"
                             options={orgOptions}
                             value={filters.org}
@@ -287,7 +336,7 @@ const Inventory = () => {
                             allLabel="All Organization"
                         />
 
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Floor"
                             options={floorOptions}
                             value={filters.floor}
@@ -295,7 +344,7 @@ const Inventory = () => {
                             allLabel="All Floors"
                         />
 
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Zone"
                             options={zoneOptions}
                             value={filters.zone}
@@ -305,7 +354,7 @@ const Inventory = () => {
 
                         <Separator />
 
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Type"
                             options={typeOptions}
                             value={filters.type}
@@ -314,7 +363,7 @@ const Inventory = () => {
                             multiple={true}
                         />
 
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Status"
                             options={statusOptions}
                             value={filters.status}
@@ -326,7 +375,7 @@ const Inventory = () => {
 
                     <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
                         {(filters.org !== 'all' || filters.floor !== 'all' || filters.zone !== 'all' || filters.type.length > 0 || filters.status.length > 0 || searchQuery !== '') && (
-                            <button 
+                            <button
                                 onClick={handleReset}
                                 className="h-8 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-lg bg-rose-50/50 shadow-sm border border-rose-100"
                             >
@@ -341,15 +390,30 @@ const Inventory = () => {
                     columns={columns}
                     data={displayedInventory}
                     onRowClick={handleOpenDrawer}
+                    rowClassName={handleRowStyle}
                     emptyMessage={<EmptyState onReset={handleReset} />}
                     footer={
                         <div className="flex items-center justify-between w-full px-1">
                             <span className="text-[11px] font-bold text-gray tracking-tight">
-                                Showing <span className="text-body font-black">{displayedInventory.length > 0 ? 1 : 0} to {displayedInventory.length}</span> of <span className="text-body font-black">{filteredInventory.length}</span> results
+                                Showing <span className="text-body font-black">{displayedInventory.length > 0 ? startIndex + 1 : 0} to {startIndex + displayedInventory.length}</span> of <span className="text-body font-black">{filteredInventory.length}</span> results
                             </span>
                             <div className="flex items-center gap-1.5">
-                                <Button variant="outline" className="!h-8 !px-3 !text-[10px] !font-black !uppercase !tracking-widest opacity-50 cursor-not-allowed">Previous</Button>
-                                <Button variant="outline" className="!h-8 !px-4 !text-[10px] !font-black !uppercase !tracking-widest">Next</Button>
+                                <Button 
+                                    variant="outline" 
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className={`!h-8 !px-3 !text-[10px] !font-black !uppercase !tracking-widest ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                    Previous
+                                </Button>
+                                <Button 
+                                    variant="outline" 
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages || totalPages === 0}
+                                    className={`!h-8 !px-4 !text-[10px] !font-black !uppercase !tracking-widest ${currentPage === totalPages || totalPages === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                    Next
+                                </Button>
                             </div>
                         </div>
                     }

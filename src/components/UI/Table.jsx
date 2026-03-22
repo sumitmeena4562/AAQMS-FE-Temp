@@ -12,6 +12,7 @@ const Table = ({
     selectedIds = [],
     onSelectionChange,
     className = "",
+    rowClassName,
     emptyMessage = "No data found"
 }) => {
     // O(1) performance boost: Convert selected array to a Set
@@ -103,6 +104,7 @@ const Table = ({
                                             group transition-all duration-300
                                             ${isSelected ? 'bg-primary/[0.04]' : 'hover:bg-base/70'}
                                             ${isClickable ? 'cursor-pointer' : 'cursor-default'}
+                                            ${rowClassName ? rowClassName(row) : ''}
                                         `}
                                     >
                                         {columns.map((col, ci) => (

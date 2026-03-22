@@ -43,7 +43,9 @@ const DataTable = ({
     footer,
     selectionFooter,
     children,
-    className = ""
+    className = "",
+    maxHeight,
+    rowClassName
 }) => {
     const hasSelection = selectable && selectedIds.length > 0;
     const scrollRef = useRef(null);
@@ -181,6 +183,7 @@ const DataTable = ({
                     selectable={selectable}
                     selectedIds={selectedIds}
                     onSelectionChange={onSelectionChange}
+                    rowClassName={rowClassName}
                     emptyMessage={emptyMessage}
                 />
             </div>
