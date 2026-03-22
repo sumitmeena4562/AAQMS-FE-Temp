@@ -93,11 +93,11 @@ const Inventory = () => {
                 (item.uniqueId && item.uniqueId.toLowerCase().includes(searchQuery.toLowerCase())) ||
                 (item.model && item.model.toLowerCase().includes(searchQuery.toLowerCase()));
             
-            const matchesOrg = filters.org === 'all' || item.org === filters.org;
-            const matchesFloor = filters.floor === 'all' || item.floor === filters.floor;
-            const matchesZone = filters.zone === 'all' || item.zoneId === filters.zone;
-            const matchesType = filters.type.length === 0 || filters.type.includes(item.type);
-            const matchesStatus = filters.status.length === 0 || filters.status.includes(item.status);
+            const matchesOrg = !filters.org || filters.org === 'all' || item.org === filters.org;
+            const matchesFloor = !filters.floor || filters.floor === 'all' || item.floor === filters.floor;
+            const matchesZone = !filters.zone || filters.zone === 'all' || item.zoneId === filters.zone;
+            const matchesType = !filters.type || filters.type.length === 0 || filters.type.includes(item.type);
+            const matchesStatus = !filters.status || filters.status.length === 0 || filters.status.includes(item.status);
             
             return matchesSearch && matchesOrg && matchesFloor && matchesZone && matchesType && matchesStatus;
         });
@@ -107,14 +107,15 @@ const Inventory = () => {
     const orgOptions = useMemo(() => orgs.map(o => ({ value: o.name, label: o.name })), [orgs]);
 
     const floorOptions = useMemo(() => {
-        const floors = [...new Set(initialData.map(i => i.floor).filter(Boolean))];
+        const relevantFloors = initialData.filter(i => !filters.org || filters.org === 'all' || i.org === filters.org);
+        const floors = [...new Set(relevantFloors.map(i => i.floor).filter(Boolean))];
         return floors.map(f => ({ value: f, label: f }));
-    }, [initialData]);
+    }, [initialData, filters.org]);
 
     const zoneOptions = useMemo(() => {
         const relevantZones = initialData.filter(i => 
-            (filters.org === 'all' || i.org === filters.org) && 
-            (filters.floor === 'all' || i.floor === filters.floor)
+            (!filters.org || filters.org === 'all' || i.org === filters.org) && 
+            (!filters.floor || filters.floor === 'all' || i.floor === filters.floor)
         );
         const zones = [...new Set(relevantZones.map(i => i.zoneId).filter(Boolean))];
         return zones.map(z => ({ value: z, label: `Zone ${z}` }));
