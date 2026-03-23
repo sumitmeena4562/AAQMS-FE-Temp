@@ -1,73 +1,8 @@
 import React from 'react';
 import DataTable from '../UI/DataTable';
 import Button from '../UI/Button';
-import {
-    FiAlertTriangle,
-    FiUserPlus,
-    FiPackage,
-    FiCheckCircle,
-    FiSettings,
-    FiFilter,
-} from 'react-icons/fi';
-
-// ── Static Activity Data ──
-const ACTIVITY = [
-    {
-        id: '1',
-        type: 'Inventory Mismatch',
-        icon: FiAlertTriangle,
-        iconBgClass: 'bg-red-50',
-        iconTextClass: 'text-red-600',
-        user: 'System AI',
-        entity: 'Zone B-12',
-        details: 'Fire Extinguisher missing in Zone 15-12',
-        time: '2 mins ago',
-    },
-    {
-        id: '2',
-        type: 'User Onboarding',
-        icon: FiUserPlus,
-        iconBgClass: 'bg-blue-50',
-        iconTextClass: 'text-blue-600',
-        user: 'Sarah Jenkins',
-        entity: 'Acme Corp',
-        details: 'Added 5 new field officers',
-        time: '15 mins ago',
-    },
-    {
-        id: '3',
-        type: 'Inventory Update',
-        icon: FiPackage,
-        iconBgClass: 'bg-orange-50',
-        iconTextClass: 'text-orange-600',
-        user: 'Mike Ross',
-        entity: 'Safety Gear Depot',
-        details: 'Stock level adjustment (-50 units)',
-        time: '1 hour ago',
-    },
-    {
-        id: '4',
-        type: 'Report Approval',
-        icon: FiCheckCircle,
-        iconBgClass: 'bg-purple-50',
-        iconTextClass: 'text-purple-600',
-        user: 'David Kim',
-        entity: 'Monthly Compliance',
-        details: 'Report #8821 approved',
-        time: '2 hours ago',
-    },
-    {
-        id: '5',
-        type: 'System Config',
-        icon: FiSettings,
-        iconBgClass: 'bg-base',
-        iconTextClass: 'text-gray',
-        user: 'Admin User',
-        entity: 'Global Settings',
-        details: 'Updated API rate limits',
-        time: '4 hours ago',
-    },
-];
+import { FiFilter } from 'react-icons/fi';
+import { DUMMY_RECENT_ACTIVITY } from '../../data/dashboardData';
 
 // ── Column definitions ──
 const columns = [
@@ -134,7 +69,7 @@ const RecentActivityTable = () => {
                 </>
             }
             columns={columns}
-            data={ACTIVITY}
+            data={DUMMY_RECENT_ACTIVITY}
             emptyMessage="No recent activity"
         />
     );
