@@ -316,13 +316,13 @@ const Organizations = () => {
                                             >
                                                 <FiEdit2 size={13} />
                                             </button>
-                                            <button 
+                                            {/* <button 
                                                 onClick={(e) => { e.stopPropagation(); removeOrg(org.id); }}
                                                 className="w-8 h-8 flex items-center justify-center text-gray hover:text-rose-500 transition-all rounded-xl hover:bg-rose-50/10 active:scale-95"
                                                 title="Delete"
                                             >
                                                 <FiTrash2 size={13} />
-                                            </button>
+                                            </button> */}
                                         </div>
                                     )
                                 }

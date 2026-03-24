@@ -131,9 +131,9 @@ export const useOrgStore = create(
         orgs: state.orgs.map(org => org.id === id ? { ...org, ...updatedOrg } : org)
       })),
 
-      removeOrg: (id) => set((state) => ({
-        orgs: state.orgs.filter(org => org.id !== id)
-      })),
+      // removeOrg: (id) => set((state) => ({
+      //   orgs: state.orgs.filter(org => org.id !== id)
+      // })),
 
       resetToDefault: () => set({ orgs: initialOrgs })
     }),
