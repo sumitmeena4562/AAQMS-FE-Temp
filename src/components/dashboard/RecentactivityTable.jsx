@@ -73,11 +73,11 @@ const RecentActivityTable = () => {
             subtitle="Live Feed"
             rightContent={
                 <>
-                    <Button variant="outline" size="sm" icon={FiFilter} className="!rounded-md !h-[30px] !text-[12px]">
+                    {/* <Button variant="outline" size="sm" icon={FiFilter} className="!rounded-md !h-[30px] !text-[12px]">
                         Filter
-                    </Button>
+                    </Button> */}
                     <Button variant="ghost" size="sm" className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10">
-                        View All Logs
+                        View All History
                     </Button>
                 </>
             }

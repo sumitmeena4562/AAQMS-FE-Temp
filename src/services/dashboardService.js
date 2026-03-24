@@ -1,5 +1,6 @@
 import api from './api';
 import { DUMMY_METRIC_CARDS, DUMMY_STATS_GRID, DUMMY_RECENT_ACTIVITY } from '../data/dashboardData';
+import { mapToStatsGrid, mapToMetricCards } from '../utils/dashboardCalculations';
 
 /**
  * ── DASHBOARD API SERVICE ──
@@ -9,11 +10,12 @@ import { DUMMY_METRIC_CARDS, DUMMY_STATS_GRID, DUMMY_RECENT_ACTIVITY } from '../
  */
 
 export const getDashboardMetrics = async () => {
+    
     // 🚀 REAL BACKEND CALL:
     // const response = await api.get('/dashboard/metrics');
-    // return response.data;
+    // return mapToMetricCards(response.data); // This dynamically calculates Warning/Danger labels!
     
-    // 🧪 SIMULATED BACKEND CALL:
+    // 🧪 SIMULATED BACKEND CALL (Will be deleted when real API is ready):
     return new Promise((resolve) => {
         setTimeout(() => resolve(DUMMY_METRIC_CARDS), 600);
     });
@@ -22,9 +24,9 @@ export const getDashboardMetrics = async () => {
 export const getDashboardStats = async () => {
     // 🚀 REAL BACKEND CALL:
     // const response = await api.get('/dashboard/stats');
-    // return response.data;
+    // return mapToStatsGrid(response.data); // This magically handles +12% growths and 98% Active calculations!
     
-    // 🧪 SIMULATED BACKEND CALL:
+    // 🧪 SIMULATED BACKEND CALL (Will be deleted when real API is ready):
     return new Promise((resolve) => {
         setTimeout(() => resolve(DUMMY_STATS_GRID), 800);
     });
