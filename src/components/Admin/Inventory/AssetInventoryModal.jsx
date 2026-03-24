@@ -9,24 +9,9 @@ import Badge from '../../UI/Badge';
 import Button from '../../UI/Button';
 
 const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
-    const [isEditing, setIsEditing] = React.useState(false);
-    const [editedAsset, setEditedAsset] = React.useState(asset);
     const [showInfo, setShowInfo] = React.useState(true);
 
-    // Sync state when asset prop changes or modal opens
-    React.useEffect(() => {
-        if (asset) {
-            setEditedAsset(asset);
-        }
-    }, [asset]);
-
-    const handleSave = () => {
-        setIsEditing(false);
-        // Here you would typically call an API to save
-        console.log("Saving asset details:", editedAsset);
-    };
-
-    if (!isOpen || !asset || !editedAsset) return null;
+    if (!isOpen || !asset) return null;
 
     const statusTheme = {
         'Operational': { color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', icon: FiCheckCircle },
@@ -48,17 +33,9 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
                         <div className="w-24 h-24 rounded-2xl bg-white shadow-xl shadow-slate-200/50 flex items-center justify-center mx-auto mb-6 border border-slate-100 group">
                             <FiBox size={40} style={{ color: statusTheme.color }} />
                         </div>
-                        {isEditing ? (
-                            <input 
-                                value={editedAsset.name} 
-                                onChange={(e) => setEditedAsset({...editedAsset, name: e.target.value})}
-                                className="w-full text-center text-xl font-black text-slate-900 bg-white border border-slate-200 rounded-xl px-2 py-1 outline-none shadow-sm"
-                            />
-                        ) : (
-                            <h2 className="text-xl font-black text-slate-900 tracking-tight leading-tight">{editedAsset.name}</h2>
-                        )}
+                        <h2 className="text-xl font-black text-slate-900 tracking-tight leading-tight">{asset.name}</h2>
                         <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white border border-slate-200 shadow-sm text-slate-500">
-                             {editedAsset.uniqueId}
+                             {asset.uniqueId}
                         </div>
                     </div>
 
@@ -266,14 +243,8 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
                          <div className="flex-1">
                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Admin Level Clearance Required</span>
                          </div>
-                         <button 
-                             onClick={isEditing ? handleSave : () => setIsEditing(true)}
-                             className="px-8 py-4 rounded-3xl bg-white border border-slate-200 text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] shadow-sm hover:bg-slate-50 transition-all active:scale-95"
-                        >
-                            {isEditing ? 'Confirm Changes' : 'Modify Asset'}
-                         </button>
                          <button className="px-8 py-4 rounded-3xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 active:scale-95 transition-all">
-                             Trigger Audit
+                              Audit Again
                          </button>
                     </div>
                 </div>
