@@ -34,8 +34,8 @@ api.interceptors.response.use(
 
             if (refreshToken) {
                 try {
-                    // Call the refresh endpoint
-                    const response = await axios.post('http://localhost:8000/api/token/refresh/', {
+                    // Call the refresh endpoint (baseURL is http://localhost:8000/api)
+                    const response = await api.post('/accounts/token/refresh/', {
                         refresh: refreshToken,
                     });
                     const { access } = response.data;
