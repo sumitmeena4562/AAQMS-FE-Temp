@@ -37,6 +37,14 @@ const useAuthStore = create((set) => ({
   login: async ({ email, password }) => {
     set({ isLoading: true, error: null });
 
+    // --- 0. MOCK BYPASS (Temporary for testing) ---
+    if (email === 'admin@aaqms.com' && password === 'Admin@123') {
+      const mockUser = { id: 1, name: "Demo Admin", email: "admin@demo.com", role: "admin" };
+      storage.saveSession("mock_access", "mock_refresh", mockUser);
+      set({ user: mockUser, isAuthenticated: true, isLoading: false });
+      return { success: true, user: mockUser };
+    }
+
     try {
       // 1. Backend se Tokens le kar aana
       const { data } = await api.post("/accounts/api/login/", { email, password });
@@ -111,4 +119,4 @@ const useAuthStore = create((set) => ({
   },
 }));
 
-export default useAuthStore;
+export default useAuthStore;
