@@ -1,129 +1,114 @@
 import { create } from "zustand";
+import api from "../services/api";
 
-// Helper function to simulate network delay
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-const MOCK_USERS = {
-    'admin@aaqms.com': { 
-        password: 'Admin@123', 
-        user: { id: 1, name: 'Sumit Meena', email: 'admin@aaqms.com', role: 'admin' } 
-    },
-    'coordinator@aaqms.com': { 
-        password: 'Coord@123', 
-        user: { id: 2, name: 'Anjali Sharma', email: 'coordinator@aaqms.com', role: 'coordinator' } 
-    },
-    'officer@aaqms.com': { 
-        password: 'Officer@123', 
-        user: { id: 3, name: 'Rahul Gupta', email: 'officer@aaqms.com', role: 'field_officer' } 
-    }
+/**
+ * STORAGE HELPERS
+ * Browser ki memory (LocalStorage) ke liye simple methods taaki repetitive code na likhna pade.
+ */
+const storage = {
+  getToken: () => localStorage.getItem("token"),
+  getUser: () => JSON.parse(localStorage.getItem("user")),
+  saveSession: (token, refresh, user) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("refresh", refresh);
+    localStorage.setItem("user", JSON.stringify(user));
+  },
+  clearSession: () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("user");
+  }
 };
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const useAuthStore = create((set) => ({
-    // Initialize state from localStorage
-    isAuthenticated: !!localStorage.getItem('token'),
-    user: JSON.parse(localStorage.getItem('user')) || null,
-    isLoading: false,
-    error: null,
+  // --- INITIAL STATE ---
+  isAuthenticated: !!storage.getToken(),
+  user: storage.getUser() || null,
+  isLoading: false,
+  error: null,
 
-    /**
-     * Simulated Login Method
-     * @param {Object} credentials - email, password, rememberMe
-     */
-    login: async ({ email, password, rememberMe }) => {
-        set({ isLoading: true, error: null });
-        
-        try {
-            await delay(1500);
-            const userData = MOCK_USERS[email.toLowerCase()];
+  // --- ACTIONS ---
 
-            if (userData && userData.password === password) {
-                const mockToken = `simulated-jwt-${Date.now()}`;
-                const loggedInUser = userData.user;
+  /**
+   * LOGIN: Backend se authenticate hona aur session save karna.
+   */
+  login: async ({ email, password }) => {
+    set({ isLoading: true, error: null });
 
-                // Handle Persistence for "Remember Me"
-                if (rememberMe) {
-                    localStorage.setItem('token', mockToken);
-                    localStorage.setItem('user', JSON.stringify(loggedInUser));
-                } else {
-                    // For short-lived sessions, we still use localStorage for simplicity 
-                    // in this POC, but the logic structure allows for sessionStorage later.
-                    localStorage.setItem('token', mockToken);
-                    localStorage.setItem('user', JSON.stringify(loggedInUser));
-                }
+    try {
+      // 1. Backend se Tokens le kar aana
+      const { data } = await api.post("/accounts/api/login/", { email, password });
+      
+      // 2. User ka profile data fetch karna
+      const profile = await api.get("/accounts/profile/");
+      const user = profile.data;
 
-                set({ 
-                    isAuthenticated: true, 
-                    user: loggedInUser, 
-                    isLoading: false, 
-                    error: null 
-                });
-                
-                return { success: true, user: loggedInUser };
-            } else {
-                throw new Error('Invalid Email or Password!');
-            }
-        } catch (err) {
-            const error = err.message || 'Authentication Failed';
-            set({ error, isLoading: false });
-            return { success: false, error };
-        }
-    },
+      // 3. Tokens aur Profile ko browser memory mein save karna
+      storage.saveSession(data.access, data.refresh, user);
 
-    logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        set({ isAuthenticated: false, user: null, error: null });
-    },
+      // 4. Global State update karna
+      set({ isAuthenticated: true, user, isLoading: false });
+      return { success: true, user };
 
-    setError: (error) => set({ error }),
-
-    /**
-     * PASSWORD RECOVERY LIFECYCLE
-     */
-
-    requestPasswordReset: async (email) => {
-        set({ isLoading: true, error: null });
-        try {
-            await delay(1200);
-            // In a real app, this would hit /auth/forgot-password
-            set({ isLoading: false });
-            return { success: true };
-        } catch (err) {
-            set({ error: err.message, isLoading: false });
-            return { success: false, error: err.message };
-        }
-    },
-
-    verifyOtp: async (email, otp) => {
-        set({ isLoading: true, error: null });
-        try {
-            await delay(1200);
-            if (otp !== '123456') { // Mock OTP for testing
-                throw new Error('Invalid or Expired OTP!');
-            }
-            set({ isLoading: false });
-            return { success: true };
-        } catch (err) {
-            set({ error: err.message, isLoading: false });
-            return { success: false, error: err.message };
-        }
-    },
-
-    resetPassword: async (email, password) => {
-        set({ isLoading: true, error: null });
-        try {
-            await delay(1500);
-            // Update MOCK_USERS password for the session
-            if (MOCK_USERS[email.toLowerCase()]) {
-                MOCK_USERS[email.toLowerCase()].password = password;
-            }
-            set({ isLoading: false });
-            return { success: true };
-        } catch (err) {
-            set({ error: err.message, isLoading: false });
-            return { success: false, error: err.message };
-        }
+    } catch (err) {
+      const errorMsg = err.response?.data?.detail || err.response?.data?.error || "Login failed";
+      set({ error: errorMsg, isLoading: false });
+      return { success: false, error: errorMsg };
     }
+  },
+
+  /**
+   * LOGOUT: Session clear karna aur state reset karna.
+   */
+  logout: () => {
+    storage.clearSession();
+    set({ isAuthenticated: false, user: null, error: null });
+  },
+
+  // --- STATE HELPERS ---
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  setError: (error) => set({ error }),
+
+  // --- PASSWORD RECOVERY (Mocks) ---
+
+  requestPasswordReset: async (email) => {
+    set({ isLoading: true });
+    try {
+      await delay(1000); // Simulate network
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      return { success: false };
+    }
+  },
+
+  verifyOtp: async (email, otp) => {
+    set({ isLoading: true });
+    try {
+      await delay(1000);
+      if (otp !== "123456") throw new Error("Invalid OTP");
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      return { success: false };
+    }
+  },
+
+  resetPassword: async (email, password) => {
+    set({ isLoading: true });
+    try {
+      await delay(1000);
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      return { success: false };
+    }
+  },
 }));
 
 export default useAuthStore;
