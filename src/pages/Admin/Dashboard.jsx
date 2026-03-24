@@ -2,33 +2,10 @@ import PageHeader from "../../components/UI/PageHeader";
 import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
 import RecentActivityTable from "../../components/Dashboard/RecentactivityTable";
-import { FiBox, FiClock, FiAlertTriangle, FiHome } from "react-icons/fi";
+import { FiHome } from "react-icons/fi";
+import { DUMMY_METRIC_CARDS } from "../../data/dashboardData";
 
 const Dashboard = () => {
-    const metricCards = [
-        {
-            title: "Inventory Items",
-            value: "15,201",
-            icon: <FiBox size={16} />,
-            statusLabel: "42 missing assets detected",
-            statusVariant: "warning",
-        },
-        {
-            title: "Pending Approvals",
-            value: "28",
-            icon: <FiClock size={16} />,
-            statusLabel: "Requires admin action",
-            statusVariant: "info",
-        },
-        {
-            title: "Critical AI Flags",
-            value: "7",
-            icon: <FiAlertTriangle size={16} />,
-            statusLabel: "Immediate review needed",
-            statusVariant: "danger",
-        },
-    ];
-
     return (
         <div className="flex flex-col gap-6">
             <PageHeader
@@ -47,7 +24,7 @@ const Dashboard = () => {
             />
             <StatGrid />
 
-            <MatricCardRow items={metricCards} />
+            <MatricCardRow items={DUMMY_METRIC_CARDS} />
             <RecentActivityTable />
 
         </div>
