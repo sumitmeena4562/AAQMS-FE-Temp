@@ -13,12 +13,13 @@ import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal';
 
 function LoginPage() {
     const navigate = useNavigate();
-    const { login, isLoading } = useAuthStore();
+    const { login, isLoading ,user} = useAuthStore();
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
     const onSubmit = async (data) => {
         const result = await login(data);
         if (result.success) {
+            console.log("Logged in user:", result.user.name);
             toast.success(`Welcome back, ${result.user.name}!`);
             navigate('/admin/dashboard');
         } else {
