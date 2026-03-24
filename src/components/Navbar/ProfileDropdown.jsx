@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import ConfirmModal from '../UI/ConfirmModal';
 
 const ProfileDropdown = () => {
     const navigate = useNavigate();
     const { logout, user } = useAuthStore();
     const [isOpen, setIsOpen] = useState(false);
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const ref = useRef(null);
 
     useEffect(() => {
@@ -17,7 +19,17 @@ const ProfileDropdown = () => {
     const name = user?.name || 'Admin User';
     const email = user?.email || 'admin@aisafety.com';
 
-    const handleLogout = (e) => { e.preventDefault(); logout(); navigate('/login'); };
+    const handleLogout = (e) => { 
+        e.preventDefault(); 
+        setIsOpen(false); // Close dropdown
+        setIsLogoutModalOpen(true); // Open confirm modal
+    };
+
+    const confirmLogout = () => {
+        logout(); 
+        setIsLogoutModalOpen(false);
+        navigate('/login');
+    };
 
     const menuItems = [
         { label: 'My Profile', icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
@@ -78,6 +90,16 @@ const ProfileDropdown = () => {
                     </div>
                 </div>
             )}
+            {/* Logout Confirmation Modal */}
+            <ConfirmModal 
+                isOpen={isLogoutModalOpen}
+                onClose={() => setIsLogoutModalOpen(false)}
+                onConfirm={confirmLogout}
+                title="Logout Confirmation"
+                message="Are you sure you want to log out of your account? You will need to sign in again to access the dashboard."
+                confirmText="Log Out"
+                danger={true}
+            />
         </div>
     );
 };

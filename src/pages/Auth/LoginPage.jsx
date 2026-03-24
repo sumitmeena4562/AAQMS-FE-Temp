@@ -20,7 +20,7 @@ function LoginPage() {
         const result = await login(data);
         if (result.success) {
             console.log("Logged in user:", result.user.name);
-            toast.success(`Welcome back, ${result.user.name}!`);
+            toast.success(`Welcome back, ${result.user.name} !`);
             navigate('/admin/dashboard');
         } else {
             toast.error(result.error || "Authentication failed. Please try again.");
