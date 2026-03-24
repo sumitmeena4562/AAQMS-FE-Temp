@@ -1,6 +1,15 @@
-export const generateSitePlansForCoordinator = (userId) => {
+export const generateSitePlansForCoordinator = (userId, userOrg = "") => {
   const seed = typeof userId === 'string' ? parseInt(userId.replace(/\D/g, '') || '1') : (userId || 1);
-  const numSites = (seed % 3) + 2; // 2 to 4 sites
+  
+  // 🔹 FIX: Hardcoded Data Alignment
+  // Ensure we output precisely what the Organization Stats say. Unassigned users get 0.
+  let numSites = 0;
+  let orgName = userOrg;
+
+  if (seed === 2) { numSites = 5; orgName = "SSISM"; } // David Kim
+  else if (seed === 3) { numSites = 12; orgName = "Globex"; } // Elena 
+  else if (seed === 5) { numSites = 8; orgName = "TechCore"; } // Aisha
+  // All others (Sarah, Marcus, etc) are unassigned or have 0 sites.
 
   const bases = [
     {
@@ -38,18 +47,25 @@ export const generateSitePlansForCoordinator = (userId) => {
   ];
 
   const plans = [];
+  if (numSites === 0) return plans;
+
   for (let i = 0; i < numSites; i++) {
-    const base = bases[(seed + i) % bases.length];
+    const base = bases[i % bases.length];
+    
+    // Completely mathematical and deterministic based on index, zero randomness
+    const dFloors = base.baseFloors + (i % 2);
+    const dZones = base.baseZones + (i % 3);
+    
     plans.push({
       id: `SITE-${seed}-${i+1}`,
-      name: base.name,
+      name: `${base.name} ${i+1}`,
       address: base.address,
       status: "ACTIVE",
       image: base.image,
       stats: {
-        floors: base.baseFloors + (seed % 3),
-        zones: base.baseZones + (seed % 5),
-        assets: base.baseAssets + (seed * 10)
+        floors: dFloors,
+        zones: dZones,
+        assets: dZones * 25
       }
     });
   }
@@ -58,12 +74,34 @@ export const generateSitePlansForCoordinator = (userId) => {
 }
 
 export const generateFloorsForSite = (site) => {
-  // Defensive check for missing stats (prevents crash on page refresh/direct nav)
-  const { floors = 1, zones = 1, assets = 10 } = site?.stats || { 
-    floors: 1, 
-    zones: 1, 
-    assets: 10 
-  };
+  // 🔹 FIX: Reverse-Engineering Deterministic Fallback 
+  // If a user clicks Breadcrumbs or Refreshes the page, location.state drops the 'site.stats' memory.
+  // We reconstruct it EXACTLY by analyzing the numbering suffix in the site.name!
+  let floors = 1;
+  let zones = 1;
+  let assets = 10;
+
+  if (site?.stats && site.stats.floors) {
+      floors = site.stats.floors;
+      zones = site.stats.zones;
+      assets = site.stats.assets;
+  } else if (site?.name) {
+      const match = site.name.match(/(\d+)$/);
+      if (match) {
+          const num = parseInt(match[1]);
+          const i = num - 1;
+          const bases = [
+            { baseFloors: 4, baseZones: 12 },
+            { baseFloors: 2, baseZones: 8 },
+            { baseFloors: 5, baseZones: 20 },
+            { baseFloors: 3, baseZones: 15 }
+          ];
+          const base = bases[i % bases.length];
+          floors = base.baseFloors + (i % 2);
+          zones = base.baseZones + (i % 3);
+          assets = zones * 25;
+      }
+  }
   
   const generatedFloors = [];
   let remainingZones = zones;
@@ -73,14 +111,14 @@ export const generateFloorsForSite = (site) => {
     const isGround = i === 0;
     const isLast = i === floors - 1;
     
-    // Distribute remaining roughly equally
+    // Distribute remaining equally (NO MATH.RANDOM ALLOWED)
     let fZones = isLast ? remainingZones : Math.max(1, Math.floor(zones / floors));
     let fAssets = isLast ? remainingAssets : Math.max(1, Math.floor(assets / floors));
 
-    // Slight variance
+    // Stable variance using strict math logic based on index
     if (!isLast && floors > 1) {
-      const vZ = Math.floor(Math.random() * 2) - 1; // -1 to 0 variance
-      const vA = Math.floor(Math.random() * 20) - 10;
+      const vZ = (i % 2 === 0) ? 1 : 0; 
+      const vA = (i % 2 === 0) ? -10 : 15;
       fZones = Math.max(1, fZones + vZ);
       fAssets = Math.max(1, fAssets + vA);
     }
@@ -89,7 +127,7 @@ export const generateFloorsForSite = (site) => {
     remainingAssets -= fAssets;
     
     generatedFloors.push({
-      id: `${site.id}-FL${i}`,
+      id: `${site.id || 'SITE'}-FL${i}`,
       level: isGround ? 'G' : `L${i}`,
       name: isGround ? 'Ground Floor' : `Level ${i}`,
       description: isGround ? 'Reception, Lobby & Core Systems' : `Executive Suites, Offices & Workspaces`,

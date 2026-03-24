@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 
 /* ── Animated Collapsible ── */
@@ -20,14 +20,32 @@ const CollapsibleSection = ({ isOpen, children }) => {
 const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, setMobileOpen, onToggle }) => {
     const { user } = useAuthStore();
     const location = useLocation();
+    const navigate = useNavigate();
     const [openMenus, setOpenMenus] = useState({});
-
-    const toggleMenu = (label) => setOpenMenus(p => ({ ...p, [label]: !p[label] }));
 
     const isActive = useCallback((path) => location.pathname === path || location.pathname.startsWith(path + '/'), [location.pathname]);
     const isParentActive = useCallback((item) => 
         item.children ? item.children.some(c => isActive(c.path)) : isActive(item.path)
     , [isActive]);
+
+    // 🔹 Auto-open sidebar menus if their child is the currently active page
+    useEffect(() => {
+        const activeParents = {};
+        navItems.forEach(item => {
+            if (item.children && isParentActive(item)) {
+                activeParents[item.label] = true;
+            }
+        });
+        setOpenMenus(prev => ({ ...prev, ...activeParents }));
+    }, [location.pathname, navItems, isParentActive]);
+
+    const toggleMenu = (item) => {
+        setOpenMenus(p => ({ ...p, [item.label]: !p[item.label] }));
+        // 🔹 Navigate immediately if parent has a default path
+        if (item.path) {
+           navigate(item.path);
+        }
+    };
 
     useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname, setMobileOpen]);
 
@@ -63,7 +81,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         return (
             <div key={item.label} className="mb-0.5 group">
                 <button
-                    onClick={() => toggleMenu(item.label)}
+                    onClick={() => toggleMenu(item)}
                     className={`
                         w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 border-none outline-none cursor-pointer
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'justify-start'}

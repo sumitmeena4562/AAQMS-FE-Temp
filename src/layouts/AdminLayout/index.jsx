@@ -24,19 +24,8 @@ const navItems = [
         label: 'Dashboard', path: '/admin/dashboard', icon: <FiHome size={18} />
     },
     {
-        label: 'Organization Management', icon: <FiBriefcase size={18} />,
+        label: 'Organizations', path: '/admin/organizations', icon: <FiBriefcase size={18} />,
         children: [
-            {
-                label: 'Organizations', path: '/admin/organizations', icon: (
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
-                        <line x1="9" y1="22" x2="9" y2="7"></line>
-                        <line x1="8" y1="6" x2="8" y2="6"></line>
-                        <line x1="12" y1="6" x2="12" y2="6"></line>
-                        <line x1="16" y1="6" x2="16" y2="6"></line>
-                    </svg>
-                )
-            },
             { label: 'Coordinators', path: '/admin/coordinators', icon: <FiUsers size={15} /> },
             { label: 'Site Plan', path: '/admin/site-plan', icon: <FiMap size={15} /> },
             { label: 'Floor Plan', path: '/admin/floor-plan', icon: <FiLayers size={15} /> },

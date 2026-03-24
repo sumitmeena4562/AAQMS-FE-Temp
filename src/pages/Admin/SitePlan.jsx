@@ -1,44 +1,26 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
 import OrganizationCard from '../../components/UI/OrganizationCard';
 import PageHeader from '../../components/UI/PageHeader';
-
-import useUserStore from '../../store/userStore';
-import { generateSitePlansForCoordinator } from '../../utils/mockSiteData';
-
-import { useBreadcrumb } from '../../hooks/useBreadcrumb';
+import FilterBar from '../../components/UI/FilterBar';
+import { useFilterStore } from '../../store/useFilterStore';
+import { organizations, coordinators, sites } from '../../data/mockFilterData';
 import { FiHome, FiBriefcase } from 'react-icons/fi';
 
 const SitePlan = () => {
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const orgName = location.state?.orgName || params.get('org') || "Organization";
-  const coordName = location.state?.coordinator?.name || params.get('coord') || "Coordinator";
+  const { selectedOrg, selectedCoord } = useFilterStore();
 
-  const users = useUserStore(state => state.users);
-  const fetchUsers = useUserStore(state => state.fetchUsers);
-  const { setBreadcrumbs } = useBreadcrumb();
+  const orgInfo = selectedOrg ? organizations.find(o => o.id === selectedOrg) : null;
+  const coordInfo = selectedCoord ? coordinators.find(c => c.id === selectedCoord) : null;
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-    { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
-    { label: coordName, path: location.pathname + location.search, isActive: true }
+    { label: orgInfo?.name || "Organization", path: `/admin/coordinators` },
+    { label: coordInfo?.name || "Site Plan", path: "#", isActive: true }
   ];
 
-  React.useEffect(() => {
-    if (users.length === 0) fetchUsers();
-    // Breadcrumbs managed by PageHeader
-  }, [users.length, fetchUsers, orgName, coordName, location.pathname, location.search]);
-
-  const matchedUser = users.find(u => u.name === coordName && u.organization === orgName);
-
-  const coordinator = location.state?.coordinator || (matchedUser ? {
-    name: matchedUser.name,
-    sitePlans: generateSitePlansForCoordinator(matchedUser.id)
-  } : { name: coordName, sitePlans: [] });
-
-  const sitePlans = coordinator.sitePlans || [];
+  // Logic: Show sites belonging strictly to the currently selected coordinator
+  const sitePlans = selectedCoord ? sites.filter(s => s.coordId === selectedCoord) : [];
 
   const totalPlans = sitePlans.length;
   const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
@@ -49,32 +31,47 @@ const SitePlan = () => {
       {/* HEADER */}
       <PageHeader
         title="Site Plan Selection"
-        subtitle={`Managing ${activePlansCount} active site plans for ${coordName}`}
+        subtitle={selectedCoord ? `Managing ${activePlansCount} active site plans for ${coordInfo?.name}` : "Please use the filter bar to select a coordinator"}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
+          selectedCoord ? (
             <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                 {totalPlans} Total Projects
             </span>
+          ) : null
         }
       />
 
       {/* MAIN BODY */}
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
+        <FilterBar activeLevel="sites" />
 
-        {/* CARDS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {sitePlans.map((item, index) => (
-            <div key={item.id || index} className="w-full max-w-[340px]">
-              {/* Reuse OrganizationCard with isSiteCard flag */}
-              <OrganizationCard
-                org={item}
-                isSiteCard={true}
-                coordinatorContext={coordinator}
-              />
-            </div>
-          ))}
-        </div>
+        {!selectedCoord ? (
+          <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
+            <p className="text-gray font-medium tracking-wide">
+              Please select an Organization and Coordinator to view sites.
+            </p>
+          </div>
+        ) : sitePlans.length === 0 ? (
+          <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
+            <p className="text-gray font-medium tracking-wide">
+              No sites found for this coordinator.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            {sitePlans.map((item, index) => (
+              <div key={item.id || index} className="w-full max-w-[340px]">
+                <OrganizationCard
+                  org={item}
+                  isSiteCard={true}
+                  coordinatorContext={{ name: coordInfo?.name }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* FOOTER */}
         <div className="mt-auto pt-16 flex items-center justify-center gap-1.5 text-xs text-gray/60 font-medium pb-6">
@@ -83,7 +80,6 @@ const SitePlan = () => {
           </svg>
           AI assists detection. Final approval is human-controlled.
         </div>
-
       </main>
     </div>
   );

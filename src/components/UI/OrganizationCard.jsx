@@ -15,21 +15,16 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     u.role === 'Coordinator'
   );
 
+  // 🔹 FIX: Strict Data Adherence. 
+  // We bypass all random mock recalculations and trust exactly what the Global Store provides!
   let totalComputedSites = 0;
   let totalComputedFloors = 0;
+  let totalComputedCoordinators = 0;
 
   if (!isSiteCard) {
-    if (orgCoordinators.length > 0) {
-      orgCoordinators.forEach(coord => {
-        const plans = generateSitePlansForCoordinator(coord.id);
-        totalComputedSites += plans.length;
-        totalComputedFloors += plans.reduce((acc, p) => acc + p.stats.floors, 0);
-      });
-    } else {
-      // Fallback to static stats if no coordinators assigned yet
       totalComputedSites = org.stats?.sites || 0;
       totalComputedFloors = org.stats?.floors || 0;
-    }
+      totalComputedCoordinators = org.stats?.coordinators || 0;
   }
 
   let currentStatus = org.status || 'ACTIVE';
@@ -139,7 +134,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               {isSiteCard ? 'FLOORS' : 'COORDS'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
-              {isSiteCard ? org.stats?.floors || 0 : orgCoordinators.length}
+              {isSiteCard ? org.stats?.floors || 0 : totalComputedCoordinators}
             </p>
           </div>
           <div className="flex flex-col">

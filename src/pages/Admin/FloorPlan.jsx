@@ -1,58 +1,40 @@
-import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
+import FilterBar from '../../components/UI/FilterBar';
 import FloorCard from '../../components/UI/FloorCard';
-import { generateFloorsForSite } from '../../utils/mockSiteData';
-
-import { useBreadcrumb } from '../../hooks/useBreadcrumb';
+import { useFilterStore } from '../../store/useFilterStore';
+import { organizations, coordinators, sites, floors } from '../../data/mockFilterData';
 import { FiHome, FiBriefcase } from 'react-icons/fi';
 
 const FloorPlan = () => {
-  const location = useLocation();
   const navigate = useNavigate();
+  const { selectedOrg, selectedCoord, selectedSite } = useFilterStore();
 
-  const params = new URLSearchParams(location.search);
-  const siteName = location.state?.site?.name || params.get('site') || "Site";
-  const orgName = location.state?.orgName || params.get('org') || "Organization";
-  const coordName = location.state?.coordinator?.name || params.get('coord') || "Coordinator";
-  const site = location.state?.site || { name: siteName, id: 'SITE-UNKNOWN' };
-  const coordinator = location.state?.coordinator || { name: coordName };
-
-  const { setBreadcrumbs } = useBreadcrumb();
+  const orgInfo = selectedOrg ? organizations.find(o => o.id === selectedOrg) : null;
+  const coordInfo = selectedCoord ? coordinators.find(c => c.id === selectedCoord) : null;
+  const siteInfo = selectedSite ? sites.find(s => s.id === selectedSite) : null;
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-    { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
-    { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
-    { label: site.name, path: location.pathname + location.search, isActive: true }
+    { label: orgInfo?.name || "Organization", path: `/admin/coordinators` },
+    { label: coordInfo?.name || "Site Plan", path: `/admin/site-plan` },
+    { label: siteInfo?.name || "Floor Plan", path: "#", isActive: true }
   ];
 
-  useEffect(() => {
-    // Breadcrumbs managed by PageHeader
-  }, [orgName, coordinator.name, site.name, location.pathname, location.search]);
+  // We explicitly fetch matched floors from the relational store to keep UI accurate
+  const floorList = selectedSite ? floors.filter(f => f.siteId === selectedSite).map(f => ({
+      ...f, 
+      status: 'ACTIVE',
+      stats: { zones: Math.floor(Math.random() * 5) + 2, assets: Math.floor(Math.random() * 20) + 5 }
+  })) : [];
 
-  // Fallback safe state
-  if (!site) {
-    return (
-      <div className="p-8 text-center text-gray font-sans mt-20">
-        <h2 className="text-xl font-bold mb-4 text-title">No Site Selected</h2>
-        <p className="mb-6">Please start from the Organization Dashboard and select a Site Plan.</p>
-        <button 
-          onClick={() => navigate('/admin/organizations')} 
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Go to Dashboard
-        </button>
-      </div>
-    );
-  }
-
-  const floorsList = generateFloorsForSite(site);
-  const activePlansCount = floorsList.filter(f => f.status === 'ACTIVE').length;
+  const activePlansCount = floorList.filter(f => f.status === 'ACTIVE').length;
 
   const handleFloorClick = (floor) => {
-    navigate(`/admin/zones?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}&site=${encodeURIComponent(site.name)}&floor=${encodeURIComponent(floor.name)}`, { state: { floor, site, orgName, coordinator } });
+    // Navigate is preserved for any potential tight routing mapping, but user relies on filter store
+    navigate(`/admin/zones`);
   };
 
   return (
@@ -61,30 +43,46 @@ const FloorPlan = () => {
       {/* HEADER */}
       <PageHeader 
         title="Floor Plan Selection"
-        subtitle={`Managing ${activePlansCount} active floor plans for ${site.name}`}
+        subtitle={selectedSite ? `Managing ${activePlansCount} active floor plans for ${siteInfo?.name}` : "Please use the filter bar to select a site"}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
+          selectedSite ? (
             <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
-                {floorsList.length} Total Levels
+                {floorList.length} Total Levels
             </span>
+          ) : null
         }
       />
 
       {/* MAIN BODY */}
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
+        <FilterBar activeLevel="floors" />
 
-        {/* CARDS LIST/GRID */}
-        <div className="flex flex-wrap gap-6">
-          {floorsList.map((floor, index) => (
-            <FloorCard 
-              key={floor.id || index} 
-              floor={floor} 
-              site={site}
-              onClick={() => handleFloorClick(floor)} 
-            />
-          ))}
-        </div>
+        {!selectedSite ? (
+          <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
+            <p className="text-gray font-medium tracking-wide">
+              Please select an Organization, Coordinator, and Site to view floors.
+            </p>
+          </div>
+        ) : floorList.length === 0 ? (
+          <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
+            <p className="text-gray font-medium tracking-wide">
+              No floors found for this site.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-6">
+            {floorList.map((floor, index) => (
+              <FloorCard 
+                key={floor.id || index} 
+                floor={floor} 
+                site={siteInfo}
+                onClick={() => handleFloorClick(floor)} 
+              />
+            ))}
+          </div>
+        )}
 
         {/* FOOTER */}
         <div className="mt-auto pt-16 flex items-center justify-center gap-1.5 text-xs text-gray/60 font-medium pb-6">

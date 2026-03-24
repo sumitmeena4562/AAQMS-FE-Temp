@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
 import FilterBar from '../../components/UI/FilterBar';
@@ -7,7 +7,8 @@ import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
 import { FiSquare, FiCheckSquare } from 'react-icons/fi';
 import { List } from 'lucide-react';
-import { useBreadcrumb } from '../../hooks/useBreadcrumb';
+import { useFilterStore } from '../../store/useFilterStore';
+import { organizations, coordinators, sites, floors } from '../../data/mockFilterData';
 import { FiHome, FiBriefcase } from 'react-icons/fi';
 import { ZONES_DATA } from '../../data/zones';
 
@@ -15,6 +16,14 @@ const Zones = () => {
     const [activeView, setActiveView] = useState('list');
     const [selectionMode, setSelectionMode] = useState(false);
     const [filters, setFilters] = useState({ zoneType: '' });
+
+    const navigate = useNavigate();
+    const { selectedOrg, selectedCoord, selectedSite, selectedFloor } = useFilterStore();
+
+    const orgInfo = selectedOrg ? organizations.find(o => o.id === selectedOrg) : null;
+    const coordInfo = selectedCoord ? coordinators.find(c => c.id === selectedCoord) : null;
+    const siteInfo = selectedSite ? sites.find(s => s.id === selectedSite) : null;
+    const floorInfo = selectedFloor ? floors.find(f => f.id === selectedFloor) : null;
 
     const filteredZones = useMemo(() => {
         let result = [...ZONES_DATA];
@@ -24,57 +33,22 @@ const Zones = () => {
         return result;
     }, [filters.zoneType]);
 
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    const params = new URLSearchParams(location.search);
-    const floorName = location.state?.floor?.name || params.get('floor') || null;
-    const siteName = location.state?.site?.name || params.get('site') || "Site";
-    const orgName = location.state?.orgName || params.get('org') || "Organization";
-    const coordName = location.state?.coordinator?.name || params.get('coord') || "Coordinator";
-
-    const floor = location.state?.floor || (floorName ? { name: floorName } : null);
-    const site = location.state?.site || { name: siteName };
-    const coordinator = location.state?.coordinator || { name: coordName };
-
-    const { setBreadcrumbs } = useBreadcrumb();
-
     const breadcrumbs = [
         { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
         { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-        { label: orgName, path: `/admin/coordinators?org=${encodeURIComponent(orgName)}` },
-        { label: coordinator.name, path: `/admin/site-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}` },
-        { label: site.name, path: `/admin/floor-plan?org=${encodeURIComponent(orgName)}&coord=${encodeURIComponent(coordinator.name)}&site=${encodeURIComponent(site.name)}` },
-        { label: floor?.name || "Zones", path: location.pathname + location.search, isActive: true }
+        { label: orgInfo?.name || "Organization", path: `/admin/coordinators` },
+        { label: coordInfo?.name || "Site Plan", path: `/admin/site-plan` },
+        { label: siteInfo?.name || "Floor Plan", path: `/admin/floor-plan` },
+        { label: floorInfo?.name || "Zones", path: "#", isActive: true }
     ];
-
-    React.useEffect(() => {
-        // Dynamic PageHeader takes care of breadcrumbs now
-    }, [orgName, coordinator.name, site.name, floor?.name, location.pathname, location.search]);
-
-    // Fallback safe state
-    if (!floor) {
-        return (
-            <div className="p-8 text-center text-gray font-sans mt-20">
-                <h2 className="text-xl font-bold mb-4 text-title">No Floor Selected</h2>
-                <p className="mb-6">Please start from the Organization Dashboard and select a Floor Plan.</p>
-                <button
-                    onClick={() => navigate('/admin/organizations')}
-                    className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                    Go to Organizations
-                </button>
-            </div>
-        );
-    }
 
     return (
         <div className="flex flex-col font-sans h-full">
 
             {/* HEADER */}
             <PageHeader
-                title={`Zones in ${floor.name}`}
-                subtitle={`Operational safety zones for ${site.name} — ${orgName}`}
+                title={floorInfo ? `Zones in ${floorInfo.name}` : "Zones Management"}
+                subtitle={floorInfo ? `Operational safety zones for ${siteInfo?.name}` : "Please use the filter bar to select a specific floor"}
                 breadcrumbs={breadcrumbs}
                 hideAddButton={true}
             />
@@ -82,7 +56,7 @@ const Zones = () => {
             {/* MAIN BODY */}
             <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
 
-                <FilterBar className="mb-6">
+                <FilterBar activeLevel="zones" className="mb-6">
                     <div className="flex items-center gap-3">
                         <Button
                             variant={selectionMode ? "primary" : "outline"}
@@ -135,25 +109,31 @@ const Zones = () => {
                     </div>
                 </FilterBar>
 
-                {/* TABLE */}
-                <div className={`transition-all duration-300 w-full ${activeView === 'list' ? 'block animate-in fade-in duration-500' : 'hidden'}`}>
-                    <ZonesTable data={filteredZones} selectionMode={selectionMode} />
-                </div>
-                {activeView === 'drawing' && (
-                    <div className="w-full h-[600px] border border-border-main rounded-xl flex items-center justify-center bg-card text-gray animate-in fade-in duration-500">
-                        <div className="flex flex-col items-center gap-3">
-                            <svg className="w-10 h-10 text-border-main" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <span>Interactive Floor Plan acts exactly like the Drawing tab here.</span>
-                        </div>
+                {!selectedFloor ? (
+                    <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
+                        <p className="text-gray font-medium tracking-wide">
+                            Please sequentially select an Organization, Coordinator, Site, and Floor to view zones.
+                        </p>
                     </div>
+                ) : (
+                    <>
+                        {/* TABLE */}
+                        <div className={`transition-all duration-300 w-full ${activeView === 'list' ? 'block animate-in fade-in duration-500' : 'hidden'}`}>
+                            <ZonesTable data={filteredZones} selectionMode={selectionMode} />
+                        </div>
+                        {activeView === 'drawing' && (
+                            <div className="w-full h-[600px] border border-border-main rounded-xl flex items-center justify-center bg-card text-gray animate-in fade-in duration-500 mt-4">
+                                <div className="flex flex-col items-center gap-3">
+                                    <svg className="w-10 h-10 text-border-main" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span>Interactive Floor Plan acts exactly like the Drawing tab here.</span>
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
-               
-
             </main>
-
-
         </div>
     );
 };

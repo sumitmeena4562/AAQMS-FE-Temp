@@ -1,132 +1,128 @@
 import { create } from 'zustand';
+import api from '../services/api';
 
-const initialOrgs = [
-  {
-    id: "1",
-    name: "Acme Corp", industry: "Technology", region: "North America", 
-    status: "ACTIVE",
-    lastInventoryAudit: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: { sites: 4, floors: 5, zones: 12 },
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "2",
-    name: "Global Logistics", industry: "Logistics", region: "Europe", 
-    status: "ACTIVE",
-    lastInventoryAudit: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: { sites: 12, floors: 8, zones: 24 },
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "3",
-    name: "SSISM", industry: "Security", region: "Asia Pacific", 
-    status: "MAINTENANCE",
-    lastInventoryAudit: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: { sites: 2, floors: 4, zones: 8 },
-    image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "4",
-    name: "Apex Manufacturing", industry: "Manufacturing", region: "East Coast",
-    status: "ACTIVE",
-    lastInventoryAudit: new Date().toISOString(),
-    stats: { sites: 6, floors: 3, zones: 18 },
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "5",
-    name: "St. Mary's Healthcare", industry: "Healthcare", region: "West Coast",
-    status: "ACTIVE",
-    lastInventoryAudit: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: { sites: 3, floors: 12, zones: 45 },
-    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "6",
-    name: "Vision Education", industry: "Education", region: "UK & Ireland",
-    status: "ACTIVE",
-    lastInventoryAudit: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: { sites: 8, floors: 4, zones: 32 },
-    image: "https://www.visionmanagement.org/wp-content/uploads/2023/08/Vision-scaled-600x400.jpg"
-  },
-  {
-    id: "7",
-    name: "Skyway Retail", industry: "Retail", region: "Middle East",
-    status: "MAINTENANCE",
-    lastInventoryAudit: new Date(Date.now() - 50 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: { sites: 15, floors: 2, zones: 60 },
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "8",
-    name: "Quantum Tech", industry: "Technology", region: "Germany",
-    status: "ACTIVE",
-    lastInventoryAudit: new Date().toISOString(),
-    stats: { sites: 2, floors: 1, zones: 5 },
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "9",
-    name: "Blue Ocean Energy", industry: "Energy", region: "Nordics",
-    status: "ACTIVE",
-    lastInventoryAudit: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: { sites: 4, floors: 10, zones: 20 },
-    image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "10",
-    name: "Horizon Banking", industry: "Finance", region: "Singapore",
-    status: "ACTIVE",
-    lastInventoryAudit: new Date().toISOString(),
-    stats: { sites: 5, floors: 15, zones: 30 },
-    image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "11",
-    name: "Everest Construction", industry: "Construction", region: "India",
-    status: "MAINTENANCE",
-    lastInventoryAudit: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: { sites: 9, floors: 6, zones: 54 },
-    image: "https://is1-2.housingcdn.com/4f2250e8/be11ddbc6e3f8c667d628fbd9ecf6124/v0/fs/everest_axora-bhayli-vadodara-everest_construction_company.jpeg"
-  },
-  {
-    id: "12",
-    name: "Gourmet Foods", industry: "Food & Beverage", region: "France",
-    status: "ACTIVE",
-    lastInventoryAudit: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-    stats: { sites: 20, floors: 1, zones: 40 },
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=800&auto=format&fit=crop"
-  },
-  {
-    id: "13",
-    name: "Nova Aerospace", industry: "Aerospace", region: "Texas, USA",
-    status: "ACTIVE",
-    lastInventoryAudit: new Date().toISOString(),
-    stats: { sites: 3, floors: 4, zones: 12 },
-    image: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=800&auto=format&fit=crop"
-  }
+// 🔹 DUMMY DATA FOR UI TESTING (Synced with UserStore Seed Data)
+// 🔹 RULE: If coordinator is 'unassigned', sites are 0. Numbers match userStore exactly.
+let MOCK_ORGS = [
+    { id: '1', name: 'Acme Corp', industry: 'technology', region: 'North Zone', status: 'ACTIVE', stats: { sites: 0, floors: 0, coordinators: 1 }, logo: 'https://ui-avatars.com/api/?name=Acme+Corp&background=random' },
+    { id: '2', name: 'SSISM', industry: 'logistics', region: 'South Zone', status: 'ACTIVE', stats: { sites: 5, floors: 20, coordinators: 1 }, logo: 'https://ui-avatars.com/api/?name=SSISM&background=random' },
+    { id: '3', name: 'Globex', industry: 'manufacturing', region: 'East Zone', status: 'INACTIVE', stats: { sites: 12, floors: 48, coordinators: 1 }, logo: 'https://ui-avatars.com/api/?name=Globex&background=random' },
+    { id: '4', name: 'Innovate Ltd', industry: 'finance', region: 'West Zone', status: 'ACTIVE', stats: { sites: 0, floors: 0, coordinators: 1 }, logo: 'https://ui-avatars.com/api/?name=Innovate+Ltd&background=random' },
+    { id: '5', name: 'TechCore', industry: 'research', region: 'Central Zone', status: 'INACTIVE', stats: { sites: 8, floors: 32, coordinators: 1 }, logo: 'https://ui-avatars.com/api/?name=TechCore&background=random' },
 ];
 
-export const useOrgStore = create((set) => ({
-  orgs: (() => {
-    const saved = JSON.parse(localStorage.getItem('aaqms_organizations'));
-    // If we have very few orgs, it means it's an old state. Reset to see all 13 demo orgs.
-    if (!saved || saved.length < 5) return initialOrgs;
-    return saved;
-  })(),
-  addOrg: (newOrg) => set((state) => {
-    const updated = [...state.orgs, newOrg];
-    localStorage.setItem('aaqms_organizations', JSON.stringify(updated));
-    return { orgs: updated };
-  }),
-  updateOrg: (id, updatedOrg) => set((state) => {
-    const updated = state.orgs.map(org => org.id === id ? { ...org, ...updatedOrg } : org);
-    localStorage.setItem('aaqms_organizations', JSON.stringify(updated));
-    return { orgs: updated };
-  }),
-  removeOrg: (id) => set((state) => {
-    const updated = state.orgs.filter(org => org.id !== id);
-    localStorage.setItem('aaqms_organizations', JSON.stringify(updated));
-    return { orgs: updated };
-  })
+export const useOrgStore = create((set, get) => ({
+  orgs: [],
+  isLoading: false,
+  error: null,
+  page: 1,
+  totalPages: 1,
+  totalCount: 0,
+  searchTerm: '',
+
+  // Fetch all organizations (MOCKED)
+  fetchOrgs: async (page = 1, search = "") => {
+    set({ isLoading: true, error: null, page, searchTerm: search });
+    try {
+      // ⚠️ REAL API CALL (COMMENTED OUT FOR NOW)
+      // const response = await api.get(`/organizations/?page=${page}&search=${search}`);
+      // const data = response.data;
+      
+      // 🔹 IMMEDIATE RETURN (No Artificial Lag)
+      
+      let results = [...MOCK_ORGS];
+      if (search) {
+          results = results.filter(org => org.name.toLowerCase().includes(search.toLowerCase()));
+      }
+      
+      const totalCount = results.length;
+      const totalPages = Math.ceil(totalCount / 10) || 1;
+
+      set({ 
+        orgs: results,
+        totalCount,
+        totalPages,
+        isLoading: false 
+      });
+      return { success: true, data: results };
+    } catch (err) {
+      set({ error: 'Failed to fetch organizations', isLoading: false });
+      return { success: false, error: 'Failed' };
+    }
+  },
+
+  // Add a new organization (MOCKED)
+  addOrg: async (newOrg) => {
+    set({ isLoading: true, error: null });
+    try {
+      // ⚠️ REAL API CALL (COMMENTED OUT)
+      // const response = await api.post('/organizations/', newOrg);
+      
+      // 🔹 IMMEDIATE RETURN (No Artificial Lag)
+      
+      const createdOrg = {
+          ...newOrg,
+          id: Math.random().toString(36).substr(2, 9),
+          stats: { sites: 0, coordinators: 0 },
+          logo: `https://ui-avatars.com/api/?name=${encodeURIComponent(newOrg.name)}&background=random`
+      };
+      
+      MOCK_ORGS.push(createdOrg); // Predictable Push
+
+      set((state) => ({
+        orgs: [...state.orgs, createdOrg],
+        isLoading: false
+      }));
+      return { success: true, data: createdOrg };
+    } catch (err) {
+      set({ error: 'Failed to create organization', isLoading: false });
+      return { success: false, error: 'Failed' };
+    }
+  },
+
+  // Update an existing organization (MOCKED)
+  updateOrg: async (id, updatedData) => {
+    set({ isLoading: true, error: null });
+    try {
+      // ⚠️ REAL API CALL (COMMENTED OUT)
+      // const response = await api.patch(`/organizations/${id}/`, updatedData);
+      
+      // 🔹 IMMEDIATE RETURN (No Artificial Lag)
+      
+      const updatedOrgIndex = MOCK_ORGS.findIndex(org => org.id === id);
+      if (updatedOrgIndex > -1) {
+          MOCK_ORGS[updatedOrgIndex] = { ...MOCK_ORGS[updatedOrgIndex], ...updatedData };
+      }
+
+      set((state) => ({
+        orgs: state.orgs.map((org) => (org.id === id ? { ...org, ...updatedData } : org)),
+        isLoading: false
+      }));
+      return { success: true, data: updatedData };
+    } catch (err) {
+      set({ error: 'Failed to update organization', isLoading: false });
+      return { success: false, error: 'Failed' };
+    }
+  },
+
+  // Remove an organization (MOCKED)
+  removeOrg: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      // ⚠️ REAL API CALL (COMMENTED OUT)
+      // await api.delete(`/organizations/${id}/`);
+      
+      // 🔹 IMMEDIATE RETURN (No Artificial Lag)
+      MOCK_ORGS = MOCK_ORGS.filter(org => org.id !== id);
+
+      set((state) => ({
+        orgs: state.orgs.filter((org) => org.id !== id),
+        isLoading: false
+      }));
+      return { success: true };
+    } catch (err) {
+      set({ error: 'Failed to delete organization', isLoading: false });
+      return { success: false, error: 'Failed' };
+    }
+  }
 }));

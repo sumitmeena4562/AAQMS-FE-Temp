@@ -12,6 +12,8 @@ import DataTable from '../../components/UI/DataTable';
 import DotStatus from '../../components/UI/DotStatus';
 import Badge from '../../components/UI/Badge';
 import FilterBar from '../../components/UI/FilterBar';
+import Search from '../../components/UI/Search';
+import TableSkeleton from '../../components/UI/TableSkeleton';
 
 // Resilient Logo Component for DataTable
 const OrgLogo = ({ org }) => {
@@ -37,10 +39,8 @@ const OrgLogo = ({ org }) => {
 };
 
 const Organizations = () => {
-    const orgs = useOrgStore(state => state.orgs);
-    const addOrg = useOrgStore(state => state.addOrg);
-    const updateOrg = useOrgStore(state => state.updateOrg);
-    const removeOrg = useOrgStore(state => state.removeOrg);
+    // 🔹 Map Zustand Store state and actions explicitly
+    const { orgs, addOrg, updateOrg, removeOrg, fetchOrgs, isLoading, page, totalPages, totalCount, searchTerm } = useOrgStore();
     
     const [filters, setFilters] = useState({ industry: 'all', status: 'all', region: 'all' });
     const [viewMode, setViewMode] = useState('grid');
@@ -51,10 +51,9 @@ const Organizations = () => {
     const { users, fetchUsers } = useUserStore();
 
     useEffect(() => {
-        if (users.length === 0) {
-            fetchUsers();
-        }
-    }, [users.length, fetchUsers]);
+        if (users.length === 0) fetchUsers();
+        fetchOrgs(1, ""); // 🔹 Initial Fetch
+    }, []);
 
     const filteredOrgs = orgs.filter(org => {
         const matchesIndustry = filters.industry === 'all' || (org.industry || "") === filters.industry;
@@ -173,6 +172,13 @@ const Organizations = () => {
                             onChange={(v) => setFilters(prev => ({ ...prev, status: v || 'all' }))}
                             allLabel="All Statuses"
                         />
+                        
+                        {/* 🔹 Search Integration */}
+                        <Search 
+                            placeholder="Search Organizations..." 
+                            className="max-w-[200px]"
+                            onSearch={(query) => fetchOrgs(1, query)} // Resets to page 1 on search
+                        />
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
@@ -197,7 +203,11 @@ const Organizations = () => {
                 {/* THE GRID (Properly Aligned) */}
 
                 {/* THE CONTENT (GRID OR LIST) */}
-                {filteredOrgs.length > 0 ? (
+                {isLoading ? (
+                    <div className="bg-card rounded-3xl p-6 border border-border-main shadow-sm w-full">
+                        <TableSkeleton rows={5} />
+                    </div>
+                ) : filteredOrgs.length > 0 ? (
                     viewMode === 'grid' ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                             {filteredOrgs.map(org => (
@@ -347,6 +357,32 @@ const Organizations = () => {
                             <FiRefreshCcw className="w-3.5 h-3.5" />
                             Clear Criteria
                         </button>
+                    </div>
+                )}
+
+                {/* 🔹 Pagination Controls */}
+                {!isLoading && orgs.length > 0 && totalPages > 1 && (
+                    <div className="flex items-center justify-between border-t border-border-main/50 pt-5 mt-4">
+                        <span className="text-[12px] font-medium text-gray">
+                            Showing page <span className="font-bold text-title">{page}</span> of <span className="font-bold text-title">{totalPages}</span> 
+                            &nbsp;({totalCount} total results)
+                        </span>
+                        <div className="flex items-center gap-2">
+                            <button 
+                                onClick={() => fetchOrgs(page - 1, searchTerm)}
+                                disabled={page === 1 || isLoading}
+                                className="px-4 py-1.5 text-[11px] font-bold tracking-wider uppercase bg-base text-body rounded-[var(--radius-button)] border border-border-main hover:bg-card hover:text-title disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                            >
+                                Previous
+                            </button>
+                            <button 
+                                onClick={() => fetchOrgs(page + 1, searchTerm)}
+                                disabled={page >= totalPages || isLoading}
+                                className="px-4 py-1.5 text-[11px] font-bold tracking-wider uppercase bg-base text-body rounded-[var(--radius-button)] border border-border-main hover:bg-card hover:text-title disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                            >
+                                Next
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

@@ -20,7 +20,7 @@ const SEED_USERS = [
 ];
 
 // ── Helpers ──
-const delay = (ms = 200) => new Promise(r => setTimeout(r, ms));
+const delay = (ms = 0) => new Promise(r => r());
 
 function loadUsers() {
     try {
