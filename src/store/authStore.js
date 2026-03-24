@@ -1,104 +1,114 @@
 import { create } from "zustand";
-import api from "../services/api"; // API interceptor ko import kar liya
+import api from "../services/api";
 
-// Helper function to simulate network delay for recovery methods (if still using mocks)
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+/**
+ * STORAGE HELPERS
+ * Browser ki memory (LocalStorage) ke liye simple methods taaki repetitive code na likhna pade.
+ */
+const storage = {
+  getToken: () => localStorage.getItem("token"),
+  getUser: () => JSON.parse(localStorage.getItem("user")),
+  saveSession: (token, refresh, user) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("refresh", refresh);
+    localStorage.setItem("user", JSON.stringify(user));
+  },
+  clearSession: () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("user");
+  }
+};
+
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const useAuthStore = create((set) => ({
-    isAuthenticated: !!localStorage.getItem('token'),
-    user: JSON.parse(localStorage.getItem('user')) || null,
-    isLoading: false,
-    error: null,
+  // --- INITIAL STATE ---
+  isAuthenticated: !!storage.getToken(),
+  user: storage.getUser() || null,
+  isLoading: false,
+  error: null,
 
-    /**
-     * Real Login Method - Backend API Integration
-     * @param {Object} credentials - email, password
-     */
-    login: async ({ email, password }) => {
-        set({ isLoading: true, error: null });
-        
-        try {
-            // STEP 1: Backend ki Login API ko Request bhejna
-            const response = await api.post('/accounts/api/login/', { email, password });
-            const { access, refresh } = response.data;
+  // --- ACTIONS ---
 
-            // STEP 2: Tokens ko Browser me Save karna
-            localStorage.setItem('token', access);
-            localStorage.setItem('refresh', refresh);
+  /**
+   * LOGIN: Backend se authenticate hona aur session save karna.
+   */
+  login: async ({ email, password }) => {
+    set({ isLoading: true, error: null });
 
-            // STEP 3: User ki details/profile laana
-            const profileRes = await api.get('/accounts/profile/');
-            const user = profileRes.data;
+    try {
+      // 1. Backend se Tokens le kar aana
+      const { data } = await api.post("/accounts/api/login/", { email, password });
+      
+      // 2. User ka profile data fetch karna
+      const profile = await api.get("/accounts/profile/");
+      const user = profile.data;
 
-            // STEP 4: User ka data save karna
-            localStorage.setItem('user', JSON.stringify(user));
+      // 3. Tokens aur Profile ko browser memory mein save karna
+      storage.saveSession(data.access, data.refresh, user);
 
-            set({ isAuthenticated: true, user: user, isLoading: false, error: null });
-            return { success: true, user: user };
+      // 4. Global State update karna
+      set({ isAuthenticated: true, user, isLoading: false });
+      return { success: true, user };
 
-        } catch (err) {
-            const error = err.response?.data?.detail 
-                       || err.response?.data?.error 
-                       || 'Login Failed. Check your connection or credentials.';
-            
-            set({ error, isLoading: false });
-            return { success: false, error };
-        }
-    },
-
-    logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refresh');
-        localStorage.removeItem('user');
-        set({ isAuthenticated: false, user: null, error: null });
-    },
-
-    setUser: (user) => set({ user, isAuthenticated: !!user }),
-
-    setError: (error) => set({ error }),
-
-    /**
-     * PASSWORD RECOVERY LIFECYCLE (Mocks for now)
-     */
-
-    requestPasswordReset: async (email) => {
-        set({ isLoading: true, error: null });
-        try {
-            await delay(1200);
-            set({ isLoading: false });
-            return { success: true };
-        } catch (err) {
-            set({ error: err.message, isLoading: false });
-            return { success: false, error: err.message };
-        }
-    },
-
-    verifyOtp: async (email, otp) => {
-        set({ isLoading: true, error: null });
-        try {
-            await delay(1200);
-            if (otp !== '123456') { // Mock OTP for testing
-                throw new Error('Invalid or Expired OTP!');
-            }
-            set({ isLoading: false });
-            return { success: true };
-        } catch (err) {
-            set({ error: err.message, isLoading: false });
-            return { success: false, error: err.message };
-        }
-    },
-
-    resetPassword: async (email, password) => {
-        set({ isLoading: true, error: null });
-        try {
-            await delay(1500);
-            set({ isLoading: false });
-            return { success: true };
-        } catch (err) {
-            set({ error: err.message, isLoading: false });
-            return { success: false, error: err.message };
-        }
+    } catch (err) {
+      const errorMsg = err.response?.data?.detail || err.response?.data?.error || "Login failed";
+      set({ error: errorMsg, isLoading: false });
+      return { success: false, error: errorMsg };
     }
+  },
+
+  /**
+   * LOGOUT: Session clear karna aur state reset karna.
+   */
+  logout: () => {
+    storage.clearSession();
+    set({ isAuthenticated: false, user: null, error: null });
+  },
+
+  // --- STATE HELPERS ---
+  setUser: (user) => set({ user, isAuthenticated: !!user }),
+  setError: (error) => set({ error }),
+
+  // --- PASSWORD RECOVERY (Mocks) ---
+
+  requestPasswordReset: async (email) => {
+    set({ isLoading: true });
+    try {
+      await delay(1000); // Simulate network
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      return { success: false };
+    }
+  },
+
+  verifyOtp: async (email, otp) => {
+    set({ isLoading: true });
+    try {
+      await delay(1000);
+      if (otp !== "123456") throw new Error("Invalid OTP");
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      return { success: false };
+    }
+  },
+
+  resetPassword: async (email, password) => {
+    set({ isLoading: true });
+    try {
+      await delay(1000);
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      set({ error: err.message, isLoading: false });
+      return { success: false };
+    }
+  },
 }));
 
 export default useAuthStore;

@@ -1,5 +1,10 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
+/**
+ * INITIAL DEMO DATA
+ * Case 1: First time load -> User sees 13 premium demo organizations.
+ */
 const initialOrgs = [
   {
     id: "1",
@@ -107,26 +112,33 @@ const initialOrgs = [
   }
 ];
 
-export const useOrgStore = create((set) => ({
-  orgs: (() => {
-    const saved = JSON.parse(localStorage.getItem('aaqms_organizations'));
-    // If we have very few orgs, it means it's an old state. Reset to see all 13 demo orgs.
-    if (!saved || saved.length < 5) return initialOrgs;
-    return saved;
-  })(),
-  addOrg: (newOrg) => set((state) => {
-    const updated = [...state.orgs, newOrg];
-    localStorage.setItem('aaqms_organizations', JSON.stringify(updated));
-    return { orgs: updated };
-  }),
-  updateOrg: (id, updatedOrg) => set((state) => {
-    const updated = state.orgs.map(org => org.id === id ? { ...org, ...updatedOrg } : org);
-    localStorage.setItem('aaqms_organizations', JSON.stringify(updated));
-    return { orgs: updated };
-  }),
-  removeOrg: (id) => set((state) => {
-    const updated = state.orgs.filter(org => org.id !== id);
-    localStorage.setItem('aaqms_organizations', JSON.stringify(updated));
-    return { orgs: updated };
-  })
-}));
+/**
+ * ORGANIZATION STORE
+ * Handles listing, adding, and updating organizations with automatic persistence.
+ */
+export const useOrgStore = create(
+  persist(
+    (set) => ({
+      // --- STATE ---
+      orgs: initialOrgs,
+
+      // --- CORE ACTIONS ---
+      addOrg: (newOrg) => set((state) => ({ 
+        orgs: [...state.orgs, newOrg] 
+      })),
+
+      updateOrg: (id, updatedOrg) => set((state) => ({
+        orgs: state.orgs.map(org => org.id === id ? { ...org, ...updatedOrg } : org)
+      })),
+
+      removeOrg: (id) => set((state) => ({
+        orgs: state.orgs.filter(org => org.id !== id)
+      })),
+
+      resetToDefault: () => set({ orgs: initialOrgs })
+    }),
+    {
+      name: 'aaqms_organizations_v2', // New version for clean slate if needed
+    }
+  )
+);

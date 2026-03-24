@@ -1,9 +1,12 @@
-// ─── User Service — Full CRUD with localStorage persistence ─────────────────
-// When a real API is ready, replace these functions with actual fetch/axios calls.
+/**
+ * USER SERVICE
+ * Mock API for User Management. Handles CRUD with localStorage persistence.
+ * Replace these functions with real axios calls when the backend is ready.
+ */
 
 const STORAGE_KEY = 'aaqms_users';
 
-// ── Seed Data ──
+// --- SEED DATA ---
 const SEED_USERS = [
     { id: 1,  name: "Sarah Jenkins",    email: "sarah.j@acmecorp.com",   organization: "Acme Corp",     role: "Coordinator",   assignment: "unassigned", status: "active",   verified: true,  lastActive: "2 hours ago",  createdAt: "2024-11-15", region: "North Zone" },
     { id: 2,  name: "David Kim",        email: "david.kim@ssism.com",    organization: "SSISM",         role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "Now",          createdAt: "2024-10-20", region: "South Zone" },
@@ -15,80 +18,64 @@ const SEED_USERS = [
     { id: 8,  name: "Liam O'Connor",    email: "liam.oc@emerald.ie",     organization: "Emerald Eco",   role: "Coordinator",   assignment: "unassigned", status: "active",   verified: false, lastActive: "1 day ago",    createdAt: "2025-02-01", region: "East Zone" },
     { id: 9,  name: "Sofia Rossi",      email: "s.rossi@lume.it",        organization: "Lume SpA",      role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "4 hours ago",  createdAt: "2024-06-10", region: "West Zone" },
     { id: 10, name: "Chen Wei",         email: "c.wei@easternstar.cn",   organization: "Eastern Star",  role: "Coordinator",   assignment: "assigned",   status: "inactive", verified: true,  lastActive: "2 days ago",   createdAt: "2024-05-30", region: "Central Zone" },
-    { id: 11, name: "Maria Garcia",     email: "m.garcia@techcorp.es",   organization: "TechCorp",      role: "Admin",         assignment: "assigned",   status: "active",   verified: true,  lastActive: "30 mins ago",  createdAt: "2024-04-14", region: "North Zone" },
+    { id: 11, name: "Maria Garcia",     email: "m.garcia@techcorp. Spanish",   organization: "TechCorp",      role: "Admin",         assignment: "assigned",   status: "active",   verified: true,  lastActive: "30 mins ago",  createdAt: "2024-04-14", region: "North Zone" },
     { id: 12, name: "Ahmed Hassan",     email: "a.hassan@innovate.ae",   organization: "Innovate Labs", role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "15 mins ago",  createdAt: "2024-03-20", region: "South Zone" },
 ];
 
-// ── Helpers ──
-const delay = (ms = 200) => new Promise(r => setTimeout(r, ms));
-
-function loadUsers() {
-    try {
+// --- STORAGE HELPERS ---
+const storage = {
+    load: () => {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) return JSON.parse(stored);
-    } catch { /* fall through */ }
-    // First load — seed
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_USERS));
-    return [...SEED_USERS];
-}
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(SEED_USERS));
+        return [...SEED_USERS];
+    },
+    save: (users) => localStorage.setItem(STORAGE_KEY, JSON.stringify(users)),
+    delay: (ms = 200) => new Promise(r => setTimeout(r, ms))
+};
 
-function saveUsers(users) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-}
-
-function getNextId(users) {
-    return users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
-}
-
-// ── Service API ──
+// --- SERVICE IMPLEMENTATION ---
 export const userService = {
     /**
-     * Fetch all users (with optional filters + search)
+     * GET USERS: Fetch with search & filters
      */
     getUsers: async (filters = {}, searchQuery = '') => {
-        await delay();
-        let users = loadUsers();
+        await storage.delay();
+        let users = storage.load();
 
-        // Search
+        // 1. Search Logic
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
-            users = users.filter(u =>
-                u.name.toLowerCase().includes(q) ||
-                u.email.toLowerCase().includes(q) ||
-                (u.organization || '').toLowerCase().includes(q)
+            users = users.filter(u => 
+                [u.name, u.email, u.organization].some(val => (val || '').toLowerCase().includes(q))
             );
         }
 
-        // Filters
-        if (filters.organization) users = users.filter(u => u.organization === filters.organization);
-        if (filters.role)         users = users.filter(u => u.role === filters.role);
-        if (filters.status)       users = users.filter(u => u.status === filters.status);
-        if (filters.assignment)   users = users.filter(u => u.assignment === filters.assignment);
-        if (filters.region)       users = users.filter(u => u.region === filters.region);
-        if (filters.verified !== undefined && filters.verified !== '') {
-            const isVerified = filters.verified === 'true' || filters.verified === true;
-            users = users.filter(u => u.verified === isVerified);
+        // 2. Filter Logic
+        const { organization, role, status, assignment, region, verified, timeRange } = filters;
+        
+        if (organization) users = users.filter(u => u.organization === organization);
+        if (role)         users = users.filter(u => u.role === role);
+        if (status)       users = users.filter(u => u.status === status);
+        if (assignment)   users = users.filter(u => u.assignment === assignment);
+        if (region)       users = users.filter(u => u.region === region);
+        
+        if (verified !== undefined && verified !== '') {
+            users = users.filter(u => u.verified === (verified === 'true' || verified === true));
         }
 
-        // Time Range Filter
-        if (filters.timeRange && filters.timeRange !== 'all') {
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            
-            users = users.filter(u => {
-                const createdDate = new Date(u.createdAt);
-                const diffTime = Math.abs(today - createdDate);
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        // 3. Time Range Logic
+        if (timeRange && timeRange !== 'all') {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-                if (filters.timeRange === 'today') {
-                    return createdDate >= today;
-                }
-                if (filters.timeRange === '7d') {
-                    return diffDays <= 7;
-                }
-                if (filters.timeRange === '30d') {
-                    return diffDays <= 30;
-                }
+            users = users.filter(u => {
+                const date = new Date(u.createdAt);
+                const diffDays = (today - date) / (1000 * 60 * 60 * 24);
+                
+                if (timeRange === 'today') return date >= today;
+                if (timeRange === '7d') return diffDays <= 7;
+                if (timeRange === '30d') return diffDays <= 30;
                 return true;
             });
         }
@@ -97,52 +84,32 @@ export const userService = {
     },
 
     /**
-     * Get a single user by ID
-     */
-    getUserById: async (id) => {
-        await delay(100);
-        const users = loadUsers();
-        return users.find(u => u.id === id) || null;
-    },
-
-    /**
-     * Create a new user
+     * CRUD ACTIONS
      */
     createUser: async (userData) => {
-        await delay(300);
-        const users = loadUsers();
+        await storage.delay(300);
+        const users = storage.load();
 
-        // Duplicate email check
         if (users.some(u => u.email.toLowerCase() === userData.email.toLowerCase())) {
-            throw new Error('A user with this email already exists');
+            throw new Error('Email already exists');
         }
 
         const newUser = {
-            id: getNextId(users),
-            name: userData.name,
-            email: userData.email,
-            organization: userData.organization || null,
-            role: userData.role || 'Field Officer',
-            assignment: userData.assignment || 'unassigned',
-            status: userData.status || 'active',
+            ...userData,
+            id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
             verified: false,
             lastActive: 'Never',
-            createdAt: new Date().toISOString().split('T')[0],
-            region: userData.region || 'North Zone',
-            avatar: userData.avatar || null
+            createdAt: new Date().toISOString().split('T')[0]
         };
 
         users.push(newUser);
-        saveUsers(users);
+        storage.save(users);
         return newUser;
     },
 
-    /**
-     * Update an existing user
-     */
     updateUser: async (id, updates) => {
-        await delay(300);
-        const users = loadUsers();
+        await storage.delay(300);
+        const users = storage.load();
         const idx = users.findIndex(u => u.id === id);
         if (idx === -1) throw new Error('User not found');
 
@@ -152,46 +119,39 @@ export const userService = {
         }
 
         users[idx] = { ...users[idx], ...updates };
-        saveUsers(users);
+        storage.save(users);
         return users[idx];
     },
 
-    /**
-     * Delete a user
-     */
     deleteUser: async (id) => {
-        await delay(200);
-        let users = loadUsers();
-        users = users.filter(u => u.id !== id);
-        saveUsers(users);
+        await storage.delay(200);
+        const users = storage.load().filter(u => u.id !== id);
+        storage.save(users);
         return true;
     },
 
     /**
-     * Bulk action — activate, deactivate, ban, or unban multiple users
+     * BULK ACTIONS
      */
     bulkAction: async (ids, action) => {
-        await delay(300);
-        let users = loadUsers();
-
-        if (action === 'activate' || action === 'unban') {
-            users = users.map(u => ids.includes(u.id) ? { ...u, status: 'active' } : u);
-        } else if (action === 'deactivate') {
-            users = users.map(u => ids.includes(u.id) ? { ...u, status: 'inactive' } : u);
-        } else if (action === 'ban') {
-            users = users.map(u => ids.includes(u.id) ? { ...u, status: 'banned' } : u);
-        }
-
-        saveUsers(users);
+        await storage.delay(300);
+        const users = storage.load().map(u => {
+            if (!ids.includes(u.id)) return u;
+            if (action === 'activate' || action === 'unban') return { ...u, status: 'active' };
+            if (action === 'deactivate') return { ...u, status: 'inactive' };
+            if (action === 'ban') return { ...u, status: 'banned' };
+            return u;
+        });
+        storage.save(users);
         return users;
     },
 
     /**
-     * Get stats (computed from current data)
+     * ANALYTICS & OPTIONS
      */
     getUserStats: async () => {
-        await delay(100);
-        const users = loadUsers();
+        await storage.delay(100);
+        const users = storage.load();
         return {
             total: users.length,
             active: users.filter(u => u.status === 'active').length,
@@ -200,45 +160,39 @@ export const userService = {
         };
     },
 
-    /**
-     * Get filter option lists (Dynamic based on selected filters)
-     */
     getFilterOptions: async (filters = {}) => {
-        await delay(50);
-        const allUsers = loadUsers();
+        await storage.delay(50);
+        const all = storage.load();
         
-        // Start with all users, then narrow down based on dependent filters
-        let availableForOrgs = [...allUsers];
-        if (filters.role) availableForOrgs = availableForOrgs.filter(u => u.role === filters.role);
+        let filtered = [...all];
+        if (filters.role) filtered = filtered.filter(u => u.role === filters.role);
         
-        let availableForRegions = [...availableForOrgs]; // Region depends on Role AND Organization
-        if (filters.organization) availableForRegions = availableForRegions.filter(u => u.organization === filters.organization);
+        const regionScoped = filters.organization 
+            ? filtered.filter(u => u.organization === filters.organization)
+            : filtered;
+
+        const getUnique = (arr, key) => [...new Set(arr.map(u => u[key]).filter(Boolean))].sort();
 
         return {
-            organizations: [...new Set(availableForOrgs.map(u => u.organization).filter(Boolean))].sort(),
-            roles: [...new Set(allUsers.map(u => u.role).filter(Boolean))].sort(),
-            regions: [...new Set(availableForRegions.map(u => u.region).filter(Boolean))].sort(),
+            organizations: getUnique(filtered, 'organization'),
+            roles: getUnique(all, 'role'),
+            regions: getUnique(regionScoped, 'region'),
         };
     },
 
     /**
-     * Export users as CSV string
+     * EXPORT
      */
     exportCSV: async () => {
-        await delay(100);
-        const users = loadUsers();
-        const headers = ['Name', 'Email', 'Organization', 'Role', 'Assignment', 'Status', 'Created'];
-        const rows = users.map(u => [u.name, u.email, u.organization || '', u.role, u.assignment, u.status, u.createdAt]);
-        const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-        return csv;
+        await storage.delay(100);
+        const users = storage.load();
+        const headers = ['Name', 'Email', 'Organization', 'Role', 'Status', 'Created'];
+        const rows = users.map(u => [u.name, u.email, u.organization || '', u.role, u.status, u.createdAt]);
+        return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     },
 
-    /**
-     * Reset to seed data
-     */
     resetData: async () => {
-        await delay(100);
-        saveUsers([...SEED_USERS]);
+        storage.save([...SEED_USERS]);
         return SEED_USERS;
-    },
+    }
 };
