@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
 import FilterBar from '../../components/UI/FilterBar';
@@ -18,12 +18,46 @@ const Zones = () => {
     const [filters, setFilters] = useState({ zoneType: '' });
 
     const navigate = useNavigate();
-    const { selectedOrg, selectedCoord, selectedSite, selectedFloor } = useFilterStore();
+    const location = useLocation();
+    const { selectedOrg, selectedCoord, selectedSite, selectedFloor, setOrg, setCoord, setSite, setFloor } = useFilterStore();
 
-    const orgInfo = selectedOrg ? organizations.find(o => o.id === selectedOrg) : null;
-    const coordInfo = selectedCoord ? coordinators.find(c => c.id === selectedCoord) : null;
-    const siteInfo = selectedSite ? sites.find(s => s.id === selectedSite) : null;
-    const floorInfo = selectedFloor ? floors.find(f => f.id === selectedFloor) : null;
+    const passedOrgName = location.state?.orgName || new URLSearchParams(location.search).get('org');
+    const passedCoordName = location.state?.coordinator?.name || new URLSearchParams(location.search).get('coord');
+    const passedSiteName = location.state?.site?.name || location.state?.siteInfo?.name || new URLSearchParams(location.search).get('site');
+    const passedFloorName = location.state?.floor?.name || new URLSearchParams(location.search).get('floor');
+
+    useEffect(() => {
+        let currentOrgId = selectedOrg;
+        let currentCoordId = selectedCoord;
+        let currentSiteId = selectedSite;
+
+        if (!currentOrgId && passedOrgName) {
+            const matchOrg = organizations.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
+            if (matchOrg) { setOrg(matchOrg.id); currentOrgId = matchOrg.id; }
+        }
+        if (!currentCoordId && passedCoordName) {
+            const matchCoord = coordinators.find(c => c.name.toLowerCase() === passedCoordName.toLowerCase() && (!currentOrgId || c.orgId === currentOrgId));
+            if (matchCoord) { setCoord(matchCoord.id); currentCoordId = matchCoord.id; }
+        }
+        if (!currentSiteId && passedSiteName) {
+            const matchSite = sites.find(s => s.name.toLowerCase() === passedSiteName.toLowerCase() && (!currentCoordId || s.coordId === currentCoordId));
+            if (matchSite) { setSite(matchSite.id); currentSiteId = matchSite.id; }
+        }
+        if (!selectedFloor && passedFloorName) {
+            const matchFloor = floors.find(f => f.name.toLowerCase() === passedFloorName.toLowerCase() && (!currentSiteId || f.siteId === currentSiteId));
+            if (matchFloor) setFloor(matchFloor.id);
+        }
+    }, [selectedOrg, selectedCoord, selectedSite, selectedFloor, passedOrgName, passedCoordName, passedSiteName, passedFloorName, setOrg, setCoord, setSite, setFloor]);
+
+    const activeOrgId = selectedOrg || organizations.find(o => o.name.toLowerCase() === passedOrgName?.toLowerCase())?.id;
+    const activeCoordId = selectedCoord || coordinators.find(c => c.name.toLowerCase() === passedCoordName?.toLowerCase())?.id;
+    const activeSiteId = selectedSite || sites.find(s => s.name.toLowerCase() === passedSiteName?.toLowerCase())?.id;
+    const activeFloorId = selectedFloor || floors.find(f => f.name.toLowerCase() === passedFloorName?.toLowerCase())?.id;
+
+    const orgInfo = activeOrgId ? organizations.find(o => o.id === activeOrgId) : null;
+    const coordInfo = activeCoordId ? coordinators.find(c => c.id === activeCoordId) : null;
+    const siteInfo = activeSiteId ? sites.find(s => s.id === activeSiteId) : null;
+    const floorInfo = activeFloorId ? floors.find(f => f.id === activeFloorId) : null;
 
     const filteredZones = useMemo(() => {
         let result = [...ZONES_DATA];
@@ -109,7 +143,7 @@ const Zones = () => {
                     </div>
                 </FilterBar>
 
-                {!selectedFloor ? (
+                {!activeFloorId ? (
                     <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
                         <p className="text-gray font-medium tracking-wide">
                             Please sequentially select an Organization, Coordinator, Site, and Floor to view zones.

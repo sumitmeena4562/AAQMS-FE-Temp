@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import OrganizationCard from '../../components/UI/OrganizationCard';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
@@ -7,10 +8,34 @@ import { organizations, coordinators, sites } from '../../data/mockFilterData';
 import { FiHome, FiBriefcase } from 'react-icons/fi';
 
 const SitePlan = () => {
-  const { selectedOrg, selectedCoord } = useFilterStore();
+  const location = useLocation();
+  const { selectedOrg, selectedCoord, setOrg, setCoord } = useFilterStore();
 
-  const orgInfo = selectedOrg ? organizations.find(o => o.id === selectedOrg) : null;
-  const coordInfo = selectedCoord ? coordinators.find(c => c.id === selectedCoord) : null;
+  const passedOrgName = location.state?.orgName || new URLSearchParams(location.search).get('org');
+  const passedCoordName = location.state?.coordinator?.name || new URLSearchParams(location.search).get('coord');
+
+  useEffect(() => {
+    let currentOrgId = selectedOrg;
+    if (!currentOrgId && passedOrgName) {
+      const matchOrg = organizations.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
+      if (matchOrg) {
+        setOrg(matchOrg.id);
+        currentOrgId = matchOrg.id;
+      }
+    }
+    if (!selectedCoord && passedCoordName) {
+      const matchCoord = coordinators.find(c => c.name.toLowerCase() === passedCoordName.toLowerCase() && (!currentOrgId || c.orgId === currentOrgId));
+      if (matchCoord) {
+        setCoord(matchCoord.id);
+      }
+    }
+  }, [selectedOrg, selectedCoord, passedOrgName, passedCoordName, setOrg, setCoord]);
+
+  const activeOrgId = selectedOrg || organizations.find(o => o.name.toLowerCase() === passedOrgName?.toLowerCase())?.id;
+  const activeCoordId = selectedCoord || coordinators.find(c => c.name.toLowerCase() === passedCoordName?.toLowerCase())?.id;
+
+  const orgInfo = activeOrgId ? organizations.find(o => o.id === activeOrgId) : null;
+  const coordInfo = activeCoordId ? coordinators.find(c => c.id === activeCoordId) : null;
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
@@ -20,7 +45,7 @@ const SitePlan = () => {
   ];
 
   // Logic: Show sites belonging strictly to the currently selected coordinator
-  const sitePlans = selectedCoord ? sites.filter(s => s.coordId === selectedCoord) : [];
+  const sitePlans = activeCoordId ? sites.filter(s => s.coordId === activeCoordId) : [];
 
   const totalPlans = sitePlans.length;
   const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
@@ -31,11 +56,11 @@ const SitePlan = () => {
       {/* HEADER */}
       <PageHeader
         title="Site Plan Selection"
-        subtitle={selectedCoord ? `Managing ${activePlansCount} active site plans for ${coordInfo?.name}` : "Please use the filter bar to select a coordinator"}
+        subtitle={activeCoordId ? `Managing ${activePlansCount} active site plans for ${coordInfo?.name}` : "Please use the filter bar to select a coordinator"}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
-          selectedCoord ? (
+          activeCoordId ? (
             <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                 {totalPlans} Total Projects
             </span>
@@ -47,7 +72,7 @@ const SitePlan = () => {
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
         <FilterBar activeLevel="sites" />
 
-        {!selectedCoord ? (
+        {!activeCoordId ? (
           <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
             <p className="text-gray font-medium tracking-wide">
               Please select an Organization and Coordinator to view sites.

@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import FloorCard from '../../components/UI/FloorCard';
@@ -9,11 +9,44 @@ import { FiHome, FiBriefcase } from 'react-icons/fi';
 
 const FloorPlan = () => {
   const navigate = useNavigate();
-  const { selectedOrg, selectedCoord, selectedSite } = useFilterStore();
+  const location = useLocation();
+  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
 
-  const orgInfo = selectedOrg ? organizations.find(o => o.id === selectedOrg) : null;
-  const coordInfo = selectedCoord ? coordinators.find(c => c.id === selectedCoord) : null;
-  const siteInfo = selectedSite ? sites.find(s => s.id === selectedSite) : null;
+  const passedOrgName = location.state?.orgName || new URLSearchParams(location.search).get('org');
+  const passedCoordName = location.state?.coordinator?.name || new URLSearchParams(location.search).get('coord');
+  const passedSiteName = location.state?.site?.name || new URLSearchParams(location.search).get('site');
+
+  useEffect(() => {
+    let currentOrgId = selectedOrg;
+    let currentCoordId = selectedCoord;
+
+    if (!currentOrgId && passedOrgName) {
+      const matchOrg = organizations.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
+      if (matchOrg) {
+        setOrg(matchOrg.id);
+        currentOrgId = matchOrg.id;
+      }
+    }
+    if (!currentCoordId && passedCoordName) {
+      const matchCoord = coordinators.find(c => c.name.toLowerCase() === passedCoordName.toLowerCase() && (!currentOrgId || c.orgId === currentOrgId));
+      if (matchCoord) {
+        setCoord(matchCoord.id);
+        currentCoordId = matchCoord.id;
+      }
+    }
+    if (!selectedSite && passedSiteName) {
+      const matchSite = sites.find(s => s.name.toLowerCase() === passedSiteName.toLowerCase() && (!currentCoordId || s.coordId === currentCoordId));
+      if (matchSite) setSite(matchSite.id);
+    }
+  }, [selectedOrg, selectedCoord, selectedSite, passedOrgName, passedCoordName, passedSiteName, setOrg, setCoord, setSite]);
+
+  const activeOrgId = selectedOrg || organizations.find(o => o.name.toLowerCase() === passedOrgName?.toLowerCase())?.id;
+  const activeCoordId = selectedCoord || coordinators.find(c => c.name.toLowerCase() === passedCoordName?.toLowerCase())?.id;
+  const activeSiteId = selectedSite || sites.find(s => s.name.toLowerCase() === passedSiteName?.toLowerCase())?.id;
+
+  const orgInfo = activeOrgId ? organizations.find(o => o.id === activeOrgId) : null;
+  const coordInfo = activeCoordId ? coordinators.find(c => c.id === activeCoordId) : null;
+  const siteInfo = activeSiteId ? sites.find(s => s.id === activeSiteId) : null;
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
@@ -24,7 +57,7 @@ const FloorPlan = () => {
   ];
 
   // We explicitly fetch matched floors from the relational store to keep UI accurate
-  const floorList = selectedSite ? floors.filter(f => f.siteId === selectedSite).map(f => ({
+  const floorList = activeSiteId ? floors.filter(f => f.siteId === activeSiteId).map(f => ({
       ...f, 
       status: 'ACTIVE',
       stats: { zones: Math.floor(Math.random() * 5) + 2, assets: Math.floor(Math.random() * 20) + 5 }
@@ -33,8 +66,9 @@ const FloorPlan = () => {
   const activePlansCount = floorList.filter(f => f.status === 'ACTIVE').length;
 
   const handleFloorClick = (floor) => {
-    // Navigate is preserved for any potential tight routing mapping, but user relies on filter store
-    navigate(`/admin/zones`);
+    navigate(`/admin/zones?org=${encodeURIComponent(orgInfo?.name || "")}&coord=${encodeURIComponent(coordInfo?.name || "")}&site=${encodeURIComponent(siteInfo?.name || "")}&floor=${encodeURIComponent(floor.name || "")}`, {
+      state: { floor, site: siteInfo, coordinator: coordInfo, orgName: orgInfo?.name }
+    });
   };
 
   return (
@@ -43,11 +77,11 @@ const FloorPlan = () => {
       {/* HEADER */}
       <PageHeader 
         title="Floor Plan Selection"
-        subtitle={selectedSite ? `Managing ${activePlansCount} active floor plans for ${siteInfo?.name}` : "Please use the filter bar to select a site"}
+        subtitle={activeSiteId ? `Managing ${activePlansCount} active floor plans for ${siteInfo?.name}` : "Please use the filter bar to select a site"}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
-          selectedSite ? (
+          activeSiteId ? (
             <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                 {floorList.length} Total Levels
             </span>
@@ -59,7 +93,7 @@ const FloorPlan = () => {
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
         <FilterBar activeLevel="floors" />
 
-        {!selectedSite ? (
+        {!activeSiteId ? (
           <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
             <p className="text-gray font-medium tracking-wide">
               Please select an Organization, Coordinator, and Site to view floors.

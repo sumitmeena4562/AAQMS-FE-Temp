@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import CoordinatorCard from '../../components/UI/CoordinatorCard';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
@@ -9,10 +10,13 @@ import { generateSitePlansForCoordinator } from '../../utils/mockSiteData';
 import { FiHome, FiBriefcase, FiGrid, FiList } from 'react-icons/fi';
 
 const AssignedCoordinators = () => {
+  const location = useLocation();
   const [view, setView] = React.useState('list');
-  const { selectedOrg } = useFilterStore();
+  const { selectedOrg, setOrg } = useFilterStore();
+  
+  const passedOrgName = location.state?.org?.name || new URLSearchParams(location.search).get('org');
   const orgInfo = selectedOrg ? organizations.find(o => o.id === selectedOrg) : null;
-  const orgName = orgInfo?.name || "Organization";
+  const orgName = orgInfo?.name || passedOrgName || "Organization";
 
   const users = useUserStore(state => state.users);
   const fetchUsers = useUserStore(state => state.fetchUsers);
@@ -24,10 +28,17 @@ const AssignedCoordinators = () => {
   ];
 
   useEffect(() => {
+    if (!selectedOrg && passedOrgName) {
+      const match = organizations.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
+      if (match) {
+        setOrg(match.id);
+      }
+    }
     if (users.length === 0) fetchUsers();
-  }, [users.length, fetchUsers]);
+  }, [selectedOrg, passedOrgName, setOrg, users.length, fetchUsers]);
 
-  const orgUsers = selectedOrg ? users.filter(u => u.organization === orgName) : [];
+  const isOrgSelected = !!(selectedOrg || passedOrgName);
+  const orgUsers = isOrgSelected ? users.filter(u => u.organization === orgName) : [];
 
   const coordinatorsList = orgUsers.map(user => {
     const plans = generateSitePlansForCoordinator(user.id, user.organization);
@@ -52,11 +63,11 @@ const AssignedCoordinators = () => {
       {/* HEADER */}
       <PageHeader
         title={`${orgName}: Assigned Coordinators`}
-        subtitle={selectedOrg ? `Managing ${activeCoordinatorsCount} active platform coordinators for this entity` : "Please use the filter bar to select an organization"}
+        subtitle={isOrgSelected ? `Managing ${activeCoordinatorsCount} active platform coordinators for this entity` : "Please use the filter bar to select an organization"}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
-          selectedOrg ? (
+          isOrgSelected ? (
             <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                 {coordinatorsList.length} Total Users
             </span>
@@ -68,7 +79,7 @@ const AssignedCoordinators = () => {
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
         <FilterBar activeLevel="coordinators" />
 
-        {!selectedOrg ? (
+        {!isOrgSelected ? (
           <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
             <p className="text-gray font-medium tracking-wide">
               Please select an Organization to view assigned coordinators.
