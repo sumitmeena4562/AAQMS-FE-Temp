@@ -5,16 +5,39 @@ import ZonesTable from '../../components/Zones/ZonesTable';
 import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
-import { FiSquare, FiCheckSquare } from 'react-icons/fi';
+import { FiSquare, FiCheckSquare, FiRefreshCcw, FiHome, FiBriefcase } from 'react-icons/fi';
 import { List } from 'lucide-react';
 import { useBreadcrumb } from '../../hooks/useBreadcrumb';
-import { FiHome, FiBriefcase } from 'react-icons/fi';
 import { ZONES_DATA } from '../../data/zones';
+
+const filterOptions = {
+    organizations: ['Acme Corp', 'Stark Industries', 'Wayne Enterprises', 'Globex', 'Initech'],
+    roles: ['Admin', 'Coordinator', 'Field Officer', 'System AI'],
+    sites: ['Site Alpha', 'Site Beta', 'Site Gamma', 'HQ'],
+    floors: ['Ground Floor', 'Level 1', 'Level 2', 'Level 3'],
+    zones: ['Zone 15-12', 'Zone B-12', 'Restricted Area', 'Loading Dock'],
+    zoneTypes: ['Storage', 'Loading Bay', 'Office']
+};
 
 const Zones = () => {
     const [activeView, setActiveView] = useState('list');
     const [selectionMode, setSelectionMode] = useState(false);
-    const [filters, setFilters] = useState({ zoneType: '' });
+    const [filters, setFilters] = useState({ 
+        zoneType: '',
+        organization: '',
+        role: '',
+        site: '',
+        floor: '',
+        zone: ''
+    });
+
+    const activeFilterCount = Object.values(filters).filter(v => v !== '').length;
+
+    const resetFilters = () => {
+        setFilters({
+            zoneType: '', organization: '', role: '', site: '', floor: '', zone: ''
+        });
+    };
 
     const filteredZones = useMemo(() => {
         let result = [...ZONES_DATA];
@@ -83,53 +106,144 @@ const Zones = () => {
             <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
 
                 <FilterBar className="mb-6">
-                    <div className="flex items-center gap-3">
-                        <Button
-                            variant={selectionMode ? "primary" : "outline"}
-                            onClick={() => setSelectionMode(!selectionMode)}
-                            className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : ''}`}
-                        >
-                            {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
-                            Select
-                        </Button>
-                        <FilterBar.Separator />
+                    {/* FRONT SECTION: "Select" Button (and mobile View toggle) */}
+                    <div className="flex items-center justify-between w-full md:w-auto md:justify-start gap-3 shrink-0">
+                        <div className="flex items-center gap-3">
+                            <Button
+                                variant={selectionMode ? "primary" : "outline"}
+                                onClick={() => setSelectionMode(!selectionMode)}
+                                className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : ''}`}
+                            >
+                                {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
+                                Select
+                            </Button>
+                            <FilterBar.Separator className="hidden md:block" />
+                        </div>
+
+                        {/* MOBILE ONLY: List/Drawing Buttons */}
+                        <div className="flex md:hidden items-center bg-base p-1 rounded-lg border border-border-main/60 shrink-0">
+                            <button 
+                                onClick={() => setActiveView('list')}
+                                className={`flex items-center justify-center gap-2 h-[28px] px-3 sm:px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
+                                    activeView === 'list' 
+                                    ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5' 
+                                    : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
+                                }`}
+                                title="List View"
+                            >
+                                <List size={16} className={activeView === 'list' ? "text-title" : "text-gray"} />
+                            </button>
+                            <button 
+                                onClick={() => setActiveView('drawing')}
+                                className={`flex items-center justify-center gap-2 h-[28px] px-3 sm:px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
+                                    activeView === 'drawing' 
+                                    ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5' 
+                                    : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
+                                }`}
+                                title="Drawing View"
+                            >
+                                <svg className={`w-4 h-4 ${activeView === 'drawing' ? "text-title" : "text-gray"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 flex-1">
+                    {/* MIDDLE SECTION: Dropdown Ribbon */}
+                    {/* On Desktop: wraps normally. On Mobile: beautiful horizontal scrolling ribbon so it doesn't take up 4 lines of screen space! */}
+                    <div className="flex flex-nowrap md:flex-wrap items-center gap-2 flex-1 w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
+                        {activeFilterCount > 0 && (
+                            <button
+                                onClick={resetFilters}
+                                className="md:hidden h-9 flex items-center gap-1.5 px-3 mr-1 shrink-0 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 border border-transparent hover:border-rose-100"
+                            >
+                                <FiRefreshCcw size={12} />
+                                <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px]">{activeFilterCount}</span>
+                            </button>
+                        )}
+                        
+                        <FilterDropdown
+                            label="Organization"
+                            options={filterOptions.organizations}
+                            value={filters.organization}
+                            onChange={(v) => setFilters(prev => ({ ...prev, organization: v }))}
+                            allLabel="All Orgs"
+                        />
+                        <FilterDropdown
+                            label="Role"
+                            options={filterOptions.roles}
+                            value={filters.role}
+                            onChange={(v) => setFilters(prev => ({ ...prev, role: v }))}
+                            allLabel="All Roles"
+                        />
+                        <FilterDropdown
+                            label="Site"
+                            options={filterOptions.sites}
+                            value={filters.site}
+                            onChange={(v) => setFilters(prev => ({ ...prev, site: v }))}
+                            allLabel="All Sites"
+                        />
+                        <FilterDropdown
+                            label="Floor"
+                            options={filterOptions.floors}
+                            value={filters.floor}
+                            onChange={(v) => setFilters(prev => ({ ...prev, floor: v }))}
+                            allLabel="All Floors"
+                        />
+                        <FilterDropdown
+                            label="Zone"
+                            options={filterOptions.zones}
+                            value={filters.zone}
+                            onChange={(v) => setFilters(prev => ({ ...prev, zone: v }))}
+                            allLabel="All Zones"
+                        />
                         <FilterDropdown
                             label="Zone Type"
-                            options={['Storage', 'Loading Bay', 'Office']}
+                            options={filterOptions.zoneTypes}
                             value={filters.zoneType}
                             onChange={(v) => setFilters(prev => ({ ...prev, zoneType: v }))}
                             allLabel="All Types"
                         />
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
-                        <div className="flex items-center bg-base p-1 rounded-lg border border-border-main/60">
+                    {/* DESKTOP ONLY: Right Tools (Reset + List/Drawing) */}
+                    <div className="hidden md:flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
+                        
+                        {activeFilterCount > 0 && (
+                            <button
+                                onClick={resetFilters}
+                                className="h-9 flex items-center gap-1.5 px-3 mr-1 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 shadow-sm border border-transparent hover:border-rose-100 animate-in zoom-in duration-300 group"
+                            >
+                                <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                                <span className="hidden lg:inline">Reset</span>
+                                <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px] sm:ml-1">{activeFilterCount}</span>
+                            </button>
+                        )}
+
+                        <div className="flex items-center bg-base p-1 rounded-lg border border-border-main/60 shrink-0">
                             <button 
                                 onClick={() => setActiveView('list')}
-                                className={`flex items-center justify-center gap-2 h-[38px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
+                                className={`flex items-center justify-center gap-2 h-[28px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
                                     activeView === 'list' 
                                     ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5' 
                                     : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
                                 }`}
+                                title="List View"
                             >
                                 <List size={16} className={activeView === 'list' ? "text-title" : "text-gray"} />
-                                <span>List</span>
                             </button>
                             <button 
                                 onClick={() => setActiveView('drawing')}
-                                className={`flex items-center justify-center gap-2 h-[38px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
+                                className={`flex items-center justify-center gap-2 h-[28px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${
                                     activeView === 'drawing' 
                                     ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5' 
                                     : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
                                 }`}
+                                title="Drawing View"
                             >
                                 <svg className={`w-4 h-4 ${activeView === 'drawing' ? "text-title" : "text-gray"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                 </svg>
-                                <span>Drawing</span>
                             </button>
                         </div>
                     </div>

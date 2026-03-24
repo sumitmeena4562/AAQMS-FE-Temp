@@ -46,12 +46,12 @@ const Dashboard = () => {
                 title="System Overview"
                 subtitle="Monitoring real-time operational metrics and AI risk triggers"
                 breadcrumbs={[
-                    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} />, isActive: true }
+                    // { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} />, isActive: true }
                 ]}
                 rightContent={
                     <div className="px-3 py-1.5 bg-base/50 border border-border-main/50 rounded-lg shadow-inner">
                         <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                            Last Sync: <span className="text-primary italic transition-all duration-300">{syncText}</span>
+                            Last Sync: <span className="text-primary  transition-all duration-300">{syncText}</span>
                         </span>
                     </div>
                 }

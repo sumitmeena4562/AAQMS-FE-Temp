@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable from '../UI/DataTable';
 import Button from '../UI/Button';
 import { FiFilter, FiBox } from 'react-icons/fi';
@@ -55,6 +56,7 @@ const columns = [
 
 const RecentActivityTable = () => {
     const { data: activityList, isLoading, isError } = useRecentActivity();
+    const navigate = useNavigate();
 
     if (isLoading) {
         return (
@@ -73,10 +75,13 @@ const RecentActivityTable = () => {
             subtitle="Live Feed"
             rightContent={
                 <>
-                    {/* <Button variant="outline" size="sm" icon={FiFilter} className="!rounded-md !h-[30px] !text-[12px]">
-                        Filter
-                    </Button> */}
-                    <Button variant="ghost" size="sm" className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10">
+                
+                    <Button 
+                        onClick={() => navigate('/admin/history')}
+                        variant="ghost" 
+                        size="sm" 
+                        className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10"
+                    >
                         View All History
                     </Button>
                 </>

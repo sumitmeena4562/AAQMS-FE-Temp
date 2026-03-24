@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getDashboardMetrics, getDashboardStats, getRecentActivity } from '../services/dashboardService';
+import { getDashboardMetrics, getDashboardStats, getRecentActivity, getAllHistory } from '../services/dashboardService';
 
 /**
  * ── DASHBOARD CUSTOM QUERY HOOKS ──
@@ -40,5 +40,13 @@ export const useRecentActivity = () => {
         // Activity feeds change often, so maybe we only cache it for 1 minute before refetching in the background.
         staleTime: 1 * 60 * 1000, 
         refetchInterval: 15000, // Background updates for activity every 15 seconds!
+    });
+};
+
+export const useAllHistory = (filters) => {
+    return useQuery({
+        queryKey: ['history', 'all', filters],
+        queryFn: () => getAllHistory(filters),
+        staleTime: 5 * 60 * 1000, 
     });
 };
