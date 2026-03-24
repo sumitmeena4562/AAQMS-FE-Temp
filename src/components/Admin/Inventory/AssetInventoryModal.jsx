@@ -76,7 +76,7 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
                                     </div>
                                     <div className="flex flex-col">
                                         <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Floor & Zone</span>
-                                        <span className="text-[13px] font-black text-slate-900 leading-none mt-1">{asset.floor} <span className="text-slate-300 mx-1">/</span> Zone {asset.zone || '104'}</span>
+                                        <span className="text-[13px] font-black text-slate-900 leading-none mt-1">{asset.floor} <span className="text-slate-300 mx-1">/</span>{asset.zone || '104'}</span>
                                     </div>
                                 </div>
                             </div>
