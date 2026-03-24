@@ -141,3 +141,50 @@ export const generateFloorsForSite = (site) => {
   
   return generatedFloors;
 };
+
+export const generateGlobalInventory = (orgs) => {
+    const assets = [];
+    const count = 30; // Clean, manageable count
+    const ASSET_TYPES = ['Furniture', 'Electronics', 'Network', 'Safety'];
+    
+    for (let i = 0; i < count; i++) {
+        const org = orgs[i % orgs.length]?.name || 'Unknown Org';
+        const type = ASSET_TYPES[i % ASSET_TYPES.length];
+        const status = i % 10 === 0 ? 'Mismatch' : i % 7 === 0 ? 'Pending' : 'Verified';
+        
+        // Define meaningful name and icon based on type
+        let name = "";
+        let icon = "box";
+
+        if (type === 'Furniture') {
+            name = `${['Ergonomic', 'Mesh', 'Office'][i % 3]} Chair`;
+            icon = 'chair';
+        } else if (type === 'Electronics') {
+            const device = i % 4 === 0 ? 'Printer' : i % 2 === 0 ? 'Monitor' : 'UPS';
+            name = `${['Dell', 'HP', 'Samsung'][i % 3]} ${device}`;
+            icon = device.toLowerCase();
+        } else if (type === 'Network') {
+            const device = i % 2 === 0 ? 'Router' : 'Switch';
+            name = `Cisco ${device} Pro`;
+            icon = 'network';
+        } else {
+            name = `Fire Extinguisher S${i + 1}`;
+            icon = 'safety';
+        }
+
+        assets.push({
+            id: i + 1,
+            uniqueId: `ASSET-${2000 + i}`,
+            name: name,
+            type: type,
+            model: `V${i + 1} Edition`,
+            status: status,
+            org: org,
+            floor: `Floor ${Math.floor(i / 10) + 1}`,
+            zone: `Zone ${(i % 3) + 1}`,
+            lastAudit: `2024-03-${10 + (i % 10)}`,
+            icon: icon
+        });
+    }
+    return assets;
+};

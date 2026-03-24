@@ -4,7 +4,7 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiCheck, FiX } from 'react-icons/fi';
 import useClickOutside from '../../hooks/useClickOutside';
 
-const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All' }) => {
+const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All', multiple = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
     const containerRef = useRef(null);
@@ -41,14 +41,46 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
         }
     }, [isOpen]);
 
-    const isFilterActive = value !== undefined && value !== null && value !== '' && value !== 'All' && value !== 'all' && value !== allLabel;
+    const isFilterActive = multiple
+        ? (Array.isArray(value) && value.length > 0 && !value.includes('all'))
+        : (value !== undefined && value !== null && value !== '' && value !== 'All' && value !== 'all' && value !== allLabel);
 
     const getDisplayLabel = () => {
         if (!isFilterActive) return allLabel;
+
+        if (multiple && Array.isArray(value)) {
+            if (value.length === 1) {
+                const option = options.find(opt => (typeof opt === 'string' ? opt === value[0] : opt.value === value[0]));
+                return typeof option === 'string' ? option : (option?.label || value[0]);
+            }
+            return `${label} (${value.length})`;
+        }
+
         const option = options.find(opt =>
             typeof opt === 'string' ? opt === value : opt.value === value
         );
         return typeof option === 'string' ? option : (option?.label || value);
+    };
+
+    const handleSelect = (val) => {
+        if (!multiple) {
+            onChange(val);
+            setIsOpen(false);
+            return;
+        }
+
+        if (val === '' || val === 'all') {
+            onChange([]);
+            setIsOpen(false);
+            return;
+        }
+
+        const currentValues = Array.isArray(value) ? value : [];
+        if (currentValues.includes(val)) {
+            onChange(currentValues.filter(v => v !== val));
+        } else {
+            onChange([...currentValues, val]);
+        }
     };
 
     const dropdownMenu = (
@@ -63,39 +95,49 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                         top: coords.top + 8,
                         left: coords.left,
                         width: 'max-content',
-                        minWidth: Math.max(coords.width, 120),
-                        maxWidth: 220,
+                        minWidth: Math.max(coords.width, 140),
+                        maxWidth: 240,
                         zIndex: 9999
                     }}
                     className="bg-card border border-border-main rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.12)] overflow-hidden p-1.5"
                     role="listbox"
                 >
                     <button
-                        onClick={() => { onChange(''); setIsOpen(false); }}
+                        onClick={() => handleSelect('')}
                         className={`w-full px-2.5 py-1.5 text-left rounded-lg transition-all duration-200 text-[12px] font-bold group flex items-center justify-between
-                            ${!isFilterActive ? 'bg-primary cursor-default' : 'hover:bg-base text-body'}`}
+                            ${!isFilterActive ? 'bg-primary text-white cursor-default' : 'hover:bg-base text-body'}`}
                     >
-                        <span className={!isFilterActive ? 'text-white' : 'truncate'}>{allLabel}</span>
-                        {!isFilterActive && <FiCheck className="text-white shrink-0" size={13} />}
+                        <span className="truncate">{allLabel}</span>
+                        {!isFilterActive && <FiCheck size={13} />}
                     </button>
                     <div className="max-h-[240px] overflow-y-auto no-scrollbar pt-1">
                         {options.map((opt, i) => {
                             const val = typeof opt === 'string' ? opt : opt.value;
                             const lbl = typeof opt === 'string' ? opt : opt.label;
-                            const isSelected = value === val;
+                            const isSelected = multiple
+                                ? (Array.isArray(value) && value.includes(val))
+                                : (value === val);
 
                             return (
                                 <button
                                     key={val !== undefined && val !== null ? val : i}
                                     id={`option-${val}`}
-                                    onClick={() => { onChange(val); setIsOpen(false); }}
+                                    onClick={() => handleSelect(val)}
                                     className={`w-full px-2.5 py-1.5 text-left rounded-lg transition-all duration-200 text-[12px] font-bold mt-0.5 group flex items-center justify-between gap-3
-                                        ${isSelected ? 'bg-primary cursor-default' : 'hover:bg-base text-body'}`}
+                                        ${isSelected ? 'bg-primary text-white cursor-default' : 'hover:bg-base text-body'}`}
                                     role="option"
                                     aria-selected={isSelected}
                                 >
-                                    <span className={`truncate ${isSelected ? 'text-white' : ''}`}>{lbl}</span>
-                                    {isSelected && <FiCheck className="text-white shrink-0" size={13} />}
+                                    <div className="flex items-center gap-2 truncate">
+                                        {multiple && (
+                                            <div className={`w-3.5 h-3.5 rounded border transition-colors flex items-center justify-center
+                                                ${isSelected ? 'bg-white border-white' : 'border-border-main group-hover:border-primary'}`}>
+                                                {isSelected && <FiCheck className="text-primary" size={10} strokeWidth={4} />}
+                                            </div>
+                                        )}
+                                        <span className="truncate">{lbl}</span>
+                                    </div>
+                                    {!multiple && isSelected && <FiCheck size={13} />}
                                 </button>
                             );
                         })}
@@ -124,8 +166,7 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                         <div
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onChange('');
-                                setIsOpen(false);
+                                handleSelect('');
                             }}
                             className="ml-0.5 p-0.5 text-blue-400 hover:text-rose-500 hover:bg-rose-50 rounded-sm transition-colors flex items-center justify-center"
                             title="Clear filter"

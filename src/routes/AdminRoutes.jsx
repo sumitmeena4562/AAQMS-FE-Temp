@@ -1,3 +1,4 @@
+import React, { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout"
 import Dashboard from "../pages/Admin/Dashboard";
@@ -13,6 +14,7 @@ import SitePlan from "../pages/Admin/SitePlan";
 import FloorPlan from "../pages/Admin/FloorPlan";
 import Zones from "../pages/Admin/Zones";
 import Inventory from "../pages/Admin/Inventory";
+// const ActivityLogs = lazy(() => import('../pages/Admin/ActivityLogs'));
 
 const AdminRoutes = () => {
     return (
@@ -29,6 +31,7 @@ const AdminRoutes = () => {
                 <Route path="zones" element={<Zones />} />
                 <Route path="inventory" element={<Inventory />} />
                 <Route path="risk-alerts" element={<RiskAlerts />} />
+                {/* <Route path="activity" element={<ActivityLogs />} /> */}
                 <Route path="reports" element={<Reports />} />
                 <Route path="users" element={<Users />} />
                 <Route path="settings" element={<Settings />} />

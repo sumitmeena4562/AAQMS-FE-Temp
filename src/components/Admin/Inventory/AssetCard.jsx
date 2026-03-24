@@ -1,0 +1,72 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { FiExternalLink, FiLayout } from 'react-icons/fi';
+import Badge from '../../UI/Badge';
+import Button from '../../UI/Button';
+import { AssetIcon } from '../../../pages/Admin/Inventory'; 
+
+const AssetCard = ({ asset, onClick }) => {
+    const navigate = useNavigate();
+    const statusColor = asset.status === 'Verified' ? 'success' : asset.status === 'Mismatch' ? 'danger' : 'warning';
+    
+    const handleDetailsClick = (e) => {
+        e.stopPropagation();
+        navigate(`/admin/inventory/analysis/${asset.id}`);
+    };
+    
+    return (
+        <motion.div
+            layout
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -5, transition: { duration: 0.2, ease: "easeOut" } }}
+            onClick={() => onClick(asset)}
+            className="group relative bg-card border border-border-main rounded-[var(--radius-card)] p-6 shadow-card hover:shadow-card-hover transition-all cursor-pointer overflow-hidden flex flex-col min-h-[170px]"
+        >
+            {/* Subtle Gradient Accent */}
+            <div className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 rounded-full opacity-[0.04] group-hover:opacity-[0.08] transition-all group-hover:scale-150 ${
+                asset.status === 'Mismatch' ? 'bg-danger' : asset.status === 'Pending' ? 'bg-warning' : 'bg-success'
+            }`} />
+
+            <div className="flex justify-between items-start mb-5 relative z-10">
+                <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-base border border-border-main shadow-sm group-hover:bg-card group-hover:border-primary/20 transition-all duration-300">
+                    <AssetIcon type={asset.icon} className="w-5 h-5 text-title/70 group-hover:text-primary transition-colors" />
+                </div>
+                <Badge
+                    variant="light"
+                    color={statusColor}
+                    className="text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-widest border border-border-main/50 flex items-center gap-1.5"
+                >
+                    <span className={`w-1.5 h-1.5 rounded-full ${
+                        asset.status === 'Verified' ? 'bg-success' : asset.status === 'Mismatch' ? 'bg-danger' : 'bg-warning'
+                    }`} />
+                    {asset.status}
+                </Badge>
+            </div>
+
+            <div className="space-y-1.5 mb-6 relative z-10">
+                <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-black text-gray/40 tracking-[0.15em] font-mono uppercase">
+                        #{asset.uniqueId}
+                    </span>
+                </div>
+                <h3 className="text-[15px] font-black text-title leading-tight truncate group-hover:text-primary transition-colors">
+                    {asset.name}
+                </h3>
+                <p className="text-[11px] font-bold text-gray/60 truncate uppercase tracking-tighter">
+                    {asset.model} <span className="mx-1 opacity-20">•</span> {asset.org}
+                </p>
+            </div>
+
+            <div className="mt-auto flex items-center justify-between pt-4 border-t border-border-main/40 relative z-10">
+                <div className="flex flex-col">
+                    <span className="text-[8px] font-black text-gray/40 uppercase tracking-widest mb-0.5">Last Audit</span>
+                    <span className="text-[11px] font-extrabold text-title truncate">{asset.lastAudit}</span>
+                </div>
+            </div>
+        </motion.div>
+    );
+};
+
+export default AssetCard;
