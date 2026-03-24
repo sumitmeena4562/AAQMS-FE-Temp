@@ -21,7 +21,6 @@ const storage = {
 };
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const useAuthStore = create((set) => ({
   // --- INITIAL STATE ---
   isAuthenticated: !!storage.getToken(),
