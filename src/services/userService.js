@@ -11,13 +11,13 @@ const SEED_USERS = [
     { id: 1,  name: "Sarah Jenkins",    email: "sarah.j@acmecorp.com",   organization: "Acme Corp",     role: "Coordinator",   assignment: "unassigned", status: "active",   verified: true,  lastActive: "2 hours ago",  createdAt: "2024-11-15", region: "North Zone" },
     { id: 2,  name: "David Kim",        email: "david.kim@ssism.com",    organization: "SSISM",         role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "Now",          createdAt: "2024-10-20", region: "South Zone" },
     { id: 3,  name: "Elena Rodriguez",  email: "elena.r@globex.org",     organization: "Globex",        role: "Coordinator",   assignment: "assigned",   status: "active",   verified: true,  lastActive: "5 mins ago",   createdAt: "2024-09-12", region: "East Zone" },
-    { id: 4,  name: "Marcus Thorne",    email: "m.thorne@innovate.io",   organization: "Innovate Ltd",  role: "Field Officer", assignment: "unassigned", status: "inactive", verified: false, lastActive: "3 days ago",   createdAt: "2025-01-05", region: "West Zone" },
+    { id: 4,  name: "Marcus Thorne",    email: "m.thorne@innovate.io",   organization: "Innovate Ltd",  role: "Field Officer", assignment: "unassigned", status: "deactive", verified: false, lastActive: "3 days ago",   createdAt: "2025-01-05", region: "West Zone" },
     { id: 5,  name: "Aisha Khan",       email: "aisha.k@techcore.com",   organization: "TechCore",      role: "Coordinator",   assignment: "assigned",   status: "active",   verified: true,  lastActive: "1 hour ago",   createdAt: "2024-08-01", region: "Central Zone" },
     { id: 6,  name: "John Smith",       email: "j.smith@builders.inc",   organization: "Builders Inc",  role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "10 mins ago",  createdAt: "2024-12-18", region: "North Zone" },
     { id: 7,  name: "Yuki Tanaka",      email: "yuki.t@zensoft.jp",      organization: "ZenSoft",       role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "Now",          createdAt: "2024-07-22", region: "South Zone" },
     { id: 8,  name: "Liam O'Connor",    email: "liam.oc@emerald.ie",     organization: "Emerald Eco",   role: "Coordinator",   assignment: "unassigned", status: "active",   verified: false, lastActive: "1 day ago",    createdAt: "2025-02-01", region: "East Zone" },
     { id: 9,  name: "Sofia Rossi",      email: "s.rossi@lume.it",        organization: "Lume SpA",      role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "4 hours ago",  createdAt: "2024-06-10", region: "West Zone" },
-    { id: 10, name: "Chen Wei",         email: "c.wei@easternstar.cn",   organization: "Eastern Star",  role: "Coordinator",   assignment: "assigned",   status: "inactive", verified: true,  lastActive: "2 days ago",   createdAt: "2024-05-30", region: "Central Zone" },
+    { id: 10, name: "Chen Wei",         email: "c.wei@easternstar.cn",   organization: "Eastern Star",  role: "Coordinator",   assignment: "assigned",   status: "deactive", verified: true,  lastActive: "2 days ago",   createdAt: "2024-05-30", region: "Central Zone" },
     { id: 11, name: "Maria Garcia",     email: "m.garcia@techcorp. Spanish",   organization: "TechCorp",      role: "Admin",         assignment: "assigned",   status: "active",   verified: true,  lastActive: "30 mins ago",  createdAt: "2024-04-14", region: "North Zone" },
     { id: 12, name: "Ahmed Hassan",     email: "a.hassan@innovate.ae",   organization: "Innovate Labs", role: "Field Officer", assignment: "assigned",   status: "active",   verified: true,  lastActive: "15 mins ago",  createdAt: "2024-03-20", region: "South Zone" },
 ];
@@ -137,9 +137,8 @@ export const userService = {
         await storage.delay(300);
         const users = storage.load().map(u => {
             if (!ids.includes(u.id)) return u;
-            if (action === 'activate' || action === 'unban') return { ...u, status: 'active' };
-            if (action === 'deactivate') return { ...u, status: 'inactive' };
-            if (action === 'ban') return { ...u, status: 'banned' };
+            if (action === 'activate') return { ...u, status: 'active' };
+            if (action === 'deactivate') return { ...u, status: 'deactive' };
             return u;
         });
         storage.save(users);
@@ -155,7 +154,7 @@ export const userService = {
         return {
             total: users.length,
             active: users.filter(u => u.status === 'active').length,
-            inactive: users.filter(u => u.status === 'inactive').length,
+            inactive: users.filter(u => u.status === 'deactive').length,
             unassigned: users.filter(u => u.assignment === 'unassigned').length,
         };
     },

@@ -5,7 +5,6 @@ import Badge from './Badge';
 import DotStatus from './DotStatus';
 
 const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) => {
-  const isBanned = user.status === 'banned';
   const isActive = user.status === 'active';
   const isAssigned = user.assignment === 'assigned';
 
@@ -43,10 +42,10 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
         <div className="absolute top-3 right-3">
           <Badge 
             variant="light" 
-            color={isActive ? 'success' : isBanned ? 'danger' : 'neutral'}
+            color={isActive ? 'success' : 'neutral'}
             className="!text-[9px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest"
           >
-            {user.status}
+            {isActive ? 'Active' : 'Deactive'}
           </Badge>
         </div>
       </div>

@@ -39,10 +39,6 @@ export default function Users() {
     const [isPeekOpen, setIsPeekOpen] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
-    const [banTarget, setBanTarget] = useState(null);
-    const [banActionType, setBanActionType] = useState('ban'); // 'ban' or 'unban'
-    const [bulkBanOpen, setBulkBanOpen] = useState(false);
-    const [bulkActionType, setBulkActionType] = useState('ban');
     const [selectionMode, setSelectionMode] = useState(false);
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
 
@@ -94,23 +90,6 @@ export default function Users() {
         return res;
     };
 
-    const handleBanUser = (user, type = 'ban') => {
-        setBanTarget(user);
-        setBanActionType(type);
-        setIsPeekOpen(false);
-    };
-
-    const handleConfirmBan = async () => {
-        if (!banTarget) return;
-        const res = await store.bulkAction(banActionType, [banTarget.id]);
-        if (res.success) {
-            toast.success(`User ${banActionType === 'ban' ? 'banned' : 'restored'} successfully`);
-            setBanTarget(null);
-        } else {
-            toast.error(res.error || `Failed to ${banActionType} user`);
-        }
-    };
-
     const handleBulkActivate = async () => {
         const res = await store.bulkAction('activate', selectedIds);
         if (res.success) {
@@ -129,16 +108,6 @@ export default function Users() {
         }
     };
 
-    const handleBulkBan = async () => {
-        const res = await store.bulkAction(bulkActionType, selectedIds);
-        if (res.success) {
-            toast.success(`${selectedIds.length} users ${bulkActionType === 'ban' ? 'banned' : 'restored'}`);
-            setBulkBanOpen(false);
-        } else {
-            toast.error(res.error || `Bulk ${bulkActionType} failed`);
-        }
-    };
-
     const statsData = [
         {
             title: 'Total Users',
@@ -146,7 +115,7 @@ export default function Users() {
             icon: FiUsers,
             iconColorClass: 'text-primary',
             iconBgClass: 'bg-primary/10',
-            change: `${stats.active} Active / ${stats.inactive} Inactive`,
+            change: `${stats.active} Active / ${stats.inactive} Deactive`,
             changeType: 'neutral',
             description: 'all platform users'
         },
@@ -160,7 +129,7 @@ export default function Users() {
             description: 'vs last month'
         },
         {
-            title: 'Inactive',
+            title: 'Deactive',
             value: stats.inactive,
             icon: FiAlertCircle,
             iconColorClass: 'text-danger',
@@ -251,16 +220,15 @@ export default function Users() {
             width: '10%',
             align: 'center',
             render: (value) => {
-                const isBanned = value.toLowerCase() === 'banned';
                 const isActive = value.toLowerCase() === 'active';
                 return (
                     <div className="flex justify-center">
                         <Badge 
                             variant="light" 
-                            color={isActive ? 'success' : isBanned ? 'danger' : 'neutral'}
+                            color={isActive ? 'success' : 'neutral'}
                             className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
                         >
-                            {value}
+                            {isActive ? 'Active' : 'Deactive'}
                         </Badge>
                     </div>
                 );
@@ -365,7 +333,10 @@ export default function Users() {
                     />
                     <FilterDropdown
                         label="Status"
-                        options={filterOptions.statuses}
+                        options={[
+                            { value: 'active', label: 'Active' },
+                            { value: 'deactive', label: 'Deactive' }
+                        ]}
                         value={filters.status}
                         onChange={v => setFilters({ ...filters, status: v })}
                         allLabel="All Statuses"
@@ -418,22 +389,6 @@ export default function Users() {
                                 className="!h-8 !px-3 !text-[10px] !font-bold !bg-amber-50 !text-amber-700 !border-amber-100/50 hover:!bg-amber-100 !rounded-lg"
                             >
                                 Deactivate
-                            </Button>
-                            <Button
-                                onClick={() => { setBulkActionType('ban'); setBulkBanOpen(true); }}
-                                icon={FiAlertCircle}
-                                variant="outline"
-                                className="!h-8 !px-3 !text-[10px] !font-bold !bg-rose-50 !text-rose-700 !border-rose-100/50 hover:!bg-rose-100 !rounded-lg"
-                            >
-                                Ban
-                            </Button>
-                            <Button
-                                onClick={() => { setBulkActionType('unban'); setBulkBanOpen(true); }}
-                                icon={FiCheckCircle}
-                                variant="outline"
-                                className="!h-8 !px-3 !text-[10px] !font-bold !bg-blue-50 !text-blue-700 !border-blue-100/50 hover:!bg-blue-100 !rounded-lg"
-                            >
-                                Unban
                             </Button>
                             <div className="hidden sm:block w-px h-5 bg-border-main/50 mx-1" />
                             <Button
@@ -501,22 +456,6 @@ export default function Users() {
                                     >
                                         Deactivate
                                     </Button>
-                                    <Button
-                                        onClick={() => { setBulkActionType('ban'); setBulkBanOpen(true); }}
-                                        icon={FiAlertCircle}
-                                        variant="outline"
-                                        className="!h-8 !px-3 !text-[10px] !font-bold !bg-rose-50 !text-rose-700 !border-rose-100/50 hover:!bg-rose-100 !rounded-lg"
-                                    >
-                                        Ban
-                                    </Button>
-                                    <Button
-                                        onClick={() => { setBulkActionType('unban'); setBulkBanOpen(true); }}
-                                        icon={FiCheckCircle}
-                                        variant="outline"
-                                        className="!h-8 !px-3 !text-[10px] !font-bold !bg-blue-50 !text-blue-700 !border-blue-100/50 hover:!bg-blue-100 !rounded-lg"
-                                    >
-                                        Unban
-                                    </Button>
                                     <div className="hidden sm:block w-px h-5 bg-border-main/50 mx-1" />
                                     <Button
                                         variant="ghost"
@@ -570,7 +509,6 @@ export default function Users() {
                 onClose={() => setIsPeekOpen(false)}
                 user={peekUser}
                 onEdit={handleEditUser}
-                onBan={handleBanUser}
             />
 
             <UserFormModal
@@ -578,32 +516,6 @@ export default function Users() {
                 onClose={() => { setIsFormOpen(false); setEditingUser(null); }}
                 onSubmit={handleFormSubmit}
                 user={editingUser}
-                loading={loading}
-            />
-
-            <ConfirmModal
-                isOpen={!!banTarget}
-                onClose={() => setBanTarget(null)}
-                onConfirm={handleConfirmBan}
-                title={banActionType === 'ban' ? "Ban User" : "Unban User"}
-                message={banActionType === 'ban' 
-                    ? `Are you sure you want to ban "${banTarget?.name}"? This will restrict their access to the platform.`
-                    : `Are you sure you want to restore access for "${banTarget?.name}"?`}
-                confirmText={banActionType === 'ban' ? "Confirm Ban" : "Confirm Unban"}
-                danger={banActionType === 'ban'}
-                loading={loading}
-            />
-
-            <ConfirmModal
-                isOpen={bulkBanOpen}
-                onClose={() => setBulkBanOpen(false)}
-                onConfirm={handleBulkBan}
-                title={bulkActionType === 'ban' ? "Bulk Ban" : "Bulk Unban"}
-                message={bulkActionType === 'ban'
-                    ? `You are about to ban ${selectedIds.length} users. Continue?`
-                    : `You are about to unban ${selectedIds.length} users. Continue?`}
-                confirmText={bulkActionType === 'ban' ? `Ban (${selectedIds.length})` : `Unban (${selectedIds.length})`}
-                danger={bulkActionType === 'ban'}
                 loading={loading}
             />
         </div>

@@ -15,7 +15,7 @@ export const userSchema = z.object({
         .min(1, { message: "Employee ID is required" }),
     designation: z.string()
         .min(1, { message: "Designation is required" }),
-    status: z.enum(['active', 'inactive']),
+    status: z.enum(['active', 'deactive']),
     region: z.string().optional(),
     phoneNumber: z.string().optional(),
     equipmentId: z.string().optional(),
