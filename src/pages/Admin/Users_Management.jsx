@@ -39,6 +39,8 @@ export default function Users() {
     const [isPeekOpen, setIsPeekOpen] = useState(false);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
+    const [statusTarget, setStatusTarget] = useState(null);
+    const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
     const [selectionMode, setSelectionMode] = useState(false);
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
 
@@ -96,6 +98,18 @@ export default function Users() {
             toast.success(`${selectedIds.length} users activated`);
         } else {
             toast.error(res.error || 'Bulk activation failed');
+        }
+    };
+
+    const handleConfirmDeactivate = async () => {
+        const targets = statusTarget ? [statusTarget.id] : selectedIds;
+        const res = await store.bulkAction('deactivate', targets);
+        if (res.success) {
+            toast.success(`${targets.length} user(s) deactivated safely`);
+            setStatusTarget(null);
+            setBulkStatusOpen(false);
+        } else {
+            toast.error(res.error || 'Deactivation failed');
         }
     };
 
@@ -383,7 +397,7 @@ export default function Users() {
                                 Activate
                             </Button>
                             <Button
-                                onClick={handleBulkDeactivate}
+                                onClick={() => setBulkStatusOpen(true)}
                                 icon={FiUserX}
                                 variant="outline"
                                 className="!h-8 !px-3 !text-[10px] !font-bold !bg-amber-50 !text-amber-700 !border-amber-100/50 hover:!bg-amber-100 !rounded-lg"
@@ -449,7 +463,7 @@ export default function Users() {
                                         Activate
                                     </Button>
                                     <Button
-                                        onClick={handleBulkDeactivate}
+                                        onClick={() => setBulkStatusOpen(true)}
                                         icon={FiUserX}
                                         variant="outline"
                                         className="!h-8 !px-3 !text-[10px] !font-bold !bg-amber-50 !text-amber-700 !border-amber-100/50 hover:!bg-amber-100 !rounded-lg"
@@ -509,6 +523,7 @@ export default function Users() {
                 onClose={() => setIsPeekOpen(false)}
                 user={peekUser}
                 onEdit={handleEditUser}
+                onDeactivate={(u) => { setPeekUser(null); setIsPeekOpen(false); setStatusTarget(u); }}
             />
 
             <UserFormModal
@@ -516,6 +531,28 @@ export default function Users() {
                 onClose={() => { setIsFormOpen(false); setEditingUser(null); }}
                 onSubmit={handleFormSubmit}
                 user={editingUser}
+                loading={loading}
+            />
+
+            <ConfirmModal
+                isOpen={!!statusTarget}
+                onClose={() => setStatusTarget(null)}
+                onConfirm={handleConfirmDeactivate}
+                title="Deactivate Account"
+                message={`Are you sure you want to deactivate "${statusTarget?.name}"? They will no longer be able to access the platform until reactivated.`}
+                confirmText="Confirm Deactivation"
+                danger={true}
+                loading={loading}
+            />
+
+            <ConfirmModal
+                isOpen={bulkStatusOpen}
+                onClose={() => setBulkStatusOpen(false)}
+                onConfirm={handleConfirmDeactivate}
+                title="Bulk Deactivation"
+                message={`You are about to deactivate ${selectedIds.length} users. Continue?`}
+                confirmText={`Deactivate (${selectedIds.length})`}
+                danger={true}
                 loading={loading}
             />
         </div>

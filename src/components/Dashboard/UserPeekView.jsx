@@ -13,7 +13,7 @@ function getAvatar(name) {
 
 import Button from '../UI/Button';
 
-const UserPeekView = ({ isOpen, onClose, user, onEdit }) => {
+const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate }) => {
     if (!user) return null;
     const { initials, colors } = getAvatar(user.name);
 
@@ -140,6 +140,15 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit }) => {
 
                         {/* Modal Footer */}
                         <div className="relative z-10 p-5 bg-base border-t border-border-main flex items-center justify-end gap-2">
+                            {user.status === 'active' && (
+                                <Button
+                                    variant="danger"
+                                    onClick={() => onDeactivate(user)}
+                                    className="!h-10 !px-5 !text-[11px] !font-bold !uppercase !tracking-wider"
+                                >
+                                    Deactivate Account
+                                </Button>
+                            )}
                             <Button
                                 variant="primary"
                                 onClick={() => { onClose(); onEdit(user); }}
