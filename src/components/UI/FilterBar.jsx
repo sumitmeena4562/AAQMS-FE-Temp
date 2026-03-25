@@ -3,7 +3,9 @@ import { FiGrid, FiList, FiRefreshCcw } from 'react-icons/fi';
 import FilterDropdown from './FilterDropdown';
 import Search from './Search';
 import { useFilterStore } from '../../store/useFilterStore';
-import { organizations, coordinators, sites, floors } from '../../data/mockFilterData';
+import { coordinators, sites, floors } from '../../data/mockFilterData';
+import { useOrgStore } from '../../store/useOrgStore';
+import { useEffect } from 'react';
 
 const FilterBar = ({ 
     activeLevel, // 'coordinators', 'sites', 'floors', 'zones'
@@ -23,6 +25,12 @@ const FilterBar = ({
         resetFilters
     } = useFilterStore();
 
+    const { orgs, fetchOrgs } = useOrgStore();
+
+    useEffect(() => {
+        if (orgs.length === 0) fetchOrgs();
+    }, [orgs.length, fetchOrgs]);
+
     // Safely strip singular/plural mapping for consistent tiering
     const normalizedLevel = activeLevel?.replace(/s$/, '') || ''; 
 
@@ -33,7 +41,7 @@ const FilterBar = ({
     const renderFloor = ['zone'].includes(normalizedLevel);
 
     // Dynamic Relational Options mapping
-    const orgOptions = organizations.map(o => ({ value: o.id, label: o.name }));
+    const orgOptions = orgs.map(o => ({ value: o.id, label: o.name }));
     const coordOptions = coordinators.filter(c => c.orgId === selectedOrg).map(c => ({ value: c.id, label: c.name }));
     const siteOptions = sites.filter(s => s.coordId === selectedCoord).map(s => ({ value: s.id, label: s.name }));
     const floorOptions = floors.filter(f => f.siteId === selectedSite).map(f => ({ value: f.id, label: f.name }));

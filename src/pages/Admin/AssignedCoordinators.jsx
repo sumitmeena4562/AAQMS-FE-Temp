@@ -5,16 +5,18 @@ import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import useUserStore from '../../store/userStore';
 import { useFilterStore } from '../../store/useFilterStore';
-import { organizations, sites, floors, zones } from '../../data/mockFilterData';
+import { useOrgStore } from '../../store/useOrgStore';
+import { sites, floors, zones } from '../../data/mockFilterData';
 import { FiHome, FiBriefcase, FiGrid, FiList } from 'react-icons/fi';
 
 const AssignedCoordinators = () => {
   const location = useLocation();
   const [view, setView] = React.useState('list');
   const { selectedOrg, setOrg } = useFilterStore();
+  const { orgs, fetchOrgs } = useOrgStore();
   
   const passedOrgName = location.state?.org?.name || new URLSearchParams(location.search).get('org');
-  const orgInfo = selectedOrg ? organizations.find(o => o.id === selectedOrg) : null;
+  const orgInfo = selectedOrg ? orgs.find(o => o.id === selectedOrg) : null;
   const orgName = orgInfo?.name || passedOrgName || "Organization";
 
   const users = useUserStore(state => state.users);
@@ -27,14 +29,15 @@ const AssignedCoordinators = () => {
   ];
 
   useEffect(() => {
-    if (!selectedOrg && passedOrgName) {
-      const match = organizations.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
+    if (orgs.length === 0) fetchOrgs();
+    if (!selectedOrg && passedOrgName && orgs.length > 0) {
+      const match = orgs.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
       if (match) {
         setOrg(match.id);
       }
     }
     if (users.length === 0) fetchUsers();
-  }, [selectedOrg, passedOrgName, setOrg, users.length, fetchUsers]);
+  }, [selectedOrg, passedOrgName, setOrg, users.length, fetchUsers, orgs.length, fetchOrgs, orgs]);
 
   const isOrgSelected = !!(selectedOrg || passedOrgName);
   const orgUsers = isOrgSelected ? users.filter(u => u.organization === orgName) : [];

@@ -47,7 +47,7 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur, disabled = fal
               </div>
               <span className={`text-[13px] font-medium ${error ? 'text-red-400' : 'text-gray'}`}>Upload Image</span>
             </>
-        )}
+          )}
         </button>
         {value && !disabled && (
           <button

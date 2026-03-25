@@ -173,7 +173,20 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
         {/* Bottom Button */}
         <button
-          onClick={handleAction}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (isSiteCard) {
+              const currentOrg = location.state?.orgName || new URLSearchParams(location.search).get('org') || '';
+              const coordName = coordinatorContext?.name || new URLSearchParams(location.search).get('coord') || '';
+              navigate(`/admin/floor-plan?org=${encodeURIComponent(currentOrg)}&coord=${encodeURIComponent(coordName)}&site=${encodeURIComponent(org.name)}`, {
+                state: { site: org, orgName: currentOrg, coordinator: coordinatorContext }
+              });
+            } else {
+              navigate(`/admin/coordinators?org=${encodeURIComponent(org.name)}`, {
+                state: { orgName: org.name, org: org }
+              });
+            }
+          }}
           className="mt-auto w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-2 group">
           <span>
             {isSiteCard ? 'View Floors' : 'Manage Org'}
