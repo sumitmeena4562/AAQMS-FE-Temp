@@ -61,8 +61,12 @@ const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // 1. Backend se Tokens le kar aana
-      const { data } = await api.post("accounts/login/", { identifier, password });
+      // 1. Backend se Tokens le kar aana (Dual-compatibility payload)
+      const { data } = await api.post("accounts/login/", { 
+        email: identifier, // Required by current BE
+        identifier,        // Required by future BE (Dual-Login)
+        password 
+      });
 
       // Agar rememberMe true hai toh email save karein
         if (rememberMe) {
