@@ -1,8 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable from '../UI/DataTable';
 import Button from '../UI/Button';
-import { FiFilter } from 'react-icons/fi';
-import { DUMMY_RECENT_ACTIVITY } from '../../data/dashboardData';
+import { FiFilter, FiBox } from 'react-icons/fi';
+import { useRecentActivity } from '../../hooks/useDashboardQueries';
 
 // ── Column definitions ──
 const columns = [
@@ -54,22 +55,39 @@ const columns = [
 ];
 
 const RecentActivityTable = () => {
+    const { data: activityList, isLoading, isError } = useRecentActivity();
+    const navigate = useNavigate();
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center p-16 bg-white rounded-xl shadow-sm border border-gray-100 group transition-all duration-300 hover:shadow-md cursor-wait">
+                <FiBox className="text-primary animate-pulse mb-3 group-hover:scale-110 transition-transform duration-300" size={44} />
+                <span className="text-sm font-semibold text-gray-500 group-hover:text-primary transition-colors">Loading Live Feed...</span>
+            </div>
+        );
+    }
+
+    if (isError) return null;
+
     return (
         <DataTable
             title="Recent Activity"
             subtitle="Live Feed"
             rightContent={
                 <>
-                    <Button variant="outline" size="sm" icon={FiFilter} className="!rounded-md !h-[30px] !text-[12px]">
-                        Filter
-                    </Button>
-                    <Button variant="ghost" size="sm" className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10">
-                        View All Logs
+                
+                    <Button 
+                        onClick={() => navigate('/admin/history')}
+                        variant="ghost" 
+                        size="sm" 
+                        className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10"
+                    >
+                        View All History
                     </Button>
                 </>
             }
             columns={columns}
-            data={DUMMY_RECENT_ACTIVITY}
+            data={activityList}
             emptyMessage="No recent activity"
         />
     );

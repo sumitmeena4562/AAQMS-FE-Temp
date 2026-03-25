@@ -14,7 +14,7 @@ import SitePlan from "../pages/Admin/SitePlan";
 import FloorPlan from "../pages/Admin/FloorPlan";
 import Zones from "../pages/Admin/Zones";
 import Inventory from "../pages/Admin/Inventory";
-// const ActivityLogs = lazy(() => import('../pages/Admin/ActivityLogs'));
+import AllHistory from "../pages/Admin/AllHistory";
 
 const AdminRoutes = () => {
     return (
@@ -35,6 +35,7 @@ const AdminRoutes = () => {
                 <Route path="reports" element={<Reports />} />
                 <Route path="users" element={<Users />} />
                 <Route path="settings" element={<Settings />} />
+                <Route path="history" element={<AllHistory />} />
             </Route>
         </Routes>
     );
