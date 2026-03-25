@@ -112,7 +112,7 @@ export const userService = {
             return {
                 organizations: getUnique(users, 'organization'),
                 roles: roles,
-                regions: getUnique(users, 'region'),
+                regions: [...new Set([...getUnique(users, 'region'), ...getUnique(users, 'zone')])].sort(),
             };
         } catch (error) {
             return { organizations: [], roles: [], regions: [] };

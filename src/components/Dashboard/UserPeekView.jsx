@@ -97,7 +97,7 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate }) => {
                                     { icon: <FiShield size={14} />, label: "Role", value: user.role === 'field_officer' ? 'Field Officer' : user.role?.charAt(0).toUpperCase() + user.role?.slice(1) },
                                     { icon: <FiBriefcase size={14} />, label: "Organization", value: user.organization },
                                     { icon: <FiMapPin size={14} />, label: user.role === 'field_officer' ? 'Assigned Zone' : 'Region', value: user.role === 'field_officer' ? (user.zone || 'No Zone') : (user.region || 'Not Specified') },
-                                    { icon: <FiCalendar size={14} />, label: "Joined Platform", value: user.createdAt || 'Recent' },
+                                    { icon: <FiCalendar size={14} />, label: "Joined Platform", value: user.created_at || 'Recent' },
                                     { icon: <FiUser size={14} />, label: "System ID", value: user.employee_id || 'N/A' }
                                 ].map((item, idx) => (
                                     <div 

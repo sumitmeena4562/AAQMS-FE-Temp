@@ -8,8 +8,8 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
   const isActive = user.status === 'active';
   const isAssigned = user.assignment === 'assigned';
 
-  // Calculate Tenure (Days since createdAt)
-  const createdDate = new Date(user.createdAt || '2024-01-01');
+  // Calculate Tenure (Days since created_at)
+  const createdDate = new Date(user.created_at || '2024-01-01');
   const diffDays = Math.ceil(Math.abs(new Date() - createdDate) / (1000 * 60 * 60 * 24));
 
   return (
@@ -116,8 +116,8 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
           <div className="flex flex-col items-end text-right">
             <span className="text-[7.5px] font-black text-gray/60 uppercase tracking-widest mb-1 leading-none">Activity & Joined</span>
             <div className="flex flex-col gap-0.5">
-                <span className="text-[11px] font-black text-body truncate">{user.lastActive || 'Never'}</span>
-                <span className="text-[9px] font-bold text-gray/80 truncate">Joined {user.createdAt || 'N/A'}</span>
+                <span className="text-[11px] font-black text-body truncate">{user.last_login || 'Never'}</span>
+                <span className="text-[9px] font-bold text-gray/80 truncate">Joined {user.created_at || 'N/A'}</span>
             </div>
           </div>
         </div>
