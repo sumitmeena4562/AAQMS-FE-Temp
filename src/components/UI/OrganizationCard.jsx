@@ -9,8 +9,8 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
   const users = useUserStore(state => state.users);
 
   // Derive coordinators exactly as stored in User Management: 
-  const orgCoordinators = users.filter(u => 
-    (u.organization || "").trim().toLowerCase() === (org.name || "").trim().toLowerCase() && 
+  const orgCoordinators = users.filter(u =>
+    (u.organization || "").trim().toLowerCase() === (org.name || "").trim().toLowerCase() &&
     u.role === 'Coordinator'
   );
 
@@ -30,15 +30,15 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
   let siteComputedAssets = 0;
 
   if (isSiteCard) {
-      const sFloors = floors.filter(f => f.siteId === org.id);
-      const floorIds = sFloors.map(f => f.id);
-      const sZones = zones.filter(z => floorIds.includes(z.floorId));
-      const zoneIds = sZones.map(z => z.id);
-      const sAssets = assets.filter(a => zoneIds.includes(a.zoneId));
+    const sFloors = floors.filter(f => f.siteId === org.id);
+    const floorIds = sFloors.map(f => f.id);
+    const sZones = zones.filter(z => floorIds.includes(z.floorId));
+    const zoneIds = sZones.map(z => z.id);
+    const sAssets = assets.filter(a => zoneIds.includes(a.zoneId));
 
-      siteComputedFloors = sFloors.length;
-      siteComputedZones = sZones.length;
-      siteComputedAssets = sAssets.length;
+    siteComputedFloors = sFloors.length;
+    siteComputedZones = sZones.length;
+    siteComputedAssets = sAssets.length;
   }
 
   let currentStatus = org.status || 'ACTIVE';
@@ -60,8 +60,8 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     if (isSiteCard) {
       const currentOrg = location.state?.orgName || new URLSearchParams(location.search).get('org') || '';
       const coordName = coordinatorContext?.name || new URLSearchParams(location.search).get('coord') || '';
-      navigate(`/admin/floor-plan?org=${encodeURIComponent(currentOrg)}&coord=${encodeURIComponent(coordName)}&site=${encodeURIComponent(org.name)}`, { 
-        state: { site: org, orgName: currentOrg, coordinator: coordinatorContext } 
+      navigate(`/admin/floor-plan?org=${encodeURIComponent(currentOrg)}&coord=${encodeURIComponent(coordName)}&site=${encodeURIComponent(org.name)}`, {
+        state: { site: org, orgName: currentOrg, coordinator: coordinatorContext }
       });
     } else {
       navigate(`/admin/coordinators?org=${encodeURIComponent(org.name)}`, { state: { org } });
@@ -69,7 +69,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
   };
 
   return (
-    <div 
+    <div
       className={`h-[360px] bg-card rounded-[var(--radius-card)] shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col border border-border-main overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
       onClick={handleAction}
     >
