@@ -15,6 +15,7 @@ const PageHeader = ({
   hideAddButton = true,
   className = ""
 }) => {
+
   return (
     <div className={`bg-card border-b border-border-main/50 ${className}`}>
         {/* 1. BREADCRUMB STRIP (Internalized for Cohesion) */}

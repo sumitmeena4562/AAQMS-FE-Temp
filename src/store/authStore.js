@@ -38,17 +38,22 @@ const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // 1. Backend se Tokens le kar aana
-      const { data } = await api.post("/accounts/api/login/", { email, password });
+      // 1. Backend se Tokens le kar aana (baseURL is /api)
+      const { data } = await api.post("/accounts/login/", { email, password });
       
-      // 2. User ka profile data fetch karna
+      // 2. Tokens ko temporarily save karna taaki profile fetch authenticated ho
+      // Hamare api.js interceptors localStorage se token read karte hain
+      localStorage.setItem("token", data.access);
+      localStorage.setItem("refresh", data.refresh);
+
+      // 3. User ka profile data fetch karna
       const profile = await api.get("/accounts/profile/");
       const user = profile.data;
 
-      // 3. Tokens aur Profile ko browser memory mein save karna
+      // 4. Poore session ko save karna (including user info)
       storage.saveSession(data.access, data.refresh, user);
 
-      // 4. Global State update karna
+      // 5. Global State update karna
       set({ isAuthenticated: true, user, isLoading: false });
       return { success: true, user };
 
@@ -111,4 +116,4 @@ const useAuthStore = create((set) => ({
   },
 }));
 
-export default useAuthStore;
+export default useAuthStore;
