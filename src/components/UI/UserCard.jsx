@@ -105,10 +105,12 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
         {/* 2-Column Info Grid — Proper Profile Data */}
         <div className="grid grid-cols-2 gap-3 py-3 border-y border-border-main/30 border-dashed">
           <div className="flex flex-col">
-            <span className="text-[7.5px] font-black text-gray/60 uppercase tracking-widest mb-1 leading-none">Organization & Zone</span>
+            <span className="text-[7.5px] font-black text-gray/60 uppercase tracking-widest mb-1 leading-none">Assignment: {user.role === 'field_officer' ? 'Org & Zone' : 'Org & Region'}</span>
             <div className="flex flex-col gap-0.5">
                 <span className="text-[11px] font-black text-body truncate">{user.organization || 'Freelance'}</span>
-                <span className="text-[9px] font-bold text-gray/80 truncate">{user.region || 'No Zone'}</span>
+                <span className="text-[9px] font-bold text-gray/80 truncate">
+                  {user.role === 'field_officer' ? (user.zone || 'No Zone') : (user.region || 'No Region')}
+                </span>
             </div>
           </div>
           <div className="flex flex-col items-end text-right">
