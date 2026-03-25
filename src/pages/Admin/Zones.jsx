@@ -6,9 +6,10 @@ import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
 import { FiSquare, FiCheckSquare, FiRefreshCcw, FiHome, FiBriefcase } from 'react-icons/fi';
-import { List } from 'lucide-react';
+import { List, Layout, Truck, Fuel, Monitor } from 'lucide-react';
 import { useBreadcrumb } from '../../hooks/useBreadcrumb';
-import { ZONES_DATA } from '../../data/zones';
+import { organizations, coordinators, sites, floors, zones, assets } from '../../data/mockFilterData';
+import { useFilterStore } from '../../store/useFilterStore';
 
 const filterOptions = {
     organizations: ['Acme Corp', 'Stark Industries', 'Wayne Enterprises', 'Globex', 'Initech'],
