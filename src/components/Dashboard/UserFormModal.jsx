@@ -33,7 +33,7 @@ const ROLE_DETAILS = [
     }
 ];
 
-const STATUS_OPTIONS = ['active', 'inactive'];
+const STATUS_OPTIONS = ['active', 'deactive'];
 const DESIGNATIONS = ['Regional Manager', 'Senior Coordinator', 'Operations Lead', 'Compliance Officer'];
 
 const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false }) => {

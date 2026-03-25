@@ -14,6 +14,7 @@ import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal';
 function LoginPage() {
     const navigate = useNavigate();
     const { login, isLoading ,user} = useAuthStore();
+    const rememberedEmail = localStorage.getItem("rememberedEmail");
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
     const onSubmit = async (data) => {
@@ -37,6 +38,10 @@ function LoginPage() {
                 isLoading={isLoading}
                 submitText="Sign In"
                 loadingText="Signing in..."
+                defaultValues={{
+                    email: rememberedEmail || '',
+                    rememberMe: !!rememberedEmail
+                }}
                 footer={
                     <span className="font-semibold text-slate-500">
                         Don&apos;t have access? 

@@ -9,7 +9,8 @@ export const loginSchema = z.object({
         .min(8, { message: "Security rule: Minimum 8 characters" })
         .regex(/[a-z]/, { message: "Missing lowercase letter" })
         .regex(/[A-Z]/, { message: "Missing uppercase letter" })
-        .regex(/[0-9]/, { message: "Missing numerical digit" })
+        .regex(/[0-9]/, { message: "Missing numerical digit" }),
+    rememberMe: z.boolean().optional()
 });
 
 export const registerSchema = z.object({

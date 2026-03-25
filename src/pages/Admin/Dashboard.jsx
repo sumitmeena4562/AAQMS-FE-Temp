@@ -17,7 +17,7 @@ const formatLastSync = (timestamp) => {
 
 const Dashboard = () => {
     const { data: metricCards, isLoading, isError, dataUpdatedAt: metricTime } = useDashboardMetrics();
-    
+
     // Call the hooks just to access their update timestamps. 
     // React Query is smart enough to NOT make duplicate network requests!
     const { dataUpdatedAt: statsTime } = useDashboardStats();
@@ -32,7 +32,7 @@ const Dashboard = () => {
     useEffect(() => {
         if (latestTimestamp === 0) return;
         setSyncText(formatLastSync(latestTimestamp));
-        
+
         // Gently tick the timer label every 10 seconds (so it fades from "Just now" to "1 min ago")
         const interval = setInterval(() => {
             setSyncText(formatLastSync(latestTimestamp));
@@ -45,13 +45,13 @@ const Dashboard = () => {
             <PageHeader
                 title="System Overview"
                 subtitle="Monitoring real-time operational metrics and AI risk triggers"
-                breadcrumbs={[
-                    // { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} />, isActive: true }
-                ]}
+                // breadcrumbs={[
+                //     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} />, isActive: true }
+                // ]}
                 rightContent={
                     <div className="px-3 py-1.5 bg-base/50 border border-border-main/50 rounded-lg shadow-inner">
                         <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                            Last Sync: <span className="text-primary  transition-all duration-300">{syncText}</span>
+                            Last Sync: <span className="text-primary">Just now</span>
                         </span>
                     </div>
                 }

@@ -16,6 +16,7 @@ const InputField = forwardRef(({
     containerStyle = {},
     isValid,
     helperText,
+    disabled = false,
     ...props
 }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -99,6 +100,7 @@ const InputField = forwardRef(({
                     onMouseLeave={(e) => {
                         if (!isFocused && !error) e.target.style.borderColor = 'var(--color-border)';
                     }}
+                    disabled={disabled}
                     {...props}
                 />
 

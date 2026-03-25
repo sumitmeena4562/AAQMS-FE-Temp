@@ -8,9 +8,14 @@ import toast from 'react-hot-toast';
  */
 
 const api = axios.create({
+<<<<<<< HEAD
     // In production, use env variables: import.meta.env.VITE_API_BASE_URL
     baseURL: '',
     headers: {
+=======
+    baseURL: import.meta.env.VITE_API_URL, //this is Django backend URl
+    headers:{
+>>>>>>> 7e60b2d1f24c90023cdc84d8b6d29e8f3a5cba5e
         'Content-Type': 'application/json',
     },
     // Prevent infinite loaders if the server crashes
@@ -55,66 +60,69 @@ api.interceptors.response.use(
         if (error.response) {
             const { status, data } = error.response;
 
-            // If 401 (Unauthorized) and we haven't retried yet
-            if (status === 401 && !originalRequest._retry) {
-                originalRequest._retry = true;
-                const refreshToken = localStorage.getItem('refresh');
+            if (refreshToken) {
+                try {
+                    // Call the refresh endpoint (baseURL is http://localhost:8000/api)
+                    const response = await api.post('accounts/token/refresh/', {
+                        refresh: refreshToken,
+                    });
+                    const { access } = response.data;
 
-                if (refreshToken) {
-                    try {
-                        // Use pure axios pointing to backend to prevent infinite interceptor loops
-                        const response = await axios.post('http://localhost:8000/api/accounts/token/refresh/', {
-                            refresh: refreshToken,
-                        });
-                        const { access } = response.data;
+                    if (refreshToken) {
+                        try {
+                            // Use pure axios pointing to backend to prevent infinite interceptor loops
+                            const response = await axios.post('http://localhost:8000/api/accounts/token/refresh/', {
+                                refresh: refreshToken,
+                            });
+                            const { access } = response.data;
 
-                        // Save new token
-                        localStorage.setItem('auth_token', access);
-                        api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-                        originalRequest.headers['Authorization'] = `Bearer ${access}`;
+                            // Save new token
+                            localStorage.setItem('auth_token', access);
+                            api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+                            originalRequest.headers['Authorization'] = `Bearer ${access}`;
 
-                        // Retry the original request with the new token
-                        return api(originalRequest);
-                    } catch (refreshError) {
-                        // Refresh token also failed - logout the user
+                            // Retry the original request with the new token
+                            return api(originalRequest);
+                        } catch (refreshError) {
+                            // Refresh token also failed - logout the user
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('refresh');
+                            localStorage.removeItem('user');
+                            window.location.href = '/login';
+                            return Promise.reject(refreshError);
+                        }
+                    } else {
+                        toast.error("Session expired. Please log in again.");
                         localStorage.removeItem('auth_token');
-                        localStorage.removeItem('refresh');
-                        localStorage.removeItem('user');
                         window.location.href = '/login';
-                        return Promise.reject(refreshError);
                     }
                 } else {
-                    toast.error("Session expired. Please log in again.");
-                    localStorage.removeItem('auth_token');
-                    window.location.href = '/login';
+                    // Global Error Handling: We use react-hot-toast here so your components remain dumb.
+                    switch (status) {
+                        case 403: // Forbidden
+                            toast.error("You don't have permission to perform this action.");
+                            break;
+                        case 404: // Not Found
+                            toast.error("The requested resource was not found.");
+                            break;
+                        case 500: // Server crashed
+                            toast.error("Server error. Engineers have been notified.");
+                            break;
+                        default:
+                            // Fallback to backend validation message
+                            if (status !== 401) {
+                                toast.error(data?.message || "An unexpected error occurred.");
+                            }
+                            break;
+                    }
                 }
-            } else {
-                // Global Error Handling: We use react-hot-toast here so your components remain dumb.
-                switch (status) {
-                    case 403: // Forbidden
-                        toast.error("You don't have permission to perform this action.");
-                        break;
-                    case 404: // Not Found
-                        toast.error("The requested resource was not found.");
-                        break;
-                    case 500: // Server crashed
-                        toast.error("Server error. Engineers have been notified.");
-                        break;
-                    default:
-                        // Fallback to backend validation message
-                        if (status !== 401) {
-                            toast.error(data?.message || "An unexpected error occurred.");
-                        }
-                        break;
-                }
+            } else if (error.request) {
+                // No response received (Check your internet!)
+                toast.error("Network Error: Could not connect to the backend server.");
             }
-        } else if (error.request) {
-            // No response received (Check your internet!)
-            toast.error("Network Error: Could not connect to the backend server.");
-        }
 
-        return Promise.reject(error);
-    }
+            return Promise.reject(error);
+        }
 );
 
 export default api;
