@@ -47,7 +47,12 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     }
   }
 
-  const handleAction = (e) => {
+  const handleView = (e) => {
+    if (e) e.stopPropagation();
+    onView?.(org);
+  };
+
+  const handleManage = (e) => {
     if (e) e.stopPropagation();
     if (isSiteCard) {
       const currentOrg = location.state?.orgName || new URLSearchParams(location.search).get('org') || '';
@@ -56,15 +61,16 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         state: { site: org, orgName: currentOrg, coordinator: coordinatorContext } 
       });
     } else {
-      // Instead of navigating, open the view modal
-      onView?.(org);
+      navigate(`/admin/coordinators?org=${encodeURIComponent(org.name)}`, { 
+        state: { org } 
+      });
     }
   };
 
   return (
     <div 
-      className={`h-[360px] bg-card rounded-[var(--radius-card)] shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col border border-border-main overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
-      onClick={handleAction}
+      className={`h-[360px] bg-card rounded-[var(--radius-card)] shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col border border-border-main overflow-hidden group/card cursor-pointer`}
+      onClick={handleView}
     >
 
       {/* Top Image Section */}
@@ -164,7 +170,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
         {/* Bottom Button */}
         <button
-          onClick={handleAction}
+          onClick={handleManage}
           className="mt-auto w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-2 group">
           <span>
             {isSiteCard ? 'View Floors' : 'Manage Org'}
