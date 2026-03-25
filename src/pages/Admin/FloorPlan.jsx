@@ -4,7 +4,7 @@ import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import FloorCard from '../../components/UI/FloorCard';
 import { useFilterStore } from '../../store/useFilterStore';
-import { organizations, coordinators, sites, floors } from '../../data/mockFilterData';
+import { organizations, coordinators, sites, floors, zones, assets } from '../../data/mockFilterData';
 import { FiHome, FiBriefcase } from 'react-icons/fi';
 
 const FloorPlan = () => {
@@ -57,11 +57,17 @@ const FloorPlan = () => {
   ];
 
   // We explicitly fetch matched floors from the relational store to keep UI accurate
-  const floorList = activeSiteId ? floors.filter(f => f.siteId === activeSiteId).map(f => ({
-      ...f, 
-      status: 'ACTIVE',
-      stats: { zones: Math.floor(Math.random() * 5) + 2, assets: Math.floor(Math.random() * 20) + 5 }
-  })) : [];
+  const floorList = activeSiteId ? floors.filter(f => f.siteId === activeSiteId).map(f => {
+      const floorZones = zones.filter(z => z.floorId === f.id);
+      const zoneIds = floorZones.map(z => z.id);
+      const floorAssets = assets.filter(a => zoneIds.includes(a.zoneId));
+
+      return {
+          ...f, 
+          status: 'ACTIVE',
+          stats: { zones: floorZones.length, assets: floorAssets.length }
+      };
+  }) : [];
 
   const activePlansCount = floorList.filter(f => f.status === 'ACTIVE').length;
 

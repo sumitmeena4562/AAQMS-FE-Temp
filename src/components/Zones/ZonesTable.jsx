@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QrCode } from 'lucide-react';
 
-const ZonesTable = () => {
+const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false }) => {
     const navigate = useNavigate();
     return (
         <div className="bg-card border border-border-main rounded-xl shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] flex flex-col w-full overflow-hidden">

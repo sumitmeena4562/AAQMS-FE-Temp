@@ -5,8 +5,7 @@ import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import useUserStore from '../../store/userStore';
 import { useFilterStore } from '../../store/useFilterStore';
-import { organizations } from '../../data/mockFilterData';
-import { generateSitePlansForCoordinator } from '../../utils/mockSiteData';
+import { organizations, sites, floors, zones } from '../../data/mockFilterData';
 import { FiHome, FiBriefcase, FiGrid, FiList } from 'react-icons/fi';
 
 const AssignedCoordinators = () => {
@@ -41,16 +40,19 @@ const AssignedCoordinators = () => {
   const orgUsers = isOrgSelected ? users.filter(u => u.organization === orgName) : [];
 
   const coordinatorsList = orgUsers.map(user => {
-    const plans = generateSitePlansForCoordinator(user.id, user.organization);
-    const totalZones = plans.reduce((acc, plan) => acc + plan.stats.zones, 0);
+    // True Relational Cascade
+    const userSites = sites.filter(s => s.coordId?.toString() === user.id.toString());
+    const siteIds = userSites.map(s => s.id);
+    const userFloors = floors.filter(f => siteIds.includes(f.siteId));
+    const floorIds = userFloors.map(f => f.id);
+    const userZones = zones.filter(z => floorIds.includes(z.floorId));
 
     return {
       name: user.name,
       id: `USER-${user.id.toString().padStart(3, '0')}`,
       status: user.status === 'active' ? 'ACTIVE' : 'AWAY',
-      sites: plans.length,
-      zones: totalZones,
-      sitePlans: plans,
+      sites: userSites.length,
+      zones: userZones.length,
       image: null
     };
   });

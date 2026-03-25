@@ -8,9 +8,9 @@ import Button from '../../components/UI/Button';
 import { FiSquare, FiCheckSquare } from 'react-icons/fi';
 import { List } from 'lucide-react';
 import { useFilterStore } from '../../store/useFilterStore';
-import { organizations, coordinators, sites, floors } from '../../data/mockFilterData';
+import { organizations, coordinators, sites, floors, zones, assets } from '../../data/mockFilterData';
 import { FiHome, FiBriefcase } from 'react-icons/fi';
-import { ZONES_DATA } from '../../data/zones';
+import { Fuel, Truck, Layout, Monitor } from 'lucide-react';
 
 const Zones = () => {
     const [activeView, setActiveView] = useState('list');
@@ -59,13 +59,35 @@ const Zones = () => {
     const siteInfo = activeSiteId ? sites.find(s => s.id === activeSiteId) : null;
     const floorInfo = activeFloorId ? floors.find(f => f.id === activeFloorId) : null;
 
+    const floorZones = useMemo(() => {
+        if (!activeFloorId) return [];
+        return zones.filter(z => z.floorId === activeFloorId).map(z => {
+            const zoneAssets = assets.filter(a => a.zoneId === z.id);
+            let Icon = Layout;
+            let bgClass = 'bg-blue-50';
+            let txtClass = 'text-blue-600';
+            
+            if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
+            if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
+            if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
+
+            return {
+                ...z,
+                icon: Icon,
+                iconBgClass: bgClass,
+                iconTextClass: txtClass,
+                count: `${zoneAssets.length} Assets`
+            };
+        });
+    }, [activeFloorId]);
+
     const filteredZones = useMemo(() => {
-        let result = [...ZONES_DATA];
+        let result = [...floorZones];
         if (filters.zoneType) {
             result = result.filter(z => z.type === filters.zoneType);
         }
         return result;
-    }, [filters.zoneType]);
+    }, [floorZones, filters.zoneType]);
 
     const breadcrumbs = [
         { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
@@ -106,7 +128,7 @@ const Zones = () => {
                     <div className="flex flex-wrap items-center gap-2 flex-1">
                         <FilterDropdown
                             label="Zone Type"
-                            options={['Storage', 'Loading Bay', 'Office']}
+                            options={['Storage', 'Logistics', 'Office', 'Data Room', 'Infrastructure', 'Security', 'HVAC']}
                             value={filters.zoneType}
                             onChange={(v) => setFilters(prev => ({ ...prev, zoneType: v }))}
                             allLabel="All Types"

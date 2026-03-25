@@ -40,7 +40,9 @@ const OrgLogo = ({ org }) => {
 
 const Organizations = () => {
     // 🔹 Map Zustand Store state and actions explicitly
-    const { orgs, addOrg, updateOrg, removeOrg, fetchOrgs, isLoading, page, totalPages, totalCount, searchTerm } = useOrgStore();
+    const { orgs, addOrg, updateOrg, removeOrg } = useOrgStore();
+    const isLoading = false;
+    const [searchQuery, setSearchQuery] = useState("");
     
     const [filters, setFilters] = useState({ industry: 'all', status: 'all', region: 'all' });
     const [viewMode, setViewMode] = useState('grid');
@@ -52,14 +54,14 @@ const Organizations = () => {
 
     useEffect(() => {
         if (users.length === 0) fetchUsers();
-        fetchOrgs(1, ""); // 🔹 Initial Fetch
-    }, []);
+    }, [users.length, fetchUsers]);
 
     const filteredOrgs = orgs.filter(org => {
         const matchesIndustry = filters.industry === 'all' || (org.industry || "") === filters.industry;
         const matchesStatus = filters.status === 'all' || (org.status || "") === filters.status;
         const matchesRegion = filters.region === 'all' || (org.region || "") === filters.region;
-        return matchesIndustry && matchesStatus && matchesRegion;
+        const matchesSearch = !searchQuery || org.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchesIndustry && matchesStatus && matchesRegion && matchesSearch;
     });
 
     const handleEdit = (org) => {
@@ -177,7 +179,7 @@ const Organizations = () => {
                         <Search 
                             placeholder="Search Organizations..." 
                             className="max-w-[200px]"
-                            onSearch={(query) => fetchOrgs(1, query)} // Resets to page 1 on search
+                            onSearch={(query) => setSearchQuery(query)}
                         />
                     </div>
 
@@ -360,31 +362,7 @@ const Organizations = () => {
                     </div>
                 )}
 
-                {/* 🔹 Pagination Controls */}
-                {!isLoading && orgs.length > 0 && totalPages > 1 && (
-                    <div className="flex items-center justify-between border-t border-border-main/50 pt-5 mt-4">
-                        <span className="text-[12px] font-medium text-gray">
-                            Showing page <span className="font-bold text-title">{page}</span> of <span className="font-bold text-title">{totalPages}</span> 
-                            &nbsp;({totalCount} total results)
-                        </span>
-                        <div className="flex items-center gap-2">
-                            <button 
-                                onClick={() => fetchOrgs(page - 1, searchTerm)}
-                                disabled={page === 1 || isLoading}
-                                className="px-4 py-1.5 text-[11px] font-bold tracking-wider uppercase bg-base text-body rounded-[var(--radius-button)] border border-border-main hover:bg-card hover:text-title disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                            >
-                                Previous
-                            </button>
-                            <button 
-                                onClick={() => fetchOrgs(page + 1, searchTerm)}
-                                disabled={page >= totalPages || isLoading}
-                                className="px-4 py-1.5 text-[11px] font-bold tracking-wider uppercase bg-base text-body rounded-[var(--radius-button)] border border-border-main hover:bg-card hover:text-title disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                            >
-                                Next
-                            </button>
-                        </div>
-                    </div>
-                )}
+                {/* 🔹 Pagination Controls Removed (Persisted Store logic) */}
             </div>
 
             {/* Create Organization Modal */}
