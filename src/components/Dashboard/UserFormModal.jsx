@@ -68,7 +68,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     } = useForm({
         resolver: zodResolver(userSchema),
         defaultValues: {
-            name: '', email: '', organization: '', role: '', 
+            firstName: '', lastName: '', email: '', organization: '', role: '', 
             assignment: 'standby', status: 'active',
             region: '', employeeId: '', equipmentId: '', 
             phoneNumber: '', designation: ''
@@ -90,9 +90,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
         if (user) {
             reset({
-                name: user.name || '',
+                firstName: user.first_name || '',
+                lastName: user.last_name || '',
                 email: user.email || '',
-                organization: user.organization || '',
                 role: user.role || '',
                 assignment: user.assignment || 'standby',
                 status: user.status || 'active',
@@ -107,7 +107,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             setStep(1);
         } else {
             reset({ 
-                name: '', email: '', organization: '', role: '', 
+                firstName: '', lastName: '', email: '', organization: '', role: '', 
                 assignment: 'standby', status: 'active',
                 region: '', employeeId: '', equipmentId: '',
                 phoneNumber: '', designation: '', avatar: ''
@@ -120,7 +120,13 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     const onFormSubmit = async (data) => {
         setSubmitError('');
-        const result = await onSubmit(data);
+        // Map camelCase to snake_case for backend
+        const payload = {
+            ...data,
+            first_name: data.firstName,
+            last_name: data.lastName
+        };
+        const result = await onSubmit(payload);
         if (result?.success) {
             onClose();
         } else {
@@ -273,12 +279,22 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Basic Information</h3>
                                             </div>
 
-                                            <div className="col-span-2">
+                                            <div className="col-span-1">
                                                 <InputField
-                                                    label="Full Name"
-                                                    placeholder="Enter full name"
-                                                    {...register('name')}
-                                                    error={errors.name?.message}
+                                                    label="First Name"
+                                                    placeholder="e.g. John"
+                                                    {...register('firstName')}
+                                                    error={errors.firstName?.message}
+                                                    required
+                                                />
+                                            </div>
+
+                                            <div className="col-span-1">
+                                                <InputField
+                                                    label="Last Name"
+                                                    placeholder="e.g. Doe"
+                                                    {...register('lastName')}
+                                                    error={errors.lastName?.message}
                                                     required
                                                 />
                                             </div>
