@@ -23,7 +23,7 @@ export const registerSchema = z.object({
         .regex(/[0-9]/, { message: "Missing numerical digit" }),
     confirmPassword: z.string()
         .min(1, { message: "Please confirm your password" }),
-    role: z.enum(['admin', 'coordinator', 'field officer'], {
+    role: z.enum(['admin', 'coordinator', 'field_officer'], {
         errorMap: () => ({ message: "Stakeholder role is required" })
     }),
     termsAccepted: z.boolean().refine(val => val === true, {

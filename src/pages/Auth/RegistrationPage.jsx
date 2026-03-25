@@ -102,7 +102,7 @@ function RegistrationPage() {
                             options={[
                                 { label: 'Admin', value: 'admin' },
                                 { label: 'Coordinator', value: 'coordinator' },
-                                { label: 'Field Officer', value: 'field officer' }
+                                { label: 'Field Officer', value: 'field_officer' }
                             ]}
                             {...register('role')}
                             error={errors.role?.message}

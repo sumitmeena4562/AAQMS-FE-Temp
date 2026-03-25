@@ -108,9 +108,8 @@ const useAuthStore = create((set) => ({
       }
       toast.success("Logged out successfully");
     } catch (err) {
-      // Logout even if backend call fails
-      console.warn("Backend logout failed:", err.message);
-      toast.success("Logged out successfully");
+      console.error("Logout API failed:", err);
+      toast.success("Logged out successfully"); // Still show success toast
     } finally {
       storage.clearSession();
       set({ isAuthenticated: false, user: null, error: null });

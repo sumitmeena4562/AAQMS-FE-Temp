@@ -68,10 +68,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     } = useForm({
         resolver: zodResolver(userSchema),
         defaultValues: {
-            firstName: '', lastName: '', email: '', organization: '', role: '', 
+            first_name: '', last_name: '', email: '', organization: '', role: '', 
             assignment: 'standby', status: 'active',
-            region: '', zone: '', employeeId: '', 
-            phoneNumber: ''
+            region: '', employee_id: '', equipment_id: '', 
+            phone_number: '', designation: ''
         }
     });
 
@@ -90,18 +90,18 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
         if (user) {
             reset({
-                firstName: user.first_name || '',
-                lastName: user.last_name || '',
+                first_name: user.first_name || '',
+                last_name: user.last_name || '',
                 email: user.email || '',
                 organization: user.organization || '',
                 role: user.role || '',
                 assignment: user.assignment || 'standby',
                 status: user.status || 'active',
                 region: user.region || '',
-                zone: user.zone || '',
-                zone: user.zone || '',
-                employeeId: user.employee_id || '',
-                phoneNumber: user.phone_number || '',
+                employee_id: user.employee_id || '',
+                equipment_id: user.equipment_id || '',
+                phone_number: user.phone_number || '',
+                designation: user.designation || '',
                 avatar: user.avatar || ''
             });
             setImagePreview(user.avatar || null);
@@ -109,10 +109,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             setStep(1);
         } else {
             reset({ 
-                firstName: '', lastName: '', email: '', organization: '', role: '', 
+                first_name: '', last_name: '', email: '', organization: '', role: '', 
                 assignment: 'standby', status: 'active',
-                region: '', zone: '', employeeId: '',
-                phoneNumber: '', avatar: ''
+                region: '', employee_id: '', equipment_id: '',
+                phone_number: '', designation: '', avatar: ''
             });
             setShowWorkAssignment(false);
             setImagePreview(null);
@@ -123,26 +123,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     const onFormSubmit = async (data) => {
         setSubmitError('');
-        
-        // Map camelCase to snake_case for backend & remove frontend-only fields
-        const payload = {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            email: data.email,
-            role: data.role,
-            status: data.status,
-            assignment: data.assignment,
-            organization: data.organization || '',
-            region: data.region || '',
-            zone: data.zone || '',
-            employee_id: data.employeeId || '',
-            phone_number: data.phoneNumber || '',
-            avatar: data.avatar || '',
-            // No password — backend will email a setup link to the user
-            send_setup_email: !isEdit
-        };
-
-        const result = await onSubmit(payload);
+        const result = await onSubmit(data);
         if (result?.success) {
             onClose();
         } else {
@@ -299,8 +280,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 <InputField
                                                     label="First Name"
                                                     placeholder="e.g. John"
-                                                    {...register('firstName')}
-                                                    error={errors.firstName?.message}
+                                                    {...register('first_name')}
+                                                    error={errors.first_name?.message}
                                                     required
                                                 />
                                             </div>
@@ -309,8 +290,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 <InputField
                                                     label="Last Name"
                                                     placeholder="e.g. Doe"
-                                                    {...register('lastName')}
-                                                    error={errors.lastName?.message}
+                                                    {...register('last_name')}
+                                                    error={errors.last_name?.message}
                                                     required
                                                 />
                                             </div>
@@ -328,10 +309,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
                                             <div className="col-span-1">
                                                 <InputField
-                                                    label="Phone Number"
-                                                    placeholder="+1 (555) 000-0000"
-                                                    {...register('phoneNumber')}
-                                                    error={errors.phoneNumber?.message}
+                                                    label="Employee ID"
+                                                    placeholder="EMP-001"
+                                                    {...register('employee_id')}
+                                                    error={errors.employee_id?.message}
                                                 />
                                             </div>
 
@@ -433,7 +414,26 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 )}
                                             </div>
                                             
-                                            {/* Phone and Equipment fields removed from here as Phone is moved up and Equipment is deleted */}
+                                            {currentRole === 'field_officer' && (
+                                                <>
+                                                    <div className="col-span-1">
+                                                        <InputField
+                                                            label="Phone Number"
+                                                            placeholder="+1 (555) 000-0000"
+                                                            {...register('phone_number')}
+                                                            error={errors.phone_number?.message}
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-1">
+                                                        <InputField
+                                                            label="Equipment ID"
+                                                            placeholder="e.g. EQ-101"
+                                                            {...register('equipment_id')}
+                                                            error={errors.equipment_id?.message}
+                                                        />
+                                                    </div>
+                                                </>
+                                            )}
 
                                             <div className="col-span-2">
                                                 <label className="block text-[11px] font-bold text-gray mb-1.5 ml-1 uppercase tracking-wider">Operational Status</label>
