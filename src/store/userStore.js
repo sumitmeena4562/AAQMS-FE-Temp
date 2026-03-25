@@ -111,8 +111,8 @@ const useUserStore = create(
              */
             exportCSV: async () => {
                 try {
-                    const csv = await userService.exportCSV();
-                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const csvData = await userService.exportCSV();
+                    const blob = new Blob([csvData], { type: 'text/csv' });
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
@@ -165,11 +165,10 @@ const useUserStore = create(
         }), 
         {
             name: 'aaqms-user-filters',
-            version: 1, // Incremented version to trigger migration
+            version: 1, 
             migrate: (persistedState, version) => {
                 if (version === 0) {
-                    // MIGRATION: Purane filters ko naye format mein convert karna
-                    const state = persistedState;
+                    const state = { ...persistedState };
                     if (state.filters) {
                         if (state.filters.role === 'Coordinator') state.filters.role = 'coordinator';
                         if (state.filters.role === 'Field Officer') state.filters.role = 'field_officer';

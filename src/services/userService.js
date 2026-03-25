@@ -18,7 +18,6 @@ export const userService = {
                     search: search 
                 }
             });
-            // Backend se data 'results' array mein aata hai (standard DRF format)
             return response.data.results || response.data; 
         } catch (error) {
             console.error("User list fetch failed:", error);
@@ -87,17 +86,13 @@ export const userService = {
 
     getFilterOptions: async (filters = {}) => {
         try {
-            // Hum users list se hi unique values nikal lete hain (ya BE se mangwa sakte hain)
             const users = await userService.getUsers(filters);
-            
             const getUnique = (arr, key) => [...new Set(arr.map(u => u[key]).filter(Boolean))].sort();
-
             const roles = [
                 { value: 'admin', label: 'Admin' },
                 { value: 'coordinator', label: 'Coordinator' },
                 { value: 'field_officer', label: 'Field Officer' }
             ];
-
             return {
                 organizations: getUnique(users, 'organization'),
                 roles: roles,
