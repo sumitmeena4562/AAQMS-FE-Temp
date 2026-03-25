@@ -123,22 +123,30 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     const onFormSubmit = async (data) => {
         setSubmitError('');
-        // Map camelCase to snake_case for backend
+        
+        // Map camelCase to snake_case for backend & remove frontend-only fields
         const payload = {
-            ...data,
             first_name: data.firstName,
             last_name: data.lastName,
-            employee_id: data.employeeId,
-            equipment_id: data.equipmentId,
-            phone_number: data.phoneNumber,
+            email: data.email,
+            role: data.role,
+            status: data.status,
+            assignment: data.assignment,
+            organization: data.organization || '',
+            region: data.region || '',
+            zone: data.zone || '',
+            employee_id: data.employeeId || '',
+            phone_number: data.phoneNumber || '',
+            avatar: data.avatar || '',
             // No password — backend will email a setup link to the user
-            send_setup_email: true
+            send_setup_email: !isEdit
         };
+
         const result = await onSubmit(payload);
         if (result?.success) {
             onClose();
         } else {
-            setSubmitError(result?.error || 'Something went wrong');
+            setSubmitError(result.error || 'Failed to process request');
         }
     };
 
