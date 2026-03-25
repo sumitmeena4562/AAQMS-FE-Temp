@@ -5,6 +5,24 @@
 
 import api from "./api";
 
+/**
+ * Extract readable error message from API error response.
+ */
+const extractError = (error, fallback) => {
+    const data = error.response?.data;
+    if (!data) return error.message || fallback;
+    if (data.detail) return data.detail;
+    if (typeof data === 'object') {
+        const firstEntry = Object.entries(data).find(([, v]) => v);
+        if (firstEntry) {
+            const [key, val] = firstEntry;
+            const msg = Array.isArray(val) ? val[0] : val;
+            return key === 'non_field_errors' ? msg : `${key}: ${msg}`;
+        }
+    }
+    return fallback;
+};
+
 // --- SERVICE IMPLEMENTATION ---
 export const userService = {
     /**
@@ -20,8 +38,7 @@ export const userService = {
             });
             return response.data.results || response.data; 
         } catch (error) {
-            console.error("User list fetch failed:", error);
-            throw error;
+            throw new Error(extractError(error, 'Failed to load user list. Please refresh the page.'));
         }
     },
 
@@ -33,8 +50,7 @@ export const userService = {
             const response = await api.post('/accounts/users/', userData);
             return response.data;
         } catch (error) {
-            const msg = error.response?.data?.detail || error.response?.data?.email?.[0] || 'Email already exists';
-            throw new Error(msg);
+            throw new Error(extractError(error, 'Failed to create user. Please check all fields.'));
         }
     },
 
@@ -43,8 +59,7 @@ export const userService = {
             const response = await api.patch(`/accounts/users/${id}/`, updates);
             return response.data;
         } catch (error) {
-            const msg = error.response?.data?.detail || 'Failed to update user';
-            throw new Error(msg);
+            throw new Error(extractError(error, 'Failed to update user profile.'));
         }
     },
 
@@ -53,8 +68,7 @@ export const userService = {
             await api.delete(`/accounts/users/${id}/`);
             return true;
         } catch (error) {
-            console.error("Delete failed:", error);
-            throw error;
+            throw new Error(extractError(error, 'Failed to delete user.'));
         }
     },
 
@@ -63,11 +77,13 @@ export const userService = {
      */
     bulkAction: async (ids, action) => {
         try {
-            const response = await api.post('/accounts/users/bulk-action/', { ids, action });
+            // Map frontend action names to backend expected values
+            const actionMap = { 'activate': 'active', 'deactivate': 'deactive' };
+            const backendAction = actionMap[action] || action;
+            const response = await api.post('/accounts/users/bulk-action/', { ids, action: backendAction });
             return response.data;
         } catch (error) {
-            console.error("Bulk action failed:", error);
-            throw error;
+            throw new Error(extractError(error, 'Bulk action failed. Please try again.'));
         }
     },
 
@@ -79,14 +95,14 @@ export const userService = {
             const response = await api.get('/accounts/users/stats/');
             return response.data;
         } catch (error) {
-            console.error("Stats fetch failed:", error);
             return { total: 0, active: 0, inactive: 0, unassigned: 0 };
         }
     },
 
-    getFilterOptions: async (filters = {}) => {
+    getFilterOptions: async (filters = {}, existingUsers = null) => {
         try {
-            const users = await userService.getUsers(filters);
+            // Use existing users data if available, avoid duplicate API call
+            const users = existingUsers || await userService.getUsers(filters);
             const getUnique = (arr, key) => [...new Set(arr.map(u => u[key]).filter(Boolean))].sort();
             const roles = [
                 { value: 'admin', label: 'Admin' },
@@ -111,8 +127,7 @@ export const userService = {
             const response = await api.get('/accounts/users/export/', { responseType: 'blob' });
             return response.data;
         } catch (error) {
-            console.error("Export failed:", error);
-            throw error;
+            throw new Error(extractError(error, 'CSV export failed. Please try again.'));
         }
     }
 };

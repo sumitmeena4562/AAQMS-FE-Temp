@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { userService } from '../services/userService';
+import toast from 'react-hot-toast';
 
 /**
  * USER STORE
@@ -33,16 +34,20 @@ const useUserStore = create(
                 try {
                     const { search, filters } = get();
                     
-                    // Parallel Requests for performance
-                    const [users, stats, filterOptions] = await Promise.all([
+                    // Fetch users and stats in parallel
+                    const [users, stats] = await Promise.all([
                         userService.getUsers(filters, search),
                         userService.getUserStats(),
-                        userService.getFilterOptions(filters)
                     ]);
+
+                    // Derive filter options from already-fetched users (avoid duplicate API call)
+                    const filterOptions = await userService.getFilterOptions(filters, users);
 
                     set({ users, stats, filterOptions, loading: false });
                 } catch (err) {
-                    set({ error: err.message, loading: false });
+                    const msg = err.message || 'Failed to load users';
+                    set({ error: msg, loading: false });
+                    toast.error(msg);
                 }
             },
 
@@ -56,8 +61,10 @@ const useUserStore = create(
                     await get().fetchUsers(); // Refresh list
                     return { success: true };
                 } catch (err) {
-                    set({ loading: false, error: err.message });
-                    return { success: false, error: err.message };
+                    const msg = err.message || 'Failed to create user';
+                    set({ loading: false, error: msg });
+                    toast.error(msg);
+                    return { success: false, error: msg };
                 }
             },
 
@@ -68,8 +75,10 @@ const useUserStore = create(
                     await get().fetchUsers();
                     return { success: true };
                 } catch (err) {
-                    set({ loading: false, error: err.message });
-                    return { success: false, error: err.message };
+                    const msg = err.message || 'Failed to update user';
+                    set({ loading: false, error: msg });
+                    toast.error(msg);
+                    return { success: false, error: msg };
                 }
             },
 
@@ -82,8 +91,10 @@ const useUserStore = create(
                     await get().fetchUsers();
                     return { success: true };
                 } catch (err) {
-                    set({ loading: false, error: err.message });
-                    return { success: false, error: err.message };
+                    const msg = err.message || 'Failed to delete user';
+                    set({ loading: false, error: msg });
+                    toast.error(msg);
+                    return { success: false, error: msg };
                 }
             },
 
@@ -101,8 +112,10 @@ const useUserStore = create(
                     await get().fetchUsers();
                     return { success: true };
                 } catch (err) {
-                    set({ loading: false, error: err.message });
-                    return { success: false, error: err.message };
+                    const msg = err.message || 'Bulk action failed';
+                    set({ loading: false, error: msg });
+                    toast.error(msg);
+                    return { success: false, error: msg };
                 }
             },
 
@@ -120,7 +133,9 @@ const useUserStore = create(
                     link.click();
                     URL.revokeObjectURL(url);
                 } catch (err) {
-                    set({ error: err.message });
+                    const msg = err.message || 'CSV export failed';
+                    set({ error: msg });
+                    toast.error(msg);
                 }
             },
 

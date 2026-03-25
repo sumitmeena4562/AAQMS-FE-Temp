@@ -3,7 +3,6 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { userSchema } from '../../schema/userSchema';
-import { motion } from "framer-motion";
 import { 
     FiX, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle
 } from 'react-icons/fi';

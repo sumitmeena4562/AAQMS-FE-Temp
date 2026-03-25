@@ -1,4 +1,5 @@
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL, //this is Django backend URl
@@ -9,12 +10,17 @@ const api = axios.create({
 
 // Request intercepter: set on JWT token in header
 
+// Public endpoints jo bina token ke accessible hain
+const PUBLIC_ENDPOINTS = ['accounts/login/', 'accounts/token/refresh/'];
+
 api.interceptors.request.use(
     (config)=>{
-        const token = localStorage.getItem('token');
-        if(token){
-            config.headers.Authorization=`Bearer ${token}`;
-
+        const isPublic = PUBLIC_ENDPOINTS.some(url => config.url?.includes(url));
+        if (!isPublic) {
+            const token = localStorage.getItem('token');
+            if(token){
+                config.headers.Authorization=`Bearer ${token}`;
+            }
         }
         return config;
     },
@@ -34,7 +40,7 @@ api.interceptors.response.use(
 
             if (refreshToken) {
                 try {
-                    // Call the refresh endpoint (baseURL is http://localhost:8000/api)
+                    // Call the refresh endpoint
                     const response = await api.post('accounts/token/refresh/', {
                         refresh: refreshToken,
                     });
@@ -46,10 +52,11 @@ api.interceptors.response.use(
                     // Retry the original request with the new token
                     return api(originalRequest);
                 } catch (refreshError) {
-                    // Refresh token also failed - logout the user
+                    // Refresh token also failed - session expired
                     localStorage.removeItem('token');
                     localStorage.removeItem('refresh');
                     localStorage.removeItem('user');
+                    toast.error("Session expired. Please login again.");
                     window.location.href = '/login';
                 }
             }

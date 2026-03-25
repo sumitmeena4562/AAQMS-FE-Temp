@@ -5,11 +5,7 @@ export const loginSchema = z.object({
         .min(1, { message: "Email address is required" })
         .email({ message: "Invalid email format (e.g., user@company.com)" }),
     password: z.string()
-        .min(1, { message: "Password is required" })
-        .min(8, { message: "Security rule: Minimum 8 characters" })
-        .regex(/[a-z]/, { message: "Missing lowercase letter" })
-        .regex(/[A-Z]/, { message: "Missing uppercase letter" })
-        .regex(/[0-9]/, { message: "Missing numerical digit" }),
+        .min(1, { message: "Password is required" }),
     rememberMe: z.boolean().optional()
 });
 
