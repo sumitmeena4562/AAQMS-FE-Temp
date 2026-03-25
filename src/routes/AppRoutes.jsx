@@ -43,7 +43,6 @@ const AppRoutes = () => {
                     {/* Guest Access (Redirects if already logged in) */}
                     <Route element={<GuestRoute />}>
                         <Route path="/login" element={<Login />} />
-                        <Route path="/registration" element={<Registration />} />
                         <Route path="/forgot-password" element={<ForgotPassword />} />
                     </Route>
 

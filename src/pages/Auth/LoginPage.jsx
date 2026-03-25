@@ -42,17 +42,7 @@ function LoginPage() {
                     email: rememberedEmail || '',
                     rememberMe: !!rememberedEmail
                 }}
-                footer={
-                    <span className="font-semibold text-slate-500">
-                        Don&apos;t have access? 
-                        <a 
-                            href="/registration" 
-                            className="text-primary font-black ml-1.5 border-b-2 border-transparent hover:border-primary transition-all duration-300"
-                        >
-                            Register Here
-                        </a>
-                    </span>
-                }
+                footer={null}
             >
                 {({ register, errors, itemVariants }) => (
                     <>

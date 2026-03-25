@@ -14,7 +14,16 @@ import { useOrgStore } from '../../store/useOrgStore';
 
 const ROLE_DETAILS = [
     { 
-        id: 'Coordinator', 
+        id: 'admin', 
+        name: 'Admin', 
+        desc: 'Full administrative control: Manage users, organizations, and global settings.', 
+        icon: <FiLayers size={18} />,
+        color: 'text-amber-600',
+        bg: 'bg-amber-50',
+        border: 'border-amber-100',
+    },
+    { 
+        id: 'coordinator', 
         name: 'Coordinator', 
         desc: 'Strategic oversight: Manage regional assets, field units, and operational workflows.', 
         icon: <FiLayers size={18} />,
@@ -23,7 +32,7 @@ const ROLE_DETAILS = [
         border: 'border-sky-100',
     },
     { 
-        id: 'Field Officer', 
+        id: 'field officer', 
         name: 'Field Officer', 
         desc: 'Tactical execution: On-site inspections, direct asset management, and data logging.', 
         icon: <FiActivity size={18} />,
