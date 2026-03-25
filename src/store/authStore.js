@@ -33,12 +33,19 @@ const useAuthStore = create((set) => ({
   /**
    * LOGIN: Backend se authenticate hona aur session save karna.
    */
-  login: async ({ email, password }) => {
+  login: async ({ email, password, rememberMe }) => {
     set({ isLoading: true, error: null });
 
     try {
       // 1. Backend se Tokens le kar aana (baseURL is /api)
       const { data } = await api.post("accounts/login/", { email, password });
+
+      // Agar rememberMe true hai toh email save karein, warna remove karein
+        if (rememberMe) {
+            localStorage.setItem("rememberedEmail", email);
+        } else {
+            localStorage.removeItem("rememberedEmail");
+        }
       
       // 2. Tokens ko temporarily save karna taaki profile fetch authenticated ho
       // Hamare api.js interceptors localStorage se token read karte hain

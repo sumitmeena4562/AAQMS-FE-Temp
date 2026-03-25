@@ -41,11 +41,13 @@ function AuthForm({
     loadingText,
     footer,
     children,
-    grid = false
+    grid = false,
+    defaultValues = {}
 }) {
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(schema),
-        mode: 'onChange' // Enable real-time validation
+        mode: 'onChange',
+        defaultValues
     });
 
     const renderedChildren = typeof children === 'function'
