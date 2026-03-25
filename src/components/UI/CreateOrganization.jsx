@@ -45,7 +45,7 @@ const orgSchema = z.object({
   })
 });
 
-const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isViewOnly = false }) => {
+const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isViewOnly = false, isSubmitting = false }) => {
   const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, reset, trigger } = useForm({
     resolver: zodResolver(orgSchema),
     mode: "all",
@@ -104,7 +104,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
   };
 
   const submitForm = (data) => {
-    if (isViewOnly) return;
+    if (isViewOnly || isSubmitting) return;
     if (onSubmit) {
       onSubmit({
         id: org?.id || String(Date.now()),
@@ -171,7 +171,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                 {...register("name")}
                 error={errors.name?.message}
                 isValid={isNameValid}
-                disabled={isViewOnly}
+                disabled={isViewOnly || isSubmitting}
               />
               <SelectField
                 label="Industry Type"
@@ -183,7 +183,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                   "Healthcare",
                   "Education"
                 ]}
-                disabled={isViewOnly}
+                disabled={isViewOnly || isSubmitting}
               />
 
               <SelectField
@@ -195,7 +195,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                   "Commercial Building",
                   "Warehouse"
                 ]}
-                disabled={isViewOnly}
+                disabled={isViewOnly || isSubmitting}
               />
               <SelectField
                 label="Classification of Occupancy"
@@ -206,7 +206,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                   "Group B - Business",
                   "Group S - Storage"
                 ]}
-                disabled={isViewOnly}
+                disabled={isViewOnly || isSubmitting}
               />
 
               <InputField
@@ -215,7 +215,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                 required
                 {...register("contactPerson")}
                 error={errors.contactPerson?.message}
-                disabled={isViewOnly}
+                disabled={isViewOnly || isSubmitting}
               />
               <InputField
                 label="Contact Email"
@@ -224,7 +224,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                 required
                 {...register("contactEmail")}
                 error={errors.contactEmail?.message}
-                disabled={isViewOnly}
+                disabled={isViewOnly || isSubmitting}
               />
 
               <InputField
@@ -233,13 +233,13 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                 required
                 {...register("address")}
                 error={errors.address?.message}
-                disabled={isViewOnly}
+                disabled={isViewOnly || isSubmitting}
               />
               <InputField
                 label="Other Information (Optional)"
                 placeholder="Any additional details..."
                 {...register("otherInfo")}
-                disabled={isViewOnly}
+                disabled={isViewOnly || isSubmitting}
               />
             </div>
 
@@ -255,6 +255,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                     type="button"
                     onClick={() => setValue('imagery.extra', [...extraImages, ''], { shouldValidate: false, shouldDirty: true })}
                     className="bg-primary hover:bg-primary/90 text-white rounded-[var(--radius-button)] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors shadow-sm"
+                    disabled={isSubmitting}
                   >
                     <Plus size={14} strokeWidth={2.5} />
                     Add More
@@ -264,23 +265,23 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
 
               {/* Upload Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-[24px] pt-2">
-                <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url) => handleImage('north', url)} error={errors.imagery?.north?.message} disabled={isViewOnly} />
-                <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url) => handleImage('south', url)} error={errors.imagery?.south?.message} disabled={isViewOnly} />
-                <ImageUploadCard label="East View →" value={imageryValues?.east} onUpload={(url) => handleImage('east', url)} error={errors.imagery?.east?.message} disabled={isViewOnly} />
-                <ImageUploadCard label="West View ←" value={imageryValues?.west} onUpload={(url) => handleImage('west', url)} error={errors.imagery?.west?.message} disabled={isViewOnly} />
+                <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url) => handleImage('north', url)} error={errors.imagery?.north?.message} disabled={isViewOnly || isSubmitting} />
+                <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url) => handleImage('south', url)} error={errors.imagery?.south?.message} disabled={isViewOnly || isSubmitting} />
+                <ImageUploadCard label="East View →" value={imageryValues?.east} onUpload={(url) => handleImage('east', url)} error={errors.imagery?.east?.message} disabled={isViewOnly || isSubmitting} />
+                <ImageUploadCard label="West View ←" value={imageryValues?.west} onUpload={(url) => handleImage('west', url)} error={errors.imagery?.west?.message} disabled={isViewOnly || isSubmitting} />
                 {extraImages.map((value, index) => (
                   <ImageUploadCard
                     key={`extra-${index}`}
                     label={`Other View ${index + 1}`}
                     value={value}
                     onUpload={(url) => {
-                      if (isViewOnly) return;
+                      if (isViewOnly || isSubmitting) return;
                       const newExtra = [...extraImages];
                       newExtra[index] = url;
                       setValue('imagery.extra', newExtra, { shouldValidate: true, shouldDirty: true });
                     }}
                     error={errors.imagery?.extra?.[index]?.message}
-                    disabled={isViewOnly}
+                    disabled={isViewOnly || isSubmitting}
                   />
                 ))}
               </div>
@@ -292,7 +293,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                   <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Add Profile Logo</h3>
               </div>
               <div className="w-full lg:w-1/4 pb-4 pt-3">
-                <ImageUploadCard value={imageryValues?.profile} onUpload={(url) => handleImage('profile', url)} error={errors.imagery?.profile?.message} disabled={isViewOnly} />
+                <ImageUploadCard value={imageryValues?.profile} onUpload={(url) => handleImage('profile', url)} error={errors.imagery?.profile?.message} disabled={isViewOnly || isSubmitting} />
               </div>
             </div>
           </form>
@@ -305,16 +306,17 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                     type="button"
                     onClick={onClose} 
                     className="h-10 px-4 hover:bg-base rounded-[var(--radius-button)] text-[11px] font-bold uppercase tracking-wider text-gray hover:text-title transition-colors flex items-center justify-center"
+                    disabled={isSubmitting}
                 >
                     {isViewOnly ? 'Close' : 'Cancel'}
                 </button>
                 {!isViewOnly && (
                   <button
                     onClick={handleSubmit(submitForm)}
-                    disabled={!isValid}
-                    className={`h-10 bg-primary px-6 rounded-[var(--radius-button)] text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-2 ${!isValid ? 'bg-base text-white cursor-not-allowed border-transparent shadow-none' : 'bg-primary hover:bg-primary/95 text-white'}`}
+                    disabled={!isValid || isSubmitting}
+                    className={`h-10 px-6 rounded-[var(--radius-button)] text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-2 ${(!isValid || isSubmitting) ? 'bg-base text-gray cursor-not-allowed border-transparent shadow-none' : 'bg-primary hover:bg-primary/95 text-white'}`}
                   >
-                    {org ? 'Save Changes' : 'Create Organization'}
+                    {isSubmitting ? 'Saving...' : org ? 'Save Changes' : 'Create Organization'}
                   </button>
                 )}
             </div>

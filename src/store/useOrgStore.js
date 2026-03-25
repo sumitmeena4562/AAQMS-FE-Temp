@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { organizationService } from '../services/organizationService';
+import toast from 'react-hot-toast';
 
 /**
  * INITIAL DEMO DATA
@@ -114,31 +115,86 @@ const initialOrgs = [
 
 /**
  * ORGANIZATION STORE
- * Handles listing, adding, and updating organizations with automatic persistence.
+ * Connects to the real backend via organizationService, with robust error handling and loading states.
  */
-export const useOrgStore = create(
-  persist(
-    (set) => ({
-      // --- STATE ---
-      orgs: initialOrgs,
+export const useOrgStore = create((set, get) => ({
+  // --- STATE ---
+  orgs: [],
+  isLoading: false,
+  isSubmitting: false,
+  error: null,
 
-      // --- CORE ACTIONS ---
-      addOrg: (newOrg) => set((state) => ({
-        orgs: [...state.orgs, newOrg]
-      })),
-
-      updateOrg: (id, updatedOrg) => set((state) => ({
-        orgs: state.orgs.map(org => org.id === id ? { ...org, ...updatedOrg } : org)
-      })),
-
-      // removeOrg: (id) => set((state) => ({
-      //   orgs: state.orgs.filter(org => org.id !== id)
-      // })),
-
-      resetToDefault: () => set({ orgs: initialOrgs })
-    }),
-    {
-      name: 'aaqms_organizations_v2', // New version for clean slate if needed
+  // --- ACTIONS ---
+  fetchOrgs: async (filters = {}) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data } = await organizationService.getOrganizations(filters);
+      // If the backend returns empty or is not fully seeded properly yet, we can optionally use fallback data:
+      set({ orgs: data?.length ? data : initialOrgs, isLoading: false });
+    } catch (err) {
+      set({ 
+        error: err.message || "Failed to fetch organizations", 
+        // ⚠️ FALLBACK FOR DEMO PURPOSES: Remove this when backend is 100% online
+        orgs: initialOrgs, 
+        isLoading: false 
+      });
+      console.warn("Backend not reachable. Falling back to mock data.");
     }
-  )
-);
+  },
+
+  addOrg: async (newOrg) => {
+    set({ isSubmitting: true, error: null });
+    try {
+      const data = await organizationService.createOrganization(newOrg);
+      set((state) => ({ orgs: [...state.orgs, data.data || newOrg], isSubmitting: false }));
+      toast.success("Organization created successfully");
+      return true; // Used to close modals
+    } catch (err) {
+      set({ error: err.message, isSubmitting: false });
+      // ⚠️ FALLBACK FOR DEMO PURPOSES
+      set((state) => ({ orgs: [...state.orgs, { ...newOrg, id: Date.now().toString() }] }));
+      toast.success("Organization created locally (API offline)");
+      return true;
+    }
+  },
+
+  updateOrg: async (id, updatedOrg) => {
+    set({ isSubmitting: true, error: null });
+    try {
+      const data = await organizationService.updateOrganization(id, updatedOrg);
+      set((state) => ({
+        orgs: state.orgs.map(org => org.id === id ? { ...org, ...(data.data || updatedOrg) } : org),
+        isSubmitting: false
+      }));
+      toast.success("Organization updated successfully");
+      return true;
+    } catch (err) {
+      set({ error: err.message, isSubmitting: false });
+      // ⚠️ FALLBACK FOR DEMO PURPOSES
+      set((state) => ({
+        orgs: state.orgs.map(org => org.id === id ? { ...org, ...updatedOrg } : org)
+      }));
+      toast.success("Organization updated locally (API offline)");
+      return true;
+    }
+  },
+
+  removeOrg: async (id) => {
+    set({ isSubmitting: true, error: null });
+    try {
+      await organizationService.deleteOrganization(id);
+      set((state) => ({
+        orgs: state.orgs.filter(org => org.id !== id),
+        isSubmitting: false
+      }));
+      toast.success("Organization deleted successfully");
+    } catch (err) {
+      set({ error: err.message, isSubmitting: false });
+      // ⚠️ FALLBACK FOR DEMO PURPOSES
+      set((state) => ({
+        orgs: state.orgs.filter(org => org.id !== id)
+      }));
+      toast.success("Organization deleted locally (API offline)");
+    }
+  },
+}));

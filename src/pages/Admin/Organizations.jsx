@@ -39,9 +39,7 @@ const OrgLogo = ({ org }) => {
 };
 
 const Organizations = () => {
-    // 🔹 Map Zustand Store state and actions explicitly
-    const { orgs, addOrg, updateOrg, removeOrg } = useOrgStore();
-    const isLoading = false;
+    const { orgs, addOrg, updateOrg, removeOrg, fetchOrgs, isLoading, isSubmitting } = useOrgStore();
     const [searchQuery, setSearchQuery] = useState("");
     
     const [filters, setFilters] = useState({ industry: 'all', status: 'all', region: 'all' });
@@ -55,7 +53,8 @@ const Organizations = () => {
 
     useEffect(() => {
         if (users.length === 0) fetchUsers();
-    }, [users.length, fetchUsers]);
+        if (orgs.length === 0) fetchOrgs();
+    }, [users.length, fetchUsers, orgs.length, fetchOrgs]);
 
     const filteredOrgs = orgs.filter(org => {
         const matchesIndustry = filters.industry === 'all' || (org.industry || "") === filters.industry;
@@ -77,14 +76,17 @@ const Organizations = () => {
         setIsCreateModalOpen(true);
     };
 
-    const handleCreateOrUpdate = (data) => {
+    const handleCreateOrUpdate = async (data) => {
+        let success = false;
         if (editingOrg) {
-            updateOrg(editingOrg.id, data);
+            success = await updateOrg(editingOrg.id, data);
         } else {
-            addOrg(data);
+            success = await addOrg(data);
         }
-        setIsCreateModalOpen(false);
-        setEditingOrg(null);
+        if (success) {
+            setIsCreateModalOpen(false);
+            setEditingOrg(null);
+        }
     };
 
     const industryOptions = ['all', ...new Set(orgs.map(o => o.industry).filter(Boolean))].map(i => ({ 
@@ -379,6 +381,7 @@ const Organizations = () => {
                 isOpen={isCreateModalOpen} 
                 org={editingOrg}
                 isViewOnly={isViewOnly}
+                isSubmitting={isSubmitting}
                 onSubmit={handleCreateOrUpdate}
                 onClose={() => { setIsCreateModalOpen(false); setEditingOrg(null); setIsViewOnly(false); }}
             />

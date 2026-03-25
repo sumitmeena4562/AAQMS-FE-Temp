@@ -4,8 +4,8 @@ import PageHeader from '../../components/UI/PageHeader';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
 import DataTable from '../../components/UI/DataTable';
 import Badge from '../../components/UI/Badge';
-import { 
-    FiHome, FiBriefcase, FiBox, FiCheckCircle, 
+import {
+    FiHome, FiBriefcase, FiBox, FiCheckCircle,
     FiAlertCircle, FiClock, FiExternalLink, FiGrid,
     FiMonitor, FiLayout, FiRefreshCcw, FiPrinter,
     FiCpu, FiHardDrive, FiSmartphone, FiTablet,
@@ -14,7 +14,7 @@ import {
 import { generateGlobalInventory } from '../../utils/mockSiteData';
 import Button from '../../components/UI/Button';
 import FilterBar from '../../components/UI/FilterBar';
-import FilterDropdown from '../../components/UI/FilterDropdown';
+
 import { useOrgStore } from '../../store/useOrgStore';
 import AssetInventoryModal from '../../components/Admin/Inventory/AssetInventoryModal';
 import EmptyState from '../../components/Admin/Inventory/EmptyState';
@@ -57,21 +57,21 @@ const Inventory = () => {
     const location = useLocation();
     const [searchParams] = useSearchParams();
     const orgs = useOrgStore(state => state.orgs);
-    
+
     // Modal State
     const [selectedAsset, setSelectedAsset] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
+
     // Initial data load: Optimized memoization
     const initialData = useMemo(() => generateGlobalInventory(orgs), [orgs.length]);
-    
+
     // Filter State
-    const [filters, setFilters] = useState({ 
-        org: 'all', 
-        floor: 'all', 
+    const [filters, setFilters] = useState({
+        org: 'all',
+        floor: 'all',
         zone: 'all',
-        type: [], 
-        status: [] 
+        type: [],
+        status: []
     });
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState('list'); // 'list' | 'grid'
@@ -97,23 +97,23 @@ const Inventory = () => {
     }, [searchParams]);
 
     const handleReset = () => {
-        setFilters({ org: 'all', floor: 'all', zone: 'all', type: [], status: [] }); 
+        setFilters({ org: 'all', floor: 'all', zone: 'all', type: [], status: [] });
         setSearchQuery('');
     };
 
     const filteredInventory = useMemo(() => {
         return initialData.filter(item => {
-            const matchesSearch = searchQuery === '' || 
-                (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())) || 
+            const matchesSearch = searchQuery === '' ||
+                (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
                 (item.uniqueId && item.uniqueId.toLowerCase().includes(searchQuery.toLowerCase())) ||
                 (item.model && item.model.toLowerCase().includes(searchQuery.toLowerCase()));
-            
+
             const matchesOrg = !filters.org || filters.org === 'all' || item.org === filters.org;
             const matchesFloor = !filters.floor || filters.floor === 'all' || item.floor === filters.floor;
             const matchesZone = !filters.zone || filters.zone === 'all' || item.zoneId === filters.zone;
             const matchesType = !filters.type || filters.type.length === 0 || filters.type.includes(item.type);
             const matchesStatus = !filters.status || filters.status.length === 0 || filters.status.includes(item.status);
-            
+
             return matchesSearch && matchesOrg && matchesFloor && matchesZone && matchesType && matchesStatus;
         });
     }, [initialData, filters, searchQuery]);
@@ -128,8 +128,8 @@ const Inventory = () => {
     }, [initialData, filters.org]);
 
     const zoneOptions = useMemo(() => {
-        const relevantZones = initialData.filter(i => 
-            (!filters.org || filters.org === 'all' || i.org === filters.org) && 
+        const relevantZones = initialData.filter(i =>
+            (!filters.org || filters.org === 'all' || i.org === filters.org) &&
             (!filters.floor || filters.floor === 'all' || i.floor === filters.floor)
         );
         const zones = [...new Set(relevantZones.map(i => i.zoneId).filter(Boolean))];
@@ -154,39 +154,39 @@ const Inventory = () => {
         const pending = filteredInventory.filter(i => i.status === 'Pending').length;
 
         return [
-            { 
-                label: "Assets", 
-                value: total, 
-                icon: FiBox, 
-                iconBgClass: "bg-blue-50", 
+            {
+                label: "Assets",
+                value: total,
+                icon: FiBox,
+                iconBgClass: "bg-blue-50",
                 iconColorClass: "text-blue-500",
                 description: "Live system count",
                 trend: 12
             },
-            { 
-                label: "Verified", 
-                value: verified, 
-                icon: FiCheckCircle, 
-                iconBgClass: "bg-emerald-50", 
+            {
+                label: "Verified",
+                value: verified,
+                icon: FiCheckCircle,
+                iconBgClass: "bg-emerald-50",
                 iconColorClass: "text-emerald-500",
                 description: "AI confirmed",
                 trend: 8
             },
-            { 
-                label: "Mismatches", 
-                value: mismatches, 
-                icon: FiAlertCircle, 
-                iconBgClass: "bg-rose-50", 
+            {
+                label: "Mismatches",
+                value: mismatches,
+                icon: FiAlertCircle,
+                iconBgClass: "bg-rose-50",
                 iconColorClass: "text-rose-500",
                 description: "Requires attention",
                 trend: -2,
                 changeType: 'negative'
             },
-            { 
-                label: "Pending", 
-                value: pending, 
-                icon: FiClock, 
-                iconBgClass: "bg-amber-50", 
+            {
+                label: "Pending",
+                value: pending,
+                icon: FiClock,
+                iconBgClass: "bg-amber-50",
                 iconColorClass: "text-amber-500",
                 description: "Review queue",
                 trend: 4
@@ -438,16 +438,16 @@ const Inventory = () => {
                                     Showing <span className="text-body font-black">{displayedInventory.length > 0 ? startIndex + 1 : 0} to {startIndex + displayedInventory.length}</span> of <span className="text-body font-black">{filteredInventory.length}</span> results
                                 </span>
                                 <div className="flex items-center gap-1.5">
-                                    <Button 
-                                        variant="outline" 
+                                    <Button
+                                        variant="outline"
                                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                         disabled={currentPage === 1}
                                         className={`!h-8 !px-3 !text-[10px] !font-black !uppercase !tracking-widest ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         Previous
                                     </Button>
-                                    <Button 
-                                        variant="outline" 
+                                    <Button
+                                        variant="outline"
                                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                         disabled={currentPage === totalPages || totalPages === 0}
                                         className={`!h-8 !px-4 !text-[10px] !font-black !uppercase !tracking-widest ${currentPage === totalPages || totalPages === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -463,10 +463,10 @@ const Inventory = () => {
                         {displayedInventory.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-5 gap-5">
                                 {displayedInventory.map(asset => (
-                                    <AssetCard 
-                                        key={asset.id} 
-                                        asset={asset} 
-                                        onClick={handleAssetClick}  
+                                    <AssetCard
+                                        key={asset.id}
+                                        asset={asset}
+                                        onClick={handleAssetClick}
                                     />
                                 ))}
                             </div>
@@ -481,8 +481,8 @@ const Inventory = () => {
                                     Showing <span className="text-body font-black">{startIndex + 1} to {startIndex + displayedInventory.length}</span> of <span className="text-body font-black">{filteredInventory.length}</span> results
                                 </span>
                                 <div className="flex items-center gap-2">
-                                    <Button 
-                                        variant="outline" 
+                                    <Button
+                                        variant="outline"
                                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                         disabled={currentPage === 1}
                                         className="!h-9 !px-4 !text-[11px]"
@@ -492,8 +492,8 @@ const Inventory = () => {
                                     <div className="flex items-center gap-1 px-2 font-black text-[11px] text-title bg-base h-9 rounded-lg border border-border-main">
                                         {currentPage} / {totalPages}
                                     </div>
-                                    <Button 
-                                        variant="outline" 
+                                    <Button
+                                        variant="outline"
                                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                         disabled={currentPage === totalPages}
                                         className="!h-9 !px-4 !text-[11px]"
