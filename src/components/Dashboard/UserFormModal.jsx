@@ -93,13 +93,14 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 firstName: user.first_name || '',
                 lastName: user.last_name || '',
                 email: user.email || '',
+                organization: user.organization || '',
                 role: user.role || '',
                 assignment: user.assignment || 'standby',
                 status: user.status || 'active',
                 region: user.region || '',
-                employeeId: user.employeeId || '',
-                equipmentId: user.equipmentId || '',
-                phoneNumber: user.phoneNumber || '',
+                employeeId: user.employee_id || '',
+                equipmentId: user.equipment_id || '',
+                phoneNumber: user.phone_number || '',
                 designation: user.designation || '',
                 avatar: user.avatar || ''
             });
@@ -124,7 +125,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         const payload = {
             ...data,
             first_name: data.firstName,
-            last_name: data.lastName
+            last_name: data.lastName,
+            employee_id: data.employeeId,
+            equipment_id: data.equipmentId,
+            phone_number: data.phoneNumber
         };
         const result = await onSubmit(payload);
         if (result?.success) {

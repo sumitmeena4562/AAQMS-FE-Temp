@@ -96,10 +96,10 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate }) => {
                                 {[
                                     { icon: <FiShield size={14} />, label: "Role", value: user.role === 'field_officer' ? 'Field Officer' : user.role?.charAt(0).toUpperCase() + user.role?.slice(1) },
                                     { icon: <FiBriefcase size={14} />, label: "Organization", value: user.organization },
-                                    { icon: <FiMapPin size={14} />, label: "Location", value: user.region || 'North Zone' },
-                                    { icon: <FiCalendar size={14} />, label: "Joined", value: user.createdAt || '20 Mar 2024' },
-                                    { icon: <FiClock size={14} />, label: "Last Active", value: user.lastActive || 'Active Now' },
-                                    { icon: <FiUser size={14} />, label: "Employee ID", value: user.employeeId || 'EM-402' }
+                                    { icon: <FiMapPin size={14} />, label: "Region", value: user.region || 'Not Specified' },
+                                    { icon: <FiUser size={14} />, label: "Designation", value: user.designation || 'Staff' },
+                                    { icon: <FiCalendar size={14} />, label: "Joined", value: user.createdAt || 'Recent' },
+                                    { icon: <FiUser size={14} />, label: "Employee ID", value: user.employee_id || 'N/A' }
                                 ].map((item, idx) => (
                                     <div 
                                         key={idx}
