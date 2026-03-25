@@ -38,7 +38,7 @@ const useAuthStore = create((set) => ({
 
     try {
       // 1. Backend se Tokens le kar aana (baseURL is /api)
-      const { data } = await api.post("/accounts/login/", { email, password });
+      const { data } = await api.post("accounts/login/", { email, password });
       
       // 2. Tokens ko temporarily save karna taaki profile fetch authenticated ho
       // Hamare api.js interceptors localStorage se token read karte hain
@@ -46,8 +46,10 @@ const useAuthStore = create((set) => ({
       localStorage.setItem("refresh", data.refresh);
 
       // 3. User ka profile data fetch karna
-      const profile = await api.get("/accounts/profile/");
+      const profile = await api.get("accounts/profile/");
       const user = profile.data;
+      console.log(profile.data);
+      
 
       // 4. Poore session ko save karna (including user info)
       storage.saveSession(data.access, data.refresh, user);
