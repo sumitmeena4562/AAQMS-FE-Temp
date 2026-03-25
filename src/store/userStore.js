@@ -165,6 +165,20 @@ const useUserStore = create(
         }), 
         {
             name: 'aaqms-user-filters',
+            version: 1, // Incremented version to trigger migration
+            migrate: (persistedState, version) => {
+                if (version === 0) {
+                    // MIGRATION: Purane filters ko naye format mein convert karna
+                    const state = persistedState;
+                    if (state.filters) {
+                        if (state.filters.role === 'Coordinator') state.filters.role = 'coordinator';
+                        if (state.filters.role === 'Field Officer') state.filters.role = 'field_officer';
+                        if (state.filters.role === 'Admin') state.filters.role = 'admin';
+                    }
+                    return state;
+                }
+                return persistedState;
+            },
             partialize: (state) => ({ 
                 filters: state.filters, 
                 sortKey: state.sortKey, 

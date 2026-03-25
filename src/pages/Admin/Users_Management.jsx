@@ -53,7 +53,7 @@ export default function Users() {
     }, [debouncedSearch, filters, fetchUsers]);
 
     const sortedUsers = useMemo(() => {
-        const list = [...users];
+        const list = [...(users || [])];
         list.sort((a, b) => {
             const av = (a[sortKey] || '').toString().toLowerCase();
             const bv = (b[sortKey] || '').toString().toLowerCase();
@@ -200,10 +200,11 @@ export default function Users() {
                 <div className="flex justify-center">
                     <Badge 
                         variant="solid" 
-                        color={value === 'Coordinator' ? 'coordinator' : value === 'Admin' ? 'admin' : 'fieldOfficer'}
+                        color={value === 'coordinator' ? 'coordinator' : value === 'admin' ? 'admin' : 'fieldOfficer'}
                         className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
                     >
-                        {value}
+                        {/* Render human readable role name */}
+                        {value === 'field_officer' ? 'Field Officer' : value.charAt(0).toUpperCase() + value.slice(1)}
                     </Badge>
                 </div>
             )
@@ -511,7 +512,7 @@ export default function Users() {
                         className="flex items-center gap-2 px-6 py-2.5 bg-card border border-border-main rounded-xl text-xs font-black text-body hover:bg-base hover:border-border-hover transition-all shadow-sm active:scale-95"
                     >
                         <FiRefreshCw className="w-3.5 h-3.5" />
-                        Clear Criteria
+                        Clear Filters
                     </button>
                 </div>
             )}

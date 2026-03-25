@@ -32,7 +32,7 @@ const ROLE_DETAILS = [
         border: 'border-sky-100',
     },
     { 
-        id: 'field officer', 
+        id: 'field_officer', 
         name: 'Field Officer', 
         desc: 'Tactical execution: On-site inspections, direct asset management, and data logging.', 
         icon: <FiActivity size={18} />,
@@ -326,7 +326,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 />
                                             </div>
                                             
-                                            {currentRole === 'Coordinator' && (
+                                            {currentRole === 'coordinator' && (
                                                 <div className="col-span-2">
                                                     <InputField
                                                         label="Work Region / Area"
@@ -337,7 +337,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 </div>
                                             )}
                                             
-                                            {currentRole === 'Field Officer' && (
+                                            {currentRole === 'field_officer' && (
                                                 <>
                                                     <div className="col-span-1">
                                                         <InputField

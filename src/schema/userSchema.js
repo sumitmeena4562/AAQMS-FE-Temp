@@ -22,14 +22,14 @@ export const userSchema = z.object({
     assignment: z.string().default('unassigned'),
     avatar: z.string().optional(),
 }).superRefine((data, ctx) => {
-    if (data.role === 'Coordinator' && (!data.region || data.region.trim() === '')) {
+    if (data.role === 'coordinator' && (!data.region || data.region.trim() === '')) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Region is required for Coordinators",
             path: ["region"],
         });
     }
-    if (data.role === 'Field Officer') {
+    if (data.role === 'field_officer') {
         if (!data.phoneNumber || data.phoneNumber.trim() === '') {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,

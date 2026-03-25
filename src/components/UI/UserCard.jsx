@@ -87,10 +87,10 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
           <div className="flex items-center gap-1.5">
             <Badge 
                 variant="solid" 
-                color={user.role === 'Coordinator' ? 'coordinator' : user.role === 'Admin' ? 'admin' : 'fieldOfficer'}
+                color={user.role === 'coordinator' ? 'coordinator' : user.role === 'admin' ? 'admin' : 'fieldOfficer'}
                 className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
             >
-              {user.role}
+              {user.role === 'field_officer' ? 'Field Officer' : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
             </Badge>
             <Badge 
                 variant="light" 

@@ -94,7 +94,7 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate }) => {
                             {/* Details Grid */}
                             <div className="grid grid-cols-2 gap-3 mb-8">
                                 {[
-                                    { icon: <FiShield size={14} />, label: "Role", value: user.role },
+                                    { icon: <FiShield size={14} />, label: "Role", value: user.role === 'field_officer' ? 'Field Officer' : user.role?.charAt(0).toUpperCase() + user.role?.slice(1) },
                                     { icon: <FiBriefcase size={14} />, label: "Organization", value: user.organization },
                                     { icon: <FiMapPin size={14} />, label: "Location", value: user.region || 'North Zone' },
                                     { icon: <FiCalendar size={14} />, label: "Joined", value: user.createdAt || '20 Mar 2024' },
