@@ -1,6 +1,6 @@
 import React from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
-import { FiX, FiShield, FiBriefcase, FiClock, FiCalendar, FiEdit2, FiTrash2, FiMapPin, FiUser } from 'react-icons/fi';
+import { FiX, FiShield, FiBriefcase, FiClock, FiCalendar, FiEdit2, FiTrash2, FiMapPin, FiUser, FiPhone } from 'react-icons/fi';
 import { t } from '../../theme/theme';
 
 const AVATAR_COLORS = t.color.avatarGradients;
@@ -87,19 +87,29 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate }) => {
                                         `}>
                                             {user.status === 'active' ? 'Active' : 'Deactive'}
                                         </div>
+                                        {/* Dynamic Assignment Status */}
+                                        <div className={`
+                                            px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border
+                                            ${(user.organization || user.region || user.zone) 
+                                                ? 'bg-primary/5 text-primary border-primary/10' 
+                                                : 'bg-amber-50 text-amber-600 border-amber-100'}
+                                        `}>
+                                            {(user.organization || user.region || user.zone) ? 'Assigned' : 'Standby'}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Details Grid */}
+                            {/* Details Grid - Only showing fields with data */}
                             <div className="grid grid-cols-2 gap-3 mb-8">
                                 {[
                                     { icon: <FiShield size={14} />, label: "Role", value: user.role === 'field_officer' ? 'Field Officer' : user.role?.charAt(0).toUpperCase() + user.role?.slice(1) },
+                                    { icon: <FiPhone size={14} />, label: "Mobile Number", value: user.phone_number },
                                     { icon: <FiBriefcase size={14} />, label: "Organization", value: user.organization },
-                                    { icon: <FiMapPin size={14} />, label: user.role === 'field_officer' ? 'Assigned Zone' : 'Region', value: user.role === 'field_officer' ? (user.zone || 'No Zone') : (user.region || 'Not Specified') },
+                                    { icon: <FiMapPin size={14} />, label: user.role === 'field_officer' ? 'Assigned Zone' : 'Region', value: user.role === 'field_officer' ? user.zone : user.region },
                                     { icon: <FiCalendar size={14} />, label: "Joined Platform", value: user.created_at || 'Recent' },
-                                    { icon: <FiUser size={14} />, label: "System ID", value: user.employee_id || 'N/A' }
-                                ].map((item, idx) => (
+                                    { icon: <FiUser size={14} />, label: "Employee ID", value: user.employee_id || user.id }
+                                ].filter(item => item.value && item.value !== 'N/A' && item.value !== 'Not Specified' && item.value !== '').map((item, idx) => (
                                     <div 
                                         key={idx}
                                         className="p-3 bg-base border border-border-main rounded-[var(--radius-card)]"

@@ -6,7 +6,7 @@ import DotStatus from './DotStatus';
 
 const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) => {
   const isActive = user.status === 'active';
-  const isAssigned = user.assignment === 'assigned';
+  const isAssigned = !!(user.organization || user.region || user.zone);
 
   // Calculate Tenure (Days since created_at)
   const createdDate = new Date(user.created_at || '2024-01-01');
@@ -107,7 +107,7 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
           <div className="flex flex-col">
             <span className="text-[7.5px] font-black text-gray/60 uppercase tracking-widest mb-1 leading-none">Assignment: {user.role === 'field_officer' ? 'Org & Zone' : 'Org & Region'}</span>
             <div className="flex flex-col gap-0.5">
-                <span className="text-[11px] font-black text-body truncate">{user.organization || 'Freelance'}</span>
+                <span className="text-[11px] font-black text-body truncate">{user.organization || 'Unassigned'}</span>
                 <span className="text-[9px] font-bold text-gray/80 truncate">
                   {user.role === 'field_officer' ? (user.zone || 'No Zone') : (user.region || 'No Region')}
                 </span>

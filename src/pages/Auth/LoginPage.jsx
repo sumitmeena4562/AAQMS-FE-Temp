@@ -21,8 +21,17 @@ function LoginPage() {
         const result = await login(data);
         if (result.success) {
             console.log("Logged in user:", result.user.name);
-            toast.success(`Welcome back, ${result.user.name} !`);
-            navigate('/admin/dashboard');
+            toast.success(`Welcome back, ${result.user.name}!`);
+            
+            // Dynamic redirection based on role
+            const role = result.user.role;
+            if (role === 'coordinator') {
+                navigate('/coordinator/dashboard');
+            } else if (role === 'field_officer') {
+                navigate('/field-officer/dashboard');
+            } else {
+                navigate('/admin/dashboard');
+            }
         } else {
             toast.error(result.error || "Authentication failed. Please try again.");
         }

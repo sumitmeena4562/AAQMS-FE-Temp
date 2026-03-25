@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { userSchema } from '../../schema/userSchema';
 import { 
     FiX, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle, FiMail,
-    FiPlus, FiMapPin
+    FiPlus, FiMapPin, FiCheckCircle
 } from 'react-icons/fi';
 import Button from '../UI/Button';
 import InputField from '../UI/InputField';
@@ -70,7 +70,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         defaultValues: {
             first_name: '', last_name: '', email: '', organization: '', role: '', 
             assignment: 'standby', status: 'active',
-            region: '', employee_id: '', equipment_id: '', 
+            region: '', zone: '', employee_id: '', equipment_id: '', 
             phone_number: '', designation: ''
         }
     });
@@ -98,6 +98,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 assignment: user.assignment || 'standby',
                 status: user.status || 'active',
                 region: user.region || '',
+                zone: user.zone || '',
                 employee_id: user.employee_id || '',
                 equipment_id: user.equipment_id || '',
                 phone_number: user.phone_number || '',
@@ -123,7 +124,22 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     const onFormSubmit = async (data) => {
         setSubmitError('');
-        const result = await onSubmit(data);
+        
+        // Backend expects a password for new users. 
+        // We'll set a strong default and users will change it via setup link.
+        const payload = { ...data };
+        if (!isEdit && !payload.password) {
+            payload.password = 'Admin@123'; 
+        }
+
+        // Automatically determine assignment status
+        if (payload.organization || payload.region || payload.zone) {
+            payload.assignment = 'assigned';
+        } else {
+            payload.assignment = 'standby';
+        }
+
+        const result = await onSubmit(payload);
         if (result?.success) {
             onClose();
         } else {
@@ -309,12 +325,13 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
                                             <div className="col-span-1">
                                                 <InputField
-                                                    label="Employee ID"
-                                                    placeholder="EMP-001"
-                                                    {...register('employee_id')}
-                                                    error={errors.employee_id?.message}
+                                                    label="Phone Number"
+                                                    placeholder="+91-0000000000"
+                                                    {...register('phone_number')}
+                                                    error={errors.phone_number?.message}
                                                 />
                                             </div>
+
 
                                             {!isEdit && (
                                                 <div className="col-span-2 mt-2">
@@ -415,24 +432,11 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
                                             
                                             {currentRole === 'field_officer' && (
-                                                <>
-                                                    <div className="col-span-1">
-                                                        <InputField
-                                                            label="Phone Number"
-                                                            placeholder="+1 (555) 000-0000"
-                                                            {...register('phone_number')}
-                                                            error={errors.phone_number?.message}
-                                                        />
+                                                <div className="col-span-2 mt-2">
+                                                    <div className="flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-[11px] font-bold">
+                                                        <FiCheckCircle size={14} /> Field Officer access level granted
                                                     </div>
-                                                    <div className="col-span-1">
-                                                        <InputField
-                                                            label="Equipment ID"
-                                                            placeholder="e.g. EQ-101"
-                                                            {...register('equipment_id')}
-                                                            error={errors.equipment_id?.message}
-                                                        />
-                                                    </div>
-                                                </>
+                                                </div>
                                             )}
 
                                             <div className="col-span-2">

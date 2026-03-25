@@ -112,7 +112,40 @@ const useAuthStore = create((set) => ({
       toast.success("Logged out successfully"); // Still show success toast
     } finally {
       storage.clearSession();
-      set({ isAuthenticated: false, user: null, error: null });
+    }
+  },
+
+  /**
+   * REGISTER: Naya account create karna.
+   * Note: Backend endpoint 'accounts/register/' abhi implement hona baki hai.
+   */
+  register: async (userData) => {
+    set({ isLoading: true, error: null });
+    try {
+      // Name split logic (Full Name -> First/Last)
+      const names = userData.fullName.trim().split(/\s+/);
+      const first_name = names[0];
+      const last_name = names.slice(1).join(' ') || '';
+
+      const payload = {
+        first_name,
+        last_name,
+        email: userData.email,
+        password: userData.password,
+        role: userData.role
+      };
+
+      // Real API call (Assuming endpoint exists in future)
+      // const response = await api.post("accounts/register/", payload);
+      
+      // For now, simulating success to showcase the flow
+      await delay(1500);
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      const errorMsg = extractError(err, "Registration failed. Please try again.");
+      set({ error: errorMsg, isLoading: false });
+      return { success: false, error: errorMsg };
     }
   },
 

@@ -187,7 +187,7 @@ export default function Users() {
             width: '15%',
             render: (value) => (
                 <div className="flex flex-col min-w-0">
-                    <span className="text-[12px] font-black text-title truncate leading-none">{value || 'Contractor'}</span>
+                    <span className="text-[12px] font-black text-title truncate leading-none">{value || 'Unassigned'}</span>
                     <span className="text-[8px] text-gray font-black uppercase tracking-[0.1em] mt-1 truncate">Unit</span>
                 </div>
             )
@@ -202,7 +202,7 @@ export default function Users() {
                 <div className="flex justify-center">
                     <Badge 
                         variant="solid" 
-                        color={value === 'coordinator' ? 'coordinator' : value === 'admin' ? 'admin' : 'fieldOfficer'}
+                        color={value === 'coordinator' ? 'coordinator' : value === 'admin' ? 'admin' : 'field_officer'}
                         className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
                     >
                         {/* Render human readable role name */}
@@ -216,8 +216,8 @@ export default function Users() {
             accessor: 'assignment',
             width: '12%',
             align: 'center',
-            render: (value) => {
-                const isAssigned = value === 'assigned';
+            render: (_, row) => {
+                const isAssigned = !!(row.organization || row.region || row.zone);
                 return (
                     <div className="flex justify-center">
                         <Badge 
@@ -287,7 +287,7 @@ export default function Users() {
                 onExport={exportCSV}
                 breadcrumbs={[
                     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-                    { label: "User Management", path: "/admin/users", icon: <FiUser size={14} />, isActive: true }
+                    { label: "User Management", path: "/admin/users", icon: <FiUsers size={14} />, isActive: true }
                 ]}
                 rightContent={null}
             />
