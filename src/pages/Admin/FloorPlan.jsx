@@ -74,8 +74,8 @@ const FloorPlan = () => {
       {/* MAIN BODY */}
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
 
-        {/* CARDS LIST/GRID */}
-        <div className="flex flex-wrap gap-6">
+        {/* CARDS GRID (Standardized) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {floorsList.map((floor, index) => (
             <FloorCard 
               key={floor.id || index} 

@@ -59,10 +59,10 @@ export const generateSitePlansForCoordinator = (userId) => {
 
 export const generateFloorsForSite = (site) => {
   // Defensive check for missing stats (prevents crash on page refresh/direct nav)
-  const { floors = 1, zones = 1, assets = 10 } = site?.stats || { 
-    floors: 1, 
-    zones: 1, 
-    assets: 10 
+  const { floors = 3, zones = 12, assets = 150 } = site?.stats || { 
+    floors: 3, 
+    zones: 12, 
+    assets: 150 
   };
   
   const generatedFloors = [];
@@ -94,9 +94,16 @@ export const generateFloorsForSite = (site) => {
       name: isGround ? 'Ground Floor' : `Level ${i}`,
       description: isGround ? 'Reception, Lobby & Core Systems' : `Executive Suites, Offices & Workspaces`,
       status: 'ACTIVE',
+      image: [
+        "https://images.unsplash.com/photo-1497215728101-856f4ea42174?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=800&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=800&auto=format&fit=crop"
+      ][i % 3],
+      lastAudit: `2024-03-${15 + (i % 10)}`,
       stats: {
         zones: fZones,
-        assets: fAssets
+        assets: fAssets,
+        audits: Math.floor(Math.random() * 5) + 1
       }
     });
   }
