@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { userSchema } from '../../schema/userSchema';
 import { 
-    FiX, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle
+    FiX, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle, FiMail,
+    FiPlus, FiMapPin
 } from 'react-icons/fi';
 import Button from '../UI/Button';
 import InputField from '../UI/InputField';
@@ -42,12 +43,12 @@ const ROLE_DETAILS = [
 ];
 
 const STATUS_OPTIONS = ['active', 'deactive'];
-const DESIGNATIONS = ['Regional Manager', 'Senior Coordinator', 'Operations Lead', 'Compliance Officer'];
 
 const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false }) => {
     const isEdit = !!user;
     const [step, setStep] = useState(0);
     const [submitError, setSubmitError] = useState('');
+    const [showWorkAssignment, setShowWorkAssignment] = useState(false);
         // Image selection state
     const [imagePreview, setImagePreview] = useState(user?.avatar || null);
     const fileInputRef = useRef(null); // Ye hidden file input ko trigger karne ke liye hai
@@ -69,8 +70,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         defaultValues: {
             firstName: '', lastName: '', email: '', organization: '', role: '', 
             assignment: 'standby', status: 'active',
-            region: '', employeeId: '', equipmentId: '', 
-            phoneNumber: '', designation: ''
+            region: '', zone: '', employeeId: '', 
+            phoneNumber: ''
         }
     });
 
@@ -97,21 +98,23 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 assignment: user.assignment || 'standby',
                 status: user.status || 'active',
                 region: user.region || '',
+                zone: user.zone || '',
+                zone: user.zone || '',
                 employeeId: user.employee_id || '',
-                equipmentId: user.equipment_id || '',
                 phoneNumber: user.phone_number || '',
-                designation: user.designation || '',
                 avatar: user.avatar || ''
             });
             setImagePreview(user.avatar || null);
+            setShowWorkAssignment(!!user.organization);
             setStep(1);
         } else {
             reset({ 
                 firstName: '', lastName: '', email: '', organization: '', role: '', 
                 assignment: 'standby', status: 'active',
-                region: '', employeeId: '', equipmentId: '',
-                phoneNumber: '', designation: '', avatar: ''
+                region: '', zone: '', employeeId: '',
+                phoneNumber: '', avatar: ''
             });
+            setShowWorkAssignment(false);
             setImagePreview(null);
             setStep(0);
         }
@@ -127,7 +130,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             last_name: data.lastName,
             employee_id: data.employeeId,
             equipment_id: data.equipmentId,
-            phone_number: data.phoneNumber
+            phone_number: data.phoneNumber,
+            // No password — backend will email a setup link to the user
+            send_setup_email: true
         };
         const result = await onSubmit(payload);
         if (result?.success) {
@@ -302,7 +307,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 />
                                             </div>
 
-                                            <div className="col-span-2">
+                                            <div className="col-span-1">
                                                 <InputField
                                                     label="Email Address"
                                                     type="email"
@@ -313,82 +318,114 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 />
                                             </div>
 
-                                            {!isEdit && (
-                                                <div className="col-span-2">
-                                                    <InputField
-                                                        label="Account Password"
-                                                        type="password"
-                                                        placeholder="••••••••"
-                                                        {...register('password')}
-                                                        error={errors.password?.message}
-                                                        required
-                                                    />
-                                                </div>
-                                            )}
-
-                                            {/* Deployment Section */}
-                                            <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-border-main/50 mt-2">
-                                                <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Work Details</h3>
-                                            </div>
-
                                             <div className="col-span-1">
                                                 <InputField
-                                                    label="Employee ID"
-                                                    placeholder="EMP-001"
-                                                    {...register('employeeId')}
-                                                    error={errors.employeeId?.message}
+                                                    label="Phone Number"
+                                                    placeholder="+1 (555) 000-0000"
+                                                    {...register('phoneNumber')}
+                                                    error={errors.phoneNumber?.message}
                                                 />
                                             </div>
 
-                                            <div className="col-span-1">
-                                                <SelectField
-                                                    label="Designation"
-                                                    {...register('designation')}
-                                                    error={errors.designation?.message}
-                                                    options={DESIGNATIONS}
-                                                />
-                                            </div>
+                                            {!isEdit && (
+                                                <div className="col-span-2 mt-2">
+                                                    <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/10 rounded-2xl">
+                                                        <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                                                            <FiMail size={20} />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <div className="text-[13px] font-bold text-title mb-0.5">Setup link will be emailed</div>
+                                                            <p className="text-[11px] font-medium text-gray leading-relaxed text-pretty">
+                                                                For security, we don't set passwords manually. A secure link will be sent to <strong>{watch('email') || 'the user'}</strong> to set their own password.
+                                                            </p>
+                                                            <div className="mt-2 py-1 px-2.5 bg-primary/10 rounded-lg inline-flex items-center gap-2">
+                                                                <span className="text-[9px] font-black uppercase text-primary tracking-tighter">Auto-Gen</span>
+                                                                <span className="text-[10px] font-bold text-title">System ID (e.g. EMP-0001) will be assigned</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
 
-                                            <div className="col-span-2">
-                                                <SelectField
-                                                    label="Organization / Company"
-                                                    {...register('organization')}
-                                                    error={errors.organization?.message}
-                                                    options={dynamicOrganizations}
-                                                />
-                                            </div>
-                                            
-                                            {currentRole === 'coordinator' && (
-                                                <div className="col-span-2">
+
+
+                                            {isEdit && (
+                                                <div className="col-span-1">
                                                     <InputField
-                                                        label="Work Region / Area"
-                                                        placeholder="e.g. North Zone"
-                                                        {...register('region')}
-                                                        error={errors.region?.message}
+                                                        label="System ID"
+                                                        {...register('employeeId')}
+                                                        readOnly
+                                                        className="bg-gray/5"
                                                     />
                                                 </div>
                                             )}
+
+                                            {/* Designation field removed as per user request */}
+
+                                            <div className="col-span-2 mt-2">
+                                                {!showWorkAssignment ? (
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => setShowWorkAssignment(true)}
+                                                        className="w-full py-3 px-4 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:border-primary/30 transition-all flex items-center justify-center gap-2 group"
+                                                    >
+                                                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                            <FiPlus size={16} />
+                                                        </div>
+                                                        <span className="text-[13px] font-bold">Assign Work Area</span>
+                                                    </button>
+                                                ) : (
+                                                    <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 relative">
+                                                        <button 
+                                                            type="button"
+                                                            onClick={() => setShowWorkAssignment(false)}
+                                                            className="absolute top-3 right-3 text-gray hover:text-primary transition-colors"
+                                                            title="Remove assignment"
+                                                        >
+                                                            <FiX size={14} />
+                                                        </button>
+                                                        
+                                                        <div className="flex items-center gap-2 mb-4">
+                                                            <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
+                                                                <FiMapPin size={16} />
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-[12px] font-bold text-title leading-none">Assignment Details</div>
+                                                                <div className="text-[10px] font-medium text-gray leading-none mt-1">Linking user to operational units</div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="space-y-4">
+                                                            <SelectField
+                                                                label="Organization / Company"
+                                                                {...register('organization')}
+                                                                error={errors.organization?.message}
+                                                                options={dynamicOrganizations}
+                                                            />
+
+                                                            {currentRole === 'coordinator' && (
+                                                                <InputField
+                                                                    label="Work Region / Area"
+                                                                    placeholder="e.g. North Zone"
+                                                                    {...register('region')}
+                                                                    error={errors.region?.message}
+                                                                />
+                                                            )}
+
+                                                            {currentRole === 'field_officer' && (
+                                                                <InputField
+                                                                    label="Operational Zone"
+                                                                    placeholder="e.g. Zone A-101"
+                                                                    {...register('zone')}
+                                                                    error={errors.zone?.message}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                             
-                                            {currentRole === 'field_officer' && (
-                                                <>
-                                                    <div className="col-span-1">
-                                                        <InputField
-                                                            label="Phone Number"
-                                                            placeholder="+1 (555) 000-0000"
-                                                            {...register('phoneNumber')}
-                                                            error={errors.phoneNumber?.message}
-                                                        />
-                                                    </div>
-                                                    <div className="col-span-1">
-                                                        <InputField
-                                                            label="Equipment ID"
-                                                            placeholder="e.g. EQ-101"
-                                                            {...register('equipmentId')}
-                                                            error={errors.equipmentId?.message}
-                                                        />
-                                                    </div>
-                                                </>
-                                            )}
+                                            {/* Phone and Equipment fields removed from here as Phone is moved up and Equipment is deleted */}
 
                                             <div className="col-span-2">
                                                 <label className="block text-[11px] font-bold text-gray mb-1.5 ml-1 uppercase tracking-wider">Operational Status</label>

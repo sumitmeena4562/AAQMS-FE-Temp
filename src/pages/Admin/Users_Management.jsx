@@ -83,7 +83,9 @@ export default function Users() {
             : await store.createUser(data);
 
         if (res.success) {
-            toast.success(editingUser ? 'Profile updated successfully' : 'User created successfully');
+            toast.success(editingUser 
+                ? 'Profile updated successfully' 
+                : `User created! Setup link sent to ${data.email}`);
             setIsFormOpen(false);
             setEditingUser(null);
         } else {

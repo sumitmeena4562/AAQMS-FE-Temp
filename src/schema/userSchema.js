@@ -14,17 +14,14 @@ export const userSchema = z.object({
         .min(1, { message: "Organization is required" }),
     role: z.string()
         .min(1, { message: "Role is required" }),
-    employeeId: z.string()
-        .min(1, { message: "Employee ID is required" }),
-    designation: z.string()
-        .min(1, { message: "Designation is required" }),
+    employeeId: z.string().optional(),
     status: z.enum(['active', 'deactive']),
     region: z.string().optional(),
+    zone: z.string().optional(),
     phoneNumber: z.string().optional(),
-    equipmentId: z.string().optional(),
     assignment: z.string().default('standby'),
     avatar: z.string().optional(),
-    password: z.string().min(8, "Password must be at least 8 characters").optional(),
+    // No password field — backend generates setup link and emails user
 }).superRefine((data, ctx) => {
     if (data.role === 'coordinator' && (!data.region || data.region.trim() === '')) {
         ctx.addIssue({

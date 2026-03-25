@@ -57,16 +57,16 @@ const useAuthStore = create((set) => ({
   /**
    * LOGIN: Backend se authenticate hona aur session save karna.
    */
-  login: async ({ email, password, rememberMe }) => {
+  login: async ({ identifier, password, rememberMe }) => {
     set({ isLoading: true, error: null });
 
     try {
       // 1. Backend se Tokens le kar aana
-      const { data } = await api.post("accounts/login/", { email, password });
+      const { data } = await api.post("accounts/login/", { identifier, password });
 
       // Agar rememberMe true hai toh email save karein
         if (rememberMe) {
-            localStorage.setItem("rememberedEmail", email);
+            localStorage.setItem("rememberedEmail", identifier);
         } else {
             localStorage.removeItem("rememberedEmail");
         }

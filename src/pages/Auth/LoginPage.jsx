@@ -39,7 +39,7 @@ function LoginPage() {
                 submitText="Sign In"
                 loadingText="Signing in..."
                 defaultValues={{
-                    email: rememberedEmail || '',
+                    identifier: rememberedEmail || '',
                     rememberMe: !!rememberedEmail
                 }}
                 footer={null}
@@ -48,12 +48,12 @@ function LoginPage() {
                     <>
                         <motion.div variants={itemVariants}>
                             <InputField
-                                label="Email address"
-                                type="email"
-                                placeholder="name@company.com"
+                                label="Email or User ID"
+                                type="text"
+                                placeholder="name@company.com or EMP-001"
                                 icon={<MailIcon />}
-                                {...register('email')}
-                                error={errors.email?.message}
+                                {...register('identifier')}
+                                error={errors.identifier?.message}
                             />
                         </motion.div>
 
