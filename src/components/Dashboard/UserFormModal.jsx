@@ -69,7 +69,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         resolver: zodResolver(userSchema),
         defaultValues: {
             name: '', email: '', organization: '', role: '', 
-            assignment: 'unassigned', status: 'active',
+            assignment: 'standby', status: 'active',
             region: '', employeeId: '', equipmentId: '', 
             phoneNumber: '', designation: ''
         }
@@ -94,7 +94,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 email: user.email || '',
                 organization: user.organization || '',
                 role: user.role || '',
-                assignment: user.assignment || 'unassigned',
+                assignment: user.assignment || 'standby',
                 status: user.status || 'active',
                 region: user.region || '',
                 employeeId: user.employeeId || '',
@@ -108,7 +108,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         } else {
             reset({ 
                 name: '', email: '', organization: '', role: '', 
-                assignment: 'unassigned', status: 'active',
+                assignment: 'standby', status: 'active',
                 region: '', employeeId: '', equipmentId: '',
                 phoneNumber: '', designation: '', avatar: ''
             });
@@ -204,7 +204,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                         className="space-y-3 pt-3"
                                     >
                                         <div className="text-[12px] font-medium text-body mb-4 px-1">Select user role type</div>
-                                        {ROLE_DETAILS.map(role => (
+                                        {ROLE_DETAILS.filter(r => r.id !== 'admin').map(role => (
                                             <div
                                                 key={role.id}
                                                 onClick={() => handleRoleSelect(role.id)}
@@ -293,6 +293,19 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                     required
                                                 />
                                             </div>
+
+                                            {!isEdit && (
+                                                <div className="col-span-2">
+                                                    <InputField
+                                                        label="Account Password"
+                                                        type="password"
+                                                        placeholder="••••••••"
+                                                        {...register('password')}
+                                                        error={errors.password?.message}
+                                                        required
+                                                    />
+                                                </div>
+                                            )}
 
                                             {/* Deployment Section */}
                                             <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-border-main/50 mt-2">

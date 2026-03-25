@@ -19,8 +19,9 @@ export const userSchema = z.object({
     region: z.string().optional(),
     phoneNumber: z.string().optional(),
     equipmentId: z.string().optional(),
-    assignment: z.string().default('unassigned'),
+    assignment: z.string().default('standby'),
     avatar: z.string().optional(),
+    password: z.string().min(8, "Password must be at least 8 characters").optional(),
 }).superRefine((data, ctx) => {
     if (data.role === 'coordinator' && (!data.region || data.region.trim() === '')) {
         ctx.addIssue({
