@@ -68,6 +68,7 @@ const Inventory = () => {
     // Filter State
     const [filters, setFilters] = useState({ 
         org: 'all', 
+        site: 'all',
         floor: 'all', 
         zone: 'all',
         type: [], 
@@ -78,15 +79,17 @@ const Inventory = () => {
 
     // Handle URL Parameters (Initial Load)
     useEffect(() => {
+        const siteParam = searchParams.get('site');
         const zoneParam = searchParams.get('zone');
         const orgParam = searchParams.get('org');
         const floorParam = searchParams.get('floor');
         const typeParam = searchParams.get('type');
         const statusParam = searchParams.get('status');
 
-        if (zoneParam || orgParam || floorParam || typeParam || statusParam) {
+        if (siteParam || zoneParam || orgParam || floorParam || typeParam || statusParam) {
             setFilters(prev => ({
                 ...prev,
+                site: siteParam || prev.site,
                 zone: zoneParam || prev.zone,
                 org: orgParam || prev.org,
                 floor: floorParam || prev.floor,
@@ -97,7 +100,7 @@ const Inventory = () => {
     }, [searchParams]);
 
     const handleReset = () => {
-        setFilters({ org: 'all', floor: 'all', zone: 'all', type: [], status: [] }); 
+        setFilters({ org: 'all', building: 'all', floor: 'all', zone: 'all', type: [], status: [] }); 
         setSearchQuery('');
     };
 
@@ -109,32 +112,43 @@ const Inventory = () => {
                 (item.model && item.model.toLowerCase().includes(searchQuery.toLowerCase()));
             
             const matchesOrg = !filters.org || filters.org === 'all' || item.org === filters.org;
+            const matchesSite = !filters.site || filters.site === 'all' || item.site === filters.site;
             const matchesFloor = !filters.floor || filters.floor === 'all' || item.floor === filters.floor;
-            const matchesZone = !filters.zone || filters.zone === 'all' || item.zoneId === filters.zone;
+            const matchesZone = !filters.zone || filters.zone === 'all' || item.zone === filters.zone;
             const matchesType = !filters.type || filters.type.length === 0 || filters.type.includes(item.type);
             const matchesStatus = !filters.status || filters.status.length === 0 || filters.status.includes(item.status);
             
-            return matchesSearch && matchesOrg && matchesFloor && matchesZone && matchesType && matchesStatus;
+            return matchesSearch && matchesOrg && matchesSite && matchesFloor && matchesZone && matchesType && matchesStatus;
         });
     }, [initialData, filters, searchQuery]);
 
-    // Dropdown Options
+    // Dropdown Options - Enhanced Hierarchical Filtering
     const orgOptions = useMemo(() => orgs.map(o => ({ value: o.name, label: o.name })), [orgs]);
 
-    const floorOptions = useMemo(() => {
-        const relevantFloors = initialData.filter(i => !filters.org || filters.org === 'all' || i.org === filters.org);
-        const floors = [...new Set(relevantFloors.map(i => i.floor).filter(Boolean))];
-        return floors.map(f => ({ value: f, label: f }));
+    const siteOptions = useMemo(() => {
+        const relevantData = initialData.filter(i => !filters.org || filters.org === 'all' || i.org === filters.org);
+        const sites = [...new Set(relevantData.map(i => i.site).filter(Boolean))];
+        return sites.map(s => ({ value: s, label: s }));
     }, [initialData, filters.org]);
 
+    const floorOptions = useMemo(() => {
+        const relevantData = initialData.filter(i => 
+            (!filters.org || filters.org === 'all' || i.org === filters.org) &&
+            (!filters.site || filters.site === 'all' || i.site === filters.site)
+        );
+        const floors = [...new Set(relevantData.map(i => i.floor).filter(Boolean))];
+        return floors.map(f => ({ value: f, label: f }));
+    }, [initialData, filters.org, filters.site]);
+
     const zoneOptions = useMemo(() => {
-        const relevantZones = initialData.filter(i => 
+        const relevantData = initialData.filter(i => 
             (!filters.org || filters.org === 'all' || i.org === filters.org) && 
+            (!filters.site || filters.site === 'all' || i.site === filters.site) &&
             (!filters.floor || filters.floor === 'all' || i.floor === filters.floor)
         );
-        const zones = [...new Set(relevantZones.map(i => i.zoneId).filter(Boolean))];
-        return zones.map(z => ({ value: z, label: `Zone ${z}` }));
-    }, [initialData, filters.org, filters.floor]);
+        const zones = [...new Set(relevantData.map(i => i.zone).filter(Boolean))];
+        return zones.map(z => ({ value: z, label: z }));
+    }, [initialData, filters.org, filters.building, filters.floor]);
 
     const typeOptions = useMemo(() => {
         const types = [...new Set(initialData.map(i => i.type).filter(Boolean))];
@@ -248,8 +262,10 @@ const Inventory = () => {
             width: '14%',
             render: (_, row) => (
                 <div className="flex flex-col min-w-0">
-                    <span className="text-[11px] font-black text-title uppercase tracking-tighter truncate">{row.floor}</span>
-                    <span className="text-[10px] font-bold text-gray mt-0.5 truncate uppercase opacity-70">Zone {row.zoneId}</span>
+                    <span className="text-[12px] font-black text-title truncate tracking-tight">{row.site || 'Main Depot'}</span>
+                    <span className="text-[10px] font-bold text-gray/80 mt-0.5 truncate uppercase tracking-tighter">
+                        {row.floor} • {row.zone}
+                    </span>
                 </div>
             )
         },
@@ -354,8 +370,16 @@ const Inventory = () => {
                             label="Organization"
                             options={orgOptions}
                             value={filters.org}
-                            onChange={(v) => setFilters(prev => ({ ...prev, org: v, floor: 'all', zone: 'all' }))}
-                            allLabel="All Organization"
+                            onChange={(v) => setFilters(prev => ({ ...prev, org: v, building: 'all', floor: 'all', zone: 'all' }))}
+                            allLabel="All Org"
+                        />
+
+                        <FilterDropdown
+                            label="Site"
+                            options={siteOptions}
+                            value={filters.site}
+                            onChange={(v) => setFilters(prev => ({ ...prev, site: v, floor: 'all', zone: 'all' }))}
+                            allLabel="All Sites"
                         />
 
                         <FilterDropdown

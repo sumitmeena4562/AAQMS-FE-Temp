@@ -141,6 +141,9 @@ export const generateGlobalInventory = (orgs) => {
             icon = 'safety';
         }
 
+        const sites = ['Main Depot', 'Regional Hub', 'Service Center'];
+        const site = sites[i % sites.length];
+
         assets.push({
             id: i + 1,
             uniqueId: `ASSET-${2000 + i}`,
@@ -149,6 +152,7 @@ export const generateGlobalInventory = (orgs) => {
             model: `V${i + 1} Edition`,
             status: status,
             org: org,
+            site: site,
             floor: `Floor ${Math.floor(i / 10) + 1}`,
             zone: `Zone ${(i % 3) + 1}`,
             lastAudit: `2024-03-${10 + (i % 10)}`,
