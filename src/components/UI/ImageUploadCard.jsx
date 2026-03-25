@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { ImagePlus, X } from 'lucide-react';
 
-const ImageUploadCard = ({ label, value, onUpload, error, onBlur }) => {
+const ImageUploadCard = ({ label, value, onUpload, error, onBlur, disabled = false }) => {
   const fileInputRef = useRef(null);
 
   const handleClick = () => {
@@ -33,9 +33,10 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur }) => {
       <div className="w-full h-[120px] relative group">
         <button
           type="button"
-          onClick={handleClick}
+          onClick={() => !disabled && handleClick()}
           onBlur={onBlur}
-          className={`w-full h-full rounded-[var(--radius-card)] border border-dashed ${error ? 'border-red-500 bg-red-50/50' : 'border-border-main bg-base/50 hover:bg-base hover:border-blue-400'} flex flex-col items-center justify-center gap-2 transition-colors relative overflow-hidden`}
+          disabled={disabled}
+          className={`w-full h-full rounded-[var(--radius-card)] border border-dashed ${error ? 'border-red-500 bg-red-50/50' : 'border-border-main bg-base/50 ' + (!disabled ? 'hover:bg-base hover:border-blue-400' : 'cursor-default')} flex flex-col items-center justify-center gap-2 transition-colors relative overflow-hidden`}
         >
           {value ? (
             <img src={value} alt={label || "Profile"} className="absolute inset-0 w-full h-full object-cover" />
@@ -48,7 +49,7 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur }) => {
             </>
         )}
         </button>
-        {value && (
+        {value && !disabled && (
           <button
             type="button"
             onClick={(e) => {

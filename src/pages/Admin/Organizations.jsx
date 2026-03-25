@@ -46,6 +46,7 @@ const Organizations = () => {
     const [viewMode, setViewMode] = useState('grid');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingOrg, setEditingOrg] = useState(null);
+    const [isViewOnly, setIsViewOnly] = useState(false);
 
     const { setBreadcrumbs } = useBreadcrumb();
     const { users, fetchUsers } = useUserStore();
@@ -65,6 +66,13 @@ const Organizations = () => {
 
     const handleEdit = (org) => {
         setEditingOrg(org);
+        setIsViewOnly(false);
+        setIsCreateModalOpen(true);
+    };
+
+    const handleView = (org) => {
+        setEditingOrg(org);
+        setIsViewOnly(true);
         setIsCreateModalOpen(true);
     };
 
@@ -130,7 +138,7 @@ const Organizations = () => {
             <PageHeader 
                 title="Organizations" 
                 subtitle={`Managing ${filteredOrgs.length} strategic client entities and operational density`}
-                onAdd={() => { setEditingOrg(null); setIsCreateModalOpen(true); }}
+                onAdd={() => { setEditingOrg(null); setIsViewOnly(false); setIsCreateModalOpen(true); }}
                 addButtonText="Add Organization"
                 hideAddButton={false}
                 breadcrumbs={[
@@ -206,6 +214,7 @@ const Organizations = () => {
                                         org={org} 
                                         onDelete={() => removeOrg(org.id)}
                                         onEdit={() => handleEdit(org)}
+                                        onView={() => handleView(org)}
                                     />
                                 </div>
                             ))}
@@ -328,7 +337,7 @@ const Organizations = () => {
                                 }
                             ]}
                             data={filteredOrgs}
-                            onRowClick={(org) => handleEdit(org)}
+                            onRowClick={(org) => handleView(org)}
                         />
                     )
                 ) : (
@@ -355,8 +364,9 @@ const Organizations = () => {
             <CreateOrganization 
                 isOpen={isCreateModalOpen} 
                 org={editingOrg}
+                isViewOnly={isViewOnly}
                 onSubmit={handleCreateOrUpdate}
-                onClose={() => { setIsCreateModalOpen(false); setEditingOrg(null); }}
+                onClose={() => { setIsCreateModalOpen(false); setEditingOrg(null); setIsViewOnly(false); }}
             />
         </div>
     );

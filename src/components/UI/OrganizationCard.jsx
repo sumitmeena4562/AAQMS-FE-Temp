@@ -3,7 +3,7 @@ import useUserStore from '../../store/userStore';
 import { generateSitePlansForCoordinator } from '../../utils/mockSiteData';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 
-const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onDelete }) => {
+const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onDelete, onView }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const users = useUserStore(state => state.users);
@@ -47,7 +47,8 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     }
   }
 
-  const handleAction = () => {
+  const handleAction = (e) => {
+    if (e) e.stopPropagation();
     if (isSiteCard) {
       const currentOrg = location.state?.orgName || new URLSearchParams(location.search).get('org') || '';
       const coordName = coordinatorContext?.name || new URLSearchParams(location.search).get('coord') || '';
@@ -55,7 +56,8 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         state: { site: org, orgName: currentOrg, coordinator: coordinatorContext } 
       });
     } else {
-      navigate(`/admin/coordinators?org=${encodeURIComponent(org.name)}`, { state: { org } });
+      // Instead of navigating, open the view modal
+      onView?.(org);
     }
   };
 

@@ -11,6 +11,7 @@ const SelectField = forwardRef(({
     icon,
     error,
     required = false,
+    disabled = false,
     className = '',
     containerStyle = {},
     ...props
@@ -87,6 +88,7 @@ const SelectField = forwardRef(({
                     }}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
+                    disabled={disabled}
                     {...props}
                 >
                     <option value="" disabled hidden>Select an option</option>
