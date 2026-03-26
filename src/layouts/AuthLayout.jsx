@@ -108,7 +108,7 @@ const AuthLayout = ({ children }) => {
                     <Logo size="md" />
                 </div>
 
-                <div className="w-full max-w-[440px] mt-12 lg:mt-0">
+                <div className="w-full max-w-[440px] mt-12 lg:mt-0 relative">
                     {children}
                 </div>
             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 
 /* ── Animated Collapsible ── */
@@ -22,7 +22,13 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
     const location = useLocation();
     const [openMenus, setOpenMenus] = useState({});
 
-    const toggleMenu = (label) => setOpenMenus(p => ({ ...p, [label]: !p[label] }));
+    const navigate = useNavigate();
+    const toggleMenu = (item) => {
+        setOpenMenus(p => ({ ...p, [item.label]: !p[item.label] }));
+        if (item.path && location.pathname !== item.path) {
+            navigate(item.path);
+        }
+    };
 
     const isActive = useCallback((path) => location.pathname === path || location.pathname.startsWith(path + '/'), [location.pathname]);
     const isParentActive = useCallback((item) => 
@@ -63,7 +69,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         return (
             <div key={item.label} className="mb-0.5 group">
                 <button
-                    onClick={() => toggleMenu(item.label)}
+                    onClick={() => toggleMenu(item)}
                     className={`
                         w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 border-none outline-none cursor-pointer
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'justify-start'}

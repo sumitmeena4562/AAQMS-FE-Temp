@@ -19,8 +19,8 @@ import Inventory from "../pages/Admin/Inventory";
 const AdminRoutes = () => {
     return (
         <Routes>
-            <Route path="/" element={<AdminLayout />}>
-                <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="" element={<AdminLayout />}>
+                <Route index element={<Dashboard />} />
 
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="organizations" element={<Organizations />} />

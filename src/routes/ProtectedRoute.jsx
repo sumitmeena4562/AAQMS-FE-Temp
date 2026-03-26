@@ -12,9 +12,9 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
         return <Navigate to="/login" replace />;
     }
 
-    // 2. If no user data yet (loading), show nothing or a loader
+    // 2. If authenticated but no user data, session is stale — redirect to login
     if (!user && isAuthenticated) {
-        return null; // Or a loader component
+        return <Navigate to="/login" replace />;
     }
 
     // 3. If allowedRoles is provided, check if user has permission
