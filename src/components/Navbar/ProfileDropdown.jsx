@@ -59,7 +59,7 @@ const ProfileDropdown = () => {
                         <div className="overflow-hidden">
                             <div className="flex items-center gap-1.5 mb-0.5">
                                 <p className="text-title text-sm font-extrabold truncate leading-tight">{name}</p>
-                                <span className="text-[9px] font-black bg-primary text-white px-1.5 py-0.5 rounded uppercase tracking-wider">ADMIN</span>
+                                <span className="text-[9px] font-black bg-primary text-white px-1.5 py-0.5 rounded uppercase tracking-wider">{user?.role || 'USER'}</span>
                             </div>
                             <p className="text-gray text-[11px] font-semibold truncate">{email.toLowerCase()}</p>
                         </div>
