@@ -47,9 +47,15 @@ const AppRoutes = () => {
                     </Route>
 
                     {/* Role-Based Access (Protected) */}
-                    <Route element={<ProtectedRoute />}>
+                    <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                         <Route path="/admin/*" element={<AdminRoutes />} />
+                    </Route>
+
+                    <Route element={<ProtectedRoute allowedRoles={['coordinator']} />}>
                         <Route path="/coordinator/*" element={<CoordinatorRoutes />} />
+                    </Route>
+
+                    <Route element={<ProtectedRoute allowedRoles={['field_officer']} />}>
                         <Route path="/field-officer/*" element={<FieldOfficerRoutes />} />
                     </Route>
 

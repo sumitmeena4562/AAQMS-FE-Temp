@@ -10,9 +10,9 @@ const GuestRoute = () => {
     const { isAuthenticated, user } = useAuthStore();
 
     if (isAuthenticated) {
-        // Redirect based on role if available, or default to admin/dashboard
-        const redirectPath = user?.role === 'coordinator' ? '/coordinator' : 
-                            user?.role === 'field_officer' ? '/field-officer' : 
+        // Redirect based on role
+        const redirectPath = user?.role === 'coordinator' ? '/coordinator/dashboard' : 
+                            user?.role === 'field_officer' ? '/field-officer/dashboard' : 
                             '/admin/dashboard';
                             
         return <Navigate to={redirectPath} replace />;
