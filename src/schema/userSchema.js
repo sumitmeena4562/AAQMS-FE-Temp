@@ -21,5 +21,8 @@ export const userSchema = z.object({
     employee_id: z.string().optional().nullable(),
     designation: z.string().optional().nullable(),
     equipment_id: z.string().optional().nullable(),
-    password: z.string().min(8, "Password must be at least 8 characters").optional(),
+    password: z.string()
+        .min(8, { message: "Password must be at least 8 characters" })
+        .or(z.literal(''))
+        .optional(),
 });

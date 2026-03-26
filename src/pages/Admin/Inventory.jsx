@@ -100,7 +100,7 @@ const Inventory = () => {
     }, [searchParams]);
 
     const handleReset = () => {
-        setFilters({ org: 'all', building: 'all', floor: 'all', zone: 'all', type: [], status: [] }); 
+        setFilters({ org: 'all', site: 'all', floor: 'all', zone: 'all', type: [], status: [] }); 
         setSearchQuery('');
     };
 
@@ -148,7 +148,7 @@ const Inventory = () => {
         );
         const zones = [...new Set(relevantData.map(i => i.zone).filter(Boolean))];
         return zones.map(z => ({ value: z, label: z }));
-    }, [initialData, filters.org, filters.building, filters.floor]);
+    }, [initialData, filters.org, filters.site, filters.floor]);
 
     const typeOptions = useMemo(() => {
         const types = [...new Set(initialData.map(i => i.type).filter(Boolean))];
@@ -219,12 +219,6 @@ const Inventory = () => {
         setIsModalOpen(true);
     };
 
-    const handleAction = (asset, action) => {
-        if (action === 'view') {
-            setSelectedAsset(asset);
-            setIsModalOpen(true);
-        }
-    };
 
     const columns = useMemo(() => [
         {
@@ -437,7 +431,7 @@ const Inventory = () => {
                             </button>
                         </div>
 
-                        {(filters.org !== 'all' || filters.floor !== 'all' || filters.zone !== 'all' || filters.type.length > 0 || filters.status.length > 0 || searchQuery !== '') && (
+                        {(filters.org !== 'all' || filters.site !== 'all' || filters.floor !== 'all' || filters.zone !== 'all' || filters.type.length > 0 || filters.status.length > 0 || searchQuery !== '') && (
                             <button
                                 onClick={handleReset}
                                 className="h-8 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-lg bg-rose-50/50 shadow-sm border border-rose-100"

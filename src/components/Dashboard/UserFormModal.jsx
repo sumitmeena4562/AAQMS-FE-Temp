@@ -125,12 +125,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const onFormSubmit = async (data) => {
         setSubmitError('');
         
-        // Backend expects a password for new users. 
-        // We'll set a strong default and users will change it via setup link.
+        // Manual password entry as per user request
         const payload = { ...data };
-        if (!isEdit && !payload.password) {
-            payload.password = 'Admin@123'; 
-        }
 
         // Automatically determine assignment status
         if (payload.organization || payload.region || payload.zone) {
@@ -333,22 +329,22 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             </div>
 
 
+                                            <div className="col-span-1">
+                                                <InputField
+                                                    label={isEdit ? "New Password (Optional)" : "Set Password"}
+                                                    type="password"
+                                                    placeholder={isEdit ? "Leave blank to keep current" : "Min 8 characters"}
+                                                    {...register('password')}
+                                                    error={errors.password?.message}
+                                                    required={!isEdit}
+                                                />
+                                            </div>
+
                                             {!isEdit && (
-                                                <div className="col-span-2 mt-2">
-                                                    <div className="flex items-start gap-3 p-4 bg-primary/5 border border-primary/10 rounded-2xl">
-                                                        <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                                                            <FiMail size={20} />
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <div className="text-[13px] font-bold text-title mb-0.5">Setup link will be emailed</div>
-                                                            <p className="text-[11px] font-medium text-gray leading-relaxed text-pretty">
-                                                                For security, we don't set passwords manually. A secure link will be sent to <strong>{watch('email') || 'the user'}</strong> to set their own password.
-                                                            </p>
-                                                            <div className="mt-2 py-1 px-2.5 bg-primary/10 rounded-lg inline-flex items-center gap-2">
-                                                                <span className="text-[9px] font-black uppercase text-primary tracking-tighter">Auto-Gen</span>
-                                                                <span className="text-[10px] font-bold text-title">System ID (e.g. EMP-0001) will be assigned</span>
-                                                            </div>
-                                                        </div>
+                                                <div className="col-span-2">
+                                                    <div className="flex items-center gap-2 p-3 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-700 text-[11px] font-bold">
+                                                        <FiMail size={14} className="shrink-0" />
+                                                        <span>Login credentials will be automatically emailed to the user.</span>
                                                     </div>
                                                 </div>
                                             )}
