@@ -30,7 +30,7 @@ export const userService = {
      */
     getUsers: async (filters = {}, search = '') => {
         try {
-            const response = await api.get('/accounts/users/', {
+            const response = await api.get('accounts/users/', {
                 params: {
                     ...filters,
                     search: search 
@@ -47,7 +47,7 @@ export const userService = {
      */
     createUser: async (userData) => {
         try {
-            const response = await api.post('/accounts/users/', userData);
+            const response = await api.post('accounts/users/', userData);
             return response.data;
         } catch (error) {
             throw new Error(extractError(error, 'Failed to create user. Please check all fields.'));
@@ -56,7 +56,7 @@ export const userService = {
 
     updateUser: async (id, updates) => {
         try {
-            const response = await api.patch(`/accounts/users/${id}/`, updates);
+            const response = await api.patch(`accounts/users/${id}/`, updates);
             return response.data;
         } catch (error) {
             throw new Error(extractError(error, 'Failed to update user profile.'));
@@ -65,7 +65,7 @@ export const userService = {
 
     deleteUser: async (id) => {
         try {
-            await api.delete(`/accounts/users/${id}/`);
+            await api.delete(`accounts/users/${id}/`);
             return true;
         } catch (error) {
             throw new Error(extractError(error, 'Failed to delete user.'));
@@ -80,7 +80,7 @@ export const userService = {
             // Map frontend action names to backend expected values
             const actionMap = { 'activate': 'active', 'deactivate': 'deactive' };
             const backendAction = actionMap[action] || action;
-            const response = await api.post('/accounts/users/bulk-action/', { ids, action: backendAction });
+            const response = await api.post('accounts/users/bulk-action/', { ids, action: backendAction });
             return response.data;
         } catch (error) {
             throw new Error(extractError(error, 'Bulk action failed. Please try again.'));
@@ -92,7 +92,7 @@ export const userService = {
      */
     getUserStats: async () => {
         try {
-            const response = await api.get('/accounts/users/stats/');
+            const response = await api.get('accounts/users/stats/');
             return response.data;
         } catch (error) {
             return { total: 0, active: 0, inactive: 0, unassigned: 0 };
@@ -124,7 +124,7 @@ export const userService = {
      */
     exportCSV: async () => {
         try {
-            const response = await api.get('/accounts/users/export/', { responseType: 'blob' });
+            const response = await api.get('accounts/users/export/', { responseType: 'blob' });
             return response.data;
         } catch (error) {
             throw new Error(extractError(error, 'CSV export failed. Please try again.'));

@@ -21,7 +21,7 @@ function LoginPage() {
         const result = await login(data);
         if (result.success) {
             console.log("Logged in user:", result.user.name);
-            toast.success(`Welcome back, ${result.user.name}!`);
+            toast.success(`Login Successfull! , ${result.user.name}!`);
             
             // Dynamic redirection based on role
             const role = result.user.role;
