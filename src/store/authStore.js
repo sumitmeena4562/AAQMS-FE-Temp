@@ -112,6 +112,7 @@ const useAuthStore = create((set) => ({
       toast.success("Logged out successfully"); // Still show success toast
     } finally {
       storage.clearSession();
+      set({ isAuthenticated: false, user: null, error: null });
     }
   },
 
