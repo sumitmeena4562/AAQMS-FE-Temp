@@ -20,20 +20,32 @@ const CollapsibleSection = ({ isOpen, children }) => {
 const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, setMobileOpen, onToggle }) => {
     const { user } = useAuthStore();
     const location = useLocation();
-    const [openMenus, setOpenMenus] = useState({});
-
     const navigate = useNavigate();
-    const toggleMenu = (item) => {
-        setOpenMenus(p => ({ ...p, [item.label]: !p[item.label] }));
-        if (item.path && location.pathname !== item.path) {
-            navigate(item.path);
-        }
-    };
+    const [openMenus, setOpenMenus] = useState({});
 
     const isActive = useCallback((path) => location.pathname === path || location.pathname.startsWith(path + '/'), [location.pathname]);
     const isParentActive = useCallback((item) => 
         item.children ? item.children.some(c => isActive(c.path)) : isActive(item.path)
     , [isActive]);
+
+    // 🔹 Auto-open sidebar menus if their child is the currently active page
+    useEffect(() => {
+        const activeParents = {};
+        navItems.forEach(item => {
+            if (item.children && isParentActive(item)) {
+                activeParents[item.label] = true;
+            }
+        });
+        setOpenMenus(prev => ({ ...prev, ...activeParents }));
+    }, [location.pathname, navItems, isParentActive]);
+
+    const toggleMenu = (item) => {
+        setOpenMenus(p => ({ ...p, [item.label]: !p[item.label] }));
+        // 🔹 Navigate immediately if parent has a default path
+        if (item.path) {
+           navigate(item.path);
+        }
+    };
 
     useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname, setMobileOpen]);
 

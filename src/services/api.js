@@ -1,66 +1,122 @@
-import axios from "axios";
-import toast from "react-hot-toast";
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
+/**
+ * ── CORE API CLIENT ──
+ * This acts as the single source of truth for all backend communication.
+ * Instead of importing 'axios' globally, we will exclusively use this 'api' instance.
+ */
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL, //this is Django backend URl
-    headers:{
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api', // this is Django backend URl
+    headers: {
         'Content-Type': 'application/json',
     },
+    // Prevent infinite loaders if the server crashes
+    timeout: 15000,
 });
 
-// Request intercepter: set on JWT token in header
-
-// Public endpoints jo bina token ke accessible hain
+/**
+ * ── REQUEST INTERCEPTOR ──
+ * Fires *before* the request leaves the browser.
+ */
 const PUBLIC_ENDPOINTS = ['accounts/login/', 'accounts/token/refresh/'];
 
 api.interceptors.request.use(
-    (config)=>{
+    (config) => {
         const isPublic = PUBLIC_ENDPOINTS.some(url => config.url?.includes(url));
+        
         if (!isPublic) {
-            const token = localStorage.getItem('token');
-            if(token){
-                config.headers.Authorization=`Bearer ${token}`;
+            // 1. Get auth token from local storage
+            const token = localStorage.getItem('auth_token');
+
+            // 2. Silently attach the token to every single request
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
             }
         }
+
         return config;
     },
-    (error) => Promise.reject(error)
+    (error) => {
+        return Promise.reject(error);
+    }
 );
 
-// Response interceptor: handle token refresh
+/**
+ * ── RESPONSE INTERCEPTOR ──
+ * Fires *before* the component receives the data.
+ */
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        return response;
+    },
     async (error) => {
         const originalRequest = error.config;
 
-        // If 401 (Unauthorized) and we haven't retried yet
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
-            const refreshToken = localStorage.getItem('refresh');
+        if (error.response) {
+            const { status, data } = error.response;
 
-            if (refreshToken) {
-                try {
-                    // Call the refresh endpoint
-                    const response = await api.post('accounts/token/refresh/', {
-                        refresh: refreshToken,
-                    });
-                    const { access } = response.data;
+            // If 401 (Unauthorized) and we haven't retried yet
+            if (status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+                const refreshToken = localStorage.getItem('refresh');
 
-                    localStorage.setItem('token', access);
-                    api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-                    
-                    // Retry the original request with the new token
-                    return api(originalRequest);
-                } catch (refreshError) {
-                    // Refresh token also failed - session expired
-                    localStorage.removeItem('token');
+                if (refreshToken) {
+                    try {
+                        const refreshURL = import.meta.env.VITE_API_URL
+                            ? `${import.meta.env.VITE_API_URL}/accounts/token/refresh/`
+                            : 'http://localhost:8000/api/accounts/token/refresh/';
+
+                        const response = await axios.post(refreshURL, {
+                            refresh: refreshToken,
+                        });
+                        const { access } = response.data;
+
+                        // Save new token
+                        localStorage.setItem('auth_token', access);
+                        api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+                        originalRequest.headers['Authorization'] = `Bearer ${access}`;
+
+                        // Retry the original request with the new token
+                        return api(originalRequest);
+                    } catch (refreshError) {
+                        // Refresh token also failed - logout the user
+                        localStorage.removeItem('auth_token');
+                        localStorage.removeItem('refresh');
+                        localStorage.removeItem('user');
+                        window.location.href = '/login';
+                        return Promise.reject(refreshError);
+                    }
+                } else {
+                    toast.error("Session expired. Please log in again.");
+                    localStorage.removeItem('auth_token');
                     localStorage.removeItem('refresh');
                     localStorage.removeItem('user');
-                    toast.error("Session expired. Please login again.");
                     window.location.href = '/login';
                 }
+            } else {
+                // Global Error Handling
+                switch (status) {
+                    case 403:
+                        toast.error("You don't have permission to perform this action.");
+                        break;
+                    case 404:
+                        toast.error("The requested resource was not found.");
+                        break;
+                    case 500:
+                        toast.error("Server error. Please try again later.");
+                        break;
+                    default:
+                        if (status !== 401) {
+                            toast.error(data?.message || "An unexpected error occurred.");
+                        }
+                        break;
+                }
             }
+        } else if (error.request) {
+            toast.error("Network Error: Could not connect to the backend server.");
         }
+
         return Promise.reject(error);
     }
 );

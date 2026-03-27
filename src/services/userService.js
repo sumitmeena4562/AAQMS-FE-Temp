@@ -118,7 +118,9 @@ export const userService = {
     getFilterOptions: async (filters = {}, existingUsers = null) => {
         try {
             // Use existing users data if available, avoid duplicate API call
-            const users = existingUsers || await userService.getUsers(filters);
+            const usersData = existingUsers || await userService.getUsers(filters);
+            const users = Array.isArray(usersData) ? usersData : (usersData.users || []);
+            
             const getUnique = (arr, key) => [...new Set(arr.map(u => u[key]).filter(Boolean))].sort();
             const roles = [
                 { value: 'admin', label: 'Admin' },

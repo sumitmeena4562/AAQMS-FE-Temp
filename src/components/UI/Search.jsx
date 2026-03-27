@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
+import useDebounce from "../../hooks/useDebounce"; 
 
 const Search = ({
     placeholder = "Search...",
@@ -7,17 +8,22 @@ const Search = ({
     className = ""
 }) => {
     const [query, setQuery] = useState("");
+    
+    // 🔹 Apply global useDebounce hook (500ms delay)
+    const debouncedQuery = useDebounce(query, 500);
 
-    // debounce logic
+    // Safely store the latest onSearch reference to prevent infinite loops from inline functions
+    const onSearchRef = useRef(onSearch);
     useEffect(() => {
-        const timer = setTimeout(() => {
-            if (onSearch) {
-                onSearch(query);
-            }
-        }, 500);
+        onSearchRef.current = onSearch;
+    }, [onSearch]);
 
-        return () => clearTimeout(timer);
-    }, [query, onSearch]);
+    // Watch for the debounced value to change, then trigger the callback safely
+    useEffect(() => {
+        if (onSearchRef.current) {
+            onSearchRef.current(debouncedQuery);
+        }
+    }, [debouncedQuery]);
 
     return (
         <div className={`relative w-full ${className}`}>

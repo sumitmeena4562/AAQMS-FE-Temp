@@ -1,73 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import DataTable from '../UI/DataTable';
 import Button from '../UI/Button';
-import {
-    FiAlertTriangle,
-    FiUserPlus,
-    FiPackage,
-    FiCheckCircle,
-    FiSettings,
-    FiFilter,
-} from 'react-icons/fi';
-
-// ── Static Activity Data ──
-const ACTIVITY = [
-    {
-        id: '1',
-        type: 'Inventory Mismatch',
-        icon: FiAlertTriangle,
-        iconBgClass: 'bg-red-50',
-        iconTextClass: 'text-red-600',
-        user: 'System AI',
-        entity: 'Zone B-12',
-        details: 'Fire Extinguisher missing in Zone 15-12',
-        time: '2 mins ago',
-    },
-    {
-        id: '2',
-        type: 'User Onboarding',
-        icon: FiUserPlus,
-        iconBgClass: 'bg-blue-50',
-        iconTextClass: 'text-blue-600',
-        user: 'Sarah Jenkins',
-        entity: 'Acme Corp',
-        details: 'Added 5 new field officers',
-        time: '15 mins ago',
-    },
-    {
-        id: '3',
-        type: 'Inventory Update',
-        icon: FiPackage,
-        iconBgClass: 'bg-orange-50',
-        iconTextClass: 'text-orange-600',
-        user: 'Mike Ross',
-        entity: 'Safety Gear Depot',
-        details: 'Stock level adjustment (-50 units)',
-        time: '1 hour ago',
-    },
-    {
-        id: '4',
-        type: 'Report Approval',
-        icon: FiCheckCircle,
-        iconBgClass: 'bg-purple-50',
-        iconTextClass: 'text-purple-600',
-        user: 'David Kim',
-        entity: 'Monthly Compliance',
-        details: 'Report #8821 approved',
-        time: '2 hours ago',
-    },
-    {
-        id: '5',
-        type: 'System Config',
-        icon: FiSettings,
-        iconBgClass: 'bg-base',
-        iconTextClass: 'text-gray',
-        user: 'Admin User',
-        entity: 'Global Settings',
-        details: 'Updated API rate limits',
-        time: '4 hours ago',
-    },
-];
+import { FiFilter, FiBox } from 'react-icons/fi';
+import { useRecentActivity } from '../../hooks/useDashboardQueries';
 
 // ── Column definitions ──
 const columns = [
@@ -119,22 +55,39 @@ const columns = [
 ];
 
 const RecentActivityTable = () => {
+    const { data: activityList, isLoading, isError } = useRecentActivity();
+    const navigate = useNavigate();
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center p-16 bg-white rounded-xl shadow-sm border border-gray-100 group transition-all duration-300 hover:shadow-md cursor-wait">
+                <FiBox className="text-primary animate-pulse mb-3 group-hover:scale-110 transition-transform duration-300" size={44} />
+                <span className="text-sm font-semibold text-gray-500 group-hover:text-primary transition-colors">Loading Live Feed...</span>
+            </div>
+        );
+    }
+
+    if (isError) return null;
+
     return (
         <DataTable
             title="Recent Activity"
             subtitle="Live Feed"
             rightContent={
                 <>
-                    <Button variant="outline" size="sm" icon={FiFilter} className="!rounded-md !h-[30px] !text-[12px]">
-                        Filter
-                    </Button>
-                    <Button variant="ghost" size="sm" className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10">
-                        View All Logs
+                
+                    <Button 
+                        onClick={() => navigate('/admin/history')}
+                        variant="ghost" 
+                        size="sm" 
+                        className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10"
+                    >
+                        View All History
                     </Button>
                 </>
             }
             columns={columns}
-            data={ACTIVITY}
+            data={activityList}
             emptyMessage="No recent activity"
         />
     );

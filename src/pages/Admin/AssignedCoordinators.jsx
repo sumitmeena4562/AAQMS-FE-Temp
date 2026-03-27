@@ -2,51 +2,60 @@ import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import CoordinatorCard from '../../components/UI/CoordinatorCard';
 import PageHeader from '../../components/UI/PageHeader';
+import FilterBar from '../../components/UI/FilterBar';
 import useUserStore from '../../store/userStore';
-import { generateSitePlansForCoordinator } from '../../utils/mockSiteData';
-import { useBreadcrumb } from '../../hooks/useBreadcrumb';
-import { FiHome, FiBriefcase, FiGrid } from 'react-icons/fi';
+import { useFilterStore } from '../../store/useFilterStore';
+import { useOrgStore } from '../../store/useOrgStore';
+import { sites, floors, zones } from '../../data/mockFilterData';
+import { FiHome, FiBriefcase, FiGrid, FiList } from 'react-icons/fi';
 
 const AssignedCoordinators = () => {
   const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const orgName = location.state?.org?.name || params.get('org') || "Organization";
+  const [view, setView] = React.useState('list');
+  const { selectedOrg, setOrg } = useFilterStore();
+  const { orgs, fetchOrgs } = useOrgStore();
+  
+  const passedOrgName = location.state?.org?.name || new URLSearchParams(location.search).get('org');
+  const orgInfo = selectedOrg ? orgs.find(o => o.id === selectedOrg) : null;
+  const orgName = orgInfo?.name || passedOrgName || "Organization";
 
   const users = useUserStore(state => state.users);
   const fetchUsers = useUserStore(state => state.fetchUsers);
 
-  const { setBreadcrumbs } = useBreadcrumb();
-
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-    { label: orgName, path: location.pathname + location.search, isActive: true }
+    { label: orgName, path: "#", isActive: true }
   ];
 
   useEffect(() => {
-    // 1. Fetch users if needed
-    if (users.length === 0) {
-      fetchUsers();
+    if (orgs.length === 0) fetchOrgs();
+    if (!selectedOrg && passedOrgName && orgs.length > 0) {
+      const match = orgs.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
+      if (match) {
+        setOrg(match.id);
+      }
     }
-    // Breadcrumbs managed by PageHeader
-  }, [users.length, fetchUsers, orgName, location.pathname, location.search]);
+    if (users.length === 0) fetchUsers();
+  }, [selectedOrg, passedOrgName, setOrg, users.length, fetchUsers, orgs.length, fetchOrgs, orgs]);
 
-  // Derived logic from User Management:
-  // We grab everyone matching this organization.
-  // The User table has 'role', 'status' ('active' / 'inactive'), etc.
-  const orgUsers = users.filter(u => u.organization === orgName);
+  const isOrgSelected = !!(selectedOrg || passedOrgName);
+  const orgUsers = isOrgSelected ? users.filter(u => u.organization === orgName) : [];
 
   const coordinatorsList = orgUsers.map(user => {
-    const plans = generateSitePlansForCoordinator(user.id);
-    const totalZones = plans.reduce((acc, plan) => acc + plan.stats.zones, 0);
+    // True Relational Cascade
+    const userSites = sites.filter(s => s.coordId?.toString() === user.id.toString());
+    const siteIds = userSites.map(s => s.id);
+    const userFloors = floors.filter(f => siteIds.includes(f.siteId));
+    const floorIds = userFloors.map(f => f.id);
+    const userZones = zones.filter(z => floorIds.includes(z.floorId));
 
     return {
       name: user.name,
       id: `USER-${user.id.toString().padStart(3, '0')}`,
-      status: user.status === 'active' ? 'ACTIVE' : 'AWAY', // Maps status UI
-      sites: plans.length,
-      zones: totalZones,
-      sitePlans: plans,
+      status: user.status === 'active' ? 'ACTIVE' : 'AWAY',
+      sites: userSites.length,
+      zones: userZones.length,
       image: null
     };
   });
@@ -59,34 +68,65 @@ const AssignedCoordinators = () => {
       {/* HEADER */}
       <PageHeader
         title={`${orgName}: Assigned Coordinators`}
-        subtitle={`Managing ${activeCoordinatorsCount} active platform coordinators for this entity`}
+        subtitle={isOrgSelected ? `Managing ${activeCoordinatorsCount} active platform coordinators for this entity` : "Please use the filter bar to select an organization"}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
+          isOrgSelected ? (
             <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                 {coordinatorsList.length} Total Users
             </span>
+          ) : null
         }
       />
 
       {/* Main Content Dashboard */}
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
+        <FilterBar activeLevel="coordinators" />
 
-        {/* Coordinator Cards Container */}
-        <div className="w-full flex flex-col gap-4">
-          {coordinatorsList.length > 0 ? (
-            coordinatorsList.map((coord, index) => (
-              <CoordinatorCard key={index} coordinator={coord} orgName={orgName} />
-            ))
-          ) : (
-            <div className="text-center py-12 bg-card rounded-lg border border-border-main">
-              <p className="text-gray font-medium tracking-wide">
-                No users assigned to this organization yet.
-                <br /><span className="text-xs text-gray/60 mt-2 block">Go to User Management to create and assign users.</span>
-              </p>
+        {!isOrgSelected ? (
+          <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
+            <p className="text-gray font-medium tracking-wide">
+              Please select an Organization to view assigned coordinators.
+            </p>
+          </div>
+        ) : (
+          <div className="w-full flex flex-col mb-4">
+            <div className="flex justify-end mb-4 pr-1">
+              <div className="flex items-center bg-base border border-border-main p-1 rounded-lg">
+                <button 
+                  onClick={() => setView('list')}
+                  className={`p-1.5 rounded-md transition-all duration-200 ${view === 'list' ? 'bg-white shadow-[0_2px_8px_rgba(7,34,103,0.08)] text-primary' : 'text-gray hover:text-primary'}`}
+                  title="List View"
+                >
+                  <FiList size={15} strokeWidth={2.5} />
+                </button>
+                <button 
+                  onClick={() => setView('grid')}
+                  className={`p-1.5 rounded-md transition-all duration-200 ${view === 'grid' ? 'bg-white shadow-[0_2px_8px_rgba(7,34,103,0.08)] text-primary' : 'text-gray hover:text-primary'}`}
+                  title="Grid View"
+                >
+                  <FiGrid size={15} strokeWidth={2.5} />
+                </button>
+              </div>
             </div>
-          )}
-        </div>
+
+            <div className={view === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
+              {coordinatorsList.length > 0 ? (
+                coordinatorsList.map((coord, index) => (
+                  <CoordinatorCard key={index} coordinator={coord} orgName={orgName} view={view} />
+                ))
+              ) : (
+                <div className="text-center py-12 bg-card rounded-lg border border-border-main col-span-full">
+                  <p className="text-gray font-medium tracking-wide">
+                    No users assigned to this organization yet.
+                    <br /><span className="text-xs text-gray/60 mt-2 block">Go to User Management to create and assign users.</span>
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* FOOTER */}
         <div className="mt-auto pt-12 pb-6 flex items-center justify-center gap-1.5 text-[12px] text-gray font-medium">
@@ -95,7 +135,6 @@ const AssignedCoordinators = () => {
           </svg>
           AI assists detection. Final approval is human-controlled.
         </div>
-
       </main>
     </div>
   );

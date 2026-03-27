@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import useUserStore from '../../store/userStore';
-import { generateSitePlansForCoordinator } from '../../utils/mockSiteData';
+import { sites, floors, zones, assets } from '../../data/mockFilterData';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 
 const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onDelete, onView }) => {
@@ -9,27 +9,36 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
   const users = useUserStore(state => state.users);
 
   // Derive coordinators exactly as stored in User Management: 
-  // users mapping to this organization
-  const orgCoordinators = users.filter(u => 
-    (u.organization || "").trim().toLowerCase() === (org.name || "").trim().toLowerCase() && 
+  const orgCoordinators = users.filter(u =>
+    (u.organization || "").trim().toLowerCase() === (org.name || "").trim().toLowerCase() &&
     u.role === 'Coordinator'
   );
 
-  let totalComputedSites = 0;
-  let totalComputedFloors = 0;
+  // 🔹 STRICT RELATIONAL COMPUTATION: 
+  // If orgCoordinators is empty, NO sites and NO floors will exist!
+  const coordIds = orgCoordinators.map(c => c.id.toString());
+  const activeSites = sites.filter(s => coordIds.includes(s.coordId?.toString()));
+  const siteIds = activeSites.map(s => s.id);
+  const activeFloors = floors.filter(f => siteIds.includes(f.siteId));
 
-  if (!isSiteCard) {
-    if (orgCoordinators.length > 0) {
-      orgCoordinators.forEach(coord => {
-        const plans = generateSitePlansForCoordinator(coord.id);
-        totalComputedSites += plans.length;
-        totalComputedFloors += plans.reduce((acc, p) => acc + p.stats.floors, 0);
-      });
-    } else {
-      // Fallback to static stats if no coordinators assigned yet
-      totalComputedSites = org.stats?.sites || 0;
-      totalComputedFloors = org.stats?.floors || 0;
-    }
+  let totalComputedCoordinators = orgCoordinators.length;
+  let totalComputedSites = totalComputedCoordinators === 0 ? 0 : activeSites.length;
+  let totalComputedFloors = totalComputedCoordinators === 0 ? 0 : activeFloors.length;
+
+  let siteComputedFloors = 0;
+  let siteComputedZones = 0;
+  let siteComputedAssets = 0;
+
+  if (isSiteCard) {
+    const sFloors = floors.filter(f => f.siteId === org.id);
+    const floorIds = sFloors.map(f => f.id);
+    const sZones = zones.filter(z => floorIds.includes(z.floorId));
+    const zoneIds = sZones.map(z => z.id);
+    const sAssets = assets.filter(a => zoneIds.includes(a.zoneId));
+
+    siteComputedFloors = sFloors.length;
+    siteComputedZones = sZones.length;
+    siteComputedAssets = sAssets.length;
   }
 
   let currentStatus = org.status || 'ACTIVE';
@@ -57,8 +66,8 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     if (isSiteCard) {
       const currentOrg = location.state?.orgName || new URLSearchParams(location.search).get('org') || '';
       const coordName = coordinatorContext?.name || new URLSearchParams(location.search).get('coord') || '';
-      navigate(`/admin/floor-plan?org=${encodeURIComponent(currentOrg)}&coord=${encodeURIComponent(coordName)}&site=${encodeURIComponent(org.name)}`, { 
-        state: { site: org, orgName: currentOrg, coordinator: coordinatorContext } 
+      navigate(`/admin/floor-plan?org=${encodeURIComponent(currentOrg)}&coord=${encodeURIComponent(coordName)}&site=${encodeURIComponent(org.name)}`, {
+        state: { site: org, orgName: currentOrg, coordinator: coordinatorContext }
       });
     } else {
       navigate(`/admin/coordinators?org=${encodeURIComponent(org.name)}`, { 
@@ -147,7 +156,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               {isSiteCard ? 'FLOORS' : 'COORDS'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
-              {isSiteCard ? org.stats?.floors || 0 : orgCoordinators.length}
+              {isSiteCard ? siteComputedFloors : totalComputedCoordinators}
             </p>
           </div>
           <div className="flex flex-col">
@@ -155,7 +164,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               {isSiteCard ? 'ZONES' : 'SITES'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
-              {isSiteCard ? org.stats?.zones || 0 : totalComputedSites}
+              {isSiteCard ? siteComputedZones : totalComputedSites}
             </p>
           </div>
           <div className="flex flex-col">
@@ -163,7 +172,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               {isSiteCard ? 'ASSETS' : 'FLOORS'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
-              {isSiteCard ? (org.stats?.assets || 0).toLocaleString() : totalComputedFloors}
+              {isSiteCard ? siteComputedAssets.toLocaleString() : totalComputedFloors}
             </p>
           </div>
         </div>

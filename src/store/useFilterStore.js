@@ -12,7 +12,9 @@ export const useFilterStore = create((set) => ({
   selectedFloor: '',
   selectedZone: '',
   selectedStatus: 'all',
+  selectedCoordinator: 'all', // Legacy state preserved
   searchTerm: '',
+  page: 1,
 
   // --- ACTIONS ---
   setOrg: (id) => set({ 
@@ -20,38 +22,47 @@ export const useFilterStore = create((set) => ({
     selectedCoord: '', 
     selectedSite: '', 
     selectedFloor: '', 
-    selectedZone: '' 
+    selectedZone: '',
+    page: 1
   }),
   
   setCoord: (id) => set({ 
     selectedCoord: id, 
     selectedSite: '', 
     selectedFloor: '', 
-    selectedZone: '' 
+    selectedZone: '',
+    page: 1
   }),
   
   setSite: (id) => set({ 
     selectedSite: id, 
     selectedFloor: '', 
-    selectedZone: '' 
+    selectedZone: '',
+    page: 1
   }),
   
   setFloor: (id) => set({ 
     selectedFloor: id, 
-    selectedZone: '' 
+    selectedZone: '',
+    page: 1
   }),
   
   setZone: (id) => set({ 
-    selectedZone: id 
+    selectedZone: id,
+    page: 1
   }),
   
   setStatus: (status) => set({ 
-    selectedStatus: status 
+    selectedStatus: status,
+    page: 1
   }),
   
   setSearch: (term) => set({ 
-    searchTerm: term 
+    searchTerm: term,
+    page: 1
   }),
+  
+  setPage: (page) => set({ page }),
   
   resetFilters: () => set({
     selectedOrg: '',
@@ -60,7 +71,8 @@ export const useFilterStore = create((set) => ({
     selectedFloor: '',
     selectedZone: '',
     selectedStatus: 'all',
-    searchTerm: ''
+    searchTerm: '',
+    page: 1
   })
 }));
 
