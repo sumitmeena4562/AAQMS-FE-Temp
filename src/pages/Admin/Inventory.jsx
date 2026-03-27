@@ -453,7 +453,7 @@ const Inventory = () => {
                         footer={
                             <div className="flex items-center justify-between w-full px-1">
                                 <span className="text-[11px] font-bold text-gray tracking-tight">
-                                    Showing <span className="text-body font-black">{displayedInventory.length > 0 ? startIndex + 1 : 0} to {startIndex + displayedInventory.length}</span> of <span className="text-body font-black">{filteredInventory.length}</span> results
+                                    Showing <span className="text-title font-bold">{displayedInventory.length > 0 ? startIndex + 1 : 0} to {startIndex + displayedInventory.length}</span> of <span className="text-title font-bold">{filteredInventory.length}</span> results
                                 </span>
                                 <div className="flex items-center gap-1.5">
                                     <Button 
@@ -496,7 +496,7 @@ const Inventory = () => {
                         {totalPages > 1 && (
                             <div className="flex items-center justify-between bg-card p-4 rounded-2xl border border-border-main shadow-sm">
                                 <span className="text-[11px] font-bold text-gray tracking-tight">
-                                    Showing <span className="text-body font-black">{startIndex + 1} to {startIndex + displayedInventory.length}</span> of <span className="text-body font-black">{filteredInventory.length}</span> results
+                                    Showing <span className="text-title font-bold">{startIndex + 1} to {startIndex + displayedInventory.length}</span> of <span className="text-title font-bold">{filteredInventory.length}</span> results
                                 </span>
                                 <div className="flex items-center gap-2">
                                     <Button 
