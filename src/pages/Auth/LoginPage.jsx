@@ -23,7 +23,7 @@ function LoginPage() {
         setError(null);
         const result = await login(data);
         if (result.success) {
-            toast.success(`Welcome !, ${result.user.name}!`);
+            toast.success(`Welcome back, ${result.user.name}!`);
             
             const role = result.user.role;
             if (role === 'coordinator') {

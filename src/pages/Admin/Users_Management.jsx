@@ -84,7 +84,7 @@ export default function Users() {
             : await store.createUser(data);
 
         if (res.success) {
-            toast.success(editingUser ? 'Profile updated' : 'User created');
+            toast.success(editingUser ? 'Changes to user profile have been saved' : 'New personnel successfully added to the system');
             setIsFormOpen(false);
             setEditingUser(null);
         } else {
@@ -95,14 +95,14 @@ export default function Users() {
 
     const handleBulkActivate = async () => {
         const res = await store.bulkAction('activate', selectedIds);
-        if (res.success) toast.success(`${selectedIds.length} users activated`);
+        if (res.success) toast.success(`Selected ${selectedIds.length} users have been activated`);
     };
 
     const handleConfirmDeactivate = async () => {
         const targets = statusTarget ? [statusTarget.id] : selectedIds;
         const res = await store.bulkAction('deactivate', targets);
         if (res.success) {
-            toast.success(`${targets.length} user(s) deactivated`);
+            toast.success(`Selected ${targets.length} personnel have been deactivated`);
             setStatusTarget(null);
             setBulkStatusOpen(false);
         }

@@ -95,26 +95,25 @@ api.interceptors.response.use(
                     window.location.href = '/login';
                 }
             } else {
-                // Global Error Handling
+                // Global Error Handling (Specific to system-level issues)
                 switch (status) {
                     case 403:
-                        toast.error("You don't have permission to perform this action.");
+                        toast.error("Access Denied: You don't have permission for this.");
                         break;
                     case 404:
-                        toast.error("The requested resource was not found.");
+                        toast.error("Resource not found. Please check the URL.");
                         break;
                     case 500:
-                        toast.error("Server error. Please try again later.");
+                        toast.error("Server Error: Something went wrong on our end. Please try again later.");
                         break;
                     default:
-                        if (status !== 401) {
-                            toast.error(data?.message || "An unexpected error occurred.");
-                        }
+                        // Do NOT toast for 400 (Validation) or 401 (Auth) here
+                        // as components/stores will handle these specifically.
                         break;
                 }
             }
         } else if (error.request) {
-            toast.error("Network Error: Could not connect to the backend server.");
+            toast.error("Connection Failed: Unable to reach the security cluster. Please check your network.");
         }
 
         return Promise.reject(error);

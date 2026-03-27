@@ -18,7 +18,7 @@ function RegistrationPage() {
     const onSubmit = async (data) => {
         const result = await registerUser(data);
         if (result.success) {
-            toast.success("Account created successfully!");
+            toast.success("Registration successful! You can now sign in.");
             navigate('/login');
         } else {
             toast.error(result.error || "An error occurred during registration.");

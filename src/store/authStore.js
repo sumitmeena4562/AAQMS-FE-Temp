@@ -24,21 +24,24 @@ const storage = {
 /**
  * Extract readable error message from API error response.
  */
-const extractError = (err, fallback = "Something went wrong") => {
+const extractError = (err, fallback = "Internal connection error. Please try again.") => {
   const data = err.response?.data;
   if (!data) return err.message || fallback;
   
-  // DRF returns { detail: "..." } for most errors
+  // DRF Handlers
   if (data.detail) return data.detail;
+  if (data.error) return data.error;
+  if (data.message) return data.message;
   
-  // Validation errors: { field: ["error1", "error2"] }
+  // Validation errors: { email: ["Already exists"], non_field_errors: ["Invalid credentials"] }
   if (typeof data === 'object') {
     const messages = Object.entries(data)
       .map(([key, val]) => {
         const msg = Array.isArray(val) ? val[0] : val;
-        // Skip prefix for common structural keys
-        if (key === 'non_field_errors' || key === 'detail' || key === 'error') return msg;
-        return `${key}: ${msg}`;
+        if (key === 'non_field_errors' || key === 'error' || key === 'detail') return msg;
+        // Format key to readable: "first_name" -> "First Name"
+        const readableKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        return `${readableKey}: ${msg}`;
       });
     if (messages.length > 0) return messages[0];
   }
