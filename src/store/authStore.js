@@ -36,7 +36,9 @@ const extractError = (err, fallback = "Something went wrong") => {
     const messages = Object.entries(data)
       .map(([key, val]) => {
         const msg = Array.isArray(val) ? val[0] : val;
-        return key === 'non_field_errors' ? msg : `${key}: ${msg}`;
+        // Skip prefix for common structural keys
+        if (key === 'non_field_errors' || key === 'detail' || key === 'error') return msg;
+        return `${key}: ${msg}`;
       });
     if (messages.length > 0) return messages[0];
   }
@@ -154,16 +156,16 @@ const useAuthStore = create((set) => ({
   setUser: (user) => set({ user, isAuthenticated: !!user }),
   setError: (error) => set({ error }),
 
-  // --- PASSWORD RECOVERY (Mocks) ---
+  // --- PASSWORD RECOVERY (Real API) ---
 
   requestPasswordReset: async (email) => {
     set({ isLoading: true });
     try {
-      await delay(1000);
+      await api.post("accounts/request-reset/", { email });
       set({ isLoading: false });
       return { success: true };
     } catch (err) {
-      const errorMsg = "Failed to send reset link. Please try again.";
+      const errorMsg = extractError(err, "Failed to send reset link. Please try again.");
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
     }
@@ -172,25 +174,24 @@ const useAuthStore = create((set) => ({
   verifyOtp: async (email, otp) => {
     set({ isLoading: true });
     try {
-      await delay(1000);
-      if (otp !== "123456") throw new Error("Invalid OTP");
+      await api.post("accounts/verify-otp/", { email, otp });
       set({ isLoading: false });
       return { success: true };
     } catch (err) {
-      const errorMsg = "Invalid OTP code. Please check and try again.";
+      const errorMsg = extractError(err, "Invalid or expired OTP code.");
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
     }
   },
 
-  resetPassword: async (email, password) => {
+  resetPassword: async (email, otp, password) => {
     set({ isLoading: true });
     try {
-      await delay(1000);
+      await api.post("accounts/reset-password/", { email, otp, password });
       set({ isLoading: false });
       return { success: true };
     } catch (err) {
-      const errorMsg = "Password reset failed. Please try again.";
+      const errorMsg = extractError(err, "Password reset failed. Please try again.");
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
     }

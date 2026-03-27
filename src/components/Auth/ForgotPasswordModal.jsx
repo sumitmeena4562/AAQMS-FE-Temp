@@ -64,12 +64,14 @@ function ForgotPasswordModal({ isOpen, onClose }) {
 
     const [step, setStep] = useState(STEPS.EMAIL);
     const [email, setEmail] = useState('');
+    const [otp, setOtp] = useState('');
 
     // Reset state when modal is closed/opened
     React.useEffect(() => {
         if (isOpen) {
             setStep(STEPS.EMAIL);
             setEmail('');
+            setOtp('');
             setError(null);
         }
     }, [isOpen, setError]);
@@ -88,6 +90,7 @@ function ForgotPasswordModal({ isOpen, onClose }) {
     const handleOtpSubmit = async (data) => {
         const res = await verifyOtp(email, data.otp);
         if (res.success) {
+            setOtp(data.otp);
             setStep(STEPS.RESET);
             toast.success("OTP verified!");
         } else {
@@ -96,7 +99,7 @@ function ForgotPasswordModal({ isOpen, onClose }) {
     };
 
     const handleResetSubmit = async (data) => {
-        const res = await resetPassword(email, data.password);
+        const res = await resetPassword(email, otp, data.password);
         if (res.success) {
             setStep(STEPS.SUCCESS);
             toast.success("Password reset successful!");

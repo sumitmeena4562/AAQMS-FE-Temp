@@ -31,35 +31,51 @@ const itemVariants = {
     }
 };
 
+import useAuthStore from '../../store/authStore';
+
 function ForgotPasswordPage() {
     const navigate = useNavigate();
+    const { 
+        requestPasswordReset, 
+        verifyOtp, 
+        resetPassword,
+        isLoading,
+    } = useAuthStore();
+
     const [step, setStep] = useState(STEPS.EMAIL);
-    const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState('');
+    const [otp, setOtp] = useState('');
 
     const handleEmailSubmit = async (data) => {
-        setIsLoading(true);
-        setEmail(data.email);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        setStep(STEPS.OTP);
-        toast.success("OTP sent to your email!");
+        const res = await requestPasswordReset(data.email);
+        if (res.success) {
+            setEmail(data.email);
+            setStep(STEPS.OTP);
+            toast.success("OTP sent to your email!");
+        } else {
+            toast.error(res.error || "Failed to send OTP");
+        }
     };
 
-    const handleOtpSubmit = async () => {
-        setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        setStep(STEPS.RESET);
-        toast.success("OTP verified!");
+    const handleOtpSubmit = async (data) => {
+        const res = await verifyOtp(email, data.otp);
+        if (res.success) {
+            setOtp(data.otp);
+            setStep(STEPS.RESET);
+            toast.success("OTP verified!");
+        } else {
+            toast.error(res.error || "Invalid OTP");
+        }
     };
 
-    const handleResetSubmit = async () => {
-        setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        setIsLoading(false);
-        setStep(STEPS.SUCCESS);
-        toast.success("Password reset successful!");
+    const handleResetSubmit = async (data) => {
+        const res = await resetPassword(email, otp, data.password);
+        if (res.success) {
+            setStep(STEPS.SUCCESS);
+            toast.success("Password reset successful!");
+        } else {
+            toast.error(res.error || "Reset failed");
+        }
     };
 
     const getSubtitle = () => {

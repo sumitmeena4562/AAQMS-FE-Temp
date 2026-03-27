@@ -13,17 +13,18 @@ import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal';
 
 function LoginPage() {
     const navigate = useNavigate();
-    const { login, isLoading ,user} = useAuthStore();
+    const { login, isLoading, error: storeError, setError } = useAuthStore();
     const rememberedEmail = localStorage.getItem("rememberedEmail");
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+    const [localError, setLocalError] = useState(null);
 
     const onSubmit = async (data) => {
+        setLocalError(null);
+        setError(null);
         const result = await login(data);
         if (result.success) {
-            console.log("Logged in user:", result.user.name);
-            toast.success(`Login Successfull! , ${result.user.name}!`);
+            toast.success(`Welcome !, ${result.user.name}!`);
             
-            // Dynamic redirection based on role
             const role = result.user.role;
             if (role === 'coordinator') {
                 navigate('/coordinator/dashboard');
@@ -33,7 +34,7 @@ function LoginPage() {
                 navigate('/admin/dashboard');
             }
         } else {
-            toast.error(result.error || "Authentication failed. Please try again.");
+            setLocalError(result.error);
         }
     };
 
@@ -54,7 +55,23 @@ function LoginPage() {
                 footer={null}
             >
                 {({ register, errors, itemVariants }) => (
-                    <>
+                    <motion.div 
+                        animate={localError ? { x: [-5, 5, -5, 5, 0] } : {}}
+                        transition={{ duration: 0.4 }}
+                        className="space-y-4"
+                    >
+                        {localError && (
+                            <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                className="bg-red-50/50 border border-red-200/50 rounded-xl p-3 mb-2"
+                            >
+                                <p className="text-red-600 text-[11px] font-black uppercase tracking-wider text-center">
+                                    {localError}
+                                </p>
+                            </motion.div>
+                        )}
+
                         <motion.div variants={itemVariants}>
                             <InputField
                                 label="Email or User ID"
@@ -93,7 +110,7 @@ function LoginPage() {
                                 Forgot password?
                             </button>
                         </motion.div>
-                    </>
+                    </motion.div>
                 )}
             </AuthForm>
 
