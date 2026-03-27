@@ -12,43 +12,78 @@ import autoTable from 'jspdf-autotable';
 const useUserStore = create((set, get) => ({
     // --- DATA STATE ---
     users: [],
+    totalCount: 0,
     stats: { total: 0, active: 0, inactive: 0, unassigned: 0 },
     filterOptions: { organizations: [], roles: [], regions: [] },
     loading: false,
     error: null,
 
-    // --- UI & FILTER STATE ---
+    // --- UI, FILTER & PAGINATION STATE ---
     search: '',
-    filters: { organization: '', role: '', status: '', assignment: '', timeRange: 'all', region: '', verified: '' },
+    filters: {
+        role: '',
+        organization: '',
+        region: '',
+        assignment: '',
+        status: ''
+    },
     sortKey: 'name',
     sortDir: 'asc',
     selectedIds: [],
-
-    // --- CORE ACTIONS (API) ---
+    limit: 20,
+    offset: 0,
 
     /**
-     * Fetch users with current filters and search.
+     * INITIAL LOAD: Fetch everything needed for first mount
+     */
+    fetchInitialData: async () => {
+        set({ loading: true, error: null });
+        try {
+            const { filters, search, limit, offset } = get();
+            
+            // Fetch everything in parallel
+            const [usersData, stats] = await Promise.all([
+                userService.getUsers(filters, search, limit, offset),
+                userService.getUserStats(),
+            ]);
+
+            // Derive filter options (using full list if possible, or just the current chunk)
+            // Note: Ideally, there should be a separate 'options' endpoint for large datasets
+            const filterOptions = await userService.getFilterOptions(filters, usersData.users);
+
+            set({ 
+                users: usersData.users, 
+                totalCount: usersData.totalCount,
+                stats, 
+                filterOptions, 
+                loading: false 
+            });
+        } catch (err) {
+            set({ error: err.message, loading: false });
+            toast.error(err.message);
+        }
+    },
+
+    /**
+     * FETCH LIST: Only refresh the user list (for search, filters, pagination)
      */
     fetchUsers: async () => {
         set({ loading: true, error: null });
         try {
-            const { search, filters } = get();
-            
-            // Fetch users and stats in parallel
-            const [users, stats] = await Promise.all([
-                userService.getUsers(filters, search),
-                userService.getUserStats(),
-            ]);
-
-            // Derive filter options from already-fetched users (avoid duplicate API call)
-            const filterOptions = await userService.getFilterOptions(filters, users);
-
-            set({ users, stats, filterOptions, loading: false });
+            const { filters, search, limit, offset } = get();
+            const { users, totalCount } = await userService.getUsers(filters, search, limit, offset);
+            set({ users, totalCount, loading: false });
         } catch (err) {
-            const msg = err.message || 'Failed to load users';
-            set({ error: msg, loading: false });
-            toast.error(msg);
+            set({ error: err.message, loading: false });
+            toast.error(err.message);
         }
+    },
+
+    setPage: async (pageNumber) => {
+        const { limit } = get();
+        const newOffset = (pageNumber - 1) * limit;
+        set({ offset: newOffset });
+        await get().fetchUsers();
     },
 
     /**
@@ -58,7 +93,7 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             await userService.createUser(userData);
-            await get().fetchUsers(); // Refresh list
+            await get().fetchInitialData(); // Full refresh
             return { success: true };
         } catch (err) {
             const msg = err.message || 'Failed to create user';
@@ -72,7 +107,7 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             await userService.updateUser(id, updates);
-            await get().fetchUsers();
+            await get().fetchInitialData();
             return { success: true };
         } catch (err) {
             const msg = err.message || 'Failed to update user profile';
@@ -87,7 +122,7 @@ const useUserStore = create((set, get) => ({
             await userService.deleteUser(id);
             // Remove from selection if deleted
             set(s => ({ selectedIds: s.selectedIds.filter(i => i !== id) }));
-            await get().fetchUsers();
+            await get().fetchInitialData();
             return { success: true };
         } catch (err) {
             const msg = err.message || 'Failed to delete user';
@@ -103,16 +138,21 @@ const useUserStore = create((set, get) => ({
         const ids = targetIds || get().selectedIds;
         if (ids.length === 0) return { success: false, error: "No users selected" };
 
-        set({ loading: true, error: null });
+        set({ loading: true, error: null }); // Keep error: null for consistency with other actions
         try {
             await userService.bulkAction(ids, action);
-            if (!targetIds) set({ selectedIds: [] }); // Clear selection if it was a global action
-            await get().fetchUsers();
-            return { success: true };
+            // Clear selection if it was a global action (or if targetIds was not provided)
+            // The original code had `if (!targetIds) set({ selectedIds: [] });`
+            // The instruction removed the `if (!targetIds)` condition.
+            set({ selectedIds: [] }); 
+            await get().fetchInitialData();
+            toast.success(`Bulk ${action} successful`);
+            return { success: true }; // Return success here
         } catch (err) {
-            const msg = err.message || 'Bulk action failed';
-            set({ loading: false, error: msg });
-            return { success: false, error: msg };
+            const msg = err.message || `Bulk ${action} failed`;
+            toast.error(msg);
+            set({ loading: false, error: msg }); // Set error here
+            return { success: false, error: msg }; // Return failure here
         }
     },
 

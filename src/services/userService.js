@@ -28,15 +28,27 @@ export const userService = {
     /**
      * GET USERS: Fetch with search & filters
      */
-    getUsers: async (filters = {}, search = '') => {
+    getUsers: async (filters = {}, search = '', limit = 20, offset = 0) => {
         try {
             const response = await api.get('accounts/users/', {
                 params: {
                     ...filters,
-                    search: search 
+                    search: search,
+                    limit: limit,
+                    offset: offset
                 }
             });
-            return response.data.results || response.data; 
+            // Handle DRF Pagination response format
+            if (response.data.results) {
+                return {
+                    users: response.data.results,
+                    totalCount: response.data.count
+                };
+            }
+            return {
+                users: response.data,
+                totalCount: response.data.length
+            };
         } catch (error) {
             throw new Error(extractError(error, 'Failed to load user list. Please refresh the page.'));
         }

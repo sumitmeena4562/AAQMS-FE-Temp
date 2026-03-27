@@ -23,13 +23,14 @@ import Badge from '../../components/UI/Badge';
 import DotStatus from '../../components/UI/DotStatus';
 import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 import FilterBar from '../../components/UI/FilterBar';
+import { Pagination } from 'antd';
 
 export default function Users() {
     const store = useUserStore();
     const {
-        users, stats, filterOptions, loading,
+        users, stats, filterOptions, loading, totalCount, limit, offset,
         search, filters, sortKey, sortDir, selectedIds,
-        fetchUsers, exportPDF,
+        fetchUsers, fetchInitialData, exportPDF, setPage,
         setSearch, setFilters, toggleSelectAll, toggleSelectRow,
         clearSelection, resetFilters,
     } = store;
@@ -48,9 +49,21 @@ export default function Users() {
     const debouncedSearch = useDebounce(search, 300);
     const { setBreadcrumbs } = useBreadcrumb();
 
+    // ── DATA FETCHING ──
     useEffect(() => {
-        fetchUsers();
-    }, [debouncedSearch, filters, fetchUsers]);
+        fetchInitialData();
+    }, [fetchInitialData]);
+
+    // List Refresh - Only when criteria or page changes
+    useEffect(() => {
+        if (!loading) fetchUsers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedSearch, JSON.stringify(filters), offset]);
+
+
+    const handlePageChange = (page) => {
+        setPage(page);
+    };
 
     const sortedUsers = useMemo(() => {
         const list = [...(users || [])];
@@ -570,6 +583,20 @@ export default function Users() {
                 danger={true}
                 loading={loading}
             />
+            {/* 6. Pagination Footer */}
+            <div className="flex justify-between items-center py-4 px-6 bg-card border-t border-border-main/50 mb-10">
+                <div className="text-[11px] font-bold text-gray uppercase tracking-widest">
+                    Showing  {offset + 1} - {Math.min(offset + limit, totalCount)} of {totalCount} Records
+                </div>
+                <Pagination 
+                    current={Math.floor(offset / limit) + 1}
+                    total={totalCount}
+                    pageSize={limit}
+                    onChange={handlePageChange}
+                    showSizeChanger={false}
+                    className="aaqms-pagination"
+                />
+            </div>
         </div>
     );
 }
