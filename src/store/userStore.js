@@ -146,8 +146,7 @@ const useUserStore = create((set, get) => ({
             // The instruction removed the `if (!targetIds)` condition.
             set({ selectedIds: [] }); 
             await get().fetchInitialData();
-            toast.success(`Bulk ${action} successful`);
-            return { success: true }; // Return success here
+            return { success: true }; // Removed redundant toast.success
         } catch (err) {
             const msg = err.message || `Bulk ${action} failed`;
             toast.error(msg);
@@ -245,6 +244,7 @@ const useUserStore = create((set, get) => ({
 
             const fileName = `AAQMS_Personnel_Report_${new Date().toISOString().split('T')[0]}.pdf`;
             doc.save(fileName);
+            // Success toast is handled here because export is a side-effect
             toast.success("Comprehensive PDF Report Exported");
         } catch (err) {
             console.error("PDF Export failed:", err);
