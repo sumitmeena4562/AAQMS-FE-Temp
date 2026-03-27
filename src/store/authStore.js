@@ -103,18 +103,20 @@ const useAuthStore = create((set) => ({
    * LOGOUT: Backend pe token blacklist karna aur session clear karna.
    */
   logout: async () => {
-    try {
-      const refresh = localStorage.getItem("refresh");
-      if (refresh) {
+    const refresh = localStorage.getItem("refresh");
+    
+    // 1. Clear Local Session IMMEDIATELY for instant UI feedback
+    storage.clearSession();
+    set({ isAuthenticated: false, user: null, error: null });
+    toast.success("Logged out successfully");
+
+    // 2. Send Logout API in background (Don't await if we want instant redirect)
+    if (refresh) {
+      try {
         await api.post("accounts/logout/", { refresh });
+      } catch (err) {
+        console.error("Logout API background failed:", err);
       }
-      toast.success("Logged out successfully");
-    } catch (err) {
-      console.error("Logout API failed:", err);
-      toast.success("Logged out successfully"); // Still show success toast
-    } finally {
-      storage.clearSession();
-      set({ isAuthenticated: false, user: null, error: null });
     }
   },
 
