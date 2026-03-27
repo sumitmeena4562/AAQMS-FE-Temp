@@ -1,6 +1,9 @@
 import { create } from 'zustand';
-import { userService } from '../services/userService';
+import api from '../services/api';
+import { userService } from "../services/userService";
 import toast from 'react-hot-toast';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 /**
  * USER STORE
@@ -110,6 +113,102 @@ const useUserStore = create((set, get) => ({
             const msg = err.message || 'Bulk action failed';
             set({ loading: false, error: msg });
             return { success: false, error: msg };
+        }
+    },
+
+    /**
+     * Export to PDF (Frontend)
+     */
+    exportPDF: async () => {
+        try {
+            const { users } = get();
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            
+            // --- HEADER & BRANDING ---
+            const primaryColor = [40, 51, 107]; // AAQMS Dark Blue
+            const accentColor = [67, 97, 238];  // AAQMS Primary Blue
+            
+            // Title & Subtitle
+            doc.setFontSize(22);
+            doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+            doc.setFont("helvetica", "bold");
+            doc.text("AAQMS", 14, 20);
+            
+            doc.setFontSize(14);
+            doc.setTextColor(100);
+            doc.setFont("helvetica", "normal");
+            doc.text("Personnel Records - All Users Report", 14, 28);
+            
+            // Branding Line
+            doc.setDrawColor(accentColor[0], accentColor[1], accentColor[2]);
+            doc.setLineWidth(1);
+            doc.line(14, 32, 283, 32);
+
+            // Metadata info
+            doc.setFontSize(9);
+            doc.setTextColor(120);
+            doc.text(`Report date: ${new Date().toLocaleString()}`, 14, 38);
+            doc.text(`Total Personnel Count: ${users.length}`, 14, 43);
+
+            // --- TABLE CONFIG ---
+            const tableColumn = [
+                "Emp ID", "Full Name", "Designation", "Email", 
+                "Phone", "Role", "Organization", "Zone/Region", "Equip ID", "Status"
+            ];
+            
+            const tableRows = users.map(u => [
+                u.employee_id || '---',
+                u.name,
+                u.designation || '---',
+                u.email,
+                u.phone_number || '---',
+                u.role?.toUpperCase(),
+                u.organization || 'Unassigned',
+                u.region || u.zone || 'Global',
+                u.equipment_id || '---',
+                u.is_active ? 'ACTIVE' : 'DEACTIVE'
+            ]);
+
+            autoTable(doc, {
+                head: [tableColumn],
+                body: tableRows,
+                startY: 50,
+                theme: 'grid',
+                styles: { 
+                    fontSize: 7.5, 
+                    cellPadding: 3, 
+                    valign: 'middle',
+                    overflow: 'linebreak'
+                },
+                headStyles: { 
+                    fillColor: primaryColor, 
+                    textColor: 255, 
+                    fontStyle: 'bold',
+                    halign: 'center'
+                },
+                columnStyles: {
+                    0: { halign: 'center', fontStyle: 'bold' }, // Emp ID
+                    3: { textColor: accentColor }, // Email
+                    9: { halign: 'center' } // Status
+                },
+                alternateRowStyles: { fillColor: [250, 251, 255] },
+                margin: { left: 14, right: 14 },
+                didDrawPage: (data) => {
+                    // --- FOOTER ---
+                    const str = "Page " + doc.internal.getNumberOfPages();
+                    doc.setFontSize(8);
+                    doc.setTextColor(150);
+                    doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+                    doc.text("Confidential - AAQMS Internal Document", 230, doc.internal.pageSize.height - 10);
+                }
+            });
+
+            const fileName = `AAQMS_Personnel_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+            toast.success("Comprehensive PDF Report Exported");
+        } catch (err) {
+            console.error("PDF Export failed:", err);
+            toast.error("Failed to generate comprehensive PDF report");
         }
     },
 

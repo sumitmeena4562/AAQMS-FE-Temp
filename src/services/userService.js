@@ -78,7 +78,11 @@ export const userService = {
     bulkAction: async (ids, action) => {
         try {
             // Map frontend action names to backend expected values
-            const actionMap = { 'activate': 'active', 'deactivate': 'deactive' };
+            const actionMap = { 
+                'activate': 'active', 
+                'deactivate': 'deactive',
+                'delete': 'delete'
+            };
             const backendAction = actionMap[action] || action;
             const response = await api.post('accounts/users/bulk-action/', { ids, action: backendAction });
             return response.data;

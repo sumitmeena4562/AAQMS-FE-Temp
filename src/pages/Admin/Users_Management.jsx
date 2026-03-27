@@ -29,7 +29,7 @@ export default function Users() {
     const {
         users, stats, filterOptions, loading,
         search, filters, sortKey, sortDir, selectedIds,
-        fetchUsers, exportCSV,
+        fetchUsers, exportPDF,
         setSearch, setFilters, toggleSelectAll, toggleSelectRow,
         clearSelection, resetFilters,
     } = store;
@@ -127,41 +127,39 @@ export default function Users() {
     const statsData = [
         {
             title: 'Total Users',
-            value: stats.total,
+            value: stats.total || 0,
             icon: FiUsers,
             iconColorClass: 'text-primary',
             iconBgClass: 'bg-primary/10',
-            change: `${stats.active} Active / ${stats.inactive} Deactive`,
+            change: `${stats.active || 0} Active / ${stats.inactive || 0} Deactive`,
             changeType: 'neutral',
             description: 'all platform users'
         },
         {
             title: 'Active Users',
-            value: stats.active,
+            value: stats.active || 0,
             icon: FiCheckCircle,
             iconColorClass: 'text-success',
             iconBgClass: 'bg-emerald-50',
-            trend: 12,
-            description: 'vs last month'
+            description: 'Currently Active'
         },
         {
             title: 'Deactive',
-            value: stats.inactive,
+            value: stats.inactive || 0,
             icon: FiAlertCircle,
             iconColorClass: 'text-danger',
             iconBgClass: 'bg-rose-50',
-            trend: -5,
-            description: 'vs last month'
+            description: 'Account Disabled'
         },
         {
             title: 'Unassigned',
-            value: stats.unassigned,
+            value: stats.unassigned || 0,
             icon: FiClock,
             iconColorClass: 'text-warning',
             iconBgClass: 'bg-amber-50',
-            change: 'Needs Assignment',
+            change: 'Needs Meta-Data',
             changeType: 'warning',
-            description: 'pending review'
+            description: 'pending assignment'
         },
     ];
 
@@ -175,7 +173,10 @@ export default function Users() {
                 <div className="flex items-center gap-2 py-0.5 group-hover:px-1 transition-all">
                     <UserAvatar name={row?.name} avatar={row?.avatar} size="32px" className="shadow-sm border-2 border-white ring-1 ring-base shrink-0" />
                     <div className="flex flex-col min-w-0">
-                        <div className="text-[12px] font-black text-title leading-tight truncate">{row?.name}</div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="text-[12px] font-black text-title leading-tight truncate">{row?.name}</span>
+                            <span className="text-[9px] font-black text-primary/70 bg-primary/5 px-1 rounded uppercase tracking-tighter shrink-0">{row?.employee_id || 'NO-ID'}</span>
+                        </div>
                         <div className="text-[9px] font-bold text-gray mt-0.5 truncate uppercase tracking-widest leading-none">{row?.email}</div>
                     </div>
                 </div>
@@ -280,16 +281,27 @@ export default function Users() {
         <div className="flex flex-col gap-6 w-full">
             <PageHeader
                 title="User Management"
-                subtitle={`Managing ${users.length} active platform identities and permissions`}
+                subtitle={`Managing ${stats.total || 0} registered identities across the platform`}
                 onAdd={handleAddUser}
                 addButtonText="Add User"
                 hideAddButton={false}
-                onExport={exportCSV}
                 breadcrumbs={[
                     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
                     { label: "User Management", path: "/admin/users", icon: <FiUsers size={14} />, isActive: true }
                 ]}
-                rightContent={null}
+                rightContent={
+                    <div className="flex items-center gap-2">
+                         <Button 
+                            onClick={exportPDF}
+                            variant="outline"
+                            size="sm"
+                            className="!h-[38px] bg-card shadow-sm hover:shadow transition-all flex items-center gap-2 px-4 border-dashed border-primary/30"
+                        >
+                            <FiDownload size={14} className="text-primary/70" />
+                            <span className="font-black text-[10px] uppercase tracking-widest text-title">PDF Report</span>
+                        </Button>
+                    </div>
+                }
             />
 
             {/* 2. Stats Section — Unified Oversight Metrics */}
