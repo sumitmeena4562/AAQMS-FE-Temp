@@ -7,13 +7,20 @@ import useAuthStore from '../store/authStore';
  * Redirects authenticated users away from public-only pages (like Login/Register)
  */
 const GuestRoute = () => {
-    const { isAuthenticated, user } = useAuthStore();
+    const { isAuthenticated, user, isBootstrapping } = useAuthStore();
 
-    if (isAuthenticated) {
+    // 🔹 Only wait during initial session restore
+    if (isBootstrapping) return null;
+
+    if (isAuthenticated && user) {
         // Redirect based on role
-        const redirectPath = user?.role === 'coordinator' ? '/coordinator/dashboard' : 
-                            user?.role === 'field_officer' ? '/field-officer/dashboard' : 
-                            '/admin/dashboard';
+        const role = (user?.role || '').toLowerCase();
+        const validRoles = ['admin', 'coordinator', 'field_officer'];
+        
+        let redirectPath = '/admin/dashboard';
+        if (role === 'coordinator') redirectPath = '/coordinator/dashboard';
+        else if (role === 'field_officer') redirectPath = '/field-officer/dashboard';
+        else if (!validRoles.includes(role)) redirectPath = '/'; // Unknown role? Go to landing.
                             
         return <Navigate to={redirectPath} replace />;
     }

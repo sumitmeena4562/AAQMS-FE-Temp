@@ -11,7 +11,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
   // Derive coordinators exactly as stored in User Management: 
   const orgCoordinators = users.filter(u =>
     (u.organization || "").trim().toLowerCase() === (org.name || "").trim().toLowerCase() &&
-    u.role === 'Coordinator'
+    (u.role || "").toLowerCase() === 'coordinator'
   );
 
   // 🔹 STRICT RELATIONAL COMPUTATION: 

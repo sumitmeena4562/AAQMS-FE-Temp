@@ -11,8 +11,10 @@ const Button = ({
     disabled = false,
     isLoading = false,
     loadingText = "Loading...",
+    loading,   // 👈 add this line
     ...props
 }) => {
+    const isActuallyLoading = isLoading || loading;
     // Base styles for the premium dashboard look
     const baseStyles = "relative flex items-center justify-center gap-2 font-semibold rounded-[var(--radius-button)] transition-all duration-200 active:scale-[0.98] whitespace-nowrap disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden";
 
@@ -37,11 +39,11 @@ const Button = ({
         <button
             type={type}
             onClick={onClick}
-            disabled={disabled || isLoading}
+            disabled={disabled || isActuallyLoading}
             className={`${baseStyles} ${sizes[size]} ${variants[variant] || variants.primary} ${className}`}
             {...props}
         >
-            {isLoading ? (
+            {isActuallyLoading ? (
                 <>
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

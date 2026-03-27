@@ -27,7 +27,7 @@ api.interceptors.request.use(
         
         if (!isPublic) {
             // 1. Get auth token from local storage
-            const token = localStorage.getItem('auth_token');
+            const token = localStorage.getItem('token');
 
             // 2. Silently attach the token to every single request
             if (token) {
@@ -73,7 +73,7 @@ api.interceptors.response.use(
                         const { access } = response.data;
 
                         // Save new token
-                        localStorage.setItem('auth_token', access);
+                        localStorage.setItem('token', access);
                         api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
                         originalRequest.headers['Authorization'] = `Bearer ${access}`;
 
@@ -81,7 +81,7 @@ api.interceptors.response.use(
                         return api(originalRequest);
                     } catch (refreshError) {
                         // Refresh token also failed - logout the user
-                        localStorage.removeItem('auth_token');
+                        localStorage.removeItem('token');
                         localStorage.removeItem('refresh');
                         localStorage.removeItem('user');
                         window.location.href = '/login';
@@ -89,7 +89,7 @@ api.interceptors.response.use(
                     }
                 } else {
                     toast.error("Session expired. Please log in again.");
-                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('token');
                     localStorage.removeItem('refresh');
                     localStorage.removeItem('user');
                     window.location.href = '/login';

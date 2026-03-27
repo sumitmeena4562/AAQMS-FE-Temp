@@ -52,6 +52,7 @@ const useAuthStore = create((set) => ({
   isAuthenticated: !!storage.getToken(),
   user: storage.getUser() || null,
   isLoading: false,
+  isBootstrapping: !!storage.getToken() && !storage.getUser(), // Only bootstrap if token exists but user is missing
   error: null,
 
   // --- ACTIONS ---
@@ -63,32 +64,31 @@ const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // 1. Backend se Tokens le kar aana (Dual-compatibility payload)
+      // 1. Backend se Tokens le kar aana
       const { data } = await api.post("accounts/login/", { 
-        email: identifier, // Required by current BE
-        identifier,        // Required by future BE (Dual-Login)
+        email: identifier,
+        identifier,
         password 
       });
 
-      // Agar rememberMe true hai toh email save karein
-        if (rememberMe) {
-            localStorage.setItem("rememberedEmail", identifier);
-        } else {
-            localStorage.removeItem("rememberedEmail");
-        }
+      if (rememberMe) {
+          localStorage.setItem("rememberedEmail", identifier);
+      } else {
+          localStorage.removeItem("rememberedEmail");
+      }
       
-      // 2. Tokens ko save karna
-      localStorage.setItem("token", data.access);
-      localStorage.setItem("refresh", data.refresh);
+      // 2. Profile fetch karna
+      const profile = await api.get("accounts/profile/", {
+          headers: { Authorization: `Bearer ${data.access}` }
+      });
+      
+      // Normalizing role
+      const user = { ...profile.data, role: (profile.data.role || '').toLowerCase() };
 
-      // 3. User ka profile data fetch karna
-      const profile = await api.get("accounts/profile/");
-      const user = profile.data;
-
-      // 4. Poore session ko save karna
+      // 3. Poore session ko save karna
       storage.saveSession(data.access, data.refresh, user);
 
-      // 5. Global State update karna
+      // 4. Global State update karna
       set({ isAuthenticated: true, user, isLoading: false });
       return { success: true, user };
 
@@ -96,6 +96,45 @@ const useAuthStore = create((set) => ({
       const errorMsg = extractError(err, "Invalid email or password. Please try again.");
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
+    }
+  },
+
+  /**
+   * FETCH PROFILE: Session restore karne ke liye profile fetch karna (Bootstrapping).
+   */
+  fetchProfile: async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+        set({ isAuthenticated: false, user: null, isBootstrapping: false, isLoading: false });
+        return { success: false };
+    }
+
+    set({ isBootstrapping: true, error: null });
+    try {
+      const { data } = await api.get("accounts/profile/");
+      const refresh = localStorage.getItem("refresh");
+      
+      // Normalizing role
+      const userData = { ...data, role: (data.role || '').toLowerCase() };
+      storage.saveSession(token, refresh, userData);
+
+      set({ 
+        user: userData, 
+        isAuthenticated: true, 
+        isBootstrapping: false,
+        isLoading: false 
+      });
+      return { success: true, user: userData };
+    } catch (err) {
+      storage.clearSession();
+      set({ 
+        isAuthenticated: false, 
+        user: null, 
+        isBootstrapping: false,
+        isLoading: false,
+        error: extractError(err, "Session expired")
+      });
+      return { success: false, error: "Session expired" };
     }
   },
 

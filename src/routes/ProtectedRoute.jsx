@@ -4,8 +4,10 @@ import useAuthStore from '../store/authStore';
 
 
 const ProtectedRoute = ({ allowedRoles = [] }) => {
-    // Get state from Zustand store
-    const { isAuthenticated, user } = useAuthStore();
+    const { isAuthenticated, user, isBootstrapping } = useAuthStore();
+
+    // 🔹 Wait for bootstrapping if token exists
+    if (isBootstrapping) return null;
 
     // 1. If not logged in, force redirect to login
     if (!isAuthenticated) {
@@ -18,11 +20,14 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
     }
 
     // 3. If allowedRoles is provided, check if user has permission
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
-        // Redirect to their own dashboard based on their actual role
-        const fallbackPath = user?.role === 'coordinator' ? '/coordinator/dashboard' : 
-                            user?.role === 'field_officer' ? '/field-officer/dashboard' : 
-                            '/admin/dashboard';
+    const currentRole = (user?.role || '').toLowerCase();
+    if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
+        const validRoles = ['admin', 'coordinator', 'field_officer'];
+
+        let fallbackPath = '/admin/dashboard';
+        if (currentRole === 'coordinator') fallbackPath = '/coordinator/dashboard';
+        else if (currentRole === 'field_officer') fallbackPath = '/field-officer/dashboard';
+        else if (!validRoles.includes(currentRole)) fallbackPath = '/';
         
         return <Navigate to={fallbackPath} replace />;
     }

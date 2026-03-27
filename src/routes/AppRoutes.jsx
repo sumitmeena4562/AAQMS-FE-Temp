@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import useAuthStore from '../store/authStore';
 
 // Lazy loading components
 const LandingPage = lazy(() => import('../pages/Home/LandingPage'));
@@ -33,6 +34,15 @@ const PageLoader = () => (
 );
 
 const AppRoutes = () => {
+    const { user, fetchProfile } = useAuthStore();
+
+    React.useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token && !user) {
+            fetchProfile();
+        }
+    }, [user, fetchProfile]);
+
     return (
         <BrowserRouter>
             <Suspense fallback={<PageLoader />}>
