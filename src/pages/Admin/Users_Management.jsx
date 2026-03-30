@@ -113,7 +113,7 @@ export default function Users() {
         {
             header: 'PERSONNEL PROFILE',
             accessor: 'name',
-            width: '26%',
+            width: '20%',
             render: (_, row) => (
                 <div className="flex items-center gap-3.5 py-1.5 pr-2 group-hover:px-1 transition-all">
                     <div className="relative shrink-0">
@@ -123,9 +123,39 @@ export default function Users() {
                     <div className="flex flex-col min-w-0">
                         <span className="text-[14px] font-black text-title leading-tight truncate">{row?.name}</span>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-[9px] font-bold text-gray uppercase tracking-tighter bg-base px-1.5 py-0.5 rounded leading-none shrink-0 border border-border-main/40">{row?.employee_id || 'NO-ID'}</span>
-                            <span className="text-[9px] font-medium text-gray/60 truncate italic leading-none">• {row?.email}</span>
+                            <span className="text-[9px] font-bold text-gray uppercase tracking-tighter bg-base px-1.5 py-0.5 rounded leading-none shrink-0 border border-border-main/40">{row?.role || 'user'}</span>
+                            <span className="text-[9px] font-medium text-gray/60 truncate italic leading-none">• system entity</span>
                         </div>
+                    </div>
+                </div>
+            )
+        },
+        {
+            header: 'SYSTEM-ID',
+            accessor: 'employee_id',
+            width: '12%',
+            align: 'center',
+            render: (value) => (
+                <div className="flex justify-center">
+                    <span className="px-2 py-1 bg-title/5 text-title text-[11px] font-black rounded-lg border border-title/10 uppercase tracking-wider">
+                        {value || 'MASTER'}
+                    </span>
+                </div>
+            )
+        },
+        {
+            header: 'CONTACT',
+            accessor: 'email',
+            width: '18%',
+            render: (value, row) => (
+                <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-1.5">
+                        <FiMail size={12} className="text-gray/40 shrink-0" />
+                        <span className="text-[12px] font-medium text-title truncate leading-none">{value}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                        <FiPhone size={11} className="text-gray/40 shrink-0" />
+                        <span className="text-[11px] font-bold text-gray leading-none tracking-tight">{row?.phone_number || 'No Phone'}</span>
                     </div>
                 </div>
             )
@@ -133,7 +163,7 @@ export default function Users() {
         {
             header: 'ORGANIZATION',
             accessor: 'organization',
-            width: '18%',
+            width: '15%',
             render: (value, row) => (
                 <div className="flex flex-col min-w-0">
                     <div className="flex items-center gap-1.5">
