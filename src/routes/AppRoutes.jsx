@@ -18,16 +18,17 @@ const ProtectedRoute = lazy(() => import('./ProtectedRoute'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 /**
- * ── PRODUCTION PAGE LOADER ──
- * Premium full-screen loading state for session bootstrapping.
+ * ── MINIMALIST PAGE LOADER ──
+ * Clean, light-themed loading state for session bootstrapping.
  */
 const PageLoader = () => (
-    <div className="flex items-center justify-center min-h-screen bg-slate-900 overflow-hidden relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(var(--color-primary-rgb),0.1)_0%,_transparent_50%)]" />
-        <div className="relative flex flex-col items-center gap-6 z-10">
-            <div className="w-16 h-16 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/60 animate-pulse">
-                Establishing Secure Link
+    <div className="flex items-center justify-center min-h-screen bg-white overflow-hidden relative">
+        <div className="relative flex flex-col items-center gap-4 z-10">
+             {/* Simple modern spinner */}
+            <div className="w-10 h-10 border-2 border-slate-100 border-t-primary rounded-full animate-spin" />
+            
+            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
+                Loading...
             </div>
         </div>
     </div>
