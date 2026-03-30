@@ -385,7 +385,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 <div className="col-span-1">
                                                     <InputField
                                                         label="System ID"
-                                                        {...register('employeeId')}
+                                                        {...register('employee_id')}
                                                         readOnly
                                                         className="bg-gray/5"
                                                     />
