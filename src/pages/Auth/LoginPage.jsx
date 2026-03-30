@@ -37,6 +37,10 @@ function LoginPage() {
             }
         } else {
             setLocalError(result.error);
+            toast.error(result.error, {
+                id: 'login-error', // Prevent multiple toasts for same error
+                duration: 4000
+            });
         }
     };
 

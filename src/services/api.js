@@ -75,10 +75,10 @@ api.interceptors.response.use(
 
             // 2. Global Server Error (500+)
             if (status >= 500) {
-                toast.error("Critical: Server is currently unavailable. Contact Admin.");
+                toast.error("Server is currently unavailable. Please try again later.", { id: 'server-error' });
             }
         } else if (error.message === 'Network Error') {
-            toast.error("Network Error: Please check your internet connection.");
+            toast.error("Network Error: Please check your internet connection.", { id: 'network-error' });
         }
         
         return Promise.reject(error);
