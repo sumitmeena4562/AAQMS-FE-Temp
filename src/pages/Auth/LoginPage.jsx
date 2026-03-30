@@ -21,11 +21,13 @@ function LoginPage() {
     const onSubmit = async (data) => {
         setLocalError(null);
         setError(null);
+        
         const result = await login(data);
+        
         if (result.success) {
-            toast.success(`Welcome back, ${result.user.name}!`);
+            toast.success(`Welcome back, ${result.user.name || 'User'}!`);
             
-            const role = result.user.role;
+            const role = (result.user.role || '').toLowerCase();
             if (role === 'coordinator') {
                 navigate('/coordinator/dashboard');
             } else if (role === 'field_officer') {
@@ -49,7 +51,7 @@ function LoginPage() {
                 submitText="Sign In"
                 loadingText="Signing in..."
                 defaultValues={{
-                    identifier: rememberedEmail || '',
+                    email: rememberedEmail || '',
                     rememberMe: !!rememberedEmail
                 }}
                 footer={null}
@@ -74,12 +76,12 @@ function LoginPage() {
 
                         <motion.div variants={itemVariants}>
                             <InputField
-                                label="Email or User ID"
-                                type="text"
-                                placeholder="name@company.com or EMP-001"
+                                label="Email Address"
+                                type="email"
+                                placeholder="name@company.com"
                                 icon={<MailIcon />}
-                                {...register('identifier')}
-                                error={errors.identifier?.message}
+                                {...register('email')}
+                                error={errors.email?.message}
                             />
                         </motion.div>
 

@@ -4,15 +4,22 @@ import toast from "react-hot-toast";
 
 /**
  * STORAGE HELPERS
- * Browser ki memory (LocalStorage) ke liye simple methods.
  */
 const storage = {
   getToken: () => localStorage.getItem("token"),
-  getUser: () => JSON.parse(localStorage.getItem("user")),
+  getRefresh: () => localStorage.getItem("refresh"),
+  getUser: () => {
+    try {
+      const user = localStorage.getItem("user");
+      return user ? JSON.parse(user) : null;
+    } catch (e) {
+      return null;
+    }
+  },
   saveSession: (token, refresh, user) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("refresh", refresh);
-    localStorage.setItem("user", JSON.stringify(user));
+    if (token) localStorage.setItem("token", token);
+    if (refresh) localStorage.setItem("refresh", refresh);
+    if (user) localStorage.setItem("user", JSON.stringify(user));
   },
   clearSession: () => {
     localStorage.removeItem("token");
@@ -24,22 +31,17 @@ const storage = {
 /**
  * Extract readable error message from API error response.
  */
-const extractError = (err, fallback = "Internal connection error. Please try again.") => {
+const extractError = (err, fallback = "Connection error. Please try again.") => {
   const data = err.response?.data;
   if (!data) return err.message || fallback;
   
-  // DRF Handlers
   if (data.detail) return data.detail;
-  if (data.error) return data.error;
-  if (data.message) return data.message;
+  if (data.non_field_errors) return data.non_field_errors[0];
   
-  // Validation errors: { email: ["Already exists"], non_field_errors: ["Invalid credentials"] }
   if (typeof data === 'object') {
     const messages = Object.entries(data)
       .map(([key, val]) => {
         const msg = Array.isArray(val) ? val[0] : val;
-        if (key === 'non_field_errors' || key === 'error' || key === 'detail') return msg;
-        // Format key to readable: "first_name" -> "First Name"
         const readableKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         return `${readableKey}: ${msg}`;
       });
@@ -49,61 +51,58 @@ const extractError = (err, fallback = "Internal connection error. Please try aga
   return fallback;
 };
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set, get) => ({
   // --- INITIAL STATE ---
   isAuthenticated: !!storage.getToken(),
   user: storage.getUser() || null,
   isLoading: false,
-  isBootstrapping: !!storage.getToken() && !storage.getUser(), // Only bootstrap if token exists but user is missing
+  isBootstrapping: !!storage.getToken() && !storage.getUser(), 
   error: null,
 
   // --- ACTIONS ---
 
   /**
-   * LOGIN: Backend se authenticate hona aur session save karna.
+   * LOGIN: Backend se tokens lena, fir profile fetch karna.
    */
-  login: async ({ identifier, password, rememberMe }) => {
+  login: async ({ email, password, rememberMe }) => {
     set({ isLoading: true, error: null });
 
     try {
-      // 1. Backend se Tokens le kar aana
-      const { data } = await api.post("accounts/login/", { 
-        email: identifier,
-        identifier,
-        password 
-      });
+      // 1. Get Tokens (Matching backend path api/auth/login/)
+      const loginRes = await api.post("auth/login/", { email, password });
+      const { access, refresh } = loginRes.data;
 
+      // Handle "Remember Me"
       if (rememberMe) {
-          localStorage.setItem("rememberedEmail", identifier);
+          localStorage.setItem("rememberedEmail", email);
       } else {
           localStorage.removeItem("rememberedEmail");
       }
-      
-      // 2. Profile fetch karna
-      const profile = await api.get("accounts/profile/", {
-          headers: { Authorization: `Bearer ${data.access}` }
-      });
-      
-      // Normalizing role
-      const user = { ...profile.data, role: (profile.data.role || '').toLowerCase() };
 
-      // 3. Poore session ko save karna
-      storage.saveSession(data.access, data.refresh, user);
+      // 2. Temporarily save tokens to make the profile call possible
+      localStorage.setItem("token", access);
+      localStorage.setItem("refresh", refresh);
 
-      // 4. Global State update karna
-      set({ isAuthenticated: true, user, isLoading: false });
-      return { success: true, user };
+      // 3. IMMEDIATELY Fetch Profile to get user details/role
+      const profileResult = await get().fetchProfile();
+      
+      if (profileResult.success) {
+          set({ isLoading: false });
+          return { success: true, user: profileResult.user };
+      } else {
+          throw new Error("Could not load user profile after login.");
+      }
 
     } catch (err) {
-      const errorMsg = extractError(err, "Invalid email or password. Please try again.");
+      storage.clearSession();
+      const errorMsg = extractError(err, "Invalid email or password.");
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
     }
   },
 
   /**
-   * FETCH PROFILE: Session restore karne ke liye profile fetch karna (Bootstrapping).
+   * FETCH PROFILE: User ka role aur details backend se lana.
    */
   fetchProfile: async () => {
     const token = localStorage.getItem("token");
@@ -114,10 +113,11 @@ const useAuthStore = create((set) => ({
 
     set({ isBootstrapping: true, error: null });
     try {
-      const { data } = await api.get("accounts/profile/");
+      // Using endpoint api/auth/profile/
+      const { data } = await api.get("auth/profile/");
       const refresh = localStorage.getItem("refresh");
       
-      // Normalizing role
+      // Normalize role for consistency
       const userData = { ...data, role: (data.role || '').toLowerCase() };
       storage.saveSession(token, refresh, userData);
 
@@ -135,14 +135,14 @@ const useAuthStore = create((set) => ({
         user: null, 
         isBootstrapping: false,
         isLoading: false,
-        error: extractError(err, "Session expired")
+        error: "Session expired"
       });
       return { success: false, error: "Session expired" };
     }
   },
 
   /**
-   * LOGOUT: Backend pe token blacklist karna aur session clear karna.
+   * LOGOUT: Token blacklist karna aur state saaf karna.
    */
   logout: async () => {
     const token = localStorage.getItem("token");
@@ -156,94 +156,18 @@ const useAuthStore = create((set) => ({
     // 2. Send Logout API in background (Pass token manually because storage is now empty)
     if (refresh && token) {
       try {
-        await api.post("accounts/logout/", 
+        await api.post("auth/logout/", 
           { refresh },
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } catch (err) {
-        console.error("Logout API background failed:", err);
+        console.error("Logout API failed (background):", err);
       }
     }
   },
 
-  /**
-   * REGISTER: Naya account create karna.
-   * Note: Backend endpoint 'accounts/register/' abhi implement hona baki hai.
-   */
-  register: async (userData) => {
-    set({ isLoading: true, error: null });
-    try {
-      // Name split logic (Full Name -> First/Last)
-      const names = userData.fullName.trim().split(/\s+/);
-      const first_name = names[0];
-      const last_name = names.slice(1).join(' ') || '';
-
-      const payload = {
-        first_name,
-        last_name,
-        email: userData.email,
-        password: userData.password,
-        role: userData.role
-      };
-
-      // Real API call (Assuming endpoint exists in future)
-      // const response = await api.post("accounts/register/", payload);
-      
-      // For now, simulating success to showcase the flow
-      await delay(1500);
-      set({ isLoading: false });
-      return { success: true };
-    } catch (err) {
-      const errorMsg = extractError(err, "Registration failed. Please try again.");
-      set({ error: errorMsg, isLoading: false });
-      return { success: false, error: errorMsg };
-    }
-  },
-
-  // --- STATE HELPERS ---
   setUser: (user) => set({ user, isAuthenticated: !!user }),
   setError: (error) => set({ error }),
-
-  // --- PASSWORD RECOVERY (Real API) ---
-
-  requestPasswordReset: async (email) => {
-    set({ isLoading: true });
-    try {
-      await api.post("accounts/request-reset/", { email });
-      set({ isLoading: false });
-      return { success: true };
-    } catch (err) {
-      const errorMsg = extractError(err, "Failed to send reset link. Please try again.");
-      set({ error: errorMsg, isLoading: false });
-      return { success: false, error: errorMsg };
-    }
-  },
-
-  verifyOtp: async (email, otp) => {
-    set({ isLoading: true });
-    try {
-      await api.post("accounts/verify-otp/", { email, otp });
-      set({ isLoading: false });
-      return { success: true };
-    } catch (err) {
-      const errorMsg = extractError(err, "Invalid or expired OTP code.");
-      set({ error: errorMsg, isLoading: false });
-      return { success: false, error: errorMsg };
-    }
-  },
-
-  resetPassword: async (email, otp, password) => {
-    set({ isLoading: true });
-    try {
-      await api.post("accounts/reset-password/", { email, otp, password });
-      set({ isLoading: false });
-      return { success: true };
-    } catch (err) {
-      const errorMsg = extractError(err, "Password reset failed. Please try again.");
-      set({ error: errorMsg, isLoading: false });
-      return { success: false, error: errorMsg };
-    }
-  },
 }));
 
 export default useAuthStore;
