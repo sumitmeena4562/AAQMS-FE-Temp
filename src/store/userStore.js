@@ -192,7 +192,7 @@ const useUserStore = create((set, get) => ({
             // --- TABLE CONFIG ---
             const tableColumn = [
                 "Emp ID", "Full Name", "Designation", "Email", 
-                "Phone", "Role", "Organization", "Zone/Region", "Equip ID", "Status"
+                "Phone", "Role", "Organization", "Zone/Region", "Status"
             ];
             
             const tableRows = users.map(u => [
@@ -204,7 +204,6 @@ const useUserStore = create((set, get) => ({
                 u.role?.toUpperCase(),
                 u.organization || 'Unassigned',
                 u.region || u.zone || 'Global',
-                u.equipment_id || '---',
                 u.is_active ? 'ACTIVE' : 'DEACTIVE'
             ]);
 

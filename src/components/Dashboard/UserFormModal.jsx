@@ -70,7 +70,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         defaultValues: {
             first_name: '', last_name: '', email: '', organization: '', role: '', 
             assignment: 'standby', status: 'active',
-            region: '', zone: '', employee_id: '', equipment_id: '', 
+            region: '', zone: '', employee_id: '', 
             phone_number: '', designation: ''
         }
     });
@@ -100,7 +100,6 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 region: user.region || '',
                 zone: user.zone || '',
                 employee_id: user.employee_id || '',
-                equipment_id: user.equipment_id || '',
                 phone_number: user.phone_number || '',
                 designation: user.designation || '',
                 avatar: user.avatar || ''
@@ -112,7 +111,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             reset({ 
                 first_name: '', last_name: '', email: '', organization: '', role: '', 
                 assignment: 'standby', status: 'active',
-                region: '', employee_id: '', equipment_id: '',
+                region: '', employee_id: '',
                 phone_number: '', designation: '', avatar: ''
             });
             setShowWorkAssignment(false);

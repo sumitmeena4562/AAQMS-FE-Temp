@@ -12,13 +12,16 @@ const extractError = (error, fallback) => {
     const data = error.response?.data;
     if (!data) return error.message || fallback;
     if (data.detail) return data.detail;
+    if (typeof data === 'string') return data;
+    
     if (typeof data === 'object') {
-        const firstEntry = Object.entries(data).find(([, v]) => v);
-        if (firstEntry) {
-            const [key, val] = firstEntry;
+        const errors = Object.entries(data).map(([key, val]) => {
             const msg = Array.isArray(val) ? val[0] : val;
-            return key === 'non_field_errors' ? msg : `${key}: ${msg}`;
-        }
+            if (key === 'non_field_errors' || key === 'error') return msg;
+            const field = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            return `${field}: ${msg}`;
+        });
+        return errors.length > 0 ? errors[0] : fallback;
     }
     return fallback;
 };
