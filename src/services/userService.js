@@ -4,6 +4,7 @@
  */
 
 import api from "./api";
+import { organizationService } from "./organizationService";
 
 /**
  * Extract readable error message from API error response.
@@ -118,24 +119,30 @@ export const userService = {
         }
     },
 
-    getFilterOptions: async (filters = {}, existingUsers = null) => {
+    getFilterOptions: async () => {
         try {
-            // Use existing users data if available, avoid duplicate API call
-            const usersData = existingUsers || await userService.getUsers(filters);
-            const users = Array.isArray(usersData) ? usersData : (usersData.users || []);
-            
-            const getUnique = (arr, key) => [...new Set(arr.map(u => u[key]).filter(Boolean))].sort();
+            // Fetch real organizations and sites from backend
+            const [orgsData, sitesData] = await Promise.all([
+                organizationService.getOrganizations({ dropdown: 'true' }),
+                organizationService.getSites()
+            ]);
+
+            const orgs = Array.isArray(orgsData) ? orgsData : (orgsData.results || []);
+            const sites = Array.isArray(sitesData) ? sitesData : (sitesData.results || []);
+
             const roles = [
                 { value: 'admin', label: 'Admin' },
                 { value: 'coordinator', label: 'Coordinator' },
                 { value: 'field_officer', label: 'Field Officer' }
             ];
+
             return {
-                organizations: getUnique(users, 'organization'),
+                organizations: orgs.map(o => ({ value: o.id, label: o.name })),
                 roles: roles,
-                regions: [...new Set([...getUnique(users, 'region'), ...getUnique(users, 'zone')])].sort(),
+                regions: sites.map(s => ({ value: s.id, label: s.site_name })),
             };
         } catch (error) {
+            console.error("Failed to fetch filter options:", error);
             return { organizations: [], roles: [], regions: [] };
         }
     },

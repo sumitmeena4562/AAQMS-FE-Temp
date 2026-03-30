@@ -41,15 +41,12 @@ const useUserStore = create((set, get) => ({
         try {
             const { filters, search, limit, offset } = get();
             
-            // Fetch everything in parallel
-            const [usersData, stats] = await Promise.all([
+            // Fetch everything in parallel: Users, Stats, and Real Filter Options
+            const [usersData, stats, filterOptions] = await Promise.all([
                 userService.getUsers(filters, search, limit, offset),
                 userService.getUserStats(),
+                userService.getFilterOptions() // New dynamic fetching
             ]);
-
-            // Derive filter options (using full list if possible, or just the current chunk)
-            // Note: Ideally, there should be a separate 'options' endpoint for large datasets
-            const filterOptions = await userService.getFilterOptions(filters, usersData.users);
 
             set({ 
                 users: usersData.users, 

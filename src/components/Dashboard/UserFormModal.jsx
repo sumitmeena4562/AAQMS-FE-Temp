@@ -11,6 +11,7 @@ import Button from '../UI/Button';
 import InputField from '../UI/InputField';
 import SelectField from '../UI/SelectField';
 import { useOrgStore } from '../../store/useOrgStore';
+import { organizationService } from '../../services/organizationService';
 
 const ROLE_DETAILS = [
     { 
@@ -55,8 +56,35 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     const lastProcessedRef = useRef('');
 
-    const orgs = useOrgStore(state => state.orgs);
-    const dynamicOrganizations = orgs.map(org => org.name);
+    // Dynamic Options State
+    const [availableOrgs, setAvailableOrgs] = useState([]);
+    const [availableSites, setAvailableSites] = useState([]);
+
+    // Fetch initial organizations
+    useEffect(() => {
+        const fetchOrgs = async () => {
+            try {
+                const data = await organizationService.getOrganizations({ dropdown: 'true' });
+                setAvailableOrgs(Array.isArray(data) ? data : (data.results || []));
+            } catch (err) {
+                console.error("Failed to load orgs for form:", err);
+            }
+        };
+        if (isOpen) fetchOrgs();
+    }, [isOpen]);
+
+    // Helper to fetch sites for a selected org
+    const fetchSitesForOrg = async (orgName) => {
+        try {
+            const selectedOrg = availableOrgs.find(o => o.name === orgName);
+            if (selectedOrg) {
+                const data = await organizationService.getSites(selectedOrg.id);
+                setAvailableSites(Array.isArray(data) ? data : (data.results || []));
+            }
+        } catch (err) {
+            console.error("Failed to load sites for form:", err);
+        }
+    };
 
     const {
         register,
@@ -106,6 +134,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             });
             setImagePreview(user.avatar || null);
             setShowWorkAssignment(!!user.organization);
+            if (user.organization) {
+                fetchSitesForOrg(user.organization);
+            }
             setStep(1);
         } else {
             reset({ 
@@ -401,24 +432,22 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 label="Organization / Company"
                                                                 {...register('organization')}
                                                                 error={errors.organization?.message}
-                                                                options={dynamicOrganizations}
+                                                                options={availableOrgs.map(o => ({ value: o.name, label: o.name }))}
+                                                                onChange={(e) => {
+                                                                    const val = e.target.value;
+                                                                    setValue('organization', val);
+                                                                    fetchSitesForOrg(val); // Fetch sites when org changes
+                                                                }}
                                                             />
 
-                                                            {currentRole === 'coordinator' && (
-                                                                <InputField
-                                                                    label="Work Region / Area"
-                                                                    placeholder="e.g. North Zone"
-                                                                    {...register('region')}
-                                                                    error={errors.region?.message}
-                                                                />
-                                                            )}
-
-                                                            {currentRole === 'field_officer' && (
-                                                                <InputField
-                                                                    label="Operational Zone"
-                                                                    placeholder="e.g. Zone A-101"
-                                                                    {...register('zone')}
-                                                                    error={errors.zone?.message}
+                                                            {(currentRole === 'coordinator' || currentRole === 'field_officer') && (
+                                                                <SelectField
+                                                                    label={currentRole === 'coordinator' ? "Work Region / Area" : "Operational Zone"}
+                                                                    placeholder="Select area..."
+                                                                    {...register(currentRole === 'coordinator' ? 'region' : 'zone')}
+                                                                    error={errors[currentRole === 'coordinator' ? 'region' : 'zone']?.message}
+                                                                    options={availableSites.map(s => ({ value: s.site_name, label: s.site_name }))}
+                                                                    disabled={!watch('organization')}
                                                                 />
                                                             )}
                                                         </div>

@@ -234,6 +234,7 @@ export default function Users() {
                 subtitle={`Managing ${stats.total || 0} registered identities`}
                 onAdd={handleAddUser}
                 addButtonText="Add User"
+                hideAddButton={false}
                 breadcrumbs={[
                     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
                     { label: "User Management", path: "/admin/users", isActive: true }

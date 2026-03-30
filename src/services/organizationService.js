@@ -7,44 +7,40 @@ import api from './api';
  * Just replace '/api/v1/organizations' with the actual endpoint your backend developer provides.
  */
 export const organizationService = {
-    // Get all organizations (For Organization Listing Page)
+    // Get all organizations (For Dropdowns and Listing)
     getOrganizations: async (filters = {}) => {
-        /**
-         * @ENDPOINT: GET /api/v1/organizations
-         * @QUERY_PARAMS: ?page=1&limit=10&search=Acme&status=active
-         * @EXPECTED_RESPONSE: { data: [{ id, name, industry, status ... }], total: 100 }
-         */
-        const response = await api.get('/api/v1/organizations', { params: filters });
+        const response = await api.get('organization/organisations/', { params: filters });
+        return response.data;
+    },
+
+    // Get sites for a specific organization (For Assignment Dropdowns)
+    getSites: async (orgId = null) => {
+        const params = orgId ? { organization: orgId, dropdown: 'true' } : { dropdown: 'true' };
+        const response = await api.get('organization/sites/', { params });
         return response.data;
     },
 
     // Get single organization details
     getOrganizationById: async (id) => {
-        const response = await api.get(`/api/v1/organizations/${id}`);
+        const response = await api.get(`organization/organisations/${id}/`);
         return response.data;
     },
 
-    // Create a new organization (For Add Organization Page)
+    // Create a new organization
     createOrganization: async (orgData) => {
-        /**
-         * @ENDPOINT: POST /api/v1/organizations
-         * Note: If 'orgData' contains images (like site imagery or profile logo),
-         * the backend should support 'multipart/form-data'. You might need to pass FormData here.
-         * @EXPECTED_BODY: { name, email, phone, industry, ... }
-         */
-        const response = await api.post('/api/v1/organizations', orgData);
+        const response = await api.post('organization/organisations/', orgData);
         return response.data;
     },
 
     // Update an existing organization
     updateOrganization: async (id, orgData) => {
-        const response = await api.put(`/api/v1/organizations/${id}`, orgData);
+        const response = await api.put(`organization/organisations/${id}/`, orgData);
         return response.data;
     },
 
     // Delete an organization
     deleteOrganization: async (id) => {
-        const response = await api.delete(`/api/v1/organizations/${id}`);
+        const response = await api.delete(`organization/organisations/${id}/`);
         return response.data;
     }
 };
