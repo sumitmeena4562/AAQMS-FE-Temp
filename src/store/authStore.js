@@ -68,22 +68,18 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // 1. Get Tokens (Matching backend path api/auth/login/)
       const loginRes = await api.post("auth/login/", { email, password });
       const { access, refresh } = loginRes.data;
 
-      // Handle "Remember Me"
       if (rememberMe) {
           localStorage.setItem("rememberedEmail", email);
       } else {
           localStorage.removeItem("rememberedEmail");
       }
 
-      // 2. Temporarily save tokens to make the profile call possible
       localStorage.setItem("token", access);
       localStorage.setItem("refresh", refresh);
 
-      // 3. IMMEDIATELY Fetch Profile to get user details/role
       const profileResult = await get().fetchProfile();
       
       if (profileResult.success) {
@@ -113,11 +109,9 @@ const useAuthStore = create((set, get) => ({
 
     set({ isBootstrapping: true, error: null });
     try {
-      // Using endpoint api/auth/profile/
       const { data } = await api.get("auth/profile/");
       const refresh = localStorage.getItem("refresh");
       
-      // Normalize role for consistency
       const userData = { ...data, role: (data.role || '').toLowerCase() };
       storage.saveSession(token, refresh, userData);
 
@@ -148,12 +142,10 @@ const useAuthStore = create((set, get) => ({
     const token = localStorage.getItem("token");
     const refresh = localStorage.getItem("refresh");
     
-    // 1. Clear Local Session IMMEDIATELY for instant UI feedback
     storage.clearSession();
     set({ isAuthenticated: false, user: null, error: null });
     toast.success("Logged out successfully");
 
-    // 2. Send Logout API in background (Pass token manually because storage is now empty)
     if (refresh && token) {
       try {
         await api.post("auth/logout/", 
@@ -163,6 +155,76 @@ const useAuthStore = create((set, get) => ({
       } catch (err) {
         console.error("Logout API failed (background):", err);
       }
+    }
+  },
+
+  /**
+   * REGISTER: Naya account create karna.
+   */
+  register: async (userData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const names = userData.fullName.trim().split(/\s+/);
+      const payload = {
+        name: userData.fullName,
+        first_name: names[0],
+        last_name: names.slice(1).join(' ') || '',
+        email: userData.email,
+        password: userData.password,
+        role: userData.role
+      };
+
+      // Mock delay to showcase flow since backend register is coming soon
+      await new Promise(r => setTimeout(r, 1000));
+      // await api.post("auth/register/", payload);
+      
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      const errorMsg = extractError(err, "Registration failed. Please try again.");
+      set({ error: errorMsg, isLoading: false });
+      return { success: false, error: errorMsg };
+    }
+  },
+
+  // --- PASSWORD RECOVERY ---
+
+  requestPasswordReset: async (email) => {
+    set({ isLoading: true });
+    try {
+      await api.post("auth/request-reset/", { email });
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      const errorMsg = extractError(err, "Failed to send reset link.");
+      set({ error: errorMsg, isLoading: false });
+      return { success: false, error: errorMsg };
+    }
+  },
+
+  verifyOtp: async (email, otp) => {
+    set({ isLoading: true });
+    try {
+      await api.post("auth/verify-otp/", { email, otp });
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      const errorMsg = extractError(err, "Invalid or expired OTP code.");
+      set({ error: errorMsg, isLoading: false });
+      return { success: false, error: errorMsg };
+    }
+  },
+
+  resetPassword: async (email, otp, password) => {
+    set({ isLoading: true });
+    try {
+      await api.post("auth/reset-password/", { email, otp, password });
+      set({ isLoading: false });
+      return { success: true };
+    } catch (err) {
+      const errorMsg = extractError(err, "Password reset failed.");
+      set({ error: errorMsg, isLoading: false });
+      return { success: false, error: errorMsg };
     }
   },
 

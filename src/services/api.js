@@ -2,23 +2,27 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 
 /**
- * CORE API CLIENT
+ * ── CORE API CLIENT ──
+ * Environment aware base URL configuration.
  */
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/';
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/',
+    baseURL: API_BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
 /**
- * REQUEST INTERCEPTOR
+ * ── REQUEST INTERCEPTOR ──
+ * Attaches JWT token to all non-public requests.
  */
-const PUBLIC_ENDPOINTS = ['auth/login/', 'auth/refresh/', 'auth/register/'];
+const PUBLIC_ENDPOINTS = ['auth/login/', 'auth/refresh/', 'auth/register/', 'auth/request-reset/', 'auth/verify-otp/', 'auth/reset-password/'];
 
 api.interceptors.request.use(
     (config) => {
-        const isPublic = PUBLIC_ENDPOINTS.some(endpoint => config.url.includes(endpoint));
+        const isPublic = PUBLIC_ENDPOINTS.some(endpoint => config.url?.includes(endpoint));
         
         if (!isPublic) {
             const token = localStorage.getItem('token');
@@ -32,7 +36,8 @@ api.interceptors.request.use(
 );
 
 /**
- * RESPONSE INTERCEPTOR
+ * ── RESPONSE INTERCEPTOR ──
+ * Handles token automatic refreshment and global error alerts.
  */
 api.interceptors.response.use(
     (response) => response,
@@ -42,36 +47,40 @@ api.interceptors.response.use(
         if (error.response) {
             const { status } = error.response;
 
-            // If 401 (Unauthorized) and not retrying yet
+            // 1. Handling Unauthorized (401) with Token Refresh
             if (status === 401 && !originalRequest._retry) {
                 originalRequest._retry = true;
                 const refreshToken = localStorage.getItem('refresh');
 
                 if (refreshToken) {
                     try {
-                        const refreshURL = import.meta.env.VITE_API_URL 
-                            ? `${import.meta.env.VITE_API_URL}/auth/refresh/`
-                            : 'http://localhost:8000/api/auth/refresh/';
-
-                        const response = await axios.post(refreshURL, { refresh: refreshToken });
+                        const response = await axios.post(`${API_BASE_URL}auth/refresh/`, { refresh: refreshToken });
                         const { access } = response.data;
 
+                        // Save and retry
                         localStorage.setItem('token', access);
                         api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
                         originalRequest.headers['Authorization'] = `Bearer ${access}`;
 
                         return api(originalRequest);
                     } catch (refreshError) {
+                        // Refresh failed -> Absolute logout
                         localStorage.removeItem('token');
                         localStorage.removeItem('refresh');
                         localStorage.removeItem('user');
                         return Promise.reject(refreshError);
                     }
                 }
-            } else if (status >= 500) {
-                toast.error("Cloud server is not responding. Please try again later.");
             }
+
+            // 2. Global Server Error (500+)
+            if (status >= 500) {
+                toast.error("Critical: Server is currently unavailable. Contact Admin.");
+            }
+        } else if (error.message === 'Network Error') {
+            toast.error("Network Error: Please check your internet connection.");
         }
+        
         return Promise.reject(error);
     }
 );
