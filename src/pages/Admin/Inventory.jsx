@@ -58,7 +58,7 @@ const Inventory = () => {
     const location = useLocation();
     const [searchParams] = useSearchParams();
     const { 
-        orgs, inventory, inventoryStats, 
+        orgs, inventory, inventoryStats, isLoading,
         fetchInventory, fetchInventoryStats 
     } = useOrgStore();
 
