@@ -349,7 +349,7 @@ const Inventory = () => {
                             label="Organization"
                             options={orgOptions}
                             value={filters.org}
-                            onChange={(v) => setFilters(prev => ({ ...prev, org: v, building: 'all', floor: 'all', zone: 'all' }))}
+                            onChange={(v) => setFilters(prev => ({ ...prev, org: v, site: 'all', floor: 'all', zone: 'all' }))}
                             allLabel="All Org"
                         />
 
