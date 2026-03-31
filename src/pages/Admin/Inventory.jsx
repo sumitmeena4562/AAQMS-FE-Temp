@@ -66,11 +66,6 @@ const Inventory = () => {
     const [selectedAsset, setSelectedAsset] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     
-    // API Data Load
-    useEffect(() => {
-        fetchInventory();
-        fetchInventoryStats();
-    }, [fetchInventory, fetchInventoryStats]);
 
     // Initial data load: Use real inventory from store
     const initialData = inventory || [];
@@ -109,27 +104,7 @@ const Inventory = () => {
         }
     }, [searchParams]);
 
-    const handleReset = () => {
-        setFilters({ org: 'all', site: 'all', floor: 'all', zone: 'all', type: [], status: [] });
-        setSearchQuery('');
-    };
 
-    const filteredInventory = useMemo(() => {
-        return initialData.filter(item => {
-            const matchesSearch = searchQuery === '' ||
-                (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (item.uniqueId && item.uniqueId.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (item.model && item.model.toLowerCase().includes(searchQuery.toLowerCase()));
-
-            const matchesOrg = !filters.org || filters.org === 'all' || item.org === filters.org;
-            const matchesSite = !filters.site || filters.site === 'all' || item.site === filters.site;
-            const matchesFloor = !filters.floor || filters.floor === 'all' || item.floor === filters.floor;
-            const matchesZone = !filters.zone || filters.zone === 'all' || item.zone === filters.zone;
-            const matchesType = !filters.type || filters.type.length === 0 || filters.type.includes(item.type);
-            const matchesStatus = !filters.status || filters.status.length === 0 || filters.status.includes(item.status);
-            return matchesSearch && matchesOrg && matchesSite && matchesFloor && matchesZone && matchesType && matchesStatus;
-        });
-    }, [initialData, filters, searchQuery]);
 
     // Dropdown Options - Enhanced Hierarchical Filtering
     const orgOptions = useMemo(() => orgs.map(o => ({ value: o.name, label: o.name })), [orgs]);
@@ -169,53 +144,48 @@ const Inventory = () => {
         return statuses.map(s => ({ value: s, label: s }));
     }, [initialData]);
 
-    // Stats Calculation: Use API stats if available, fallback to client-side
-    const stats = useMemo(() => {
-        const total = inventoryStats?.total ?? filteredInventory.length;
-        const verified = inventoryStats?.verified ?? filteredInventory.filter(i => i.status === 'Verified').length;
-        const mismatches = inventoryStats?.mismatches ?? filteredInventory.filter(i => i.status === 'Mismatch').length;
-        const pending = inventoryStats?.pending ?? filteredInventory.filter(i => i.status === 'Pending').length;
+    // ═══════════════════════════════════════════════════════════════
+    //  Fetch Data (Production Grade: Server-Side Sync)
+    // ═══════════════════════════════════════════════════════════════
+    useEffect(() => {
+        // Fetch stats always (filtered by org/site/floor/zone)
+        fetchInventoryStats(filters);
+        
+        // Fetch inventory (Server-side filtering & search)
+        const fetchTimeout = setTimeout(() => {
+            fetchInventory({
+                ...filters,
+                search: searchQuery
+            });
+        }, 300); // Debounce search
 
-        return [
-            {
-                label: "Assets",
-                value: total,
-                icon: FiBox,
-                iconBgClass: "bg-blue-50",
-                iconColorClass: "text-blue-500",
-                description: "Live system count",
-                trend: inventoryStats ? null : 12
-            },
-            {
-                label: "Verified",
-                value: verified,
-                icon: FiCheckCircle,
-                iconBgClass: "bg-emerald-50",
-                iconColorClass: "text-emerald-500",
-                description: "AI confirmed",
-                trend: inventoryStats ? null : 8
-            },
-            {
-                label: "Mismatches",
-                value: mismatches,
-                icon: FiAlertCircle,
-                iconBgClass: "bg-rose-50",
-                iconColorClass: "text-rose-500",
-                description: "Requires attention",
-                trend: inventoryStats ? null : -2,
-                changeType: 'negative'
-            },
-            {
-                label: "Pending",
-                value: pending,
-                icon: FiClock,
-                iconBgClass: "bg-amber-50",
-                iconColorClass: "text-amber-500",
-                description: "Review queue",
-                trend: inventoryStats ? null : 4
-            }
-        ];
-    }, [filteredInventory, inventoryStats]);
+        return () => clearTimeout(fetchTimeout);
+    }, [filters, searchQuery, fetchInventory, fetchInventoryStats]);
+
+    // Derived Data for Display
+    const displayedInventory = inventory || []; 
+
+    // Handle Quick Filter Reset
+    const handleReset = () => {
+        setFilters({ org: 'all', site: 'all', floor: 'all', zone: 'all', type: [], status: [] });
+        setSearchQuery("");
+    };
+
+    // ═══════════════════════════════════════════════════════════════
+    //  UI Helpers — Skeletons for Production Polish
+    // ═══════════════════════════════════════════════════════════════
+    const StatsSkeleton = () => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+            {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-card px-6 py-5 rounded-[var(--radius-card)] border border-border-main animate-pulse h-[148px]">
+                    <div className="h-2 w-16 bg-slate-200/50 rounded mb-4" />
+                    <div className="h-6 w-24 bg-slate-200/50 rounded mb-4" />
+                    <div className="h-[1.5px] w-full bg-slate-100 my-4" />
+                    <div className="h-2 w-full bg-slate-100 rounded" />
+                </div>
+            ))}
+        </div>
+    );
 
     const handleRowStyle = (row) => {
         if (row.status === 'Mismatch') return 'bg-rose-50/30';
@@ -338,7 +308,7 @@ const Inventory = () => {
         }
     ], []);
 
-    // Pagination State
+    // Pagination State (Controlled by Server params in next phase, local for now)
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
@@ -346,9 +316,8 @@ const Inventory = () => {
         setCurrentPage(1);
     }, [filters, searchQuery]);
 
-    const totalPages = Math.ceil(filteredInventory.length / itemsPerPage);
+    const totalPages = Math.ceil(displayedInventory.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const displayedInventory = filteredInventory.slice(startIndex, startIndex + itemsPerPage);
 
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-16">
@@ -363,7 +332,14 @@ const Inventory = () => {
                 ]}
             />
 
-            <StatsRow items={stats} columns={4} />
+            {isLoading && !inventoryStats ? <StatsSkeleton /> : (
+                <StatsRow items={[
+                    { label: "Assets", value: inventoryStats?.total || 0, icon: FiBox, iconBgClass: "bg-blue-50", iconColorClass: "text-blue-600", description: "System Total" },
+                    { label: "Verified", value: inventoryStats?.verified || 0, icon: FiCheckCircle, iconBgClass: "bg-emerald-50", iconColorClass: "text-emerald-600", description: "AI Confirmed" },
+                    { label: "Mismatches", value: inventoryStats?.mismatches || 0, icon: FiAlertCircle, iconBgClass: "bg-rose-50", iconColorClass: "text-rose-600", description: "Needs Attention" },
+                    { label: "Pending", value: inventoryStats?.pending || 0, icon: FiClock, iconBgClass: "bg-amber-50", iconColorClass: "text-amber-600", description: "In Queue" },
+                ]} columns={4} />
+            )}
 
             <div className="flex flex-col w-full gap-4 mt-2">
 
@@ -456,13 +432,14 @@ const Inventory = () => {
                     <DataTable
                         columns={columns}
                         data={displayedInventory}
+                        loading={isLoading}
                         onRowClick={handleAssetClick}
                         rowClassName={handleRowStyle}
                         emptyMessage={<EmptyState onReset={handleReset} />}
                         footer={
                             <div className="flex items-center justify-between w-full px-1">
                                 <span className="text-[11px] font-bold text-gray tracking-tight">
-                                    Showing <span className="text-title font-bold">{displayedInventory.length > 0 ? startIndex + 1 : 0} to {startIndex + displayedInventory.length}</span> of <span className="text-title font-bold">{filteredInventory.length}</span> results
+                                    Showing <span className="text-title font-bold">{displayedInventory.length > 0 ? startIndex + 1 : 0} to {startIndex + displayedInventory.length}</span> of <span className="text-title font-bold">{displayedInventory.length}</span> results
                                 </span>
                                 <div className="flex items-center gap-1.5">
                                     <Button
@@ -505,7 +482,7 @@ const Inventory = () => {
                         {totalPages > 1 && (
                             <div className="flex items-center justify-between bg-card p-4 rounded-2xl border border-border-main shadow-sm">
                                 <span className="text-[11px] font-bold text-gray tracking-tight">
-                                    Showing <span className="text-title font-bold">{startIndex + 1} to {startIndex + displayedInventory.length}</span> of <span className="text-title font-bold">{filteredInventory.length}</span> results
+                                    Showing <span className="text-title font-bold">{startIndex + 1} to {startIndex + displayedInventory.length}</span> of <span className="text-title font-bold">{displayedInventory.length}</span> results
                                 </span>
                                 <div className="flex items-center gap-2">
                                     <Button

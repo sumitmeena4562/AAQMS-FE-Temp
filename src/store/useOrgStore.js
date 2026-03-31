@@ -205,21 +205,38 @@ export const useOrgStore = create((set, get) => ({
   fetchInventory: async (filters = {}) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await inventoryService.getInventory(filters);
-      // Backend returns { results: [...] } due to pagination
+      // Map frontend filters to backend API params
+      const params = {
+        organisation: filters.org !== 'all' ? filters.org : undefined,
+        site: filters.site !== 'all' ? filters.site : undefined,
+        floor: filters.floor !== 'all' ? filters.floor : undefined,
+        zone: filters.zone !== 'all' ? filters.zone : undefined,
+        category: filters.type?.length ? filters.type[0] : undefined, // Partial mapping for now
+        search: filters.search || undefined
+      };
+      
+      const response = await inventoryService.getInventory(params);
       set({ 
         inventory: response.results || response, 
         isLoading: false 
       });
     } catch (err) {
-      set({ error: err.message || "Failed to fetch inventory", isLoading: false });
+      const msg = err.message || "Failed to fetch inventory";
+      set({ error: msg, isLoading: false });
+      toast.error(msg);
       console.error("Inventory fetch failed:", err);
     }
   },
 
   fetchInventoryStats: async (filters = {}) => {
     try {
-      const data = await inventoryService.getInventoryStats(filters);
+      const params = {
+        organisation: filters.org !== 'all' ? filters.org : undefined,
+        site: filters.site !== 'all' ? filters.site : undefined,
+        floor: filters.floor !== 'all' ? filters.floor : undefined,
+        zone: filters.zone !== 'all' ? filters.zone : undefined
+      };
+      const data = await inventoryService.getInventoryStats(params);
       set({ inventoryStats: data });
     } catch (err) {
       console.warn("Inventory stats fetch failed:", err);
