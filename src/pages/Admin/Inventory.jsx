@@ -9,7 +9,7 @@ import {
     FiAlertCircle, FiClock, FiExternalLink, FiGrid,
     FiMonitor, FiLayout, FiRefreshCcw, FiPrinter,
     FiCpu, FiHardDrive, FiSmartphone, FiTablet,
-    FiZap, FiMousePointer
+    FiZap, FiMousePointer, FiMaximize2
 } from 'react-icons/fi';
 // import { generateGlobalInventory } from '../../utils/mockSiteData';
 import Button from '../../components/UI/Button';
