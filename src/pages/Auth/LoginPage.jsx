@@ -9,6 +9,7 @@ import InputField from '../../components/UI/InputField';
 import Checkbox from '../../components/UI/Checkbox';
 import useAuthStore from '../../store/authStore';
 import { MailIcon, LockIcon } from '../../assets/icon';
+import { FiUser } from 'react-icons/fi';
 import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal';
 
 function LoginPage() {
@@ -76,10 +77,10 @@ function LoginPage() {
 
                         <motion.div variants={itemVariants}>
                             <InputField
-                                label="Email Address"
-                                type="email"
-                                placeholder="name@company.com"
-                                icon={<MailIcon />}
+                                label="Email or System ID"
+                                type="text"
+                                placeholder="name@company.com or AAQMS-001"
+                                icon={<FiUser className="text-gray/40" />}
                                 {...register('email')}
                                 error={errors.email?.message}
                             />

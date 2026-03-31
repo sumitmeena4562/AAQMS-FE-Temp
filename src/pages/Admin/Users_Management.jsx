@@ -9,7 +9,8 @@ import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import {
     FiDownload, FiUsers, FiRefreshCw, FiRefreshCcw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock,
-    FiExternalLink, FiSquare, FiCheckSquare, FiHome, FiBriefcase, FiShield, FiUserCheck, FiUserX
+    FiExternalLink, FiSquare, FiCheckSquare, FiHome, FiBriefcase, FiShield, FiUserCheck, FiUserX,
+    FiMail, FiPhone
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
@@ -258,7 +259,7 @@ export default function Users() {
     );
 
     return (
-        <div className="flex flex-col gap-6 w-full pb-10 animate-in fade-in duration-500">
+        <div className="flex flex-col gap-6 w-full pb-10 animate-in fade-in duration-500 relative">
             <PageHeader
                 title="User Management"
                 subtitle={`Managing ${stats.total || 0} registered identities`}

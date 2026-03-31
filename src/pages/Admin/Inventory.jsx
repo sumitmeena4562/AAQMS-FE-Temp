@@ -67,10 +67,10 @@ const Inventory = () => {
     const initialData = useMemo(() => generateGlobalInventory(orgs), [orgs.length]);
 
     // Filter State
-    const [filters, setFilters] = useState({ 
-        org: 'all', 
+    const [filters, setFilters] = useState({
+        org: 'all',
         site: 'all',
-        floor: 'all', 
+        floor: 'all',
         zone: 'all',
         type: [],
         status: []
@@ -101,7 +101,7 @@ const Inventory = () => {
     }, [searchParams]);
 
     const handleReset = () => {
-        setFilters({ org: 'all', site: 'all', floor: 'all', zone: 'all', type: [], status: [] }); 
+        setFilters({ org: 'all', site: 'all', floor: 'all', zone: 'all', type: [], status: [] });
         setSearchQuery('');
     };
 
@@ -132,7 +132,7 @@ const Inventory = () => {
     }, [initialData, filters.org]);
 
     const floorOptions = useMemo(() => {
-        const relevantData = initialData.filter(i => 
+        const relevantData = initialData.filter(i =>
             (!filters.org || filters.org === 'all' || i.org === filters.org) &&
             (!filters.site || filters.site === 'all' || i.site === filters.site)
         );
@@ -141,8 +141,8 @@ const Inventory = () => {
     }, [initialData, filters.org, filters.site]);
 
     const zoneOptions = useMemo(() => {
-        const relevantData = initialData.filter(i => 
-            (!filters.org || filters.org === 'all' || i.org === filters.org) && 
+        const relevantData = initialData.filter(i =>
+            (!filters.org || filters.org === 'all' || i.org === filters.org) &&
             (!filters.site || filters.site === 'all' || i.site === filters.site) &&
             (!filters.floor || filters.floor === 'all' || i.floor === filters.floor)
         );
