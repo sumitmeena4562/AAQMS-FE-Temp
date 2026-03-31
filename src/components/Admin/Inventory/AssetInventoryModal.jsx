@@ -85,9 +85,9 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
 
                     <button 
                          onClick={onClose}
-                         className="mt-10 w-full py-4 rounded-3xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 active:scale-95 transition-all"
+                         className="mt-10 w-full py-4 rounded-3xl bg-slate-900 shadow-xl shadow-slate-900/20 active:scale-95 transition-all text-white text-[10px] font-black uppercase tracking-[0.2em]"
                     >
-                        Close Modal
+                        CLOSE
                     </button>
                 </div>
 
@@ -186,7 +186,7 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
                                     <div className="relative aspect-[16/10] rounded-2xl border-2 border-dashed border-danger/30 overflow-hidden bg-danger/[0.02] flex items-center justify-center p-8 group">
                                         <img 
                                             src="https://images.unsplash.com/photo-1598018554941-0ed5d336302a?q=80&w=600&fit=crop" 
-                                            className="absolute inset-0 w-full h-full object-cover grayscale opacity-20 transition-opacity group-hover:opacity-40"
+                                            className="absolute inset-0 w-full h-full object-cover grayscale-0 opacity-40 transition-opacity group-hover:opacity-60"
                                             alt="Current"
                                         />
                                         <div className="relative z-10 text-center">
@@ -243,8 +243,12 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
                          <div className="flex-1">
                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Admin Level Clearance Required</span>
                          </div>
-                         <button className="px-8 py-4 rounded-3xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 active:scale-95 transition-all">
-                              Audit Again
+                         <button 
+                             disabled
+                             className="px-8 py-4 rounded-3xl bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 opacity-50 cursor-not-allowed transition-all"
+                             title="Coming Soon in Phase 2"
+                         >
+                               REQUEST AUDIT
                          </button>
                     </div>
                 </div>

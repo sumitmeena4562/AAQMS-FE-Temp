@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { organizationService } from '../services/organizationService';
+import { inventoryService } from '../services/inventoryService';
 import toast from 'react-hot-toast';
 
 /**
@@ -123,6 +124,8 @@ export const useOrgStore = create((set, get) => ({
   isLoading: false,
   isSubmitting: false,
   error: null,
+  inventory: [],
+  inventoryStats: null,
 
   // --- ACTIONS ---
   fetchOrgs: async (filters = {}) => {
@@ -197,4 +200,29 @@ export const useOrgStore = create((set, get) => ({
       toast.success("Organization deleted locally (API offline)");
     }
   },
+
+  // --- INVENTORY ACTIONS ---
+  fetchInventory: async (filters = {}) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await inventoryService.getInventory(filters);
+      // Backend returns { results: [...] } due to pagination
+      set({ 
+        inventory: response.results || response, 
+        isLoading: false 
+      });
+    } catch (err) {
+      set({ error: err.message || "Failed to fetch inventory", isLoading: false });
+      console.error("Inventory fetch failed:", err);
+    }
+  },
+
+  fetchInventoryStats: async (filters = {}) => {
+    try {
+      const data = await inventoryService.getInventoryStats(filters);
+      set({ inventoryStats: data });
+    } catch (err) {
+      console.warn("Inventory stats fetch failed:", err);
+    }
+  }
 }));

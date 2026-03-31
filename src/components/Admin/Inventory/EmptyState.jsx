@@ -15,9 +15,9 @@ const EmptyState = ({ onReset }) => {
             </div>
             
             <h3 className="text-xl font-black text-title tracking-tight mb-2">No Assets Found</h3>
-            <p className="text-gray text-[13px] font-medium max-w-[280px] leading-relaxed mb-8">
+            <div className="text-gray text-[13px] font-medium max-w-[280px] leading-relaxed mb-8">
                 We couldn't find any assets matching your current filters. Try adjusting your selection or search query.
-            </p>
+            </div>
             
             <Button 
                 onClick={onReset}

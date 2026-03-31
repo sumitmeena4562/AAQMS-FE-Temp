@@ -143,7 +143,7 @@ const Table = ({
                                         <div className="w-12 h-12 rounded-full bg-base flex items-center justify-center">
                                             <p className="text-xl">📊</p>
                                         </div>
-                                        <p className="text-gray font-bold text-sm tracking-tight">{emptyMessage}</p>
+                                        <div className="text-gray font-bold text-sm tracking-tight">{emptyMessage}</div>
                                     </div>
                                 </td>
                             </tr>

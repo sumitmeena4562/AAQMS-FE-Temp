@@ -11,7 +11,7 @@ import {
     FiCpu, FiHardDrive, FiSmartphone, FiTablet,
     FiZap, FiMousePointer
 } from 'react-icons/fi';
-import { generateGlobalInventory } from '../../utils/mockSiteData';
+// import { generateGlobalInventory } from '../../utils/mockSiteData';
 import Button from '../../components/UI/Button';
 import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
@@ -57,14 +57,23 @@ export const AssetIcon = ({ type, className = "" }) => {
 const Inventory = () => {
     const location = useLocation();
     const [searchParams] = useSearchParams();
-    const orgs = useOrgStore(state => state.orgs);
+    const { 
+        orgs, inventory, inventoryStats, 
+        fetchInventory, fetchInventoryStats 
+    } = useOrgStore();
 
     // Modal State
     const [selectedAsset, setSelectedAsset] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    // API Data Load
+    useEffect(() => {
+        fetchInventory();
+        fetchInventoryStats();
+    }, [fetchInventory, fetchInventoryStats]);
 
-    // Initial data load: Optimized memoization
-    const initialData = useMemo(() => generateGlobalInventory(orgs), [orgs.length]);
+    // Initial data load: Use real inventory from store
+    const initialData = inventory || [];
 
     // Filter State
     const [filters, setFilters] = useState({
@@ -160,12 +169,12 @@ const Inventory = () => {
         return statuses.map(s => ({ value: s, label: s }));
     }, [initialData]);
 
-    // Stats Calculation
+    // Stats Calculation: Use API stats if available, fallback to client-side
     const stats = useMemo(() => {
-        const total = filteredInventory.length;
-        const verified = filteredInventory.filter(i => i.status === 'Verified').length;
-        const mismatches = filteredInventory.filter(i => i.status === 'Mismatch').length;
-        const pending = filteredInventory.filter(i => i.status === 'Pending').length;
+        const total = inventoryStats?.total ?? filteredInventory.length;
+        const verified = inventoryStats?.verified ?? filteredInventory.filter(i => i.status === 'Verified').length;
+        const mismatches = inventoryStats?.mismatches ?? filteredInventory.filter(i => i.status === 'Mismatch').length;
+        const pending = inventoryStats?.pending ?? filteredInventory.filter(i => i.status === 'Pending').length;
 
         return [
             {
@@ -175,7 +184,7 @@ const Inventory = () => {
                 iconBgClass: "bg-blue-50",
                 iconColorClass: "text-blue-500",
                 description: "Live system count",
-                trend: 12
+                trend: inventoryStats ? null : 12
             },
             {
                 label: "Verified",
@@ -184,7 +193,7 @@ const Inventory = () => {
                 iconBgClass: "bg-emerald-50",
                 iconColorClass: "text-emerald-500",
                 description: "AI confirmed",
-                trend: 8
+                trend: inventoryStats ? null : 8
             },
             {
                 label: "Mismatches",
@@ -193,7 +202,7 @@ const Inventory = () => {
                 iconBgClass: "bg-rose-50",
                 iconColorClass: "text-rose-500",
                 description: "Requires attention",
-                trend: -2,
+                trend: inventoryStats ? null : -2,
                 changeType: 'negative'
             },
             {
@@ -203,10 +212,10 @@ const Inventory = () => {
                 iconBgClass: "bg-amber-50",
                 iconColorClass: "text-amber-500",
                 description: "Review queue",
-                trend: 4
+                trend: inventoryStats ? null : 4
             }
         ];
-    }, [filteredInventory]);
+    }, [filteredInventory, inventoryStats]);
 
     const handleRowStyle = (row) => {
         if (row.status === 'Mismatch') return 'bg-rose-50/30';
@@ -269,8 +278,8 @@ const Inventory = () => {
             width: '8%',
             align: 'center',
             render: () => (
-                <div className="flex justify-center w-full text-gray/40 hover:text-title transition-colors cursor-pointer border border-transparent hover:border-border-main p-1 rounded-md">
-                    <FiLayout size={18} />
+                <div className="flex justify-center w-full text-gray/40 hover:text-title transition-colors cursor-pointer border border-transparent hover:border-border-main p-1 rounded-md" title="View QR Code">
+                    <FiMaximize2 size={18} />
                 </div>
             )
         },
