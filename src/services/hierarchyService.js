@@ -2,59 +2,46 @@ import api from './api';
 
 /**
  * ── HIERARCHY (SITE, FLOOR, ZONE) API SERVICE ──
- * 
- * TODO [BACKEND INTEGRATION]: Update the URLs below once the backend is ready.
+ * Aligned with standardized Backend path: api/organizations/
  */
 export const hierarchyService = {
     // --- SITES ---
     getSites: async (filters = {}) => {
         /**
-         * @ENDPOINT: GET /api/v1/sites
-         * @QUERY_PARAMS: ?orgId=12&coordId=45
-         * @EXPECTED_RESPONSE: [{ id, name, location, orgId, coordId ... }]
+         * Standardized: Use the organizations/sites/ path.
          */
-        const response = await api.get('/api/v1/sites', { params: filters });
+        const response = await api.get('organizations/sites/', { params: filters });
         return response.data;
     },
 
     createSite: async (siteData) => {
-        const response = await api.post('/api/v1/sites', siteData);
+        const response = await api.post('organizations/sites/', siteData);
         return response.data;
     },
 
     // --- FLOORS ---
     getFloors: async (filters = {}) => {
-        /**
-         * @ENDPOINT: GET /api/v1/floors
-         * @QUERY_PARAMS: ?siteId=89
-         * @EXPECTED_RESPONSE: [{ id, name, level, siteId, floorPlanImage ... }]
-         */
-        const response = await api.get('/api/v1/floors', { params: filters });
+        const response = await api.get('organizations/floors/', { params: filters });
         return response.data;
     },
 
     createFloor: async (floorData) => {
         /**
-         * @ENDPOINT: POST /api/v1/floors
          * Note: Usually involves uploading a floor map/blueprint image.
+         * Ensure multipart header if necessary.
          */
-        const response = await api.post('/api/v1/floors', floorData);
+        const response = await api.post('organizations/floors/', floorData);
         return response.data;
     },
 
     // --- ZONES ---
     getZones: async (filters = {}) => {
-        /**
-         * @ENDPOINT: GET /api/v1/zones
-         * @QUERY_PARAMS: ?floorId=102
-         * @EXPECTED_RESPONSE: [{ id, name, type, coordinates, floorId ... }]
-         */
-        const response = await api.get('/api/v1/zones', { params: filters });
+        const response = await api.get('organizations/zones/', { params: filters });
         return response.data;
     },
 
     createZone: async (zoneData) => {
-        const response = await api.post('/api/v1/zones', zoneData);
+        const response = await api.post('organizations/zones/', zoneData);
         return response.data;
     }
 };

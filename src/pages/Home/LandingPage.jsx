@@ -56,7 +56,7 @@ const LandingPage = () => {
             <LandingNavbar
                 navLinks={navLinks}
                 buttons={[
-                    { label: 'Login', variant: 'filled', onClick: () => navigate('/login') }
+                    { label: 'Login', variant: 'filled', href: '/login' }
                 ]}
             />
 

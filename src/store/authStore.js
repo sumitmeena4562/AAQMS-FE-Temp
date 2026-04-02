@@ -192,9 +192,7 @@ const useAuthStore = create((set, get) => ({
         role: userData.role
       };
 
-      // Mock delay to showcase flow since backend register is coming soon
-      await new Promise(r => setTimeout(r, 1000));
-      // await api.post("auth/register/", payload);
+      await api.post("auth/register/", payload);
       
       set({ isLoading: false });
       return { success: true };

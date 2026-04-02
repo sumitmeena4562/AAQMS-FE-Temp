@@ -17,7 +17,7 @@ const AuthInitializer = ({ children }) => {
             if (token && !isAuthenticated) {
                 try {
                     // Fetch real user profile from backend
-                    const response = await api.get('accounts/profile/');
+                    const response = await api.get('auth/profile/');
                     setUser(response.data);
                 } catch (error) {
                     console.error('Failed to restore session:', error);

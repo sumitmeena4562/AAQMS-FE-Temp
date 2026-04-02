@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { MdSearch, MdOutlineLanguage } from 'react-icons/md';
 import { FaXTwitter, FaGithub } from 'react-icons/fa6';
+import { Link } from 'react-router-dom';
 import Logo from '../Branding/Logo';
+
+// Stable motion-wrapped Link — created once outside the component
+// to avoid remounting on every render (fixes deprecated motion() warning)
+const MotionLink = motion.create(Link);
 
 const LandingNavbar = ({
     navLinks = [],
@@ -62,6 +67,29 @@ const LandingNavbar = ({
     const itemVariants = {
         closed: { opacity: 0, x: -20 },
         open: { opacity: 1, x: 0 }
+    };
+
+    const renderButton = (btn, i, isMobile = false) => {
+        const ButtonComponent = btn.href ? MotionLink : motion.button;
+        const buttonProps = btn.href ? { to: btn.href } : { onClick: btn.onClick };
+
+        return (
+            <ButtonComponent
+                key={i}
+                {...buttonProps}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`
+                    ${isMobile ? 'w-full py-4 text-left px-4' : 'px-4 xl:px-6 py-2 text-center ml-2'}
+                    text-[11px] xl:text-[12px] font-black uppercase tracking-widest rounded-xl transition-all whitespace-nowrap
+                    ${btn.variant === 'filled' 
+                        ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark' 
+                        : 'text-slate-600 hover:text-primary'}
+                `}
+            >
+                {btn.label}
+            </ButtonComponent>
+        );
     };
 
     return (
@@ -133,6 +161,7 @@ const LandingNavbar = ({
                                     relative z-10 flex flex-col items-center gap-1.5 px-3 py-2 text-[12px] xl:text-[13px] font-bold tracking-tight transition-colors duration-300 whitespace-nowrap cursor-pointer
                                     ${activeIdx === idx ? 'text-primary' : 'text-slate-500 hover:text-slate-900'}
                                 `}
+                                style={{ position: 'relative' }}
                             >
                                 <div className="flex items-center gap-1">
                                     {link.label}
@@ -165,22 +194,7 @@ const LandingNavbar = ({
                             </motion.button>
                         </div>
 
-                        {buttons.map((btn, i) => (
-                            <motion.button
-                                key={i}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={btn.onClick}
-                                className={`
-                                    px-4 xl:px-6 py-2 text-[11px] xl:text-[12px] font-black uppercase tracking-widest rounded-xl transition-all whitespace-nowrap ml-2
-                                    ${btn.variant === 'filled' 
-                                        ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark' 
-                                        : 'text-slate-600 hover:text-primary'}
-                                `}
-                            >
-                                {btn.label}
-                            </motion.button>
-                        ))}
+                        {buttons.map((btn, i) => renderButton(btn, i))}
                     </div>
 
                     {/* Mobile Menu Toggle Button */}
@@ -253,25 +267,7 @@ const LandingNavbar = ({
                         <div className="flex flex-col gap-8">
                             <div className="text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase font-sans">Account</div>
                             <div className="flex flex-col gap-5">
-                                {buttons.map((btn, i) => (
-                                    <motion.button
-                                        key={i}
-                                        variants={itemVariants}
-                                        whileTap={{ scale: 0.98 }}
-                                        onClick={() => {
-                                            setIsMenuOpen(false);
-                                            if (btn.onClick) btn.onClick();
-                                        }}
-                                        className={`
-                                            w-full py-4 text-[13px] font-black uppercase tracking-[0.2em] rounded-2xl transition-all font-sans
-                                            ${btn.variant === 'filled'
-                                                ? 'bg-primary text-white shadow-xl shadow-primary/20'
-                                                : 'text-slate-600 hover:text-primary text-left px-2'}
-                                        `}
-                                    >
-                                        {btn.label}
-                                    </motion.button>
-                                ))}
+                                {buttons.map((btn, i) => renderButton(btn, i, true))}
                             </div>
                         </div>
                     </motion.div>

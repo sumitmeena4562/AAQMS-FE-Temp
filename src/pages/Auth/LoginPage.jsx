@@ -77,9 +77,9 @@ function LoginPage() {
 
                         <motion.div variants={itemVariants}>
                             <InputField
-                                label="Email or System ID"
-                                type="text"
-                                placeholder="name@company.com or AAQMS-001"
+                                label="Email Address"
+                                type="email"
+                                placeholder="name@company.com"
                                 icon={<FiUser className="text-gray/40" />}
                                 {...register('email')}
                                 error={errors.email?.message}

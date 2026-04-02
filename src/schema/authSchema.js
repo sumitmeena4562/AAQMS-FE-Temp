@@ -2,7 +2,8 @@ import { z } from 'zod';
 
 export const loginSchema = z.object({
     email: z.string()
-        .min(1, { message: "Email or System ID is required" }),
+        .min(1, { message: "Email is required" })
+        .email({ message: "Please enter a valid email address" }),
     password: z.string()
         .min(1, { message: "Password is required" }),
     rememberMe: z.boolean().optional()
@@ -14,7 +15,11 @@ export const registerSchema = z.object({
     email: z.string()
         .email({ message: "Invalid email format" }),
     password: z.string()
-        .min(8, { message: "Password must be at least 8 characters" }),
+        .min(8, { message: "Password must be at least 8 characters" })
+        .regex(/[A-Z]/, { message: "Must contain at least one uppercase letter" })
+        .regex(/[a-z]/, { message: "Must contain at least one lowercase letter" })
+        .regex(/\d/, { message: "Must contain at least one digit" })
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, { message: "Must contain at least one special character" }),
     confirmPassword: z.string(),
     role: z.enum(['ADMIN', 'COORDINATOR', 'FIELD_OFFICER'], {
         errorMap: () => ({ message: "Please select a valid role" })
@@ -38,7 +43,11 @@ export const otpSchema = z.object({
 
 export const resetPasswordSchema = z.object({
     password: z.string()
-        .min(8, { message: "Password must be at least 8 characters" }),
+        .min(8, { message: "Password must be at least 8 characters" })
+        .regex(/[A-Z]/, { message: "Must contain at least one uppercase letter" })
+        .regex(/[a-z]/, { message: "Must contain at least one lowercase letter" })
+        .regex(/\d/, { message: "Must contain at least one digit" })
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, { message: "Must contain at least one special character" }),
     confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
