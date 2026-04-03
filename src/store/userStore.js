@@ -197,10 +197,10 @@ const useUserStore = create((set, get) => ({
                 u.designation || '---',
                 u.email,
                 u.phone_number || '---',
-                u.role?.toUpperCase(),
-                u.organization || 'Unassigned',
+                u.role?.toUpperCase() || '---',
+                u.organisation_name || 'Unassigned',
                 u.region || u.zone || 'Global',
-                u.is_active ? 'ACTIVE' : 'DEACTIVE'
+                u.is_active ? 'ACTIVE' : 'INACTIVE'
             ]);
 
             autoTable(doc, {

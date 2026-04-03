@@ -70,9 +70,10 @@ export const userService = {
         try {
             // Map frontend action names to backend expected values
             const actionMap = { 
-                'activate': 'active', 
-                'deactivate': 'deactive',
-                'delete': 'delete'
+                'activate': 'activate', 
+                'deactivate': 'deactivate',
+                'delete': 'delete',
+                'block': 'block'
             };
             const backendAction = actionMap[action] || action;
             const response = await api.post('users/bulk-action/', { ids, action: backendAction });
