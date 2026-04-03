@@ -208,7 +208,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                             {!collapsed && (
                                 <div className="overflow-hidden flex-1">
                                     <p className="text-slate-900 text-[13px] font-bold truncate leading-tight group-hover:text-primary transition-colors">
-                                        {user.first_name ? `${user.first_name} ${user.last_name || ''}` : 'System User'}
+                                        {user.name || 'System User'}
                                     </p>
                                     <p className="text-slate-500 text-[10px] font-bold truncate mt-0.5 tracking-tight">
                                         {user.email || 'user@system.com'}

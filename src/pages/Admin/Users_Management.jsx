@@ -116,15 +116,15 @@ export default function Users() {
             accessor: 'name',
             width: '20%',
             render: (_, row) => {
-                const fullName = row.first_name ? `${row.first_name} ${row.last_name || ''}` : 'System User';
+                const displayName = row.name || 'System User';
                 return (
                     <div className="flex items-center gap-3.5 py-1.5 pr-2 group-hover:px-1 transition-all">
                         <div className="relative shrink-0">
-                            <UserAvatar name={row?.first_name || 'U'} avatar={row?.avatar} size="42px" className="shadow-sm border-2 border-white ring-1 ring-border-main" />
+                            <UserAvatar name={displayName} avatar={row?.avatar} size="42px" className="shadow-sm border-2 border-white ring-1 ring-border-main" />
                             <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${row?.status?.toLowerCase() === 'active' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
                         </div>
                         <div className="flex flex-col min-w-0">
-                            <span className="text-[14px] font-black text-title leading-tight truncate">{fullName}</span>
+                            <span className="text-[14px] font-black text-title leading-tight truncate">{displayName}</span>
                             <div className="flex items-center gap-1.5 mt-0.5">
                                 <span className="text-[9px] font-bold text-gray uppercase tracking-tighter bg-base px-1.5 py-0.5 rounded leading-none shrink-0 border border-border-main/40">{row?.role || 'user'}</span>
                                 <span className="text-[9px] font-medium text-gray/60 truncate italic leading-none">• system entity</span>
