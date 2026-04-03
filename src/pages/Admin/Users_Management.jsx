@@ -10,7 +10,7 @@ import DataTable from '../../components/UI/DataTable';
 import {
     FiDownload, FiUsers, FiRefreshCw, FiRefreshCcw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock,
     FiExternalLink, FiSquare, FiCheckSquare, FiHome, FiBriefcase, FiShield, FiUserCheck, FiUserX,
-    FiMail, FiPhone
+    FiMail, FiPhone, FiLayers, FiActivity
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
@@ -182,7 +182,7 @@ export default function Users() {
             )
         },
         {
-            header: 'DESIGNATION',
+            header: 'PERSONNEL ROLE',
             accessor: 'role',
             width: '15%',
             align: 'center',

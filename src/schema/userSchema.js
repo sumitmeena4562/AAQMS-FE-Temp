@@ -17,7 +17,6 @@ export const userSchema = z.object({
     assignment: z.string().default('standby'),
     avatar: z.string().optional().nullable(),
     employee_id: z.string().optional().nullable(),
-    designation: z.string().optional().nullable(),
     password: z.string()
         .min(8, { message: "Password must be at least 8 characters" })
         .or(z.literal(''))

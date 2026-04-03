@@ -99,7 +99,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             name: '', email: '', organisation_id: '', role: '', 
             assignment: 'standby', status: 'active',
             region: '', zone: '', employee_id: '', 
-            phone_number: '', designation: ''
+            phone_number: ''
         }
     });
 
@@ -133,7 +133,6 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 zone: user.zone || profile.current_zone || '',
                 employee_id: user.employee_id || '',
                 phone_number: phone,
-                designation: user.designation || '',
                 avatar: user.avatar || profile.avatar || ''
             });
             setImagePreview(user.avatar || profile.avatar || null);
@@ -145,7 +144,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 name: '', email: '', organisation_id: '', role: '', 
                 assignment: 'standby', status: 'active',
                 region: '', employee_id: '',
-                phone_number: '', designation: '', avatar: ''
+                phone_number: '', avatar: ''
             });
             setShowWorkAssignment(false);
             setImagePreview(null);

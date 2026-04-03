@@ -191,14 +191,13 @@ const useUserStore = create((set, get) => ({
 
             // --- TABLE CONFIG ---
             const tableColumn = [
-                "Emp ID", "Full Name", "Designation", "Email", 
+                "Emp ID", "Full Name", "Email", 
                 "Phone", "Role", "Organization", "Zone/Region", "Status"
             ];
             
             const tableRows = users.map(u => [
                 u.employee_id || '---',
                 u.name,
-                u.designation || '---',
                 u.email,
                 u.phone_number || '---',
                 u.role?.toUpperCase() || '---',
