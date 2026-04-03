@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
@@ -116,6 +116,18 @@ function LoginPage() {
                     </motion.div>
                 )}
             </AuthForm>
+
+            <div className="text-center mt-6">
+                <span className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                    Don't have an account? 
+                    <Link 
+                        to="/register" 
+                        className="text-primary font-black ml-2 hover:underline underline-offset-4"
+                    >
+                        Create One
+                    </Link>
+                </span>
+            </div>
 
             <ForgotPasswordModal 
                 isOpen={isForgotPasswordOpen} 

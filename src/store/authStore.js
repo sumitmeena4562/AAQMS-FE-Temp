@@ -40,18 +40,14 @@ const extractError = (err, fallback = "Something went wrong. Please try again.")
 
   const { status, data } = err.response;
 
-  // 2. Specific Status Codes
-  if (status === 401) return "Invalid email or password. Please try again.";
-  if (status === 403) return "Access denied. Your account might be deactivated. Contact Admin.";
-  if (status === 404) return "Authentication service is currently unavailable. Please contact support.";
-  if (status >= 500) return "We're experiencing server issues. Please try again in a few moments.";
-
   // 3. Structured Data response
   if (data) {
     if (data.detail) return data.detail;
     if (data.non_field_errors) return data.non_field_errors[0];
     if (data.error) return data.error;
+    if (data.message) return data.message;
 
+    // 4. Deeper data parsing
     if (typeof data === 'object') {
       const messages = Object.entries(data)
         .map(([key, val]) => {
@@ -65,6 +61,12 @@ const extractError = (err, fallback = "Something went wrong. Please try again.")
     
     if (typeof data === 'string') return data;
   }
+
+  // 5. Default Status Codes (if no specific message found in data)
+  if (status === 401) return "Invalid email or password. Please try again.";
+  if (status === 403) return "Access denied. Your account might be deactivated. Contact Admin.";
+  if (status === 404) return "Authentication service is currently unavailable. Please contact support.";
+  if (status >= 500) return "We're experiencing server issues. Please try again in a few moments.";
   
   return fallback;
 };
@@ -160,10 +162,6 @@ const useAuthStore = create((set, get) => ({
     const token = localStorage.getItem("token");
     const refresh = localStorage.getItem("refresh");
     
-    storage.clearSession();
-    set({ isAuthenticated: false, user: null, error: null });
-    toast.success("Logged out successfully");
-
     if (refresh && token) {
       try {
         await api.post("accounts/logout/", 
@@ -174,6 +172,10 @@ const useAuthStore = create((set, get) => ({
         console.error("Logout API failed (background):", err);
       }
     }
+
+    storage.clearSession();
+    set({ isAuthenticated: false, user: null, error: null });
+    toast.success("Logged out successfully");
   },
 
   /**

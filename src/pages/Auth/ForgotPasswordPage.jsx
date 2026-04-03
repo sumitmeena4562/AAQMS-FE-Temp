@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import { 
     forgotPasswordSchema, 
@@ -110,12 +110,12 @@ function ForgotPasswordPage() {
             footer={
                 <span className="font-semibold text-slate-500">
                     Back to 
-                    <a 
-                        href="/login" 
+                    <Link 
+                        to="/login" 
                         className="text-primary font-black ml-1.5 border-b-2 border-transparent hover:border-primary transition-all duration-300"
                     >
                         Sign in
-                    </a>
+                    </Link>
                 </span>
             }
         >

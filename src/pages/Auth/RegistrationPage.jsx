@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -10,6 +10,8 @@ import SelectField from "../../components/UI/SelectField";
 import Checkbox from "../../components/UI/Checkbox";
 import { MailIcon, LockIcon, UserIcon } from "../../assets/icon";
 import { FiAlertCircle } from 'react-icons/fi';
+
+import useAuthStore from '../../store/authStore';
 
 function RegistrationPage() {
     const { register: registerUser, isLoading, error: authError } = useAuthStore();
@@ -38,12 +40,12 @@ function RegistrationPage() {
             footer={
                 <span className="font-semibold text-slate-500">
                     Already have an account? 
-                    <a 
-                        href="/login" 
+                    <Link 
+                        to="/login" 
                         className="text-primary font-black ml-1.5 border-b-2 border-transparent hover:border-primary transition-all duration-300"
                     >
                         Sign in here
-                    </a>
+                    </Link>
                 </span>
             }
         >
