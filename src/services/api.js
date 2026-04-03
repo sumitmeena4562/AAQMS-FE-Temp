@@ -18,7 +18,7 @@ const api = axios.create({
  * ── REQUEST INTERCEPTOR ──
  * Attaches JWT token to all non-public requests.
  */
-const PUBLIC_ENDPOINTS = ['auth/login/', 'auth/refresh/', 'auth/register/', 'auth/request-reset/', 'auth/verify-otp/', 'auth/reset-password/'];
+const PUBLIC_ENDPOINTS = ['accounts/login/', 'accounts/refresh/', 'accounts/register/', 'accounts/request-reset/', 'accounts/verify-otp/', 'accounts/reset-password/'];
 
 api.interceptors.request.use(
     (config) => {
@@ -54,7 +54,7 @@ api.interceptors.response.use(
 
                 if (refreshToken) {
                     try {
-                        const response = await axios.post(`${API_BASE_URL}auth/refresh/`, { refresh: refreshToken });
+                        const response = await axios.post(`${API_BASE_URL}accounts/token/refresh/`, { refresh: refreshToken });
                         const { access } = response.data;
 
                         // Save and retry

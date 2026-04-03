@@ -86,7 +86,7 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const loginRes = await api.post("auth/login/", { email, password });
+      const loginRes = await api.post("accounts/login/", { email, password });
       const { access, refresh } = loginRes.data;
 
       if (rememberMe) {
@@ -127,7 +127,7 @@ const useAuthStore = create((set, get) => ({
 
     set({ isBootstrapping: true, error: null });
     try {
-      const { data } = await api.get("auth/profile/");
+      const { data } = await api.get("accounts/profile/");
       const refresh = localStorage.getItem("refresh");
       
       const userData = { ...data, role: (data.role || '').toLowerCase() };
@@ -166,7 +166,7 @@ const useAuthStore = create((set, get) => ({
 
     if (refresh && token) {
       try {
-        await api.post("auth/logout/", 
+        await api.post("accounts/logout/", 
           { refresh },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -192,7 +192,7 @@ const useAuthStore = create((set, get) => ({
         role: userData.role
       };
 
-      await api.post("auth/register/", payload);
+      await api.post("accounts/register/", payload);
       
       set({ isLoading: false });
       return { success: true };
@@ -208,7 +208,7 @@ const useAuthStore = create((set, get) => ({
   requestPasswordReset: async (email) => {
     set({ isLoading: true });
     try {
-      await api.post("auth/request-reset/", { email });
+      await api.post("accounts/request-reset/", { email });
       set({ isLoading: false });
       return { success: true };
     } catch (err) {
@@ -221,7 +221,7 @@ const useAuthStore = create((set, get) => ({
   verifyOtp: async (email, otp) => {
     set({ isLoading: true });
     try {
-      await api.post("auth/verify-otp/", { email, otp });
+      await api.post("accounts/verify-otp/", { email, otp });
       set({ isLoading: false });
       return { success: true };
     } catch (err) {
@@ -234,7 +234,7 @@ const useAuthStore = create((set, get) => ({
   resetPassword: async (email, otp, password) => {
     set({ isLoading: true });
     try {
-      await api.post("auth/reset-password/", { email, otp, password });
+      await api.post("accounts/reset-password/", { email, otp, password });
       set({ isLoading: false });
       return { success: true };
     } catch (err) {
