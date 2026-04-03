@@ -117,7 +117,11 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         lastProcessedRef.current = currentKey;
 
         if (user) {
-            let orgId = user.organisation_id || '';
+            // Flatten nested profile data for the form
+            const profile = user.field_officer_profile || user.coordinator_profile || user.admin_profile || {};
+            const orgId = user.organisation_id || profile.organisation || '';
+            const phone = user.phone_number || profile.mobile_number || '';
+
             reset({
                 name: user.name || '',
                 email: user.email || '',
@@ -125,15 +129,15 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 role: user.role || '',
                 assignment: user.assignment || 'standby',
                 status: user.status || 'active',
-                region: user.region || '',
-                zone: user.zone || '',
+                region: user.region || profile.assigned_region || '',
+                zone: user.zone || profile.current_zone || '',
                 employee_id: user.employee_id || '',
-                phone_number: user.phone_number || '',
+                phone_number: phone,
                 designation: user.designation || '',
-                avatar: user.avatar || ''
+                avatar: user.avatar || profile.avatar || ''
             });
-            setImagePreview(user.avatar || null);
-            setShowWorkAssignment(!!(orgId || user.organization));
+            setImagePreview(user.avatar || profile.avatar || null);
+            setShowWorkAssignment(!!orgId);
             if (orgId) fetchSitesForOrg(orgId);
             setStep(1);
         } else {
@@ -337,9 +341,37 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 />
                                             </div>
 
-                                            
+                                            <div className="col-span-2 sm:col-span-1">
+                                                <InputField
+                                                    label="Email Address"
+                                                    placeholder="e.g. john@example.com"
+                                                    {...register('email')}
+                                                    error={errors.email?.message}
+                                                    required
+                                                />
+                                            </div>
 
+                                            <div className="col-span-2 sm:col-span-1">
+                                                <InputField
+                                                    label="Phone Number"
+                                                    placeholder="e.g. +91 9876543210"
+                                                    {...register('phone_number')}
+                                                    error={errors.phone_number?.message}
+                                                />
+                                            </div>
 
+                                            {!isEdit && (
+                                                <div className="col-span-2">
+                                                    <InputField
+                                                        label="Account Password"
+                                                        type="password"
+                                                        placeholder="Minimum 8 characters"
+                                                        {...register('password')}
+                                                        error={errors.password?.message}
+                                                    />
+                                                    <p className="text-[10px] text-gray/60 mt-1.5 ml-1 italic font-medium">Default: AAQMS@admin123 (if left blank)</p>
+                                                </div>
+                                            )}
 
                                             {isEdit && (
                                                 <div className="col-span-2">
