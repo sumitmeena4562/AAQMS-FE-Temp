@@ -70,8 +70,7 @@ const useAuthStore = create((set, get) => ({
 
     } catch (err) {
       storage.clearSession();
-      // Specialized mapping for Login to be extra human-friendly
-      const errorMsg = extractError(err, "Invalid email or password. Please check your credentials.");
+      const errorMsg = extractError(err, "Invalid email or password.");
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
     }
@@ -159,11 +158,7 @@ const useAuthStore = create((set, get) => ({
       set({ isLoading: false });
       return { success: true };
     } catch (err) {
-      // Clean up registration errors (e.g. "Email: Already exists" -> "This email is already in use")
-      let errorMsg = extractError(err, "Registration failed. Please verify your details.");
-      if (errorMsg.toLowerCase().includes("already exists")) {
-          errorMsg = "An account with this email already exists. Please sign in instead.";
-      }
+      const errorMsg = extractError(err, "Registration failed. Please try again.");
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
     }
@@ -178,7 +173,7 @@ const useAuthStore = create((set, get) => ({
       set({ isLoading: false });
       return { success: true };
     } catch (err) {
-      const errorMsg = extractError(err, "Failed to send reset link. Please check your email.");
+      const errorMsg = extractError(err, "Failed to send reset link.");
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
     }
