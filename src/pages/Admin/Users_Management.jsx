@@ -148,7 +148,7 @@ export default function Users() {
                     </div>
                     <div className="flex items-center gap-1.5 mt-1.5">
                         <FiPhone size={11} className="text-gray/40 shrink-0" />
-                        <span className="text-[11px] font-bold text-gray leading-none tracking-tight">{row?.phone_number || 'No Phone'}</span>
+                        <span className="text-[11px] font-bold text-gray leading-none tracking-tight">{row?.mobile_number || 'No Phone'}</span>
                     </div>
                 </div>
             )

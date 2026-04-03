@@ -99,7 +99,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             name: '', email: '', organisation_id: '', role: '', 
             assignment: 'standby', status: 'active',
             region: '', zone: '', 
-            phone_number: ''
+            mobile_number: ''
         }
     });
 
@@ -120,7 +120,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             // Flatten nested profile data for the form
             const profile = user.field_officer_profile || user.coordinator_profile || user.admin_profile || {};
             const orgId = user.organisation_id || profile.organisation || '';
-            const phone = user.phone_number || profile.mobile_number || '';
+            const phone = user.mobile_number || profile.mobile_number || '';
 
             reset({
                 name: user.name || '',
@@ -131,7 +131,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 status: user.status || 'active',
                 region: user.region || profile.assigned_region || '',
                 zone: user.zone || profile.current_zone || '',
-                phone_number: phone,
+                mobile_number: phone,
                 avatar: user.avatar || profile.avatar || ''
             });
             setImagePreview(user.avatar || profile.avatar || null);
@@ -143,7 +143,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 name: '', email: '', organisation_id: '', role: '', 
                 assignment: 'standby', status: 'active',
                 region: '', 
-                phone_number: '', avatar: ''
+                mobile_number: '', avatar: ''
             });
             setShowWorkAssignment(false);
             setImagePreview(null);
@@ -351,10 +351,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
                                             <div className="col-span-2 sm:col-span-1">
                                                 <InputField
-                                                    label="Phone Number"
+                                                    label="Contact Number"
                                                     placeholder="e.g. +91 9876543210"
-                                                    {...register('phone_number')}
-                                                    error={errors.phone_number?.message}
+                                                    {...register('mobile_number')}
+                                                    error={errors.mobile_number?.message}
                                                 />
                                             </div>
 

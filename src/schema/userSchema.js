@@ -13,7 +13,7 @@ export const userSchema = z.object({
     status: z.enum(['active', 'deactive', 'ACTIVE', 'INACTIVE']),
     region: z.string().optional().nullable(),
     zone: z.string().optional().nullable(),
-    phone_number: z.string().optional().nullable(),
+    mobile_number: z.string().optional().nullable(),
     assignment: z.string().default('standby'),
     avatar: z.string().optional().nullable(),
     password: z.string()
