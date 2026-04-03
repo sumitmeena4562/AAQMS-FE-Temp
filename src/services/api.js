@@ -18,7 +18,7 @@ const api = axios.create({
  * ── REQUEST INTERCEPTOR ──
  * Attaches JWT token to all non-public requests.
  */
-const PUBLIC_ENDPOINTS = ['users/login/', 'users/refresh/', 'users/register/', 'users/request-reset/', 'users/verify-otp/', 'users/reset-password/'];
+const PUBLIC_ENDPOINTS = ['users/login/', 'users/token/refresh/', 'users/register/', 'users/request-reset/', 'users/verify-otp/', 'users/reset-password/'];
 
 api.interceptors.request.use(
     (config) => {
