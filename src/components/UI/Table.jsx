@@ -13,12 +13,16 @@ const Table = ({
     onSelectionChange,
     className = "",
     rowClassName,
-    emptyMessage = "No data found"
+    emptyMessage = "No data found",
+    loading = false
 }) => {
     // O(1) performance boost: Convert selected array to a Set
     const selectedIdSet = useMemo(() => new Set(selectedIds.map(String)), [selectedIds]);
 
     const isAllSelected = data.length > 0 && data.every(item => selectedIdSet.has(String(item.id)));
+    
+    // Skeleton Rows
+    const skeletons = useMemo(() => Array(8).fill(null), []);
 
     const handleToggleAll = () => {
         if (onSelectionChange) {
@@ -88,7 +92,18 @@ const Table = ({
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-border-main/80 bg-card">
-                        {data.length > 0 ? (
+                        {loading ? (
+                            skeletons.map((_, i) => (
+                                <tr key={`skeleton-${i}`} className="animate-pulse">
+                                    {columns.map((col, ci) => (
+                                        <td key={`skeleton-cell-${ci}`} className="px-2.5 py-4">
+                                            <div className={`h-4 bg-base-300 rounded-lg w-full ${col.align === 'center' ? 'mx-auto' : ''}`} style={{ width: col.width || '100%', maxWidth: '120px' }}></div>
+                                        </td>
+                                    ))}
+                                    {selectable && <td className="px-2 py-4"><div className="w-4 h-4 bg-base-300 rounded mx-auto"></div></td>}
+                                </tr>
+                            ))
+                        ) : data.length > 0 ? (
                             data.map((row, ri) => {
                                 const isSelected = selectedIdSet.has(String(row.id));
                                 const isClickable = !!onRowClick;
@@ -111,7 +126,7 @@ const Table = ({
                                             <td
                                                 key={ci}
                                                 className={`
-                                                    px-2.5 py-1.5 text-[12px] font-medium text-body vertical-middle
+                                                    px-2.5 py-2.5 text-[12px] font-medium text-body vertical-middle
                                                     ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
                                                     ${col.className || ''}
                                                 `}
@@ -120,7 +135,7 @@ const Table = ({
                                             </td>
                                         ))}
                                         {selectable && (
-                                            <td className="px-2 py-1.5 w-7 relative">
+                                            <td className="px-2 py-2.5 w-7 relative focus-within:z-10">
                                                 {isSelected && <div className="absolute right-0 top-0 bottom-0 w-[3px] bg-primary shadow-[-1px_0_8px_rgba(var(--color-primary-rgb),0.2)]" />}
                                                 <div className="flex items-center justify-end">
                                                     <input

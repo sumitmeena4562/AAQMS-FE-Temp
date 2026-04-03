@@ -96,7 +96,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     } = useForm({
         resolver: zodResolver(userSchema),
         defaultValues: {
-            name: '', email: '', organisation: '', role: '', 
+            name: '', email: '', organisation_id: '', role: '', 
             assignment: 'standby', status: 'active',
             region: '', zone: '', employee_id: '', 
             phone_number: '', designation: ''
@@ -118,10 +118,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
         if (user) {
             reset({
-                first_name: user.first_name || '',
-                last_name: user.last_name || '',
+                name: user.name || '',
                 email: user.email || '',
-                organization: user.organization || '',
+                organisation_id: user.organisation_id || user.organization || '',
                 role: user.role || '',
                 assignment: user.assignment || 'standby',
                 status: user.status || 'active',
@@ -133,14 +132,14 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 avatar: user.avatar || ''
             });
             setImagePreview(user.avatar || null);
-            setShowWorkAssignment(!!user.organization);
-            if (user.organization) {
-                fetchSitesForOrg(user.organization);
+            setShowWorkAssignment(!!(user.organisation_id || user.organization));
+            if (user.organisation_id || user.organization) {
+                fetchSitesForOrg(user.organisation_id || user.organization);
             }
             setStep(1);
         } else {
             reset({ 
-                first_name: '', last_name: '', email: '', organization: '', role: '', 
+                name: '', email: '', organisation_id: '', role: '', 
                 assignment: 'standby', status: 'active',
                 region: '', employee_id: '',
                 phone_number: '', designation: '', avatar: ''
@@ -159,7 +158,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         const payload = { ...data };
 
         // Automatically determine assignment status
-        if (payload.organization || payload.region || payload.zone) {
+        if (payload.organisation_id || payload.region || payload.zone) {
             payload.assignment = 'assigned';
         } else {
             payload.assignment = 'standby';
@@ -318,71 +317,22 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                 <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Basic Information</h3>
                                             </div>
 
-                                            <div className="col-span-1">
+                                            <div className="col-span-2">
                                                 <InputField
-                                                    label="First Name"
-                                                    placeholder="e.g. John"
-                                                    {...register('first_name')}
-                                                    error={errors.first_name?.message}
+                                                    label="Full Name"
+                                                    placeholder="e.g. John Doe"
+                                                    {...register('name')}
+                                                    error={errors.name?.message}
                                                     required
                                                 />
                                             </div>
 
-                                            <div className="col-span-1">
-                                                <InputField
-                                                    label="Last Name"
-                                                    placeholder="e.g. Doe"
-                                                    {...register('last_name')}
-                                                    error={errors.last_name?.message}
-                                                    required
-                                                />
-                                            </div>
-
-                                            <div className="col-span-1">
-                                                <InputField
-                                                    label="Email Address"
-                                                    type="email"
-                                                    placeholder="user@example.com"
-                                                    {...register('email')}
-                                                    error={errors.email?.message}
-                                                    required
-                                                />
-                                            </div>
-
-                                            <div className="col-span-1">
-                                                <InputField
-                                                    label="Phone Number"
-                                                    placeholder="+91-0000000000"
-                                                    {...register('phone_number')}
-                                                    error={errors.phone_number?.message}
-                                                />
-                                            </div>
-
-
-                                            <div className="col-span-1">
-                                                <InputField
-                                                    label={isEdit ? "New Password (Optional)" : "Set Password"}
-                                                    type="password"
-                                                    placeholder={isEdit ? "Leave blank to keep current" : "Min 8 characters"}
-                                                    {...register('password')}
-                                                    error={errors.password?.message}
-                                                    required={!isEdit}
-                                                />
-                                            </div>
-
-                                            {!isEdit && (
-                                                <div className="col-span-2">
-                                                    <div className="flex items-center gap-2 p-3 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-700 text-[11px] font-bold">
-                                                        <FiMail size={14} className="shrink-0" />
-                                                        <span>Login credentials will be automatically emailed to the user.</span>
-                                                    </div>
-                                                </div>
-                                            )}
+                                            
 
 
 
                                             {isEdit && (
-                                                <div className="col-span-1">
+                                                <div className="col-span-2">
                                                     <InputField
                                                         label="System ID"
                                                         {...register('employee_id')}
@@ -430,12 +380,12 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                         <div className="space-y-4">
                                                             <SelectField
                                                                 label="Organization / Company"
-                                                                {...register('organization')}
-                                                                error={errors.organization?.message}
+                                                                {...register('organisation_id')}
+                                                                error={errors.organisation_id?.message}
                                                                 options={availableOrgs.map(o => ({ value: o.name, label: o.name }))}
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
-                                                                    setValue('organization', val);
+                                                                    setValue('organisation_id', val);
                                                                     fetchSitesForOrg(val); // Fetch sites when org changes
                                                                 }}
                                                             />
@@ -447,7 +397,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                     {...register(currentRole === 'coordinator' ? 'region' : 'zone')}
                                                                     error={errors[currentRole === 'coordinator' ? 'region' : 'zone']?.message}
                                                                     options={availableSites.map(s => ({ value: s.site_name, label: s.site_name }))}
-                                                                    disabled={!watch('organization')}
+                                                                    disabled={!watch('organisation_id')}
                                                                 />
                                                             )}
                                                         </div>

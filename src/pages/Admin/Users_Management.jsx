@@ -185,14 +185,23 @@ export default function Users() {
             accessor: 'role',
             width: '15%',
             align: 'center',
-            render: (value) => (
-                <div className="flex justify-center">
-                    <Badge variant="light" color={value === 'coordinator' ? 'coordinator' : value === 'admin' ? 'admin' : 'field_officer'} className="text-[9px] px-3 py-1 rounded-full font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-                        <FiShield size={10} />
-                        {value === 'field_officer' ? 'Field Officer' : value.charAt(0).toUpperCase() + value.slice(1)}
-                    </Badge>
-                </div>
-            )
+            render: (value) => {
+                const role = value?.toLowerCase();
+                const config = {
+                    admin: { color: 'text-amber-700 bg-amber-50 border-amber-100', icon: <FiShield size={10} />, label: 'Administrator' },
+                    coordinator: { color: 'text-sky-700 bg-sky-50 border-sky-100', icon: <FiLayers size={10} />, label: 'Coordinator' },
+                    field_officer: { color: 'text-teal-700 bg-teal-50 border-teal-100', icon: <FiActivity size={10} />, label: 'Field Officer' }
+                }[role] || { color: 'text-gray bg-base border-border-main', icon: <FiShield size={10} />, label: value };
+
+                return (
+                    <div className="flex justify-center">
+                        <div className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 border shadow-sm ${config.color}`}>
+                            {config.icon}
+                            {config.label}
+                        </div>
+                    </div>
+                );
+            }
         },
         {
             header: 'ACCOUNT STATUS',
@@ -200,13 +209,16 @@ export default function Users() {
             width: '15%',
             align: 'center',
             render: (value) => {
-                const isActive = value.toLowerCase() === 'active';
+                const isActive = value?.toLowerCase() === 'active';
                 return (
                     <div className="flex justify-center">
-                        <Badge variant="light" color={isActive ? 'success' : 'neutral'} className="text-[9px] px-3 py-1 rounded-full font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-                            <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-                            {isActive ? 'Active' : 'Deactive'}
-                        </Badge>
+                        <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border transition-all duration-300 shadow-sm
+                            ${isActive 
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-100/50 shadow-emerald-100/20' 
+                                : 'bg-rose-50 text-rose-700 border-rose-100/50 shadow-rose-100/20'}`}>
+                            <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500 hover:scale-110 transition-transform'}`} />
+                            {isActive ? 'Active' : 'Inactive'}
+                        </div>
                     </div>
                 );
             }
@@ -347,17 +359,30 @@ export default function Users() {
                         selectedIds={selectedIds}
                         onSelectionChange={(ids) => store.setSelectedIds(ids)}
                         onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
-                        rowClassName={(row) => row.status === 'deactive' ? 'bg-rose-50/10' : ''}
+                        rowClassName={(row) => (row.status?.toLowerCase() === 'deactive' || row.status?.toLowerCase() === 'inactive') ? 'bg-rose-50/10 opacity-80' : ''}
                         emptyMessage="No personnel records discovered"
                         footer={paginationFooter}
                     />
                 )
             ) : (
-                <div className="flex flex-col items-center justify-center py-24 bg-card/40 border-2 border-dashed border-border-main rounded-3xl">
-                    <FiUserX className="w-10 h-10 text-gray/40 mb-4" />
-                    <h3 className="text-lg font-black text-title mb-1">No Personnel Found</h3>
-                    <p className="text-gray text-xs mb-8 text-center max-w-xs font-medium">We couldn't find any users matching your selection. Try clearing your filters.</p>
-                    <button onClick={resetFilters} className="flex items-center gap-2 px-6 py-2.5 bg-card border border-border-main rounded-xl text-xs font-black text-body hover:bg-base transition-all"><FiRefreshCw />Clear Filters</button>
+                <div className="flex flex-col items-center justify-center py-20 px-6 bg-card/30 border-2 border-dashed border-border-main/60 rounded-[var(--radius-card)] backdrop-blur-sm">
+                    <div className="relative mb-6">
+                        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+                        <div className="relative w-16 h-16 rounded-2xl bg-base border border-border-main flex items-center justify-center shadow-inner">
+                            <FiUserX className="w-8 h-8 text-gray/40" />
+                        </div>
+                    </div>
+                    <h3 className="text-lg font-bold text-title mb-2 tracking-tight">No Personnel Found</h3>
+                    <p className="text-gray text-[13px] mb-8 text-center max-w-[280px] font-medium leading-relaxed italic">
+                        "The archive is empty. Try refining your parameters to discover active operators."
+                    </p>
+                    <button 
+                        onClick={resetFilters} 
+                        className="group flex items-center gap-2.5 px-6 py-3 bg-title text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-title/90 transition-all shadow-lg active:scale-95"
+                    >
+                        <FiRefreshCw className="group-hover:rotate-180 transition-transform duration-700" />
+                        Reset All Filters
+                    </button>
                 </div>
             )}
 

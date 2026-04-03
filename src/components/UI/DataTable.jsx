@@ -185,6 +185,7 @@ const DataTable = ({
                     onSelectionChange={onSelectionChange}
                     rowClassName={rowClassName}
                     emptyMessage={emptyMessage}
+                    loading={loading}
                 />
             </div>
 
