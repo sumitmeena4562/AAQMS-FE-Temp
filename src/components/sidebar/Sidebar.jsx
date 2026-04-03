@@ -203,12 +203,12 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                             `}
                         >
                             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-[13px] font-black shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
-                                {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'U'}
+                                {user.avatar || user.first_name?.charAt(0)?.toUpperCase() || 'U'}
                             </div>
                             {!collapsed && (
                                 <div className="overflow-hidden flex-1">
                                     <p className="text-slate-900 text-[13px] font-bold truncate leading-tight group-hover:text-primary transition-colors">
-                                        {user.name || 'System User'}
+                                        {user.first_name ? `${user.first_name} ${user.last_name || ''}` : 'System User'}
                                     </p>
                                     <p className="text-slate-500 text-[10px] font-bold truncate mt-0.5 tracking-tight">
                                         {user.email || 'user@system.com'}

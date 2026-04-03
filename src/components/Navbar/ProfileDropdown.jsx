@@ -16,7 +16,9 @@ const ProfileDropdown = () => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
-    const name = user?.name || 'Admin User';
+    const firstName = user?.first_name || 'Admin';
+    const lastName = user?.last_name || 'User';
+    const fullName = `${firstName} ${lastName}`;
     const email = user?.email || 'admin@aisafety.com';
 
     const handleLogout = (e) => { 
@@ -44,7 +46,7 @@ const ProfileDropdown = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 className={`w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold transition-all duration-200 hover:ring-2 hover:ring-primary/10 ${isOpen ? 'ring-2 ring-primary/10 shadow-lg' : ''}`}
             >
-                {name.charAt(0).toUpperCase()}
+                {firstName.charAt(0).toUpperCase()}
             </button>
 
             {/* Dropdown */}
@@ -53,12 +55,12 @@ const ProfileDropdown = () => {
                     {/* User Info Section */}
                     <div className="p-4 flex items-center gap-3.5 bg-gradient-to-br from-primary/[0.05] to-transparent border-b border-border-main/50">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-[#6366F1] flex items-center justify-center text-white text-[15px] font-extrabold shadow-md relative shrink-0">
-                            {name.charAt(0).toUpperCase()}
+                            {firstName.charAt(0).toUpperCase()}
                             <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
                         </div>
                         <div className="overflow-hidden">
                             <div className="flex items-center gap-1.5 mb-0.5">
-                                <p className="text-title text-sm font-extrabold truncate leading-tight">{name}</p>
+                                <p className="text-title text-sm font-extrabold truncate leading-tight">{fullName}</p>
                                 <span className="text-[9px] font-black bg-primary text-white px-1.5 py-0.5 rounded uppercase tracking-wider">{user?.role || 'USER'}</span>
                             </div>
                             <p className="text-gray text-[11px] font-semibold truncate">{email.toLowerCase()}</p>
