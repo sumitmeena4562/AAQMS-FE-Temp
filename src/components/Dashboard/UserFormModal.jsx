@@ -98,7 +98,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         defaultValues: {
             name: '', email: '', organisation_id: '', role: '', 
             assignment: 'standby', status: 'active',
-            region: '', zone: '', employee_id: '', 
+            region: '', zone: '', 
             phone_number: ''
         }
     });
@@ -131,7 +131,6 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 status: user.status || 'active',
                 region: user.region || profile.assigned_region || '',
                 zone: user.zone || profile.current_zone || '',
-                employee_id: user.employee_id || '',
                 phone_number: phone,
                 avatar: user.avatar || profile.avatar || ''
             });
@@ -143,7 +142,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             reset({ 
                 name: '', email: '', organisation_id: '', role: '', 
                 assignment: 'standby', status: 'active',
-                region: '', employee_id: '',
+                region: '', 
                 phone_number: '', avatar: ''
             });
             setShowWorkAssignment(false);
@@ -369,17 +368,6 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                         error={errors.password?.message}
                                                     />
                                                     <p className="text-[10px] text-gray/60 mt-1.5 ml-1 italic font-medium">Default: AAQMS@admin123 (if left blank)</p>
-                                                </div>
-                                            )}
-
-                                            {isEdit && (
-                                                <div className="col-span-2">
-                                                    <InputField
-                                                        label="System ID"
-                                                        {...register('employee_id')}
-                                                        readOnly
-                                                        className="bg-gray/5"
-                                                    />
                                                 </div>
                                             )}
 

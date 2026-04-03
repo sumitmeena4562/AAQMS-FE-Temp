@@ -135,19 +135,7 @@ export default function Users() {
                 );
             }
         },
-        {
-            header: 'SYSTEM-ID',
-            accessor: 'employee_id',
-            width: '12%',
-            align: 'center',
-            render: (value) => (
-                <div className="flex justify-center">
-                    <span className="px-2 py-1 bg-title/5 text-title text-[11px] font-black rounded-lg border border-title/10 uppercase tracking-wider">
-                        {value || 'MASTER'}
-                    </span>
-                </div>
-            )
-        },
+
         {
             header: 'CONTACT',
             accessor: 'email',

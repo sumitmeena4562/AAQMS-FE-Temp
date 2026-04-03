@@ -16,7 +16,6 @@ export const userSchema = z.object({
     phone_number: z.string().optional().nullable(),
     assignment: z.string().default('standby'),
     avatar: z.string().optional().nullable(),
-    employee_id: z.string().optional().nullable(),
     password: z.string()
         .min(8, { message: "Password must be at least 8 characters" })
         .or(z.literal(''))
