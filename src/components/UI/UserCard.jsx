@@ -54,7 +54,7 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
       <div className="relative -mt-10 px-4 flex items-end justify-between">
         <div className="relative">
           <UserAvatar 
-            name={user.name} 
+            name={user.first_name || 'U'} 
             avatar={user.avatar} 
             size="72px" 
             className="shadow-xl border-4 border-card ring-1 ring-border-main/20"
@@ -78,8 +78,8 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
       {/* 3. Card Information Section — Just the Essentials */}
       <div className="p-4 pt-3 flex-1 flex flex-col">
         <div className="mb-4">
-          <h3 className="text-base font-black text-title tracking-tight leading-none mb-1.5 truncate pr-8" title={user.name}>
-            {user.name}
+          <h3 className="text-base font-black text-title tracking-tight leading-none mb-1.5 truncate pr-8" title={user.first_name + ' ' + (user.last_name || '')}>
+            {user.first_name} {user.last_name || ''}
           </h3>
           <p className="text-[10px] font-bold text-gray truncate uppercase tracking-widest opacity-80 mb-3">
             {user.email}

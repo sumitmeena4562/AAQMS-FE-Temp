@@ -24,7 +24,6 @@ const useUserStore = create((set, get) => ({
         role: '',
         organization: '',
         region: '',
-        assignment: '',
         status: ''
     },
     sortKey: 'name',
@@ -270,8 +269,8 @@ const useUserStore = create((set, get) => ({
 
     // --- UI HELPERS (Filters, Sorting, Selection) ---
 
-    setSearch: (search) => set({ search }),
-    setFilters: (filters) => set({ filters }),
+    setSearch: (search) => set({ search, offset: 0 }),
+    setFilters: (filters) => set({ filters, offset: 0 }),
     setSortKey: (sortKey) => set({ sortKey }),
     setSortDir: (sortDir) => set({ sortDir }),
 
@@ -299,9 +298,9 @@ const useUserStore = create((set, get) => ({
 
     resetFilters: () => set({
         search: '',
+        offset: 0,
         filters: { 
-            organization: '', role: '', status: '', assignment: '', 
-            timeRange: 'all', region: '', verified: '' 
+            organization: '', role: '', status: '', region: ''
         },
     }),
 

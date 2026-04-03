@@ -15,7 +15,7 @@ import Button from '../UI/Button';
 
 const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate }) => {
     if (!user) return null;
-    const { initials, colors } = getAvatar(user.name);
+    const { initials, colors } = getAvatar(user.first_name);
 
     return (
         <AnimatePresence>
@@ -70,13 +70,13 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate }) => {
                                     style={{ background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})` }}
                                 >
                                     {user.avatar ? (
-                                        <img src={user.avatar} className="w-full h-full object-cover" alt={user.name} />
+                                        <img src={user.avatar} className="w-full h-full object-cover" alt={user.first_name} />
                                     ) : (
                                         initials
                                     )}
                                 </Motion.div>
                                 <div className="flex-1 min-w-0">
-                                    <div className="text-lg font-bold text-title truncate leading-tight mb-1">{user.name}</div>
+                                    <div className="text-lg font-bold text-title truncate leading-tight mb-1">{user.first_name} {user.last_name || ''}</div>
                                     <div className="flex flex-wrap items-center gap-2">
                                         <div className="text-[12px] text-body font-medium truncate">{user.email}</div>
                                         <div className={`
