@@ -34,11 +34,17 @@ export const extractError = (err, fallback = "Something went wrong. Please try a
       if (typeof data === 'string') return data;
     }
   
-    // 4. Default Status Codes
-    if (status === 401) return "Session expired or invalid credentials.";
-    if (status === 403) return "Access denied. You don't have permission for this action.";
-    if (status === 404) return "Resource not found or service unavailable.";
-    if (status >= 500) return "We're experiencing server issues. Please try again later.";
+    // 4. Default Status Codes with Human-Friendly Mappings
+    const authStatusMap = {
+        401: "Invalid email or password. Please try again.",
+        403: "Your account is restricted or you don't have permission for this action.",
+        404: "Authentication service is currently unavailable.",
+        429: "Too many attempts. Please wait a few minutes before trying again.",
+        500: "We're experiencing technical difficulties. Our team is on it!"
+    };
+
+    if (authStatusMap[status]) return authStatusMap[status];
+    if (status >= 500) return "Server is under maintenance. Please try again later.";
     
     return fallback;
 };

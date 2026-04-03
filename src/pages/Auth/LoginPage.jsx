@@ -9,7 +9,7 @@ import InputField from '../../components/UI/InputField';
 import Checkbox from '../../components/UI/Checkbox';
 import useAuthStore from '../../store/authStore';
 import { MailIcon, LockIcon } from '../../assets/icon';
-import { FiUser } from 'react-icons/fi';
+import { FiUser, FiAlertCircle } from 'react-icons/fi';
 import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal';
 
 function LoginPage() {
@@ -18,6 +18,7 @@ function LoginPage() {
     const rememberedEmail = localStorage.getItem("rememberedEmail");
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
     const [localError, setLocalError] = useState(null);
+    const [shakeTrigger, setShakeTrigger] = useState(0);
 
     const onSubmit = async (data) => {
         setLocalError(null);
@@ -38,6 +39,7 @@ function LoginPage() {
             }
         } else {
             setLocalError(result.error);
+            setShakeTrigger(prev => prev + 1);
         }
     };
 
@@ -59,17 +61,21 @@ function LoginPage() {
             >
                 {({ register, errors, itemVariants }) => (
                     <motion.div 
-                        animate={localError ? { x: [-5, 5, -5, 5, 0] } : {}}
-                        transition={{ duration: 0.4 }}
+                        key={shakeTrigger}
+                        animate={shakeTrigger > 0 ? { x: [-10, 10, -10, 10, 0] } : {}}
+                        transition={{ duration: 0.4, type: "spring", stiffness: 300, damping: 10 }}
                         className="space-y-4"
                     >
                         {localError && (
                             <motion.div 
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                className="bg-red-50/50 border border-red-200/50 rounded-xl p-3 mb-2"
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-rose-50 border border-rose-200 rounded-xl p-3 mb-2 flex items-center gap-2.5 shadow-sm"
                             >
-                                <p className="text-red-600 text-[11px] font-black uppercase tracking-wider text-center">
+                                <div className="w-6 h-6 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0">
+                                    <FiAlertCircle className="text-rose-600" size={14} />
+                                </div>
+                                <p className="text-rose-700 text-[11px] font-black uppercase tracking-widest leading-none">
                                     {localError}
                                 </p>
                             </motion.div>

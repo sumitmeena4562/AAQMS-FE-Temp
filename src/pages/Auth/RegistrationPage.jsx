@@ -16,13 +16,18 @@ import useAuthStore from '../../store/authStore';
 function RegistrationPage() {
     const { register: registerUser, isLoading, error: authError } = useAuthStore();
     const navigate = useNavigate();
+    const [localError, setLocalError] = useState(null);
+    const [shakeTrigger, setShakeTrigger] = useState(0);
 
     const onSubmit = async (data) => {
+        setLocalError(null);
         const result = await registerUser(data);
         if (result.success) {
             toast.success("Registration successful! You can now sign in.");
             navigate('/login');
         } else {
+            setLocalError(result.error);
+            setShakeTrigger(prev => prev + 1);
             toast.error(result.error || "An error occurred during registration.");
         }
     };
@@ -50,7 +55,27 @@ function RegistrationPage() {
             }
         >
             {({ register, errors, itemVariants }) => (
-                <>
+                <motion.div 
+                    key={shakeTrigger}
+                    animate={shakeTrigger > 0 ? { x: [-10, 10, -10, 10, 0] } : {}}
+                    transition={{ duration: 0.4, type: "spring", stiffness: 300, damping: 10 }}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4"
+                >
+                    {localError && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="sm:col-span-2 bg-rose-50 border border-rose-200 rounded-xl p-3 mb-2 flex items-center gap-2.5 shadow-sm"
+                        >
+                            <div className="w-6 h-6 rounded-full bg-rose-500/10 flex items-center justify-center shrink-0">
+                                <FiAlertCircle className="text-rose-600" size={14} />
+                            </div>
+                            <p className="text-rose-700 text-[11px] font-black uppercase tracking-widest leading-none">
+                                {localError}
+                            </p>
+                        </motion.div>
+                    )}
+
                     <motion.div variants={itemVariants}>
                         <InputField
                             label="Full Name"
@@ -142,7 +167,7 @@ function RegistrationPage() {
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </>
+                </motion.div>
             )}
         </AuthForm>
     );
