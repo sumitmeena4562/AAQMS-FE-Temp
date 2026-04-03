@@ -55,7 +55,8 @@ export default function Users() {
     }, [debouncedSearch, JSON.stringify(filters), offset]);
 
     const sortedUsers = useMemo(() => {
-        const list = [...(users || [])];
+        if (!Array.isArray(users)) return [];
+        const list = [...users];
         list.sort((a, b) => {
             const av = (a[sortKey] || '').toString().toLowerCase();
             const bv = (b[sortKey] || '').toString().toLowerCase();

@@ -48,14 +48,14 @@ const useUserStore = create((set, get) => ({
             ]);
 
             set({ 
-                users: usersData.users, 
-                totalCount: usersData.totalCount,
-                stats, 
-                filterOptions, 
+                users: Array.isArray(usersData.users) ? usersData.users : [], 
+                totalCount: usersData.totalCount || 0,
+                stats: stats || { total: 0, active: 0, inactive: 0, unassigned: 0 }, 
+                filterOptions: filterOptions || { organizations: [], roles: [], regions: [] }, 
                 loading: false 
             });
         } catch (err) {
-            set({ error: err.message, loading: false });
+            set({ users: [], error: err.message, loading: false });
             toast.error(err.message);
         }
     },
@@ -68,9 +68,13 @@ const useUserStore = create((set, get) => ({
         try {
             const { filters, search, limit, offset } = get();
             const { users, totalCount } = await userService.getUsers(filters, search, limit, offset);
-            set({ users, totalCount, loading: false });
+            set({ 
+                users: Array.isArray(users) ? users : [], 
+                totalCount: totalCount || 0, 
+                loading: false 
+            });
         } catch (err) {
-            set({ error: err.message, loading: false });
+            set({ users: [], error: err.message, loading: false });
             toast.error(err.message);
         }
     },
