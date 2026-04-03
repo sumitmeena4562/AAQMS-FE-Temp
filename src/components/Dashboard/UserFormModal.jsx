@@ -96,7 +96,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     } = useForm({
         resolver: zodResolver(userSchema),
         defaultValues: {
-            first_name: '', last_name: '', email: '', organization: '', role: '', 
+            name: '', email: '', organisation: '', role: '', 
             assignment: 'standby', status: 'active',
             region: '', zone: '', employee_id: '', 
             phone_number: '', designation: ''

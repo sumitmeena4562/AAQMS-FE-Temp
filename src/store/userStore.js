@@ -14,7 +14,7 @@ const useUserStore = create((set, get) => ({
     users: [],
     totalCount: 0,
     stats: { total: 0, active: 0, inactive: 0, unassigned: 0 },
-    filterOptions: { organizations: [], roles: [], regions: [] },
+    filterOptions: { organisations: [], roles: [], regions: [] },
     loading: false,
     error: null,
 
