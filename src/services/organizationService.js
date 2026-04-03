@@ -9,7 +9,7 @@ export const organizationService = {
     // Get all organizations (For Dropdowns and Listing)
     getOrganizations: async (filters = {}) => {
         try {
-            const response = await api.get('organizations/', { params: filters });
+            const response = await api.get('organisations/', { params: filters });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load organizations"));
@@ -20,7 +20,7 @@ export const organizationService = {
     getSites: async (orgId = null) => {
         try {
             const params = orgId ? { organization: orgId, dropdown: 'true' } : { dropdown: 'true' };
-            const response = await api.get('organizations/sites/', { params });
+            const response = await api.get('organisations/sites/', { params });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load sites"));
@@ -30,7 +30,7 @@ export const organizationService = {
     // Get single organization details
     getOrganizationById: async (id) => {
         try {
-            const response = await api.get(`organizations/${id}/`);
+            const response = await api.get(`organisations/${id}/`);
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Organization details not found"));
@@ -40,7 +40,7 @@ export const organizationService = {
     // Create a new organization
     createOrganization: async (orgData) => {
         try {
-            const response = await api.post('organizations/', orgData);
+            const response = await api.post('organisations/', orgData);
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to create organization"));
@@ -50,7 +50,7 @@ export const organizationService = {
     // Update an existing organization
     updateOrganization: async (id, orgData) => {
         try {
-            const response = await api.patch(`organizations/${id}/`, orgData);
+            const response = await api.patch(`organisations/${id}/`, orgData);
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to update organization"));
@@ -60,7 +60,7 @@ export const organizationService = {
     // Delete an organization
     deleteOrganization: async (id) => {
         try {
-            const response = await api.delete(`organizations/${id}/`);
+            const response = await api.delete(`organisations/${id}/`);
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to delete organization"));
