@@ -1,31 +1,6 @@
-/**
- * USER SERVICE
- * Handles User Management CRUD via real REST API integration.
- */
-
 import api from "./api";
 import { organizationService } from "./organizationService";
-
-/**
- * Extract readable error message from API error response.
- */
-const extractError = (error, fallback) => {
-    const data = error.response?.data;
-    if (!data) return error.message || fallback;
-    if (data.detail) return data.detail;
-    if (typeof data === 'string') return data;
-    
-    if (typeof data === 'object') {
-        const errors = Object.entries(data).map(([key, val]) => {
-            const msg = Array.isArray(val) ? val[0] : val;
-            if (key === 'non_field_errors' || key === 'error') return msg;
-            const field = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            return `${field}: ${msg}`;
-        });
-        return errors.length > 0 ? errors[0] : fallback;
-    }
-    return fallback;
-};
+import { extractError } from "../utils/errorUtils";
 
 // --- SERVICE IMPLEMENTATION ---
 export const userService = {
