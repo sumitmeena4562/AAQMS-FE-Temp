@@ -74,9 +74,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     }, [isOpen]);
 
     // Helper to fetch sites for a selected org
-    const fetchSitesForOrg = async (orgName) => {
+    const fetchSitesForOrg = async (orgId) => {
         try {
-            const selectedOrg = availableOrgs.find(o => o.name === orgName);
+            const selectedOrg = availableOrgs.find(o => String(o.id) === String(orgId));
             if (selectedOrg) {
                 const data = await organizationService.getSites(selectedOrg.id);
                 setAvailableSites(Array.isArray(data) ? data : (data.results || []));
@@ -117,10 +117,11 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         lastProcessedRef.current = currentKey;
 
         if (user) {
+            let orgId = user.organisation_id || '';
             reset({
                 name: user.name || '',
                 email: user.email || '',
-                organisation_id: user.organisation_id || user.organization || '',
+                organisation_id: orgId,
                 role: user.role || '',
                 assignment: user.assignment || 'standby',
                 status: user.status || 'active',
@@ -132,10 +133,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 avatar: user.avatar || ''
             });
             setImagePreview(user.avatar || null);
-            setShowWorkAssignment(!!(user.organisation_id || user.organization));
-            if (user.organisation_id || user.organization) {
-                fetchSitesForOrg(user.organisation_id || user.organization);
-            }
+            setShowWorkAssignment(!!(orgId || user.organization));
+            if (orgId) fetchSitesForOrg(orgId);
             setStep(1);
         } else {
             reset({ 
@@ -150,6 +149,17 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         }
         setSubmitError('');
     }, [user, isOpen, reset]);
+
+    // Handle mapping organization name to ID for edit mode once organizations load
+    useEffect(() => {
+        if (isOpen && user && user.organization && !watch('organisation_id') && availableOrgs.length > 0) {
+            const matchedOrg = availableOrgs.find(o => o.name === user.organization);
+            if (matchedOrg) {
+                setValue('organisation_id', matchedOrg.id);
+                fetchSitesForOrg(matchedOrg.id);
+            }
+        }
+    }, [availableOrgs, isOpen, user]);
 
     const onFormSubmit = async (data) => {
         setSubmitError('');
@@ -175,12 +185,12 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            // URL.createObjectURL temporarily browser mein image ka address banata hai
-            const previewUrl = URL.createObjectURL(file);
-            setImagePreview(previewUrl);
-            
-            // React Hook Form ko batao ki 'avatar' value change ho gayi hai
-            setValue('avatar', previewUrl); 
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+                setValue('avatar', reader.result); 
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -382,7 +392,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 label="Organization / Company"
                                                                 {...register('organisation_id')}
                                                                 error={errors.organisation_id?.message}
-                                                                options={availableOrgs.map(o => ({ value: o.name, label: o.name }))}
+                                                                options={availableOrgs.map(o => ({ value: o.id, label: o.name }))}
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
                                                                     setValue('organisation_id', val);
