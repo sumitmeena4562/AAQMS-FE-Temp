@@ -59,15 +59,21 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     // Dynamic Options State
     const [availableOrgs, setAvailableOrgs] = useState([]);
     const [availableSites, setAvailableSites] = useState([]);
+    const [isLoadingOrgs, setIsLoadingOrgs] = useState(false);
+    const [isLoadingSites, setIsLoadingSites] = useState(false);
+    const [hasNewImage, setHasNewImage] = useState(false);
 
     // Fetch initial organizations
     useEffect(() => {
         const fetchOrgs = async () => {
+            setIsLoadingOrgs(true);
             try {
                 const data = await organizationService.getOrganizations({ dropdown: 'true' });
                 setAvailableOrgs(Array.isArray(data) ? data : (data.results || []));
             } catch (err) {
                 console.error("Failed to load orgs for form:", err);
+            } finally {
+                setIsLoadingOrgs(false);
             }
         };
         if (isOpen) fetchOrgs();
@@ -75,6 +81,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     // Helper to fetch sites for a selected org
     const fetchSitesForOrg = async (orgId) => {
+        setIsLoadingSites(true);
         try {
             const selectedOrg = availableOrgs.find(o => String(o.id) === String(orgId));
             if (selectedOrg) {
@@ -83,6 +90,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             }
         } catch (err) {
             console.error("Failed to load sites for form:", err);
+        } finally {
+            setIsLoadingSites(false);
         }
     };
 
@@ -135,6 +144,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 avatar: user.avatar || profile.avatar || ''
             });
             setImagePreview(user.avatar || profile.avatar || null);
+            setHasNewImage(false);
             setShowWorkAssignment(!!orgId);
             if (orgId) fetchSitesForOrg(orgId);
             setStep(1);
@@ -147,6 +157,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             });
             setShowWorkAssignment(false);
             setImagePreview(null);
+            setHasNewImage(false);
             setStep(0);
         }
         setSubmitError('');
@@ -169,12 +180,20 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         // Manual password entry as per user request
         const payload = { ...data };
 
+        // Optimization: Do NOT send existing image URL as Base64 to BE
+        if (!hasNewImage && isEdit) {
+            delete payload.avatar;
+        }
+
         // Automatically determine assignment status
         if (payload.organisation_id || payload.region || payload.zone) {
             payload.assignment = 'assigned';
         } else {
             payload.assignment = 'standby';
         }
+
+        // Normalize constants
+        payload.status = payload.status === 'active' ? 'active' : 'inactive';
 
         const result = await onSubmit(payload);
         if (result?.success) {
@@ -191,6 +210,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             reader.onloadend = () => {
                 setImagePreview(reader.result);
                 setValue('avatar', reader.result); 
+                setHasNewImage(true);
             };
             reader.readAsDataURL(file);
         }
@@ -412,6 +432,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 {...register('organisation_id')}
                                                                 error={errors.organisation_id?.message}
                                                                 options={availableOrgs.map(o => ({ value: o.id, label: o.name }))}
+                                                                loading={isLoadingOrgs}
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
                                                                     setValue('organisation_id', val);
@@ -427,6 +448,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                     error={errors[currentRole === 'coordinator' ? 'region' : 'zone']?.message}
                                                                     options={availableSites.map(s => ({ value: s.site_name, label: s.site_name }))}
                                                                     disabled={!watch('organisation_id')}
+                                                                    loading={isLoadingSites}
                                                                 />
                                                             )}
                                                         </div>

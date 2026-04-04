@@ -12,6 +12,7 @@ const SelectField = forwardRef(({
     error,
     required = false,
     disabled = false,
+    loading = false,
     className = '',
     containerStyle = {},
     ...props
@@ -102,7 +103,7 @@ const SelectField = forwardRef(({
                     })}
                 </select>
 
-                {/* Custom Dropdown Arrow */}
+                {/* Custom Dropdown Arrow or Loading Spinner */}
                 <div style={{ 
                     position: 'absolute', 
                     right: '12px', 
@@ -111,11 +112,30 @@ const SelectField = forwardRef(({
                     display: 'flex', 
                     alignItems: 'center' 
                 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="m6 9 6 6 6-6" />
-                    </svg>
+                    {loading ? (
+                        <div style={{
+                            width: '14px',
+                            height: '14px',
+                            border: `2px solid ${t.color.border}`,
+                            borderTop: `2px solid ${t.color.primary}`,
+                            borderRadius: '50%',
+                            animation: 'spin 0.8s linear infinite'
+                        }} />
+                    ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    )}
                 </div>
             </div>
+
+            {/* In-line keyframe for spinner */}
+            <style>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
 
             {/* Error Message with animation */}
             <AnimatePresence>
