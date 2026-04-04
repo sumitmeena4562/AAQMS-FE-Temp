@@ -196,10 +196,17 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
         // Role-specific field mapping for BE consistency
         if (payload.role === 'COORDINATOR') {
-            payload.region = data.region;
+            payload.region = data.region || null;
+            payload.zone = null;
+            payload.coordinator_id = null;
         } else if (payload.role === 'FIELD_OFFICER') {
-            payload.zone = data.zone;
+            payload.zone = data.zone || null;
+            payload.region = null;
             payload.coordinator_id = data.coordinator_id || null;
+        } else {
+            payload.region = null;
+            payload.zone = null;
+            payload.coordinator_id = null;
         }
 
         const result = await onSubmit(payload);
