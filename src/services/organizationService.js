@@ -9,7 +9,7 @@ export const organizationService = {
     // Get all organizations (For Dropdowns and Listing)
     getOrganizations: async (filters = {}) => {
         try {
-            const response = await api.get('organisations/', { params: filters });
+            const response = await api.get('organisations/list/', { params: filters });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load organizations"));
@@ -19,11 +19,22 @@ export const organizationService = {
     // Get sites for a specific organization (For Assignment Dropdowns)
     getSites: async (orgId = null) => {
         try {
-            const params = orgId ? { organization: orgId, dropdown: 'true' } : { dropdown: 'true' };
+            const params = orgId ? { organisation: orgId, dropdown: 'true' } : { dropdown: 'true' };
             const response = await api.get('organisations/sites/', { params });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load sites"));
+        }
+    },
+
+    // Get all zones for an organization (For Assignment Dropdowns)
+    getZones: async (orgId = null) => {
+        try {
+            const params = orgId ? { organisation: orgId, dropdown: 'true' } : { dropdown: 'true' };
+            const response = await api.get('organisations/all-zones/', { params });
+            return response.data;
+        } catch (err) {
+            throw new Error(extractError(err, "Failed to load zones"));
         }
     },
 

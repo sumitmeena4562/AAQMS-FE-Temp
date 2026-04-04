@@ -58,7 +58,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     // Dynamic Options State
     const [availableOrgs, setAvailableOrgs] = useState([]);
-    const [availableSites, setAvailableSites] = useState([]);
+    const [assignmentData, setAssignmentData] = useState([]);
     const [isLoadingOrgs, setIsLoadingOrgs] = useState(false);
     const [isLoadingSites, setIsLoadingSites] = useState(false);
     const [hasNewImage, setHasNewImage] = useState(false);
@@ -79,17 +79,20 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         if (isOpen) fetchOrgs();
     }, [isOpen]);
 
-    // Helper to fetch sites for a selected org
-    const fetchSitesForOrg = async (orgId) => {
+    // Helper to fetch data (Sites or Zones) based on role
+    const fetchAssignmentDataForOrg = async (orgId) => {
         setIsLoadingSites(true);
         try {
-            const selectedOrg = availableOrgs.find(o => String(o.id) === String(orgId));
-            if (selectedOrg) {
-                const data = await organizationService.getSites(selectedOrg.id);
-                setAvailableSites(Array.isArray(data) ? data : (data.results || []));
+            const role_name = watch('role')?.toUpperCase();
+            let data = [];
+            if (role_name === 'COORDINATOR') {
+                data = await organizationService.getSites(orgId);
+            } else if (role_name === 'FIELD_OFFICER') {
+                data = await organizationService.getZones(orgId);
             }
+            setAssignmentData(Array.isArray(data) ? data : (data.results || []));
         } catch (err) {
-            console.error("Failed to load sites for form:", err);
+            console.error("Failed to load assignment data:", err);
         } finally {
             setIsLoadingSites(false);
         }
@@ -146,7 +149,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             setImagePreview(user.avatar || profile.avatar || null);
             setHasNewImage(false);
             setShowWorkAssignment(!!orgId);
-            if (orgId) fetchSitesForOrg(orgId);
+            if (orgId) fetchAssignmentDataForOrg(orgId);
             setStep(1);
         } else {
             reset({ 
@@ -436,17 +439,20 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
                                                                     setValue('organisation_id', val);
-                                                                    fetchSitesForOrg(val); // Fetch sites when org changes
+                                                                    fetchAssignmentDataForOrg(val); // Fetch assignment data when org changes
                                                                 }}
                                                             />
 
                                                             {(currentRole === 'coordinator' || currentRole === 'field_officer') && (
                                                                 <SelectField
                                                                     label={currentRole === 'coordinator' ? "Work Region / Area" : "Operational Zone"}
-                                                                    placeholder="Select area..."
+                                                                    placeholder={currentRole === 'coordinator' ? "Select region..." : "Select zone..."}
                                                                     {...register(currentRole === 'coordinator' ? 'region' : 'zone')}
                                                                     error={errors[currentRole === 'coordinator' ? 'region' : 'zone']?.message}
-                                                                    options={availableSites.map(s => ({ value: s.site_name, label: s.site_name }))}
+                                                                    options={assignmentData.map(item => ({ 
+                                                                        value: currentRole === 'coordinator' ? item.site_name : item.zone_name, 
+                                                                        label: currentRole === 'coordinator' ? item.site_name : item.zone_name 
+                                                                    }))}
                                                                     disabled={!watch('organisation_id')}
                                                                     loading={isLoadingSites}
                                                                 />
