@@ -87,9 +87,21 @@ const useAuthStore = create((set, get) => ({
     // DO NOT re-bootstrap if we just manually logged out
     if (get().isLoggingOut) return { success: false, error: "Logging out" };
 
+    // Set a fail-safe timeout to prevent infinite "Checking Session..." loop
+    // if the backend is slow or unreachable.
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Request timed out")), 10000)
+    );
+
     set({ isBootstrapping: true, error: null });
     try {
-      const { data } = await api.get("users/profile/", { _silent: true });
+      // Race the API call against the timeout
+      const response = await Promise.race([
+        api.get("users/profile/", { _silent: true }),
+        timeoutPromise
+      ]);
+      
+      const { data } = response;
       const userData = { ...data, role: (data.role || '').toLowerCase() };
 
       storage.saveUser(userData);
@@ -109,7 +121,7 @@ const useAuthStore = create((set, get) => ({
         isBootstrapping: false,
         isLoading: false,
       });
-      return { success: false, error: "Session expired" };
+      return { success: false, error: "Session expired or timed out" };
     }
   },
 

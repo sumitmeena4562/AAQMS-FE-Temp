@@ -38,12 +38,10 @@ const AppRoutes = () => {
     const { user, fetchProfile, isBootstrapping } = useAuthStore();
 
     React.useEffect(() => {
-        // Always attempt to fetch profile on mount if no user; 
-        // the backend cookie tells us if the session is valid.
-        if (!user) {
-            fetchProfile();
-        }
-    }, [user, fetchProfile]);
+        // ALWAYS attempt to fetch profile on mount to verify the session HttpOnly cookie.
+        // This ensures the isBootstrapping state is correctly finalized and the user state is in sync with the backend.
+        fetchProfile();
+    }, [fetchProfile]);
 
     // 🛡️ Prevent routing jumps while verifying session on refresh
     if (isBootstrapping) return <PageLoader />;

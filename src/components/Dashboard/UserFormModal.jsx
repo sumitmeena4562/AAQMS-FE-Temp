@@ -130,6 +130,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
         if (user) {
             // Flatten nested profile data for the form
+            const role_name = (user.role_name || user.role?.role_name || '').toUpperCase();
             const profile = user.field_officer_profile || user.coordinator_profile || user.admin_profile || {};
             
             // Extract IDs carefully (handle both object and ID string cases)
@@ -141,11 +142,11 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 name: user.name || '',
                 email: user.email || '',
                 organisation_id: orgId,
-                role: user.role_name?.toLowerCase() || user.role?.toLowerCase() || '',
-                assignment: user.assignment || 'standby',
+                role: role_name.toLowerCase(),
+                assignment: user.assignment || (orgId ? 'assigned' : 'standby'),
                 status: user.is_active ? 'active' : 'deactive',
                 region: profile.assigned_region || '',
-                zone: (typeof profile.current_zone === 'object' ? profile.current_zone?.id : profile.current_zone) || '',
+                zone: (typeof profile.current_zone === 'object' ? profile.current_zone?.id : profile.current_zone) || profile.current_zone || '',
                 mobile_number: phone,
                 avatar: avatarVal
             });
