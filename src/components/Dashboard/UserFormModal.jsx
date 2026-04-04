@@ -143,7 +143,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 organisation_id: orgId,
                 role: user.role_name?.toLowerCase() || user.role?.toLowerCase() || '',
                 assignment: user.assignment || 'standby',
-                status: user.is_active ? 'active' : 'inactive',
+                status: user.is_active ? 'active' : 'deactive',
                 region: profile.assigned_region || '',
                 zone: (typeof profile.current_zone === 'object' ? profile.current_zone?.id : profile.current_zone) || '',
                 mobile_number: phone,
@@ -454,7 +454,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                     {...register(currentRole === 'coordinator' ? 'region' : 'zone')}
                                                                     error={errors[currentRole === 'coordinator' ? 'region' : 'zone']?.message}
                                                                     options={(assignmentData || []).map(item => ({ 
-                                                                        value: currentRole === 'coordinator' ? item?.site_name : item?.zone_name, 
+                                                                        value: item?.id, 
                                                                         label: currentRole === 'coordinator' ? item?.site_name : item?.zone_name 
                                                                     })).filter(opt => opt.value)}
                                                                     disabled={!watch('organisation_id')}
