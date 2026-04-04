@@ -12,6 +12,7 @@ import InputField from '../UI/InputField';
 import SelectField from '../UI/SelectField';
 import { useOrgStore } from '../../store/useOrgStore';
 import { organizationService } from '../../services/organizationService';
+import { userService } from '../../services/userService';
 
 const ROLE_DETAILS = [
     { 
@@ -59,8 +60,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     // Dynamic Options State
     const [availableOrgs, setAvailableOrgs] = useState([]);
     const [assignmentData, setAssignmentData] = useState([]);
+    const [availableCoordinators, setAvailableCoordinators] = useState([]);
     const [isLoadingOrgs, setIsLoadingOrgs] = useState(false);
     const [isLoadingSites, setIsLoadingSites] = useState(false);
+    const [isLoadingCoordinators, setIsLoadingCoordinators] = useState(false);
     const [hasNewImage, setHasNewImage] = useState(false);
 
     // Fetch initial organizations
@@ -82,6 +85,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     // Helper to fetch data (Sites or Zones) based on role
     const fetchAssignmentDataForOrg = async (orgId) => {
         setIsLoadingSites(true);
+        setIsLoadingCoordinators(true);
         try {
             const role_name = watch('role')?.toUpperCase();
             let data = [];
@@ -89,12 +93,16 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 data = await organizationService.getSites(orgId);
             } else if (role_name === 'FIELD_OFFICER') {
                 data = await organizationService.getZones(orgId);
+                // Also fetch coordinators for this org
+                const coords = await userService.getCoordinators(orgId);
+                setAvailableCoordinators(Array.isArray(coords) ? coords : []);
             }
             setAssignmentData(Array.isArray(data) ? data : (data.results || []));
         } catch (err) {
             console.error("Failed to load assignment data:", err);
         } finally {
             setIsLoadingSites(false);
+            setIsLoadingCoordinators(false);
         }
     };
 
@@ -110,7 +118,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         defaultValues: {
             name: '', email: '', organisation_id: '', role: '', 
             assignment: 'standby', status: 'active',
-            region: '', zone: '', 
+            region: '', zone: '', coordinator_id: '',
             mobile_number: ''
         }
     });
@@ -147,6 +155,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 status: user.is_active ? 'active' : 'deactive',
                 region: profile.assigned_region || '',
                 zone: (typeof profile.current_zone === 'object' ? profile.current_zone?.id : profile.current_zone) || profile.current_zone || '',
+                coordinator_id: (typeof profile.coordinator === 'object' ? profile.coordinator?.id : profile.coordinator) || profile.coordinator || '',
                 mobile_number: phone,
                 avatar: avatarVal
             });
@@ -161,7 +170,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 name: '', email: '', organisation_id: '', role: '', 
                 assignment: 'standby', status: 'active',
                 region: '', 
-                mobile_number: '', avatar: ''
+                mobile_number: '', avatar: '',
+                coordinator_id: ''
             });
             setShowWorkAssignment(false);
             setImagePreview(null);
@@ -456,18 +466,36 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                             />
 
                                                             {(currentRole === 'coordinator' || currentRole === 'field_officer') && (
-                                                                <SelectField
-                                                                    label={currentRole === 'coordinator' ? "Work Region / Area" : "Operational Zone"}
-                                                                    placeholder={currentRole === 'coordinator' ? "Select region..." : "Select zone..."}
-                                                                    {...register(currentRole === 'coordinator' ? 'region' : 'zone')}
-                                                                    error={errors[currentRole === 'coordinator' ? 'region' : 'zone']?.message}
-                                                                    options={(assignmentData || []).map(item => ({ 
-                                                                        value: item?.id, 
-                                                                        label: currentRole === 'coordinator' ? item?.site_name : item?.zone_name 
-                                                                    })).filter(opt => opt.value)}
-                                                                    disabled={!watch('organisation_id')}
-                                                                    loading={isLoadingSites}
-                                                                />
+                                                                <>
+                                                                    <SelectField
+                                                                        label={currentRole === 'coordinator' ? "Work Region / Area" : "Operational Zone"}
+                                                                        placeholder={currentRole === 'coordinator' ? "Select region..." : "Select zone..."}
+                                                                        {...register(currentRole === 'coordinator' ? 'region' : 'zone')}
+                                                                        error={errors[currentRole === 'coordinator' ? 'region' : 'zone']?.message}
+                                                                        options={(assignmentData || []).map(item => ({ 
+                                                                            value: item?.id, 
+                                                                            label: currentRole === 'coordinator' ? item?.site_name : item?.zone_name 
+                                                                        })).filter(opt => opt.value)}
+                                                                        disabled={!watch('organisation_id')}
+                                                                        loading={isLoadingSites}
+                                                                    />
+
+                                                                    {currentRole === 'field_officer' && (
+                                                                        <SelectField
+                                                                            label="Reporting Coordinator"
+                                                                            placeholder="Select supervisor..."
+                                                                            {...register('coordinator_id')}
+                                                                            error={errors.coordinator_id?.message}
+                                                                            options={(availableCoordinators || []).map(c => ({ 
+                                                                                value: c.id, 
+                                                                                label: c.name 
+                                                                            }))}
+                                                                            disabled={!watch('organisation_id')}
+                                                                            loading={isLoadingCoordinators}
+                                                                            required
+                                                                        />
+                                                                    )}
+                                                                </>
                                                             )}
                                                         </div>
                                                     </div>

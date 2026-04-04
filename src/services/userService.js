@@ -133,5 +133,20 @@ export const userService = {
         } catch (error) {
             throw new Error(extractError(error, 'CSV export failed. Please try again.'));
         }
+    },
+
+    /**
+     * FETCH SUPERVISORS (COORDINATORS)
+     */
+    getCoordinators: async (orgId = null) => {
+        try {
+            const response = await api.get('coordinators/', { 
+                params: orgId ? { org_id: orgId } : {} 
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Failed to load coordinators for role mapping:", error);
+            return [];
+        }
     }
 };

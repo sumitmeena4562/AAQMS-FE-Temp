@@ -13,7 +13,10 @@ export const userSchema = z.object({
     status: z.enum(['active', 'deactive', 'ACTIVE', 'INACTIVE']),
     region: z.string().optional().nullable(),
     zone: z.string().optional().nullable(),
-    mobile_number: z.string().optional().nullable(),
+    mobile_number: z.string()
+        .regex(/^[+]?[(]?[0-9]{3}[)]?[-s.]?[0-9]{3}[-s.]?[0-9]{4,6}$/, { message: "Please enter a valid phone number" })
+        .optional().nullable().or(z.literal('')),
+    coordinator_id: z.string().optional().nullable(),
     assignment: z.string().default('standby'),
     avatar: z.string().optional().nullable(),
     password: z.string()
