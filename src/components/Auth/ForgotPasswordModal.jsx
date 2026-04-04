@@ -65,6 +65,7 @@ function ForgotPasswordModal({ isOpen, onClose }) {
     const [step, setStep] = useState(STEPS.EMAIL);
     const [email, setEmail] = useState('');
     const [otp, setOtp] = useState('');
+    const [cooldown, setCooldown] = useState(0);
 
     // Reset state when modal is closed/opened
     React.useEffect(() => {
@@ -72,18 +73,32 @@ function ForgotPasswordModal({ isOpen, onClose }) {
             setStep(STEPS.EMAIL);
             setEmail('');
             setOtp('');
+            setCooldown(0);
             setError(null);
         }
     }, [isOpen, setError]);
 
+    // Timer logic for OTP cooldown
+    React.useEffect(() => {
+        let timer;
+        if (cooldown > 0) {
+            timer = setInterval(() => setCooldown((prev) => prev - 1), 1000);
+        }
+        return () => clearInterval(timer);
+    }, [cooldown]);
+
     const handleEmailSubmit = async (data) => {
+        if (cooldown > 0) return; // Prevent spam
+
         const res = await requestPasswordReset(data.email);
         if (res.success) {
             setEmail(data.email);
             setStep(STEPS.OTP);
+            setCooldown(60); // Start 60 second timer
             toast.success("OTP sent to your email!");
         } else {
-            toast.error(res.error || "Failed to send OTP");
+            // If backend throws 429 Too Many Requests, it will be caught here
+            toast.error(res.error || "Failed to send OTP. Please try again later.");
         }
     };
 
@@ -155,8 +170,8 @@ function ForgotPasswordModal({ isOpen, onClose }) {
                             transition={{ duration: 0.3 }}
                             className="relative z-10 w-full"
                         >
-                            {step === STEPS.EMAIL && <EmailStep onSubmit={handleEmailSubmit} isLoading={isLoading} />}
-                            {step === STEPS.OTP && <OtpStep email={email} onSubmit={handleOtpSubmit} onResend={() => handleEmailSubmit({ email })} isLoading={isLoading} />}
+                            {step === STEPS.EMAIL && <EmailStep onSubmit={handleEmailSubmit} isLoading={isLoading} cooldown={cooldown} />}
+                            {step === STEPS.OTP && <OtpStep email={email} onSubmit={handleOtpSubmit} onResend={() => handleEmailSubmit({ email })} isLoading={isLoading} cooldown={cooldown} />}
                             {step === STEPS.RESET && <ResetStep onSubmit={handleResetSubmit} isLoading={isLoading} />}
                             {step === STEPS.SUCCESS && <SuccessStep onClose={onClose} />}
                         </motion.div>
@@ -173,7 +188,7 @@ function ForgotPasswordModal({ isOpen, onClose }) {
 
 // Sub-components for each step
 
-function EmailStep({ onSubmit, isLoading }) {
+function EmailStep({ onSubmit, isLoading, cooldown = 0 }) {
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(forgotPasswordSchema),
         mode: 'onChange'
@@ -201,8 +216,8 @@ function EmailStep({ onSubmit, isLoading }) {
                     />
                 </motion.div>
                 <motion.div variants={itemVariants} initial="hidden" animate="visible" className="mt-4">
-                    <Button type="submit" variant="primary" size="lg" className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading}>
-                        Send OTP
+                    <Button type="submit" variant="primary" size="lg" disabled={cooldown > 0 || isLoading} className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20" loading={isLoading && cooldown === 0}>
+                        {cooldown > 0 ? `Wait ${cooldown}s to Resend` : "Send OTP"}
                     </Button>
                 </motion.div>
             </form>
@@ -210,7 +225,7 @@ function EmailStep({ onSubmit, isLoading }) {
     );
 }
 
-function OtpStep({ email, onSubmit, onResend, isLoading }) {
+function OtpStep({ email, onSubmit, onResend, isLoading, cooldown = 0 }) {
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(otpSchema),
         mode: 'onChange'
@@ -246,9 +261,15 @@ function OtpStep({ email, onSubmit, onResend, isLoading }) {
             </form>
             <motion.div variants={itemVariants} initial="hidden" animate="visible" className="text-center mt-6 text-sm text-slate-500 font-medium">
                 Didn&apos;t receive a code? 
-                <button type="button" onClick={onResend} className="text-primary font-black ml-1.5 border-b-2 border-transparent hover:border-primary transition-all duration-300 bg-transparent p-0">
-                    Resend
-                </button>
+                {cooldown > 0 ? (
+                    <span className="text-slate-400 font-bold ml-1.5 opacity-50 cursor-not-allowed border-b-2 border-transparent inline-block min-w-[60px]">
+                        Wait {cooldown}s
+                    </span>
+                ) : (
+                    <button type="button" onClick={onResend} disabled={isLoading} className="text-primary font-black ml-1.5 border-b-2 border-transparent hover:border-primary transition-all duration-300 bg-transparent p-0 disabled:opacity-50">
+                        Resend
+                    </button>
+                )}
             </motion.div>
         </div>
     );
