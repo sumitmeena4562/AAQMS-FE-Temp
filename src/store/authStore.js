@@ -31,6 +31,7 @@ const useAuthStore = create((set, get) => ({
   user: storage.getUser() || null,
   isLoading: false,
   isBootstrapping: true, // Start as true to check cookie session
+  isLoggingOut: false, // Prevents immediate re-bootstrap on manual logout
   error: null,
 
   // --- ACTIONS ---
@@ -39,7 +40,7 @@ const useAuthStore = create((set, get) => ({
    * LOGIN: Backend sets HttpOnly cookies. We just fetch the profile.
    */
   login: async ({ email, password, rememberMe }) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, isLoggingOut: false });
 
     try {
       const { data: loginResponse } = await api.post("users/login/", { email, password });
@@ -62,7 +63,8 @@ const useAuthStore = create((set, get) => ({
         set({
           user: userData,
           isAuthenticated: true,
-          isLoading: false
+          isLoading: false,
+          isLoggingOut: false
         });
         
         return { success: true, user: userData };
@@ -82,6 +84,9 @@ const useAuthStore = create((set, get) => ({
    * FETCH PROFILE: Verifies the session cookie and gets user details.
    */
   fetchProfile: async () => {
+    // DO NOT re-bootstrap if we just manually logged out
+    if (get().isLoggingOut) return { success: false, error: "Logging out" };
+
     set({ isBootstrapping: true, error: null });
     try {
       const { data } = await api.get("users/profile/", { _silent: true });
@@ -111,17 +116,21 @@ const useAuthStore = create((set, get) => ({
   /**
    * LOGOUT: Clear backend cookies and local state.
    */
-  logout: () => {
+  logout: async () => {
     // 1. Instant UI update for snappy UX
+    set({ isLoggingOut: true, isAuthenticated: false, user: null, error: null });
     storage.clearSession();
-    set({ isAuthenticated: false, user: null, error: null });
     toast.success("Logged out successfully");
 
-    // 2. Fire and forget backend clearance in the background
+    // 2. Explicitly clear backend session
     try {
-        api.post("users/logout/").catch(err => console.error("Background logout failed:", err));
+        await api.post("users/logout/");
     } catch (err) {
-        // Ignore synchronous errors if any
+        console.error("Logout cleanup failed:", err);
+    } finally {
+        // Now it's truly safe to allow bootstraps again (for next session)
+        // Delaying this slightly ensures the redirection happens first
+        setTimeout(() => set({ isLoggingOut: false }), 2000);
     }
   },
 
