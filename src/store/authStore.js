@@ -42,7 +42,7 @@ const useAuthStore = create((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      await api.post("users/login/", { email, password });
+      const { data: loginResponse } = await api.post("users/login/", { email, password });
 
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", email);
@@ -50,12 +50,22 @@ const useAuthStore = create((set, get) => ({
         localStorage.removeItem("rememberedEmail");
       }
 
-      // Profile fetch will succeed if cookies are set correctly
-      const profileResult = await get().fetchProfile();
+      // 1-STEP LOGIN: Backend returns full user profile now
+      if (loginResponse && loginResponse.user) {
+        const userData = { 
+          ...loginResponse.user, 
+          role: (loginResponse.user.role || '').toLowerCase() 
+        };
 
-      if (profileResult.success) {
-        set({ isLoading: false });
-        return { success: true, user: profileResult.user };
+        storage.saveUser(userData);
+
+        set({
+          user: userData,
+          isAuthenticated: true,
+          isLoading: false
+        });
+        
+        return { success: true, user: userData };
       } else {
         throw new Error("Could not load user profile after login.");
       }
