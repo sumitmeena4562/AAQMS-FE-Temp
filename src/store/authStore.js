@@ -45,19 +45,19 @@ const useAuthStore = create((set, get) => ({
       await api.post("users/login/", { email, password });
 
       if (rememberMe) {
-          localStorage.setItem("rememberedEmail", email);
+        localStorage.setItem("rememberedEmail", email);
       } else {
-          localStorage.removeItem("rememberedEmail");
+        localStorage.removeItem("rememberedEmail");
       }
 
       // Profile fetch will succeed if cookies are set correctly
       const profileResult = await get().fetchProfile();
-      
+
       if (profileResult.success) {
-          set({ isLoading: false });
-          return { success: true, user: profileResult.user };
+        set({ isLoading: false });
+        return { success: true, user: profileResult.user };
       } else {
-          throw new Error("Could not load user profile after login.");
+        throw new Error("Could not load user profile after login.");
       }
 
     } catch (err) {
@@ -76,21 +76,21 @@ const useAuthStore = create((set, get) => ({
     try {
       const { data } = await api.get("users/profile/");
       const userData = { ...data, role: (data.role || '').toLowerCase() };
-      
+
       storage.saveUser(userData);
 
-      set({ 
-        user: userData, 
-        isAuthenticated: true, 
+      set({
+        user: userData,
+        isAuthenticated: true,
         isBootstrapping: false,
-        isLoading: false 
+        isLoading: false
       });
       return { success: true, user: userData };
     } catch (err) {
       storage.clearSession();
-      set({ 
-        isAuthenticated: false, 
-        user: null, 
+      set({
+        isAuthenticated: false,
+        user: null,
         isBootstrapping: false,
         isLoading: false,
       });
@@ -101,17 +101,18 @@ const useAuthStore = create((set, get) => ({
   /**
    * LOGOUT: Clear backend cookies and local state.
    */
-  logout: async () => {
-    try {
-        // Backend should clear the cookies on this endpoint
-        await api.post("users/logout/");
-    } catch (err) {
-        console.error("Logout API failed (background):", err);
-    }
-
+  logout: () => {
+    // 1. Instant UI update for snappy UX
     storage.clearSession();
     set({ isAuthenticated: false, user: null, error: null });
     toast.success("Logged out successfully");
+
+    // 2. Fire and forget backend clearance in the background
+    try {
+        api.post("users/logout/").catch(err => console.error("Background logout failed:", err));
+    } catch (err) {
+        // Ignore synchronous errors if any
+    }
   },
 
   /**
@@ -131,7 +132,7 @@ const useAuthStore = create((set, get) => ({
       };
 
       await api.post("users/register/", payload);
-      
+
       set({ isLoading: false });
       return { success: true };
     } catch (err) {

@@ -67,9 +67,15 @@ api.interceptors.response.use(
                     // Retry the original request without manual header setting.
                     return api(originalRequest);
                 } catch (refreshError) {
-                    // Refresh failed -> Absolute logout (Local cleanup only)
+                    // Refresh failed -> Local cleanup
                     localStorage.removeItem('user'); 
-                    window.location.href = '/login';
+                    
+                    // CRITICAL: Avoid infinite reload loop if already on login/guest pages
+                    const path = window.location.pathname;
+                    if (path !== '/login' && path !== '/' && path !== '/register') {
+                        window.location.href = '/login';
+                    }
+                    
                     return Promise.reject(refreshError);
                 }
             }
