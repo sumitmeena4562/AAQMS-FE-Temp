@@ -151,7 +151,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 email: user.email || '',
                 organisation_id: orgId,
                 role: role_name.toLowerCase(),
-                assignment: user.assignment || (orgId ? 'assigned' : 'standby'),
+                assignment: (orgId || profile.assigned_region || profile.current_zone) ? 'assigned' : 'standby',
                 status: user.is_active ? 'active' : 'deactive',
                 region: profile.assigned_region || '',
                 zone: (typeof profile.current_zone === 'object' ? profile.current_zone?.id : profile.current_zone) || profile.current_zone || '',
