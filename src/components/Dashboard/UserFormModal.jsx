@@ -131,22 +131,26 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         if (user) {
             // Flatten nested profile data for the form
             const profile = user.field_officer_profile || user.coordinator_profile || user.admin_profile || {};
-            const orgId = user.organisation_id || profile.organisation || '';
+            
+            // Extract IDs carefully (handle both object and ID string cases)
+            const orgId = user.organisation_id || (typeof profile.organisation === 'object' ? profile.organisation?.id : profile.organisation) || '';
             const phone = user.mobile_number || profile.mobile_number || '';
+            const avatarVal = user.avatar || profile.avatar || '';
 
             reset({
                 name: user.name || '',
                 email: user.email || '',
                 organisation_id: orgId,
-                role: user.role || '',
+                role: user.role_name?.toLowerCase() || user.role?.toLowerCase() || '',
                 assignment: user.assignment || 'standby',
-                status: user.status || 'active',
-                region: user.region || profile.assigned_region || '',
-                zone: user.zone || profile.current_zone || '',
+                status: user.is_active ? 'active' : 'inactive',
+                region: profile.assigned_region || '',
+                zone: (typeof profile.current_zone === 'object' ? profile.current_zone?.id : profile.current_zone) || '',
                 mobile_number: phone,
-                avatar: user.avatar || profile.avatar || ''
+                avatar: avatarVal
             });
-            setImagePreview(user.avatar || profile.avatar || null);
+            
+            setImagePreview(avatarVal || null);
             setHasNewImage(false);
             setShowWorkAssignment(!!orgId);
             if (orgId) fetchAssignmentDataForOrg(orgId);
@@ -166,43 +170,43 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         setSubmitError('');
     }, [user, isOpen, reset]);
 
-    // Handle mapping organization name to ID for edit mode once organizations load
+    // Re-fetch assignment data if role changes during edit mode
     useEffect(() => {
-        if (isOpen && user && user.organization && !watch('organisation_id') && availableOrgs.length > 0) {
-            const matchedOrg = availableOrgs.find(o => o.name === user.organization);
-            if (matchedOrg) {
-                setValue('organisation_id', matchedOrg.id);
-                fetchSitesForOrg(matchedOrg.id);
-            }
+        const orgId = watch('organisation_id');
+        if (isOpen && orgId && currentRole) {
+            fetchAssignmentDataForOrg(orgId);
         }
-    }, [availableOrgs, isOpen, user]);
+    }, [currentRole, isOpen]); // OrgId change is already handled by onChange
 
     const onFormSubmit = async (data) => {
         setSubmitError('');
         
-        // Manual password entry as per user request
-        const payload = { ...data };
+        // Prepare comprehensive payload for backend sync
+        const payload = { 
+            ...data,
+            role: data.role.toUpperCase(),
+            is_active: data.status === 'active',
+            avatar: imagePreview, // Use current preview (Base64 or existing URL)
+            mobile_number: data.mobile_number || null,
+            organisation_id: data.organisation_id || null
+        };
 
-        // Optimization: Do NOT send existing image URL as Base64 to BE
-        if (!hasNewImage && isEdit) {
-            delete payload.avatar;
+        // Automatic assignment state for UI/logic if needed
+        payload.assignment = (payload.organisation_id || data.region || data.zone) ? 'assigned' : 'standby';
+
+        // Role-specific field mapping for BE consistency
+        if (payload.role === 'COORDINATOR') {
+            payload.region = data.region;
+        } else if (payload.role === 'FIELD_OFFICER') {
+            payload.zone = data.zone;
+            payload.coordinator_id = data.coordinator_id || null;
         }
-
-        // Automatically determine assignment status
-        if (payload.organisation_id || payload.region || payload.zone) {
-            payload.assignment = 'assigned';
-        } else {
-            payload.assignment = 'standby';
-        }
-
-        // Normalize constants
-        payload.status = payload.status === 'active' ? 'active' : 'inactive';
 
         const result = await onSubmit(payload);
         if (result?.success) {
             onClose();
         } else {
-            setSubmitError(result.error || 'Failed to process request');
+            setSubmitError(result?.error || 'Failed to process request');
         }
     };
 
@@ -434,7 +438,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 label="Organization / Company"
                                                                 {...register('organisation_id')}
                                                                 error={errors.organisation_id?.message}
-                                                                options={availableOrgs.map(o => ({ value: o.id, label: o.name }))}
+                                                                options={(availableOrgs || []).map(o => ({ value: o.id, label: o.name || 'Unnamed' }))}
                                                                 loading={isLoadingOrgs}
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
@@ -449,10 +453,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                     placeholder={currentRole === 'coordinator' ? "Select region..." : "Select zone..."}
                                                                     {...register(currentRole === 'coordinator' ? 'region' : 'zone')}
                                                                     error={errors[currentRole === 'coordinator' ? 'region' : 'zone']?.message}
-                                                                    options={assignmentData.map(item => ({ 
-                                                                        value: currentRole === 'coordinator' ? item.site_name : item.zone_name, 
-                                                                        label: currentRole === 'coordinator' ? item.site_name : item.zone_name 
-                                                                    }))}
+                                                                    options={(assignmentData || []).map(item => ({ 
+                                                                        value: currentRole === 'coordinator' ? item?.site_name : item?.zone_name, 
+                                                                        label: currentRole === 'coordinator' ? item?.site_name : item?.zone_name 
+                                                                    })).filter(opt => opt.value)}
                                                                     disabled={!watch('organisation_id')}
                                                                     loading={isLoadingSites}
                                                                 />
