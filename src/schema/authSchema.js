@@ -2,10 +2,13 @@ import { z } from 'zod';
 
 export const loginSchema = z.object({
     email: z.string()
-        .min(1, { message: "Email is required" })
-        .email({ message: "Please enter a valid email address" }),
+        .min(1, { message: "Email or Employee ID is required" })
+        .refine(
+            (val) => z.string().email().safeParse(val).success || /^[A-Z0-9]{4,15}$/i.test(val),
+            { message: "Please enter a valid email or Employee ID" }
+        ),
     password: z.string()
-        .min(1, { message: "Password is required" }),
+        .min(8, { message: "Password must be at least 8 characters" }),
     rememberMe: z.boolean().optional()
 });
 

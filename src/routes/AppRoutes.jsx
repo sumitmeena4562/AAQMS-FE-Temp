@@ -38,8 +38,9 @@ const AppRoutes = () => {
     const { user, fetchProfile, isBootstrapping } = useAuthStore();
 
     React.useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token && !user) {
+        // Always attempt to fetch profile on mount if no user; 
+        // the backend cookie tells us if the session is valid.
+        if (!user) {
             fetchProfile();
         }
     }, [user, fetchProfile]);

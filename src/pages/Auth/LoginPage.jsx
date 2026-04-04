@@ -18,14 +18,22 @@ function LoginPage() {
     const rememberedEmail = localStorage.getItem("rememberedEmail");
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
     const [localError, setLocalError] = useState(null);
+    const [failedAttempts, setFailedAttempts] = useState(0);
+    const [lockoutTimer, setLockoutTimer] = useState(0);
 
     const onSubmit = async (data) => {
+        if (lockoutTimer > 0) {
+            toast.error(`Too many attempts. Please wait ${lockoutTimer}s.`);
+            return;
+        }
+
         setLocalError(null);
         setError(null);
         
         const result = await login(data);
         
         if (result.success) {
+            setFailedAttempts(0);
             toast.success(`Welcome back, ${result.user.name || 'User'}!`);
             
             const role = (result.user.role || '').toLowerCase();
@@ -37,6 +45,29 @@ function LoginPage() {
                 navigate('/admin/dashboard');
             }
         } else {
+            const newFailedAttempts = failedAttempts + 1;
+            setFailedAttempts(newFailedAttempts);
+
+            // Handle Server Lockout (403) explicitly
+            if (result.error.toLowerCase().includes("locked") || result.error.includes("403")) {
+                setLocalError("Your account is currently locked. Please try again in 15 minutes.");
+                return;
+            }
+
+            // Local Brute-force Delay (Rate Limiting)
+            if (newFailedAttempts >= 3) {
+                setLockoutTimer(30);
+                const interval = setInterval(() => {
+                    setLockoutTimer((prev) => {
+                        if (prev <= 1) {
+                            clearInterval(interval);
+                            return 0;
+                        }
+                        return prev - 1;
+                    });
+                }, 1000);
+            }
+
             setLocalError(result.error);
         }
     };

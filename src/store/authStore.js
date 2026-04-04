@@ -4,10 +4,9 @@ import toast from "react-hot-toast";
 
 /**
  * STORAGE HELPERS
+ * Only for non-sensitive data like user profile info.
  */
 const storage = {
-  getToken: () => localStorage.getItem("token"),
-  getRefresh: () => localStorage.getItem("refresh"),
   getUser: () => {
     try {
       const user = localStorage.getItem("user");
@@ -16,14 +15,10 @@ const storage = {
       return null;
     }
   },
-  saveSession: (token, refresh, user) => {
-    if (token) localStorage.setItem("token", token);
-    if (refresh) localStorage.setItem("refresh", refresh);
+  saveUser: (user) => {
     if (user) localStorage.setItem("user", JSON.stringify(user));
   },
   clearSession: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refresh");
     localStorage.removeItem("user");
   }
 };
@@ -32,23 +27,22 @@ import { extractError } from "../utils/errorUtils";
 
 const useAuthStore = create((set, get) => ({
   // --- INITIAL STATE ---
-  isAuthenticated: !!storage.getToken(),
+  isAuthenticated: false, // Initially false, verified during bootstrap
   user: storage.getUser() || null,
   isLoading: false,
-  isBootstrapping: !!storage.getToken() && !storage.getUser(), 
+  isBootstrapping: true, // Start as true to check cookie session
   error: null,
 
   // --- ACTIONS ---
 
   /**
-   * LOGIN: Backend se tokens lena, fir profile fetch karna.
+   * LOGIN: Backend sets HttpOnly cookies. We just fetch the profile.
    */
   login: async ({ email, password, rememberMe }) => {
     set({ isLoading: true, error: null });
 
     try {
-      const loginRes = await api.post("users/login/", { email, password });
-      const { access, refresh } = loginRes.data;
+      await api.post("users/login/", { email, password });
 
       if (rememberMe) {
           localStorage.setItem("rememberedEmail", email);
@@ -56,9 +50,7 @@ const useAuthStore = create((set, get) => ({
           localStorage.removeItem("rememberedEmail");
       }
 
-      localStorage.setItem("token", access);
-      localStorage.setItem("refresh", refresh);
-
+      // Profile fetch will succeed if cookies are set correctly
       const profileResult = await get().fetchProfile();
       
       if (profileResult.success) {
@@ -71,28 +63,21 @@ const useAuthStore = create((set, get) => ({
     } catch (err) {
       storage.clearSession();
       const errorMsg = extractError(err, "Invalid email or password.");
-      set({ error: errorMsg, isLoading: false });
+      set({ error: errorMsg, isLoading: false, isAuthenticated: false });
       return { success: false, error: errorMsg };
     }
   },
 
   /**
-   * FETCH PROFILE: User ka role aur details backend se lana.
+   * FETCH PROFILE: Verifies the session cookie and gets user details.
    */
   fetchProfile: async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-        set({ isAuthenticated: false, user: null, isBootstrapping: false, isLoading: false });
-        return { success: false };
-    }
-
     set({ isBootstrapping: true, error: null });
     try {
       const { data } = await api.get("users/profile/");
-      const refresh = localStorage.getItem("refresh");
-      
       const userData = { ...data, role: (data.role || '').toLowerCase() };
-      storage.saveSession(token, refresh, userData);
+      
+      storage.saveUser(userData);
 
       set({ 
         user: userData, 
@@ -108,28 +93,20 @@ const useAuthStore = create((set, get) => ({
         user: null, 
         isBootstrapping: false,
         isLoading: false,
-        error: "Session expired"
       });
       return { success: false, error: "Session expired" };
     }
   },
 
   /**
-   * LOGOUT: Token blacklist karna aur state saaf karna.
+   * LOGOUT: Clear backend cookies and local state.
    */
   logout: async () => {
-    const token = localStorage.getItem("token");
-    const refresh = localStorage.getItem("refresh");
-    
-    if (refresh && token) {
-      try {
-        await api.post("users/logout/", 
-          { refresh },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      } catch (err) {
+    try {
+        // Backend should clear the cookies on this endpoint
+        await api.post("users/logout/");
+    } catch (err) {
         console.error("Logout API failed (background):", err);
-      }
     }
 
     storage.clearSession();

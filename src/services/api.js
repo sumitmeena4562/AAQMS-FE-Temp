@@ -9,6 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/
 
 const api = axios.create({
     baseURL: API_BASE_URL,
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -22,14 +23,21 @@ const PUBLIC_ENDPOINTS = ['users/login/', 'users/token/refresh/', 'users/registe
 
 api.interceptors.request.use(
     (config) => {
-        const isPublic = PUBLIC_ENDPOINTS.some(endpoint => config.url?.includes(endpoint));
+        // No manual JWT injection needed; browser handles HttpOnly cookies.
         
-        if (!isPublic) {
-            const token = localStorage.getItem('token');
-            if (token) {
-                config.headers['Authorization'] = `Bearer ${token}`;
+        // ── CSRF PROTECTION ──
+        // For state-changing requests, attach the X-CSRFToken header.
+        if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
+            const csrfToken = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+            
+            if (csrfToken) {
+                config.headers['X-CSRFToken'] = csrfToken;
             }
         }
+        
         return config;
     },
     (error) => Promise.reject(error)
@@ -50,30 +58,19 @@ api.interceptors.response.use(
             // 1. Handling Unauthorized (401) with Token Refresh
             if (status === 401 && !originalRequest._retry) {
                 originalRequest._retry = true;
-                const refreshToken = localStorage.getItem('refresh');
 
-                if (refreshToken) {
-                    try {
-                        const response = await axios.post(`${API_BASE_URL}users/token/refresh/`, { refresh: refreshToken });
-                        const { access, refresh: newRefresh } = response.data;
-
-                        // Save and retry
-                        localStorage.setItem('token', access);
-                        if (newRefresh) {
-                            localStorage.setItem('refresh', newRefresh);
-                        }
-                        api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-                        originalRequest.headers['Authorization'] = `Bearer ${access}`;
-
-                        return api(originalRequest);
-                    } catch (refreshError) {
-                        // Refresh failed -> Absolute logout
-                        localStorage.removeItem('token');
-                        localStorage.removeItem('refresh');
-                        localStorage.removeItem('user');
-                        window.location.href = '/login';
-                        return Promise.reject(refreshError);
-                    }
+                try {
+                    // Browser automatically sends the refresh_token cookie
+                    await axios.post(`${API_BASE_URL}users/token/refresh/`, {}, { withCredentials: true });
+                    
+                    // If successful, the new access_token will be in a cookie.
+                    // Retry the original request without manual header setting.
+                    return api(originalRequest);
+                } catch (refreshError) {
+                    // Refresh failed -> Absolute logout (Local cleanup only)
+                    localStorage.removeItem('user'); 
+                    window.location.href = '/login';
+                    return Promise.reject(refreshError);
                 }
             }
 
