@@ -48,13 +48,14 @@ function LoginPage() {
             const newFailedAttempts = failedAttempts + 1;
             setFailedAttempts(newFailedAttempts);
 
-            // Handle Server Lockout (403) explicitly
-            if (result.error.toLowerCase().includes("locked") || result.error.includes("403")) {
-                setLocalError("Your account is currently locked. Please try again in 15 minutes.");
+            // 1. Handle Server Lockout (403) or specific Locked messages
+            const errorMsg = result.error || "Invalid credentials.";
+            if (errorMsg.toLowerCase().includes("locked")) {
+                setLocalError(errorMsg); // Use the backend's specific "Account is locked" message
                 return;
             }
 
-            // Local Brute-force Delay (Rate Limiting)
+            // 2. Local Brute-force Delay (Rate Limiting on Client)
             if (newFailedAttempts >= 3) {
                 setLockoutTimer(30);
                 const interval = setInterval(() => {
@@ -68,7 +69,7 @@ function LoginPage() {
                 }, 1000);
             }
 
-            setLocalError(result.error);
+            setLocalError(errorMsg);
         }
     };
 

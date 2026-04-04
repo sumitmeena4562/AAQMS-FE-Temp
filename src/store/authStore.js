@@ -84,7 +84,7 @@ const useAuthStore = create((set, get) => ({
   fetchProfile: async () => {
     set({ isBootstrapping: true, error: null });
     try {
-      const { data } = await api.get("users/profile/");
+      const { data } = await api.get("users/profile/", { _silent: true });
       const userData = { ...data, role: (data.role || '').toLowerCase() };
 
       storage.saveUser(userData);

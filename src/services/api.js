@@ -51,6 +51,7 @@ api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        const isSilent = originalRequest?._silent === true;
 
         if (error.response) {
             const { status } = error.response;
@@ -80,11 +81,11 @@ api.interceptors.response.use(
                 }
             }
 
-            // 2. Global Server Error (500+)
-            if (status >= 500) {
+            // 2. Global Server Error (500+) - Only toast if NOT silent
+            if (status >= 500 && !isSilent) {
                 toast.error("Server is currently unavailable. Please try again later.", { id: 'server-error' });
             }
-        } else if (error.message === 'Network Error') {
+        } else if (error.message === 'Network Error' && !isSilent) {
             toast.error("Network Error: Please check your internet connection.", { id: 'network-error' });
         }
         

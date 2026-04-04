@@ -28,7 +28,7 @@ const PageLoader = () => (
             <div className="w-10 h-10 border-2 border-slate-100 border-t-primary rounded-full animate-spin" />
             
             <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
-                Loading...
+                Checking Session...
             </div>
         </div>
     </div>
