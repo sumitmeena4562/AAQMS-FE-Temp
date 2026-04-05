@@ -3,6 +3,43 @@ import { organizationService } from '../services/organizationService';
 import { inventoryService } from '../services/inventoryService';
 import toast from 'react-hot-toast';
 
+// Helper to map Backend data to Frontend format globally
+const mapOrgToFrontend = (data) => {
+  if (!data) return null;
+  
+  // Map imagery array back to form object
+  const imagery = {
+    north: '', south: '', east: '', west: '', profile: '', extra: []
+  };
+  
+  if (Array.isArray(data.images)) {
+    data.images.forEach(img => {
+      const type = (img.image_type || '').toLowerCase();
+      if (['north', 'south', 'east', 'west', 'profile'].includes(type)) {
+        imagery[type] = img.image_url;
+      } else if (type === 'extra') {
+        imagery.extra.push(img.image_url);
+      }
+    });
+  }
+
+  return {
+    ...data,
+    name: data.organisation_name || data.name || '',
+    industry: data.industry_type || data.industry || 'General',
+    occupancyType: data.occupancy_type || data.occupancyType || '',
+    classification: data.classification || '',
+    contactPerson: data.contact_person_name || data.contactPerson || '',
+    contactEmail: data.contact_email || data.contactEmail || '',
+    contactPhone: data.contact_phone || data.contactPhone || '',
+    address: data.address || '',
+    city: data.city || '',
+    state: data.state || '',
+    country: data.country || '',
+    otherInfo: data.description || data.otherInfo || '',
+    imagery: imagery.profile ? imagery : { ...imagery, profile: data.image || '' }
+  };
+};
 /**
  * ORGANIZATION STORE
  * Connects to the real backend via organizationService, with robust error handling and loading states.
@@ -30,7 +67,8 @@ export const useOrgStore = create((set, get) => ({
       const response = await organizationService.getOrganizations(filters);
       // Backend should return a list or { results: [] }
       const data = response.data || response.results || response;
-      set({ orgs: Array.isArray(data) ? data : [], isLoading: false });
+      const mappedOrgs = Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
+      set({ orgs: mappedOrgs, isLoading: false });
     } catch (err) {
       set({ 
         error: "We couldn't load the organizations. Please refresh the page.", 
@@ -45,7 +83,7 @@ export const useOrgStore = create((set, get) => ({
     set({ isSubmitting: true, error: null });
     try {
       const response = await organizationService.createOrganization(newOrg);
-      const data = response.data || response;
+      const data = mapOrgToFrontend(response.data || response);
       set((state) => ({ orgs: [...state.orgs, data], isSubmitting: false }));
       toast.success("Success! The organization has been added.");
       return true; 
@@ -60,7 +98,7 @@ export const useOrgStore = create((set, get) => ({
     set({ isSubmitting: true, error: null });
     try {
       const response = await organizationService.updateOrganization(id, updatedOrg);
-      const data = response.data || response;
+      const data = mapOrgToFrontend(response.data || response);
       set((state) => ({
         orgs: state.orgs.map(org => org.id === id ? { ...org, ...data } : org),
         isSubmitting: false
