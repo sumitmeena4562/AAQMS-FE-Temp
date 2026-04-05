@@ -15,6 +15,13 @@ export const useOrgStore = create((set, get) => ({
   error: null,
   inventory: [],
   inventoryStats: null,
+  filters: { industry: 'all', status: 'all' },
+  viewMode: 'grid',
+
+  // --- UI ACTIONS ---
+  setFilters: (newFilters) => set((state) => ({ filters: { ...state.filters, ...newFilters } })),
+  setViewMode: (mode) => set({ viewMode: mode }),
+  resetFilters: () => set({ filters: { industry: 'all', status: 'all' } }),
 
   // --- ACTIONS ---
   fetchOrgs: async (filters = {}) => {
