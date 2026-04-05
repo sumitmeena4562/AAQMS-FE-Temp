@@ -5,34 +5,50 @@ export const loginSchema = z.object({
         .min(1, { message: "Email is required" })
         .email({ message: "Please enter a valid email address" }),
     password: z.string()
-        .min(1, { message: "Password is required" })
-        .min(8, { message: "Password must be at least 8 characters" })
-        .regex(/[a-z]/, { message: "Must contain lowercase letter" })
-        .regex(/[A-Z]/, { message: "Must contain uppercase letter" })
-        .regex(/[0-9]/, { message: "Must contain a number" })
+        .min(8, { message: "Password must be at least 8 characters" }),
+    rememberMe: z.boolean().optional()
 });
 
 export const registerSchema = z.object({
     fullName: z.string()
-        .min(2, { message: "Full name must be at least 2 characters" })
-        .max(50, { message: "Full name must be less than 50 characters" }),
+        .min(2, { message: "Name must be at least 2 characters" }),
+    email: z.string()
+        .email({ message: "Invalid email format" }),
+    password: z.string()
+        .min(8, { message: "Password must be at least 8 characters" })
+        .regex(/[A-Z]/, { message: "Must contain at least one uppercase letter" })
+        .regex(/[a-z]/, { message: "Must contain at least one lowercase letter" })
+        .regex(/\d/, { message: "Must contain at least one digit" })
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, { message: "Must contain at least one special character" }),
+    confirmPassword: z.string(),
+    role: z.enum(['ADMIN', 'COORDINATOR', 'FIELD_OFFICER'], {
+        errorMap: () => ({ message: "Please select a valid role" })
+    })
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+});
+
+export const forgotPasswordSchema = z.object({
     email: z.string()
         .min(1, { message: "Email is required" })
-        .email({ message: "Please enter a valid email address" }),
+        .email({ message: "Invalid email format" }),
+});
+
+export const otpSchema = z.object({
+    otp: z.string()
+        .length(6, { message: "OTP must be exactly 6 digits" })
+        .regex(/^\d+$/, { message: "OTP must be numeric" }),
+});
+
+export const resetPasswordSchema = z.object({
     password: z.string()
-        .min(1, { message: "Password is required" })
         .min(8, { message: "Password must be at least 8 characters" })
-        .regex(/[a-z]/, { message: "Must contain lowercase letter" })
-        .regex(/[A-Z]/, { message: "Must contain uppercase letter" })
-        .regex(/[0-9]/, { message: "Must contain a number" }),
-    confirmPassword: z.string()
-        .min(1, { message: "Confirm Password is required" }),
-    role: z.enum(['admin', 'cordinator', 'field officer'], {
-        errorMap: () => ({ message: "Please select a valid role" })
-    }),
-    termsAccepted: z.boolean().refine(val => val === true, {
-        message: "You must accept the terms and conditions",
-    }),
+        .regex(/[A-Z]/, { message: "Must contain at least one uppercase letter" })
+        .regex(/[a-z]/, { message: "Must contain at least one lowercase letter" })
+        .regex(/\d/, { message: "Must contain at least one digit" })
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, { message: "Must contain at least one special character" }),
+    confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],

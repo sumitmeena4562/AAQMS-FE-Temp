@@ -1,100 +1,62 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-/**
- * Breadcrumb Component — Global, Reusable
- *
- * Props:
- * @param {Array} items - Breadcrumb trail array
- *   Format: [{ label: 'Dashboard', path: '/admin/dashboard' }, { label: 'Zones' }]
- *   Last item (no path) = current page (bold, no link)
- * @param {string} separator - Separator character (default: '›')
- * @param {Object} style - Extra custom styles for container
- * @param {string} className - Extra CSS classes
- *
- * Usage:
- *   <Breadcrumb items={[
- *       { label: 'Dashboard', path: '/admin/dashboard' },
- *       { label: 'Organizations', path: '/admin/organizations' },
- *       { label: 'Acme Logistics Hub', path: '/admin/organizations/1' },
- *       { label: 'Zones' }  // last item = current page
- *   ]} />
- */
+const ChevronIcon = () => (
+  <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+  </svg>
+);
 
-const Breadcrumb = ({
-    items = [],
-    separator = '›',
-    style = {},
-    className = ''
-}) => {
-    if (!items.length) return null;
+const Breadcrumb = ({ items = [] }) => {
+  const navigate = useNavigate();
+  if (!items.length) return null;
 
-    return (
-        <nav
-            className={className}
-            aria-label="Breadcrumb"
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 24px',
-                background: 'var(--color-bg-secondary)',
-                borderBottom: '1px solid var(--color-border)',
-                fontFamily: 'var(--font-family)',
-                fontSize: '13.5px',
-                flexWrap: 'wrap',
-                ...style
-            }}
-        >
-            {items.map((item, index) => {
-                const isLast = index === items.length - 1;
+  return (
+    <nav className="flex items-center flex-wrap gap-2">
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
 
-                return (
-                    <React.Fragment key={index}>
-                        {/* Separator (skip before first item) */}
-                        {index > 0 && (
-                            <span style={{
-                                color: 'var(--color-text-muted)',
-                                fontSize: '14px',
-                                userSelect: 'none',
-                                opacity: 0.6
-                            }}>
-                                {separator}
-                            </span>
-                        )}
+        const handleClick = () => {
+          if (item.path) {
+            navigate(item.path);
+          }
+        };
 
-                        {/* Breadcrumb Item */}
-                        {isLast || !item.path ? (
-                            // Current page — bold, no link
-                            <span style={{
-                                fontWeight: 600,
-                                color: 'var(--color-text-primary)',
-                                letterSpacing: '-0.01em'
-                            }}>
-                                {item.label}
-                            </span>
-                        ) : (
-                            // Clickable link
-                            <Link
-                                to={item.path}
-                                style={{
-                                    fontWeight: 450,
-                                    color: 'var(--color-text-tertiary)',
-                                    textDecoration: 'none',
-                                    transition: 'color 150ms ease',
-                                    letterSpacing: '-0.01em'
-                                }}
-                                onMouseEnter={e => e.currentTarget.style.color = 'var(--color-accent)'}
-                                onMouseLeave={e => e.currentTarget.style.color = 'var(--color-text-tertiary)'}
-                            >
-                                {item.label}
-                            </Link>
-                        )}
-                    </React.Fragment>
-                );
-            })}
-        </nav>
-    );
+        return (
+          <React.Fragment key={index}>
+            {/* Active Style - Simple & Nice */}
+            {item.isActive ? (
+              <div 
+                onClick={handleClick}
+                className="flex items-center gap-1.5 px-2 py-1 bg-blue-50/50 text-primary rounded-md cursor-pointer hover:bg-blue-100/50 transition-colors"
+              >
+                {item.icon && <span className="flex items-center opacity-90">{item.icon}</span>}
+                <span className="text-[11.5px] font-bold tracking-tight">
+                  {item.label}
+                </span>
+              </div>
+            ) : (
+              /* Inactive Style - Subtle */
+              <div
+                onClick={handleClick}
+                className="flex items-center gap-1.5 px-1.5 py-1 text-[11.5px] font-medium text-slate-400 hover:text-primary transition-all duration-200 group cursor-pointer"
+              >
+                {item.icon && <span className="opacity-60 group-hover:opacity-100 flex items-center transition-opacity">{item.icon}</span>}
+                <span className="tracking-tight">{item.label}</span>
+              </div>
+            )}
+
+            {/* Simple Separator */}
+            {!isLast && (
+              <div className="opacity-20 text-slate-400">
+                <ChevronIcon />
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
+    </nav>
+  );
 };
 
 export default Breadcrumb;

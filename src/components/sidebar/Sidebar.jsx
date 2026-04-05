@@ -1,191 +1,129 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import useAuthStore from '../../store/authStore';
 
-/**
- * Sidebar Component — Global, Reusable, Fully Responsive
- *
- * Props:
- * @param {Array} navItems - Navigation items array. Each item can have children for sub-menus.
- *   Format: [{ label, path, icon, children: [{ label, path, icon }] }]
- * @param {React.ReactNode} logo - Logo component to render at the top
- * @param {Object} userInfo - User info for bottom section { name, email, avatar }
- * @param {boolean} collapsed - Whether sidebar is collapsed (icon-only mode)
- * @param {Function} onToggle - Callback when sidebar toggle is clicked
- */
-
-/* ── Animated Collapsible Wrapper ── */
+/* ── Animated Collapsible ── */
 const CollapsibleSection = ({ isOpen, children }) => {
     const ref = useRef(null);
     const [height, setHeight] = useState(0);
-
-    useEffect(() => {
-        if (ref.current) {
-            setHeight(ref.current.scrollHeight);
-        }
-    }, [children, isOpen]);
-
+    useEffect(() => { if (ref.current) setHeight(ref.current.scrollHeight); }, [children, isOpen]);
     return (
-        <div style={{
-            maxHeight: isOpen ? `${height}px` : '0px',
-            overflow: 'hidden',
-            transition: 'max-height 250ms ease',
-        }}>
-            <div ref={ref}>
-                {children}
-            </div>
+        <div 
+            className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
+            style={{ maxHeight: isOpen ? `${height}px` : '0px' }}
+        >
+            <div ref={ref}>{children}</div>
         </div>
     );
 };
 
-const Sidebar = ({
-    navItems = [],
-    logo,
-    userInfo,
-    collapsed = false,
-    onToggle
-}) => {
+const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, setMobileOpen, onToggle }) => {
+    const { user } = useAuthStore();
     const location = useLocation();
+    const navigate = useNavigate();
     const [openMenus, setOpenMenus] = useState({});
-    const [mobileOpen, setMobileOpen] = useState(false);
 
-    // Toggle sub-menu open/close
-    const toggleMenu = (label) => {
-        setOpenMenus(prev => ({ ...prev, [label]: !prev[label] }));
-    };
+    const isActive = useCallback((path) => location.pathname === path || location.pathname.startsWith(path + '/'), [location.pathname]);
+    const isParentActive = useCallback((item) => 
+        item.children ? item.children.some(c => isActive(c.path)) : isActive(item.path)
+    , [isActive]);
 
-    // Check if a parent or any of its children is active
-    const isParentActive = (item) => {
-        if (item.children) {
-            return item.children.some(child =>
-                location.pathname === child.path || location.pathname.startsWith(child.path + '/')
-            );
-        }
-        return location.pathname === item.path || location.pathname.startsWith(item.path + '/');
-    };
-
-    // Auto-open parent menu if its child is active
+    // 🔹 Auto-open sidebar menus if their child is the currently active page
     useEffect(() => {
+        const activeParents = {};
         navItems.forEach(item => {
             if (item.children && isParentActive(item)) {
-                setOpenMenus(prev => ({ ...prev, [item.label]: true }));
+                activeParents[item.label] = true;
             }
         });
-    }, [location.pathname]);
+        setOpenMenus(prev => ({ ...prev, ...activeParents }));
+    }, [location.pathname, navItems, isParentActive]);
 
-    // Close mobile sidebar on route change
-    useEffect(() => {
-        setMobileOpen(false);
-    }, [location.pathname]);
+    const toggleMenu = (item) => {
+        setOpenMenus(p => ({ ...p, [item.label]: !p[item.label] }));
+        // 🔹 Navigate immediately if parent has a default path
+        if (item.path) {
+           navigate(item.path);
+        }
+    };
 
-    // ── Render nav item with children (collapsible) ──
-    const renderParentItem = (item) => {
-        const isOpen = openMenus[item.label];
-        const isChildActive = isParentActive(item);
+    useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname, setMobileOpen]);
 
+    const renderSimple = (item) => {
+        const act = isActive(item.path);
         return (
-            <div key={item.label} style={{ marginBottom: '2px' }}>
-                <button
-                    onClick={() => toggleMenu(item.label)}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: collapsed ? 0 : '12px',
-                        justifyContent: collapsed ? 'center' : 'space-between',
-                        width: '100%',
-                        padding: '10px 14px',
-                        borderRadius: '10px',
-                        fontSize: '13.5px',
-                        fontWeight: isChildActive || isOpen ? 600 : 500,
-                        color: isChildActive ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-                        background: isOpen ? 'var(--color-primary-50)' : 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        transition: 'all 180ms ease',
-                        letterSpacing: '-0.01em',
-                        fontFamily: 'var(--font-family)',
-                        textAlign: 'left',
-                        outline: 'none'
-                    }}
-                    onMouseEnter={e => {
-                        if (!isOpen) e.currentTarget.style.background = 'var(--color-bg-hover)';
-                    }}
-                    onMouseLeave={e => {
-                        if (!isOpen) e.currentTarget.style.background = 'transparent';
-                    }}
+            <div key={item.path} className="relative mb-0.5 group">
+                {act && <div className="absolute left-[-10px] top-2 bottom-2 w-[3px] bg-primary rounded-r-full shadow-[0_0_8px_rgba(7,34,103,0.2)] transition-all duration-300" />}
+                <NavLink
+                    to={item.path}
+                    className={() => `
+                        flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200
+                        ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
+                        ${act 
+                            ? 'bg-primary/10 text-primary font-bold shadow-sm' 
+                            : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
+                    `}
                 >
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <span style={{
-                            opacity: isChildActive || isOpen ? 1 : 0.55,
-                            display: 'flex', alignItems: 'center',
-                            color: isChildActive ? 'var(--color-primary)' : 'inherit',
-                            transition: 'all 180ms ease'
-                        }}>{item.icon}</span>
-                        {!collapsed && item.label}
+                    <span className={`flex items-center shrink-0 transition-colors ${act ? 'text-primary' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                        {item.icon}
                     </span>
+                    {!collapsed && <span className="truncate tracking-tight">{item.label}</span>}
+                </NavLink>
+            </div>
+        );
+    };
+
+    const renderParent = (item) => {
+        const isOpen = openMenus[item.label];
+        const childActive = isParentActive(item);
+        const activeOrOpen = childActive || isOpen;
+        
+        return (
+            <div key={item.label} className="mb-0.5 group">
+                <button
+                    onClick={() => toggleMenu(item)}
+                    className={`
+                        w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 border-none outline-none cursor-pointer
+                        ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'justify-start'}
+                        ${activeOrOpen 
+                            ? 'bg-primary/10 text-primary font-bold' 
+                            : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
+                    `}
+                >
+                    <span className={`flex items-center shrink-0 transition-colors ${activeOrOpen ? 'text-primary' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                        {item.icon}
+                    </span>
+                    {!collapsed && <span className="flex-1 text-left truncate tracking-tight">{item.label}</span>}
                     {!collapsed && (
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                            style={{
-                                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                                transition: 'transform 250ms ease',
-                                opacity: 0.4,
-                                flexShrink: 0
-                            }}
+                        <svg 
+                            xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" 
+                            className={`shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'rotate-0 text-slate-400'}`}
                         >
-                            <polyline points="6 9 12 15 18 9"></polyline>
+                            <polyline points="6 9 12 15 18 9" />
                         </svg>
                     )}
                 </button>
-
-                {/* ── Children (animated collapse) ── */}
                 <CollapsibleSection isOpen={isOpen && !collapsed}>
-                    <div style={{
-                        marginLeft: '22px',
-                        paddingLeft: '14px',
-                        borderLeft: '2px solid var(--color-border)',
-                        marginTop: '4px',
-                        marginBottom: '6px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '2px'
-                    }}>
+                    <div className="ml-8 pl-3 border-l-2 border-slate-300 mt-1 mb-2 flex flex-col gap-0.5 transition-all">
                         {item.children.map(child => {
-                            const childActive = location.pathname === child.path || location.pathname.startsWith(child.path + '/');
+                            const cAct = isActive(child.path);
                             return (
                                 <NavLink
                                     key={child.path}
                                     to={child.path}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '10px',
-                                        padding: '8px 12px',
-                                        borderRadius: '8px',
-                                        fontSize: '13px',
-                                        fontWeight: childActive ? 600 : 450,
-                                        color: childActive ? 'var(--color-primary)' : 'var(--color-text-tertiary)',
-                                        background: childActive ? 'var(--color-primary-50)' : 'transparent',
-                                        textDecoration: 'none',
-                                        transition: 'all 150ms ease',
-                                        letterSpacing: '-0.005em'
-                                    }}
-                                    onMouseEnter={e => {
-                                        if (!childActive) e.currentTarget.style.background = 'var(--color-bg-hover)';
-                                    }}
-                                    onMouseLeave={e => {
-                                        e.currentTarget.style.background = childActive ? 'var(--color-primary-50)' : 'transparent';
-                                    }}
+                                    className={`
+                                        flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
+                                        ${cAct 
+                                            ? 'bg-slate-200 text-slate-950 font-bold' 
+                                            : 'text-slate-600 hover:text-slate-950 font-medium'}
+                                    `}
                                 >
                                     {child.icon && (
-                                        <span style={{
-                                            opacity: childActive ? 0.8 : 0.5,
-                                            display: 'flex', alignItems: 'center',
-                                            transition: 'opacity 150ms ease'
-                                        }}>{child.icon}</span>
+                                        <span className={`flex items-center shrink-0 transition-colors ${cAct ? 'text-primary' : 'text-slate-400'}`}>
+                                            {child.icon}
+                                        </span>
                                     )}
-                                    {child.label}
+                                    <span className="truncate tracking-tight">{child.label}</span>
                                 </NavLink>
                             );
                         })}
@@ -195,237 +133,92 @@ const Sidebar = ({
         );
     };
 
-    // ── Render simple nav item (no children) ──
-    const renderSimpleItem = (item) => {
-        const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
-
-        return (
-            <NavLink
-                key={item.path}
-                to={item.path}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: collapsed ? 0 : '12px',
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    padding: '10px 14px',
-                    borderRadius: '10px',
-                    fontSize: '13.5px',
-                    fontWeight: isActive ? 600 : 500,
-                    color: isActive ? '#FFFFFF' : 'var(--color-text-secondary)',
-                    background: isActive ? 'var(--color-accent-light)' : 'transparent',
-                    textDecoration: 'none',
-                    transition: 'all 180ms ease',
-                    letterSpacing: '-0.01em',
-                    marginBottom: '2px',
-                    boxShadow: isActive ? '0 2px 8px rgba(59, 130, 246, 0.25)' : 'none'
-                }}
-                onMouseEnter={e => {
-                    if (!isActive) e.currentTarget.style.background = 'var(--color-bg-hover)';
-                }}
-                onMouseLeave={e => {
-                    e.currentTarget.style.background = isActive ? 'var(--color-accent-light)' : 'transparent';
-                }}
-            >
-                <span style={{
-                    opacity: isActive ? 1 : 0.55,
-                    display: 'flex', alignItems: 'center',
-                    transition: 'opacity 180ms ease'
-                }}>{item.icon}</span>
-                {!collapsed && item.label}
-            </NavLink>
-        );
-    };
-
-    // ── Render nav item (routes to correct renderer) ──
-    const renderNavItem = (item) => {
-        if (item.children && item.children.length > 0) {
-            return renderParentItem(item);
-        }
-        return renderSimpleItem(item);
-    };
-
-    // ── Sidebar Content ──
-    const sidebarContent = (
-        <>
-            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
-                {/* Logo */}
-                {logo && (
-                    <div style={{
-                        padding: collapsed ? '20px 8px' : '24px 20px 16px 20px',
-                        borderBottom: '1px solid var(--color-border-light)',
-                        marginBottom: '8px'
-                    }}>
-                        {logo}
-                    </div>
-                )}
-
-                {/* Nav Items */}
-                <nav style={{
-                    padding: '4px 12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0px'
-                }}>
-                    {navItems.map(item => renderNavItem(item))}
-                </nav>
-            </div>
-
-            {/* Bottom User Info */}
-            {userInfo && (
-                <div style={{
-                    padding: collapsed ? '14px 8px' : '14px 20px',
-                    borderTop: '1px solid var(--color-border)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: collapsed ? 0 : '12px',
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    background: 'var(--color-bg-primary)',
-                    cursor: 'pointer',
-                    transition: 'background 150ms ease'
-                }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'var(--color-bg-hover)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'var(--color-bg-primary)'}
-                >
-                    <div style={{
-                        width: 36, height: 36, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, var(--color-success), #34D399)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: '#fff', fontWeight: 700, fontSize: 14, flexShrink: 0,
-                        boxShadow: '0 2px 6px rgba(5, 150, 105, 0.25)'
-                    }}>
-                        {userInfo.avatar || userInfo.name?.charAt(0)?.toUpperCase() || 'U'}
-                    </div>
-                    {!collapsed && (
-                        <div style={{ overflow: 'hidden', flex: 1 }}>
-                            <div style={{
-                                fontWeight: 600, fontSize: 13,
-                                color: 'var(--color-text-primary)',
-                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                            }}>
-                                {userInfo.name}
-                            </div>
-                            <div style={{
-                                fontSize: 11,
-                                color: 'var(--color-text-muted)',
-                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                            }}>
-                                {userInfo.email}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            )}
-        </>
-    );
-
     return (
         <>
-            {/* ── Mobile Hamburger ── */}
-            <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="sidebar-mobile-toggle"
-                aria-label="Toggle sidebar"
-                style={{
-                    position: 'fixed',
-                    top: '14px',
-                    left: '14px',
-                    zIndex: 1001,
-                    width: 42, height: 42,
-                    borderRadius: '12px',
-                    background: '#FFFFFF',
-                    border: '1px solid var(--color-border)',
-                    boxShadow: 'var(--shadow-md)',
-                    display: 'none',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--color-text-secondary)',
-                    transition: 'all 150ms ease'
-                }}
-            >
-                {mobileOpen ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                )}
-            </button>
-
-            {/* ── Mobile Overlay ── */}
+            {/* Mobile Overlay */}
             {mobileOpen && (
-                <div
-                    onClick={() => setMobileOpen(false)}
-                    className="sidebar-mobile-overlay"
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0, 0, 0, 0.35)',
-                        backdropFilter: 'blur(2px)',
-                        zIndex: 999,
-                        display: 'none'
-                    }}
+                <div 
+                    onClick={() => setMobileOpen(false)} 
+                    className="fixed inset-0 bg-title/40 backdrop-blur-[1px] z-[999]" 
                 />
             )}
 
-            {/* ── Sidebar ── */}
+            {/* Sidebar Container */}
             <aside
-                className={`sidebar-panel ${mobileOpen ? 'sidebar-mobile-open' : ''}`}
-                style={{
-                    width: collapsed ? '72px' : 'var(--sidebar-width)',
-                    minWidth: collapsed ? '72px' : 'var(--sidebar-width)',
-                    background: 'var(--color-bg-secondary)',
-                    borderRight: '1px solid var(--color-border)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    height: '100vh',
-                    position: 'sticky',
-                    top: 0,
-                    overflowY: 'auto',
-                    overflowX: 'hidden',
-                    transition: 'width 200ms ease, min-width 200ms ease',
-                    zIndex: 1000,
-                    flexShrink: 0
-                }}
+                className={`
+                    flex flex-col h-screen sticky top-0 bg-card border-r border-border-main z-[1000] shrink-0 transition-all duration-300 ease-in-out font-sans overflow-hidden
+                    ${collapsed ? 'w-[72px]' : 'w-[260px]'}
+                    ${mobileOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}
+                    max-md:fixed max-md:top-0 max-md:left-0 max-md:z-[1000] max-md:w-[260px] max-md:shadow-2xl
+                `}
             >
-                {sidebarContent}
-            </aside>
+                <div className="flex-1 overflow-y-auto no-scrollbar pb-2.5">
+                    {/* Logo + Toggle */}
+                    <div className={`h-[52px] flex items-center justify-between sticky top-0 bg-card z-10 px-4 mb-2 border-b border-border-main/20 ${collapsed ? 'px-4' : 'px-6'}`}>
+                        {!collapsed && logo}
+                        <button
+                            onClick={onToggle}
+                            className={`
+                                w-7 h-7 flex items-center justify-center rounded-md border border-transparent bg-transparent cursor-pointer text-gray hover:text-body hover:bg-base hover:border-border-main/60 transition-all duration-200 shrink-0
+                                ${collapsed ? 'mx-auto' : ''}
+                            `}
+                            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                        >
+                            {collapsed ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="11 17 6 12 11 7" /><polyline points="18 17 13 12 18 7" />
+                                </svg>
+                            )}
+                        </button>
+                    </div>
 
-            {/* ── Responsive Styles ── */}
-            <style>{`
-                .sidebar-panel::-webkit-scrollbar {
-                    width: 4px;
-                }
-                .sidebar-panel::-webkit-scrollbar-thumb {
-                    background: var(--color-border);
-                    border-radius: 9999px;
-                }
-                .sidebar-panel::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                @media (max-width: 768px) {
-                    .sidebar-mobile-toggle {
-                        display: flex !important;
-                    }
-                    .sidebar-mobile-overlay {
-                        display: block !important;
-                    }
-                    .sidebar-panel {
-                        position: fixed !important;
-                        top: 0 !important;
-                        left: 0 !important;
-                        height: 100vh !important;
-                        transform: translateX(-100%);
-                        transition: transform 280ms cubic-bezier(0.4, 0, 0.2, 1) !important;
-                        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.12);
-                        width: var(--sidebar-width) !important;
-                        min-width: var(--sidebar-width) !important;
-                    }
-                    .sidebar-panel.sidebar-mobile-open {
-                        transform: translateX(0);
-                    }
-                }
-            `}</style>
+                    {/* Section Label */}
+                    {!collapsed && (
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.12em] px-6 pt-5 pb-2 select-none">
+                            Oversight Hub
+                        </div>
+                    )}
+
+                    {/* Navigation */}
+                    <nav className="px-2.5 flex flex-col gap-0.5">
+                        {navItems.map(item =>
+                            item.children && item.children.length > 0
+                                ? renderParent(item)
+                                : renderSimple(item)
+                        )}
+                    </nav>
+                </div>
+
+                {/* User Card */}
+                <div className="mt-auto p-3 border-t border-slate-200 bg-slate-50/50 sticky bottom-0 z-10">
+                    {user && (
+                        <div
+                            className={`
+                                flex items-center rounded-xl bg-white border border-slate-200 transition-all duration-300 cursor-pointer group hover:border-primary/40 hover:shadow-md
+                                ${collapsed ? 'p-2 justify-center' : 'p-2.5 gap-3 justify-start'}
+                            `}
+                        >
+                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-[13px] font-black shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
+                                {user.avatar || user.first_name?.charAt(0)?.toUpperCase() || 'U'}
+                            </div>
+                            {!collapsed && (
+                                <div className="overflow-hidden flex-1">
+                                    <p className="text-slate-900 text-[13px] font-bold truncate leading-tight group-hover:text-primary transition-colors">
+                                        {user.name || 'System User'}
+                                    </p>
+                                    <p className="text-slate-500 text-[10px] font-bold truncate mt-0.5 tracking-tight">
+                                        {user.email || 'user@system.com'}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </aside>
         </>
     );
 };

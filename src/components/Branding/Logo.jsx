@@ -1,35 +1,19 @@
 import React from 'react';
 
-const Logo = ({ collapsed = false, size = 'md' }) => {
-    // Size presets for different contexts
-    const sizes = {
-        sm: { icon: 30, svg: 16, font: 'var(--font-size-xs)', sub: '9px', gap: 8, padding: '0' },
-        md: { icon: 34, svg: 18, font: 'var(--font-size-sm)', sub: '9px', gap: 10, padding: '0' },
-        lg: { icon: 42, svg: 22, font: 'var(--font-size-base)', sub: '10px', gap: 12, padding: '20px' },
+const Logo = ({ collapsed = false, size = 'md', inverse = false }) => {
+    // Size presets using Tailwind classes
+    const sizeMap = {
+        sm: { icon: 'w-7.5 h-7.5', svg: 16, font: 'text-[11px]', sub: 'text-[8px]', gap: 'gap-2' },
+        md: { icon: 'w-8.5 h-8.5', svg: 18, font: 'text-sm', sub: 'text-[9px]', gap: 'gap-2.5' },
+        lg: { icon: 'w-10.5 h-10.5', svg: 22, font: 'text-base', sub: 'text-[10px]', gap: 'gap-3', padding: 'p-5' },
     };
 
-    const s = sizes[size];
+    const s = sizeMap[size] || sizeMap.md;
 
     return (
-        <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: collapsed ? 0 : s.gap,
-            padding: s.padding,
-            justifyContent: collapsed ? 'center' : 'flex-start',
-        }}>
+        <div className={`flex items-center ${collapsed ? 'gap-0 justify-center' : `${s.gap} justify-start`} ${s.padding || 'p-0'}`}>
             {/* Shield Icon */}
-            <div style={{
-                width: s.icon,
-                height: s.icon,
-                borderRadius: 'var(--radius-full)',
-                background: 'var(--color-primary-dark)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                boxShadow: '0 2px 8px rgba(7, 34, 103, 0.3)',
-            }}>
+            <div className={`${s.icon} rounded-lg bg-primary flex items-center justify-center shrink-0 shadow-lg shadow-primary/20`}>
                 <svg
                     width={s.svg}
                     height={s.svg}
@@ -39,39 +23,19 @@ const Logo = ({ collapsed = false, size = 'md' }) => {
                 >
                     <path
                         d="M12 2L4 6V12C4 16.42 7.4 20.74 12 22C16.6 20.74 20 16.42 20 12V6L12 2Z"
-                        fill="rgba(255,255,255,0.15)"
-                        stroke="#fff"
-                        strokeWidth="1.5"
-                    />
-                    <path
-                        d="M9 12L11 14L15 10"
                         stroke="#fff"
                         strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
                     />
                 </svg>
             </div>
 
             {/* Brand Text */}
             {!collapsed && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                    <span style={{
-                        fontSize: s.font,
-                        fontWeight: 700,
-                        color: 'var(--color-text-primary)',
-                        letterSpacing: '-0.01em',
-                        lineHeight: 1.2,
-                    }}>
+                <div className="flex flex-col gap-0">
+                    <span className={`font-black ${s.font} ${inverse ? 'text-white' : 'text-slate-900'} tracking-tight leading-none`}>
                         AI Safety
                     </span>
-                    <span style={{
-                        fontSize: s.sub,
-                        fontWeight: 500,
-                        color: 'var(--color-text-muted)',
-                        letterSpacing: '0.05em',
-                        textTransform: 'uppercase',
-                    }}>
+                    <span className={`font-bold ${s.sub} ${inverse ? 'text-white/70' : 'text-slate-400'} tracking-[0.05em] uppercase leading-none mt-0.5`}>
                         Management System
                     </span>
                 </div>

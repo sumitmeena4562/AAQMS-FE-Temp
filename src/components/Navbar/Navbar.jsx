@@ -1,71 +1,55 @@
-import React from 'react';
-
-/**
- * Navbar Component — Global, Reusable Container
- *
- * Ye ek khali frame hai — andar jo chahiye wo tum props mein de do.
- *
- * Props:
- * @param {React.ReactNode} leftContent  - Left side mein jo dikhana hai (breadcrumb, title, etc.)
- * @param {React.ReactNode} centerContent - Center mein jo dikhana hai (search bar, tabs, etc.)
- * @param {React.ReactNode} rightContent  - Right side mein jo dikhana hai (bell, avatar, buttons, etc.)
- * @param {React.ReactNode} children      - Ya seedha children de do, full control tumhara
- * @param {Object} style                  - Extra custom styles
- * @param {string} className              - Extra custom classes
- */
+import React from "react";
 
 const Navbar = ({
     leftContent,
     centerContent,
     rightContent,
-    children,
-    style = {},
-    className = ''
+    showMenuButton = false,
+    onMenuClick,
+    className = "",
+    children
 }) => {
     return (
-        <header
-            className={className}
-            style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '0 24px',
-                background: 'var(--color-bg-secondary)',
-                borderBottom: '1px solid var(--color-border)',
-                height: 'var(--navbar-height)',
-                minHeight: 'var(--navbar-height)',
-                position: 'sticky',
-                top: 0,
-                zIndex: 100,
-                fontFamily: 'var(--font-family)',
-                gap: '16px',
-                ...style
-            }}
-        >
-            {children ? (
-                // Agar children diya hai toh seedha render karo — full control
-                children
-            ) : (
-                // Warna left / center / right slots use karo
-                <>
-                    {/* Left */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: leftContent ? '0 0 auto' : undefined }}>
-                        {leftContent}
-                    </div>
+        <header className={`flex flex-col flex-shrink-0 sticky top-0 z-[100] bg-card/80 backdrop-blur-md border-b border-border-main/50 h-16 justify-center box-border ${className}`}>
+            <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 box-border">
+                <div className="flex items-center justify-between h-full">
+                    {children ? (
+                        children
+                    ) : (
+                        <>
+                            {/* Left: Menu + Breadcrumbs */}
+                            <div className="flex items-center gap-2.5">
+                                {showMenuButton && (
+                                    <button
+                                        onClick={onMenuClick}
+                                        className="hidden max-md:flex p-2 -ml-1.5 rounded-md border-none bg-transparent cursor-pointer items-center justify-center text-gray hover:text-title transition-colors"
+                                        aria-label="Open menu"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="3" y1="12" x2="21" y2="12" />
+                                            <line x1="3" y1="6" x2="21" y2="6" />
+                                            <line x1="3" y1="18" x2="21" y2="18" />
+                                        </svg>
+                                    </button>
+                                )}
+                                {leftContent}
+                            </div>
 
-                    {/* Center */}
-                    {centerContent && (
-                        <div style={{ display: 'flex', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
-                            {centerContent}
-                        </div>
+                            {/* Center Content */}
+                            {centerContent && (
+                                <div className="flex-1 flex justify-center">
+                                    {centerContent}
+                                </div>
+                            )}
+
+                            {/* Right: Actions + Profile */}
+                            <div className="flex items-center ml-auto">
+                                {rightContent}
+                            </div>
+                        </>
                     )}
-
-                    {/* Right */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {rightContent}
-                    </div>
-                </>
-            )}
+                </div>
+            </div>
         </header>
     );
 };

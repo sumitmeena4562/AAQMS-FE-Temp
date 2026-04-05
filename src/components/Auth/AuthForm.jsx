@@ -3,28 +3,33 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import AuthLayout from "../../layouts/AuthLayout";
-import Button from "../../components/ui/Button";
+import Button from "../../components/UI/Button";
 
 const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, scale: 0.95 },
     visible: {
         opacity: 1,
-        y: 0,
+        scale: 1,
         transition: {
-            duration: 0.6,
+            duration: 0.8,
+            ease: [0.21, 1, 0.36, 1],
             staggerChildren: 0.1
         }
     }
 };
 
 const itemVariants = {
-    hidden: { opacity: 0, x: -10 },
-    visible: { opacity: 1, x: 0 }
+    hidden: { opacity: 0, y: 15 },
+    visible: { 
+        opacity: 1, 
+        y: 0,
+        transition: { duration: 0.5, ease: [0.21, 1, 0.36, 1] }
+    }
 };
 
 /**
  * Reusable AuthForm component for Login and Registration
- * Simplifies the UI structure while keeping premium animations.
+ * Implements a premium glassmorphic card with sophisticated architecture.
  */
 function AuthForm({
     title,
@@ -36,14 +41,15 @@ function AuthForm({
     loadingText,
     footer,
     children,
-    grid = false
+    grid = false,
+    defaultValues = {}
 }) {
     const { register, handleSubmit, formState: { errors } } = useForm({
-        resolver: zodResolver(schema)
+        resolver: zodResolver(schema),
+        mode: 'onChange',
+        defaultValues
     });
 
-    // We pass register and errors to children via a render prop pattern or cloning
-    // But for "beginner-friendly" simplicity, we'll just pass them to children if they are a function
     const renderedChildren = typeof children === 'function'
         ? children({ register, errors, itemVariants })
         : children;
@@ -54,62 +60,69 @@ function AuthForm({
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
-                style={{
-                    backgroundColor: 'var(--color-bg-secondary)',
-                    padding: '32px 28px',
-                    borderRadius: 'var(--radius-card)',
-                    boxShadow: 'var(--shadow-premium)',
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '20px',
-                    border: '1px solid var(--color-border-subtle, rgba(255,255,255,0.05))'
-                }}
+                className="bg-card/80 backdrop-blur-2xl p-8 md:p-10 rounded-[var(--radius-card)] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-border-main/50"
             >
-                <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+                {/* Grain Texture Overlay */}
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('/noise.svg')]" />
+
+                {/* Subtle top highlight */}
+                <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80" />
+
+                <div className="text-center mb-10 relative z-10">
                     <motion.h2
                         variants={itemVariants}
-                        style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 800, color: 'var(--color-text-primary)', letterSpacing: '-0.02em' }}
+                        className="text-[clamp(1.5rem,4vw,1.8rem)] font-black text-title tracking-tight leading-none mb-3"
                     >
                         {title}
                     </motion.h2>
                     <motion.p
                         variants={itemVariants}
-                        style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: '6px' }}
+                        className="text-sm text-body font-medium leading-relaxed max-w-[280px] mx-auto"
                     >
                         {subtitle}
                     </motion.p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div style={grid ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '20px', marginBottom: '20px' } : { display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <form onSubmit={handleSubmit(onSubmit)} className="relative z-10">
+                    <div className={grid ? "grid grid-cols-1 sm:grid-cols-2 gap-4" : "flex flex-col gap-4"}>
                         {renderedChildren}
                     </div>
 
-                    <motion.div variants={itemVariants} style={{ marginTop: '24px' }}>
-                        <Button type="submit" variant="dark" fullWidth disabled={isLoading}>
+                    <motion.div variants={itemVariants} className="mt-8">
+                        <Button 
+                            type="submit" 
+                            variant="primary" 
+                            size="lg" 
+                            className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20 transition-all active:scale-95" 
+                            loading={isLoading}
+                        >
                             {isLoading ? loadingText : submitText}
                         </Button>
                     </motion.div>
                 </form>
 
+                {/* Trust Badge */}
                 <motion.div
                     variants={itemVariants}
-                    style={{ textAlign: 'center', marginTop: '16px', fontSize: '12px', color: 'var(--color-text-muted)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                    className="mt-8 flex items-center justify-center gap-2 text-[10px] font-black text-gray uppercase tracking-widest relative z-10"
                 >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                     </svg>
-                    Secure Enterprise-grade Authentication
+                    Enterprise Grade Security
                 </motion.div>
+
+                {/* Floating Decoration Blobs (Internal) */}
+                <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
             </motion.div>
 
             {footer && (
                 <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
-                    style={{ textAlign: 'center', marginTop: '24px', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8, duration: 0.6 }}
+                    className="text-center mt-8 text-sm text-gray font-medium relative z-10"
                 >
                     {footer}
                 </motion.div>

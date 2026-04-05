@@ -1,59 +1,59 @@
 import React from 'react';
-import Card from '../../components/ui/Card';
+import { motion } from 'framer-motion';
+import Card from '../../components/UI/Card';
 import {
     MdOutlineBusiness,
     MdOutlineAirplanemodeActive,
     MdOutlinePushPin,
     MdOutlineQrCodeScanner,
     MdOutlineAssignmentLate,
-    MdOutlineVerified
+    MdOutlineVerified,
 } from 'react-icons/md';
 
-// eslint-disable-next-line no-unused-vars
-const CapabilityCard = ({ title, description, icon: Icon }) => {
+const CapabilityCard = ({ title, description, icon: Icon, index }) => {
     return (
-        <Card
-            className="capability-card"
-            style={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '20px'
-            }}
+        <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.7, delay: index * 0.1, ease: [0.21, 1, 0.36, 1] }}
+            className="h-full"
         >
-            <div className="capability-icon-box" style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '12px',
-                background: 'rgba(59, 130, 246, 0.08)',
-                color: '#3b82f6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <Icon size={24} />
-            </div>
+            <Card
+                className="h-full flex flex-col gap-6 group hover:border-primary/30 transition-all duration-500"
+                hoverEffect={true}
+            >
+                {/* Decorative Background Glow */}
+                <div className="absolute -top-5 -right-5 w-20 h-20 bg-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/10 transition-colors" />
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <h3 className="capability-title" style={{
-                    fontSize: '17px',
-                    fontWeight: 700,
-                    color: 'var(--color-primary-dark)',
-                    margin: 0,
-                    letterSpacing: '-0.01em'
-                }}>
-                    {title}
-                </h3>
-                <p className="capability-desc" style={{
-                    fontSize: '14px',
-                    lineHeight: 1.5,
-                    color: 'var(--color-text-secondary)',
-                    margin: 0
-                }}>
-                    {description}
-                </p>
-            </div>
-        </Card>
+                {/* Icon Box */}
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary flex items-center justify-center shadow-inner border border-primary/10 relative z-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                    <Icon className="text-[28px]" />
+                </div>
+
+                {/* Text Content */}
+                <div className="flex flex-col gap-3 relative z-10">
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight leading-tight group-hover:text-primary transition-colors">
+                        {title}
+                    </h3>
+                    <p className="text-[15px] leading-relaxed text-slate-500 font-medium">
+                        {description}
+                    </p>
+                </div>
+
+                {/* Hover indicator */}
+                <motion.div 
+                    className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+                    initial={{ x: -10 }}
+                    whileHover={{ x: 0 }}
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-primary/40">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                </motion.div>
+            </Card>
+        </motion.div>
     );
 };
 
@@ -92,71 +92,35 @@ const Capabilities = () => {
     ];
 
     return (
-        <section className="capabilities-section" style={{
-            padding: '80px 24px',
-            background: 'rgba(248, 250, 252, 0.5)',
-            borderTop: '1px solid var(--color-border-light)'
-        }}>
-            <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+        <section id="capabilities" className="py-16 px-6 bg-slate-50/50 border-t border-slate-100 overflow-hidden">
+            <div className="max-w-7xl mx-auto">
                 {/* Section Header */}
-                <div className="section-header" style={{ textAlign: 'left', marginBottom: '48px' }}>
-                    <h2 className="section-title" style={{
-                        fontSize: 'clamp(24px, 3.5vw, 36px)',
-                        fontWeight: 800,
-                        color: 'var(--color-primary-dark)',
-                        marginBottom: '12px',
-                        letterSpacing: '-0.01em'
-                    }}>
-                        Core Capabilities
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+                    className="mb-12"
+                >
+                    <div className="flex items-center gap-4 text-[11px] font-black text-primary tracking-widest uppercase mb-4">
+                        <div className="w-10 h-px bg-primary/30"></div>
+                        Key Expertise
+                    </div>
+                    <h2 className="text-[clamp(1.75rem,4vw,2.5rem)] font-black text-slate-900 mb-5 tracking-tight leading-none">
+                        Core <span className="text-primary">Capabilities.</span>
                     </h2>
-                    <p className="section-subtitle" style={{
-                        fontSize: '16px',
-                        color: 'var(--color-text-secondary)',
-                        maxWidth: '560px',
-                        lineHeight: 1.5
-                    }}>
-                        Enterprise-grade tools built for rigorous inventory and safety standards.
+                    <p className="text-base text-slate-500 max-w-xl leading-relaxed font-medium">
+                        Enterprise-grade tools built for rigorous inventory and safety standards, delivering precision at every touchpoint.
                     </p>
-                </div>
+                </motion.div>
 
                 {/* Grid */}
-                <div className="capabilities-grid" style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                    gap: '24px'
-                }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                     {list.map((item, index) => (
-                        <div key={index}>
-                            <CapabilityCard {...item} />
-                        </div>
+                        <CapabilityCard key={index} {...item} index={index} />
                     ))}
                 </div>
             </div>
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @media (max-width: 768px) {
-                    .capabilities-section {
-                        padding: 60px 20px !important;
-                    }
-                    .section-header {
-                        text-align: center !important;
-                        margin-bottom: 40px !important;
-                    }
-                    .section-subtitle {
-                        margin: 0 auto !important;
-                    }
-                    .capabilities-grid {
-                        grid-template-columns: 1fr !important;
-                        gap: 16px !important;
-                    }
-                    .capability-card {
-                        padding: 24px !important;
-                        align-items: center;
-                        text-align: center;
-                    }
-                }
-            `}} />
         </section>
     );
 };
