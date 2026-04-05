@@ -9,9 +9,16 @@ export const userService = {
      */
     getUsers: async (filters = {}, search = '', limit = 20, offset = 0) => {
         try {
+            // Map FE 'organization' filter to BE 'organisation_id' if needed
+            const finalFilters = { ...filters };
+            if (finalFilters.organization) {
+                finalFilters.organisation_id = finalFilters.organization;
+                delete finalFilters.organization;
+            }
+
             const response = await api.get('users/admin/', {
                 params: {
-                    ...filters,
+                    ...finalFilters,
                     search: search,
                     limit: limit,
                     offset: offset
@@ -140,13 +147,28 @@ export const userService = {
      */
     getCoordinators: async (orgId = null) => {
         try {
-            const response = await api.get('coordinators/', { 
-                params: orgId ? { org_id: orgId } : {} 
+            const response = await api.get('users/coordinators/', { 
+                params: orgId ? { organisation_id: orgId } : {} 
             });
             return response.data;
         } catch (error) {
             console.error("Failed to load coordinators for role mapping:", error);
             return [];
+        }
+    },
+
+    /**
+     * FETCH COORDINATOR STATS
+     */
+    getCoordinatorStats: async (orgId = null) => {
+        try {
+            const response = await api.get('users/coordinators/stats/', {
+                params: orgId ? { organisation_id: orgId } : {}
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Failed to load coordinator stats:", error);
+            return { total: 0, active: 0, inactive: 0 };
         }
     }
 };

@@ -52,6 +52,8 @@ const Coordinator = () => {
     const debouncedSearch = useDebounce(search, 300);
 
     // ── DATA FETCHING ──
+    const fetchCoordinatorData = store.fetchCoordinatorData;
+    
     useEffect(() => {
         // Initialize with Coordinator role and Org ID from URL if provided
         const initialFilters = { 
@@ -61,11 +63,11 @@ const Coordinator = () => {
             region: '' 
         };
         setFilters(initialFilters);
-        fetchInitialData();
+        fetchCoordinatorData(); // Use specialized stats + users fetch
         
         // Cleanup on unmount
         return () => resetFilters();
-    }, [fetchInitialData, orgIdFromUrl, setFilters, resetFilters]);
+    }, [fetchCoordinatorData, orgIdFromUrl, setFilters, resetFilters]);
 
     useEffect(() => {
         if (!loading) fetchUsers();
@@ -224,8 +226,8 @@ const Coordinator = () => {
                 addButtonText="Add Coordinator"
                 breadcrumbs={[
                     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-                    { label: "Personnel", path: "/admin/users" },
-                    { label: "Coordinators", path: "/admin/coordinators", isActive: true }
+                    { label: "Organizations", path: "/admin/organisations" },
+                    { label: orgNameFromUrl ? `Personnel: ${orgNameFromUrl}` : "Coordinators", path: "/admin/coordinators", isActive: true }
                 ]}
                 rightContent={
                     <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30">
