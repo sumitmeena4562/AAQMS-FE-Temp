@@ -24,16 +24,19 @@ export const userService = {
                     offset: offset
                 }
             });
-            // Handle DRF Pagination response format
-            if (response.data.results) {
+
+            // Robust Pagination Handling (DRF results/count or flat array)
+            const data = response.data;
+            if (data && typeof data === 'object' && 'results' in data) {
                 return {
-                    users: response.data.results,
-                    totalCount: response.data.count
+                    users: Array.isArray(data.results) ? data.results : [],
+                    totalCount: data.count || 0
                 };
             }
+            
             return {
-                users: response.data,
-                totalCount: response.data.length
+                users: Array.isArray(data) ? data : [],
+                totalCount: Array.isArray(data) ? data.length : 0
             };
         } catch (error) {
             throw new Error(extractError(error, 'Failed to load user list. Please refresh the page.'));
@@ -98,6 +101,18 @@ export const userService = {
             const response = await api.get('users/admin/stats/');
             return response.data;
         } catch (error) {
+            return { total: 0, active: 0, inactive: 0, unassigned: 0 };
+        }
+    },
+
+    getCoordinatorStats: async (orgId = null) => {
+        try {
+            const response = await api.get('users/coordinators/stats/', {
+                params: orgId ? { organisation_id: orgId } : {}
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Failed to fetch coordinator stats:", error);
             return { total: 0, active: 0, inactive: 0, unassigned: 0 };
         }
     },

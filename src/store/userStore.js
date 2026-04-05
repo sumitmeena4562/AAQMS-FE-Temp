@@ -21,6 +21,7 @@ const useUserStore = create((set, get) => ({
     filterOptions: { organizations: [], roles: [], regions: [] },
     loading: false,
     error: null,
+    abortController: null, // Track in-flight requests for cancellation
 
     // --- UI, FILTER & PAGINATION STATE ---
     search: '',
@@ -75,7 +76,13 @@ const useUserStore = create((set, get) => ({
      * COORDINATOR SPECIFIC LOAD: For the Admin/Coordinators page
      */
     fetchCoordinatorData: async () => {
-        set({ loading: true, error: null });
+        // Cancel previous fetch if still in flight
+        const { abortController } = get();
+        if (abortController) abortController.abort();
+        
+        const newController = new AbortController();
+        set({ loading: true, error: null, abortController: newController });
+
         try {
             const { filters, search, limit, offset } = get();
             
@@ -110,7 +117,13 @@ const useUserStore = create((set, get) => ({
      * FETCH LIST: Only refresh the user list (for search, filters, pagination)
      */
     fetchUsers: async () => {
-        set({ loading: true, error: null });
+        // Cancel previous fetch if still in flight
+        const { abortController } = get();
+        if (abortController) abortController.abort();
+        
+        const newController = new AbortController();
+        set({ loading: true, error: null, abortController: newController });
+
         try {
             const { filters, search, limit, offset } = get();
             const { users, totalCount } = await userService.getUsers(filters, search, limit, offset);

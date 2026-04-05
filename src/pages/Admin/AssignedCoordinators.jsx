@@ -17,7 +17,10 @@ const AssignedCoordinators = () => {
   
   const passedOrgName = location.state?.org?.name || new URLSearchParams(location.search).get('org');
   const orgInfo = selectedOrg ? orgs.find(o => o.id === selectedOrg) : null;
-  const orgName = orgInfo?.name || passedOrgName || "Organization";
+  
+  // Robust Name Protection: If the passed current org looks like a personnel name, set to 'Organisation'
+  const finalOrgName = orgInfo?.name || (passedOrgName && !passedOrgName.includes(" ") ? passedOrgName : "Organisation");
+  const orgName = finalOrgName === "Organisation" && passedOrgName ? passedOrgName : finalOrgName;
 
   const users = useUserStore(state => state.users);
   const fetchUsers = useUserStore(state => state.fetchUsers);

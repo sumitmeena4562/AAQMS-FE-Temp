@@ -77,9 +77,11 @@ api.interceptors.response.use(
             // 1. Handling Unauthorized (401) with Token Refresh (and Queuing)
             const isUnauthorized = status === 401 || (error.response.data?.status === false && error.response.data?.errors?.code === 'token_not_valid');
             
-            if (isUnauthorized && !originalRequest._retry) {
+            // SECURITY: Never attempt refresh for PUBLIC_ENDPOINTS (avoid login loops)
+            const isPublicEndpoint = PUBLIC_ENDPOINTS.some(endpoint => originalRequest.url?.includes(endpoint));
+            
+            if (isUnauthorized && !originalRequest._retry && !isPublicEndpoint) {
                 if (isRefreshing) {
-                    // Queue the request until refresh finishes
                     return new Promise(function(resolve, reject) {
                         failedQueue.push({ resolve, reject });
                     })
@@ -91,19 +93,27 @@ api.interceptors.response.use(
                 isRefreshing = true;
 
                 try {
-                    // Start Background Token Rotation
-                    await axios.post(`${API_BASE_URL}users/token/refresh/`, {}, { withCredentials: true });
+                    // Critical: Await the response from the refresh endpoint
+                    await axios.post(`${API_BASE_URL}users/token/refresh/`, {}, { 
+                        withCredentials: true,
+                        // Prevent this request from ever being intercepted/retried recursively
+                        _silent: true 
+                    });
                     
                     isRefreshing = false;
-                    processQueue(null); // Resolve all pending in queue
+                    processQueue(null); 
                     
+                    // Final Retry logic: Ensure headers are fresh if browser didn't auto-update
                     return api(originalRequest);
                 } catch (refreshError) {
-                    processQueue(refreshError); // Reject all pending
+                    processQueue(refreshError);
                     isRefreshing = false;
                     
-                    // Refresh failed -> Local cleanup
-                    localStorage.removeItem('user'); 
+                    // Proactive Logout on permanent failure
+                    localStorage.removeItem('user');
+                    if (!window.location.pathname.includes('/login')) {
+                        window.location.href = '/login?session_expired=true';
+                    }
                     return Promise.reject(refreshError);
                 }
             }
