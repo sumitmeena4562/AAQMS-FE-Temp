@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import PageHeader from "../../components/UI/PageHeader";
 import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
@@ -58,13 +58,8 @@ const Dashboard = () => {
             />
             <StatGrid />
 
-            {isLoading ? (
-                <div className="flex flex-col items-center justify-center p-10 bg-white rounded-xl shadow-sm border border-gray-100 group transition-all duration-300 hover:shadow-md cursor-wait">
-                    <FiBox className="text-primary animate-pulse mb-3 group-hover:scale-110 transition-transform duration-300" size={40} />
-                    <span className="text-sm font-semibold text-gray-500 group-hover:text-primary transition-colors">Loading Metrics...</span>
-                </div>
-            ) : !isError && (
-                <MatricCardRow items={metricCards} />
+            {!isError && (
+                <MatricCardRow items={metricCards || []} />
             )}
 
             <RecentActivityTable />

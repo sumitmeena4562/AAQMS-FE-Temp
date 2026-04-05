@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { getDashboardMetrics, getDashboardStats, getRecentActivity, getAllHistory } from '../services/dashboardService';
 
 /**
- * ── DASHBOARD CUSTOM QUERY HOOKS ──
+ * ΓöÇΓöÇ DASHBOARD CUSTOM QUERY HOOKS ΓöÇΓöÇ
  * These hooks are the ONLY things your UI components will ever interact with.
  * They magically provide: `data`, `isLoading`, and `isError`.
  */

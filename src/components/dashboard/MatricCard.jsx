@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import AlertCard from './AlertCard';
 
 const VARIANTS = {

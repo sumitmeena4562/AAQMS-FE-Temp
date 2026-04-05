@@ -1,6 +1,6 @@
-import React from 'react';
+﻿import React from 'react';
 import { OrgIcon, CoordIcon, OfficerIcon, ZoneIcon } from '../data/dashboardData';
-import { FiBox, FiClock, FiAlertTriangle } from 'react-icons/fi';
+import { FiBox, FiClock, FiAlertTriangle, FiUserPlus, FiPackage, FiCheckCircle, FiSettings, FiActivity } from 'react-icons/fi';
 
 /**
  * Calculates percentage growth from a previous value to a current value.
@@ -162,4 +162,68 @@ export const mapToMetricCards = (rawData) => {
             statusVariant: flags.critical > 0 ? "danger" : "success",
         },
     ];
+};
+
+/**
+ * Formats ISO timestamp to relative time (e.g., "5 mins ago")
+ */
+export const formatRelativeTime = (timestamp) => {
+    if (!timestamp) return 'Just now';
+    const diffInSeconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} mins ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    return `${Math.floor(diffInSeconds / 86400)} days ago`;
+};
+
+/**
+ * Maps raw backend activity data into the format expected by RecentactivityTable.
+ * Injects React Icons and dynamic CSS colors based on the activity literal string.
+ * @param {Array} rawData - Array of activity logs from backend.
+ * @returns {Array} Array of activity objects formatted for the UI.
+ */
+export const mapToActivityFeed = (rawData) => {
+    if (!Array.isArray(rawData)) return [];
+    
+    return rawData.map(item => {
+        // Default styling for generic activities
+        let icon = FiActivity;
+        let iconBgClass = 'bg-base';
+        let iconTextClass = 'text-gray';
+        
+        // Dynamically assign aesthetics based on business logic
+        const typeStr = (item.type || '').toLowerCase();
+        const detailsStr = (item.details || '').toLowerCase();
+        
+        if (typeStr.includes('mismatch') || typeStr.includes('risk') || typeStr.includes('deleted') || detailsStr.includes('missing')) {
+            icon = FiAlertTriangle;
+            iconBgClass = 'bg-red-50';
+            iconTextClass = 'text-red-600';
+        } else if (typeStr.includes('user') || typeStr.includes('officer') || typeStr.includes('admin') || typeStr.includes('coordinator')) {
+            icon = FiUserPlus;
+            iconBgClass = 'bg-blue-50';
+            iconTextClass = 'text-blue-600';
+        } else if (typeStr.includes('inventory') || typeStr.includes('equipment') || typeStr.includes('zone')) {
+            icon = FiPackage;
+            iconBgClass = 'bg-orange-50';
+            iconTextClass = 'text-orange-600';
+        } else if (typeStr.includes('report') || typeStr.includes('approval') || typeStr.includes('resolved') || typeStr.includes('organisation')) {
+            icon = FiCheckCircle;
+            iconBgClass = 'bg-purple-50';
+            iconTextClass = 'text-purple-600';
+        } else if (typeStr.includes('config') || typeStr.includes('settings')) {
+            icon = FiSettings;
+            iconBgClass = 'bg-gray-100';
+            iconTextClass = 'text-gray-600';
+        }
+        
+        return {
+            ...item,
+            icon,
+            iconBgClass,
+            iconTextClass,
+            time: formatRelativeTime(item.time)
+        };
+    });
 };
