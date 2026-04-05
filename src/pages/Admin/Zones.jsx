@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
@@ -17,7 +17,7 @@ const Zones = () => {
     // The activeFloorId comes directly from the FilterBar's global store
     const activeFloorId = selectedFloor;
 
-    // ΓöÇΓöÇ FETCH ZONES FROM BACKEND ΓöÇΓöÇ
+    // ── FETCH ZONES FROM BACKEND ──
     // useQuery automatically handles: loading, error, caching, retries, refetching
     const { data: rawZones = [], isLoading, isError } = useQuery({
         queryKey: ['zones', activeFloorId],
@@ -27,10 +27,10 @@ const Zones = () => {
             return Array.isArray(response) ? response : (response?.results || []);
         },
         enabled: !!activeFloorId, // Only fetch when a floor is actually selected
-        staleTime: 1000 * 60 * 5, // Cache for 5 minutes ΓÇö avoid redundant DB hits
+        staleTime: 1000 * 60 * 5, // Cache for 5 minutes — avoid redundant DB hits
     });
 
-    // ΓöÇΓöÇ MAP UI PROPS (icons/colors) onto the raw API data ΓöÇΓöÇ
+    // ── MAP UI PROPS (icons/colors) onto the raw API data ──
     const floorZones = useMemo(() => {
         return rawZones.map(z => {
             let Icon = Layout;

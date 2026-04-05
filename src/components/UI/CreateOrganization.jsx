@@ -33,7 +33,8 @@ const orgSchema = z.object({
   classification: z.string().min(1, "Classification of Occupancy is required"),
   contactPerson: z.string().min(1, "Contact Person Name is required"),
   contactEmail: z.string().min(1, "Contact Email is required").email("Invalid email"),
-  address: z.string().min(3, "Full address is required"),
+  contactPhone: z.string().regex(/^\d{10}$/, "Must be exactly 10 digits with no characters"),
+  address: z.string().trim().min(3, "Address must be at least 3 characters"),
   otherInfo: z.string().optional(),
   imagery: z.object({
     north: z.string().min(1, "Upload an image"),
@@ -45,7 +46,8 @@ const orgSchema = z.object({
   })
 });
 
-const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isViewOnly = false, isSubmitting = false }) => {
+const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEdit, isViewOnly = false, isSubmitting = false }) => {
+  const [imageFiles, setImageFiles] = React.useState({});
   const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, reset, trigger } = useForm({
     resolver: zodResolver(orgSchema),
     mode: "all",
@@ -56,6 +58,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
       classification: 'Group H - High Hazard',
       contactPerson: '',
       contactEmail: '',
+      contactPhone: '',
       address: '',
       otherInfo: '',
       imagery: {
@@ -80,6 +83,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
         classification: 'Group H - High Hazard',
         contactPerson: '',
         contactEmail: '',
+        contactPhone: '',
         address: '',
         otherInfo: '',
         imagery: {
@@ -94,21 +98,49 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
     }
   }, [org, reset, isOpen]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const imageryValues = watch('imagery');
   const nameValue = watch('name');
   const extraImages = imageryValues?.extra || [];
 
-  const handleImage = (view, url) => {
+  const handleImage = (view, url, file) => {
     if (isViewOnly) return;
     setValue(`imagery.${view}`, url, { shouldValidate: true, shouldDirty: true });
+    if (file) {
+      setImageFiles(prev => ({ ...prev, [view]: file }));
+    } else {
+      setImageFiles(prev => {
+        const next = { ...prev };
+        delete next[view];
+        return next;
+      });
+    }
+  };
+
+  const handleExtraImage = (index, url, file) => {
+    if (isViewOnly || isSubmitting) return;
+    const newUrls = [...extraImages];
+    newUrls[index] = url;
+    setValue('imagery.extra', newUrls, { shouldValidate: true, shouldDirty: true });
+
+    setImageFiles(prev => {
+      const newExtra = [...(prev.extra || [])];
+      if (file) {
+        newExtra[index] = file;
+      } else {
+        newExtra.splice(index, 1);
+      }
+      return { ...prev, extra: newExtra };
+    });
   };
 
   const submitForm = (data) => {
     if (isViewOnly || isSubmitting) return;
     if (onSubmit) {
       onSubmit({
-        id: org?.id || String(Date.now()),
+        id: org?.id,
         ...data,
+        imageFiles: imageFiles, // Pass actual files for backend processing
         status: org?.status || "ACTIVE",
         lastInventoryAudit: org?.lastInventoryAudit || new Date().toISOString(),
         stats: org?.stats || { sites: 0, floors: 0, zones: 0 }
@@ -226,6 +258,15 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                     error={errors.contactEmail?.message}
                     disabled={isViewOnly || isSubmitting}
                   />
+                  <InputField
+                    label="Contact Number"
+                    type="tel"
+                    placeholder="+1 234 567 8900"
+                    required
+                    {...register("contactPhone")}
+                    error={errors.contactPhone?.message}
+                    disabled={isViewOnly || isSubmitting}
+                  />
 
                   <InputField
                     label="Full Address"
@@ -265,21 +306,16 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
 
                   {/* Upload Grid */}
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-[24px] pt-2">
-                    <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url) => handleImage('north', url)} error={errors.imagery?.north?.message} disabled={isViewOnly || isSubmitting} />
-                    <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url) => handleImage('south', url)} error={errors.imagery?.south?.message} disabled={isViewOnly || isSubmitting} />
-                    <ImageUploadCard label="East View →" value={imageryValues?.east} onUpload={(url) => handleImage('east', url)} error={errors.imagery?.east?.message} disabled={isViewOnly || isSubmitting} />
-                    <ImageUploadCard label="West View ←" value={imageryValues?.west} onUpload={(url) => handleImage('west', url)} error={errors.imagery?.west?.message} disabled={isViewOnly || isSubmitting} />
+                    <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url, file) => handleImage('north', url, file)} error={errors.imagery?.north?.message} disabled={isViewOnly || isSubmitting} />
+                    <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url, file) => handleImage('south', url, file)} error={errors.imagery?.south?.message} disabled={isViewOnly || isSubmitting} />
+                    <ImageUploadCard label="East View →" value={imageryValues?.east} onUpload={(url, file) => handleImage('east', url, file)} error={errors.imagery?.east?.message} disabled={isViewOnly || isSubmitting} />
+                    <ImageUploadCard label="West View ←" value={imageryValues?.west} onUpload={(url, file) => handleImage('west', url, file)} error={errors.imagery?.west?.message} disabled={isViewOnly || isSubmitting} />
                     {extraImages.map((value, index) => (
                       <ImageUploadCard
                         key={`extra-${index}`}
                         label={`Other View ${index + 1}`}
                         value={value}
-                        onUpload={(url) => {
-                          if (isViewOnly || isSubmitting) return;
-                          const newExtra = [...extraImages];
-                          newExtra[index] = url;
-                          setValue('imagery.extra', newExtra, { shouldValidate: true, shouldDirty: true });
-                        }}
+                        onUpload={(url, file) => handleExtraImage(index, url, file)}
                         error={errors.imagery?.extra?.[index]?.message}
                         disabled={isViewOnly || isSubmitting}
                       />
@@ -293,7 +329,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                     <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Add Profile Logo</h3>
                   </div>
                   <div className="w-full lg:w-1/4 pb-4 pt-3">
-                    <ImageUploadCard value={imageryValues?.profile} onUpload={(url) => handleImage('profile', url)} error={errors.imagery?.profile?.message} disabled={isViewOnly || isSubmitting} />
+                    <ImageUploadCard value={imageryValues?.profile} onUpload={(url, file) => handleImage('profile', url, file)} error={errors.imagery?.profile?.message} disabled={isViewOnly || isSubmitting} />
                   </div>
                 </div>
               </form>
@@ -310,6 +346,15 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                 >
                   {isViewOnly ? 'Close' : 'Cancel'}
                 </button>
+                {isViewOnly && (
+                  <button
+                    type="button"
+                    onClick={() => onEdit?.(org)}
+                    className="h-10 px-6 rounded-[var(--radius-button)] text-[11px] font-bold uppercase tracking-wider bg-primary hover:bg-primary/95 text-white transition-colors shadow-sm flex items-center justify-center gap-2"
+                  >
+                    Edit Details
+                  </button>
+                )}
                 {!isViewOnly && (
                   <button
                     onClick={handleSubmit(submitForm)}

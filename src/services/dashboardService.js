@@ -1,9 +1,9 @@
-﻿import api from './api';
+import api from './api';
 import { DUMMY_METRIC_CARDS, DUMMY_STATS_GRID, DUMMY_RECENT_ACTIVITY } from '../data/dashboardData';
 import { mapToStatsGrid, mapToMetricCards, mapToActivityFeed } from '../utils/dashboardCalculations';
 
 /**
- * ΓöÇΓöÇ DASHBOARD API SERVICE ΓöÇΓöÇ
+ * ── DASHBOARD API SERVICE ──
 
  */
 export const getDashboardStats = async () => {

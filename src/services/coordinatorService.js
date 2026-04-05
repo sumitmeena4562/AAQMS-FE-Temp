@@ -8,21 +8,16 @@ import api from './api';
 export const coordinatorService = {
     // Get all assigned coordinators (For Assigned Coordinators Page)
     getCoordinators: async (filters = {}) => {
-        /**
-         * Standardized: Use the 'users/' endpoint with its built-in role filter.
-         */
-        const response = await api.get('users/', { 
-            params: { ...filters, role: 'coordinator' } 
+        const response = await api.get('users/', {
+            params: { ...filters, role: 'coordinator' }
         });
-        return response.data;
+        return response.data.results || response.data;
     },
 
-    // Assign a new coordinator (Create a User with coordinator role)
+    // Assign a new coordinator to an organization (Creation)
     assignCoordinator: async (coordinatorData) => {
-        /**
-         * For simplicity in AAQMS, assigning a coordinator means creating a user with the role set.
-         */
-        const payload = { ...coordinatorData, role: 'COORDINATOR' };
+        // Enforce coordinator role during creation
+        const payload = { ...coordinatorData, role: 'coordinator' };
         const response = await api.post('users/', payload);
         return response.data;
     },

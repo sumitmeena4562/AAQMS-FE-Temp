@@ -1,78 +1,102 @@
-﻿
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import FloorCard from '../../components/UI/FloorCard';
 import { useFilterStore } from '../../store/useFilterStore';
-import { hierarchyService } from '../../services/hierarchyService';
-import { FiHome, FiBriefcase, FiAlertCircle, FiLoader } from 'react-icons/fi';
-
-/**
- * ΓöÇΓöÇ FLOOR PLAN SELECTION PAGE ΓöÇΓöÇ
- * 
- * This page manages the selection of a specific floor plan within a selected Site.
- * Transitioned from Mock Data to production API integration.
- */
+import { organizationService } from '../../services/organizationService';
+import { userService } from '../../services/userService';
+import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
 
 const FloorPlan = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite, setFloor } = useFilterStore();
-  
-  // PRODUCTION STATE: Handling dynamic floor list, loading, and errors
-  const [floorList, setFloorList] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState(null);
-
-
-  // UI HELPERS (Removed unused legacy mock variables)
-
+  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
+  const [floorList, setFloorList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [contextData, setContextData] = useState({ org: null, coord: null, site: null });
 
   useEffect(() => {
-    // Breadcrumb logic removed (mock-based) or updated in future to fetch org/site info
-    // For now, focusing on FETCHING the actual floors
-    if (selectedSite) {
-        fetchFloors(selectedSite);
-    } else {
+    const fetchMetadata = async () => {
+      const orgName = location.state?.orgName || new URLSearchParams(location.search).get('org');
+      const coordName = location.state?.coordinator?.name || new URLSearchParams(location.search).get('coord');
+      const siteName = location.state?.site?.name || new URLSearchParams(location.search).get('site');
+      
+      let org = null, coord = null, site = null;
+
+      if (orgName) {
+         try {
+           const orgs = await organizationService.getOrganizations({ search: orgName });
+           org = (orgs.results || orgs).find(o => o.name?.toLowerCase() === orgName.toLowerCase() || o.organization_name?.toLowerCase() === orgName.toLowerCase());
+           if (org && !selectedOrg) setOrg(org.id);
+         } catch (e) { console.error(e); }
+      }
+
+      if (coordName) {
+         try {
+           const usersResult = await userService.getUsers({ role: 'coordinator', search: coordName });
+           const users = usersResult.users || usersResult.results || usersResult;
+           coord = Array.isArray(users) ? users.find(u => u.name.toLowerCase() === coordName.toLowerCase()) : null;
+           if (coord && !selectedCoord) setCoord(coord.id);
+         } catch (e) { console.error(e); }
+      }
+
+      if (siteName && org) {
+         try {
+            const data = await organizationService.getSites(org.id);
+            site = (data.results || data).find(s => s.name.toLowerCase() === siteName.toLowerCase());
+            if (site && !selectedSite) setSite(site.id);
+         } catch (e) { console.error(e); }
+      }
+      setContextData({ org, coord, site });
+    };
+    fetchMetadata();
+  }, [location.search, location.state, selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite]);
+
+  useEffect(() => {
+    const fetchFloors = async () => {
+      if (!selectedSite) {
         setFloorList([]);
-    }
+        return;
+      }
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await organizationService.getFloors(selectedSite);
+        setFloorList(data.results || data || []);
+      } catch (err) {
+        console.error("Failed to fetch floors:", err);
+        setError("Failed to load floor plans.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchFloors();
   }, [selectedSite]);
 
-  const fetchFloors = async (siteId) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-        // PROFESSIONAL INTEGRATION: Fetching from hierarchy API with site_id filter
-        const data = await hierarchyService.getFloors({ site_id: siteId });
-        setFloorList(data || []);
-    } catch (err) {
-        console.error("Failed to fetch floors:", err);
-        setError("Could not load floor plans. Please try again.");
-    } finally {
-        setIsLoading(false);
-    }
-  };
+  const orgInfo = contextData.org || { name: "Organization" };
+  const coordInfo = contextData.coord || { name: "Coordinator" };
+  const siteInfo = contextData.site || { name: "Site" };
 
   // Breadcrumbs updated to focus on the active selection
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-    { label: "Site Plan", path: `/admin/site-plan` },
-    { label: "Floor Plan", path: "#", isActive: true }
+    { label: orgInfo?.name || orgInfo?.organization_name || "Organization", path: `/admin/organizations` },
+    { label: coordInfo?.name || "Site Plan", path: `/admin/site-plan` },
+    { label: siteInfo?.name || "Floor Plan", path: "#", isActive: true }
   ];
 
-  // ACTIVE FILTER COUNT: Tracks how many floors have an 'ACTIVE' status (case-insensitive) for the UI header
-  const activePlansCount = floorList.filter(f => f?.status?.toUpperCase() === 'ACTIVE').length;
+  const activePlansCount = floorList.length;
 
   /**
-   * ΓöÇΓöÇ NAVIGATION HANDLER ΓöÇΓöÇ
+   * ── NAVIGATION HANDLER ──
    * Redirects the user to the Zone mapping for the specific floor.
    */
   const handleFloorClick = (floor) => {
-    setFloor(floor.id);
-    navigate(`/admin/zones?site=${selectedSite}&floor=${floor.id}`, {
-      state: { floor, siteId: selectedSite }
+    navigate(`/admin/zones?org=${encodeURIComponent(orgInfo?.name || orgInfo?.organization_name || "")}&coord=${encodeURIComponent(coordInfo?.name || "")}&site=${encodeURIComponent(siteInfo?.name || "")}&floor=${encodeURIComponent(floor.name || "")}`, {
+      state: { floor, site: siteInfo, coordinator: coordInfo, orgName: orgInfo?.name || orgInfo?.organization_name }
     });
   };
 
@@ -115,6 +139,7 @@ const FloorPlan = () => {
               <FloorCard 
                 key={floor.id || index} 
                 floor={floor} 
+                site={siteInfo}
                 onClick={() => handleFloorClick(floor)} 
               />
             ))

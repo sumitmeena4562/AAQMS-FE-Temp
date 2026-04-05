@@ -1,25 +1,132 @@
 import api from './api';
-import { extractError } from '../utils/errorUtils';
+import { extractError } from "../utils/errorUtils";
 
 /**
- * ── ORGANIZATION API SERVICE ──
- * Standardized for Production with full error handling.
+ * ── ORGANISATION API SERVICE ──
+ * Unified service for handling all operational units (Org, Site, Floor, Zone).
+ * Note: Using 'organisations' (with 's') to match backend URL structure.
  */
+
+// Helper to map frontend data to backend fields for Organisation
+const mapOrgFrontendToBackend = (data) => {
+    return {
+        name: data.name,
+        industry_type: data.industry,
+        occupancy_type: data.occupancyType,
+        classification: data.classification,
+        contact_person_name: data.contactPerson,
+        contact_email: data.contactEmail,
+        contact_phone: data.contactPhone,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+        description: data.description || data.otherInfo,
+        status: (data.status || 'PENDING').toUpperCase(),
+        is_active: data.is_active !== undefined ? data.is_active : true
+    };
+};
+
+// Helper to create FormData for uploads (Org)
+const createOrgFormData = (data) => {
+    const formData = new FormData();
+    const backendFields = mapOrgFrontendToBackend(data);
+
+    // Append basic fields
+    Object.entries(backendFields).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+            formData.append(key, value);
+        }
+    });
+
+    // Handle files if they exist
+    if (data.imageFiles) {
+        Object.entries(data.imageFiles).forEach(([key, file]) => {
+            if (Array.isArray(file)) {
+                file.forEach((item) => {
+                    if (item instanceof File) {
+                        formData.append('images', item);
+                    }
+                });
+                return;
+            }
+            if (file instanceof File) {
+                formData.append('images', file); // Uniform key for multiple image uploads
+            }
+        });
+    }
+
+    return formData;
+};
+
 export const organizationService = {
-    // Get all organizations (For Dropdowns and Listing)
+    // Get all organisations (with search/filtering)
     getOrganizations: async (filters = {}) => {
         try {
-            const response = await api.get('organisations/list/', { params: filters });
+            const params = {
+                ...filters,
+                status: filters.status?.toUpperCase()
+            };
+            const response = await api.get('organisations/', { params });
             return response.data;
         } catch (err) {
-            throw new Error(extractError(err, "Failed to load organizations"));
+            throw new Error(extractError(err, "Failed to load organisations"));
         }
     },
 
-    // Get sites for a specific organization (For Assignment Dropdowns)
-    getSites: async (orgId = null) => {
+    // Get single organisation details
+    getOrganizationById: async (id) => {
         try {
-            const params = orgId ? { organisation: orgId, dropdown: 'true' } : { dropdown: 'true' };
+            const response = await api.get(`organisations/${id}/`);
+            return response.data;
+        } catch (err) {
+            throw new Error(extractError(err, "Organisation details not found"));
+        }
+    },
+
+    // Create a new organisation
+    createOrganization: async (orgData) => {
+        try {
+            const formData = createOrgFormData(orgData);
+            const response = await api.post('organisations/', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            return response.data;
+        } catch (err) {
+            throw new Error(extractError(err, "Failed to create organisation"));
+        }
+    },
+
+    // Update an existing organisation
+    updateOrganization: async (id, orgData) => {
+        try {
+            const formData = createOrgFormData(orgData);
+            const response = await api.patch(`organisations/${id}/`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            return response.data;
+        } catch (err) {
+            throw new Error(extractError(err, "Failed to update organisation"));
+        }
+    },
+
+    blockOrganization: async (id) => {
+        try {
+            const response = await api.patch(`organisations/${id}/block/`);
+            return response.data;
+        } catch (err) {
+            throw new Error(extractError(err, "Failed to block organisation"));
+        }
+    },
+
+    // --- SUB-UNITS (SITES, FLOORS, ZONES) ---
+
+    // Get all sites
+    getSites: async (organizationId = null, coordinatorId = null) => {
+        const params = {};
+        if (organizationId) params.organisation = organizationId;
+        if (coordinatorId) params.coord_id = coordinatorId;
+        try {
             const response = await api.get('organisations/sites/', { params });
             return response.data;
         } catch (err) {
@@ -27,54 +134,42 @@ export const organizationService = {
         }
     },
 
-    // Get all zones for an organization (For Assignment Dropdowns)
-    getZones: async (orgId = null) => {
+    // Get floors for a site
+    getFloors: async (siteId) => {
+        if (!siteId) return [];
         try {
-            const params = orgId ? { organisation: orgId, dropdown: 'true' } : { dropdown: 'true' };
-            const response = await api.get('organisations/all-zones/', { params });
+            const response = await api.get(`organisations/floors/${siteId}/`);
+            return response.data;
+        } catch (err) {
+            throw new Error(extractError(err, "Failed to load floors"));
+        }
+    },
+
+    // Get zones for a floor
+    getZones: async (floorId) => {
+        if (!floorId) return [];
+        try {
+            const response = await api.get(`organisations/floors/${floorId}/zones/`);
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load zones"));
         }
     },
 
-    // Get single organization details
-    getOrganizationById: async (id) => {
+    // Generic delete for any unit
+    deleteUnit: async (type, id) => {
         try {
-            const response = await api.get(`organisations/${id}/`);
-            return response.data;
+            const endpointMap = {
+                'organisation': 'organisations',
+                'site': 'organisations/sites',
+                'floor': 'organisations/floors',
+                'zone': 'organisations/zones'
+            };
+            const endpoint = endpointMap[type] || type;
+            await api.delete(`${endpoint}/${id}/`);
+            return true;
         } catch (err) {
-            throw new Error(extractError(err, "Organization details not found"));
-        }
-    },
-
-    // Create a new organization
-    createOrganization: async (orgData) => {
-        try {
-            const response = await api.post('organisations/', orgData);
-            return response.data;
-        } catch (err) {
-            throw new Error(extractError(err, "Failed to create organization"));
-        }
-    },
-
-    // Update an existing organization
-    updateOrganization: async (id, orgData) => {
-        try {
-            const response = await api.patch(`organisations/${id}/`, orgData);
-            return response.data;
-        } catch (err) {
-            throw new Error(extractError(err, "Failed to update organization"));
-        }
-    },
-
-    // Delete an organization
-    deleteOrganization: async (id) => {
-        try {
-            const response = await api.delete(`organisations/${id}/`);
-            return response.data;
-        } catch (err) {
-            throw new Error(extractError(err, "Failed to delete organization"));
+            throw new Error(extractError(err, `Failed to delete ${type}`));
         }
     }
 };

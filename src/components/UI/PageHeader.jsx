@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { FiPlus, FiDownload, FiRefreshCw } from 'react-icons/fi';
 import Breadcrumb from '../Breadcrumb/Breadcrumb';
 import Button from './Button';
@@ -26,7 +26,7 @@ const PageHeader = ({
 
       <div className="w-full px-4 sm:px-8 py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         
-        {/* 2. TITLE & SUBTITLE ΓÇö High Density Typography */}
+        {/* 2. TITLE & SUBTITLE — High Density Typography */}
         {title && (
           <div className="flex flex-col gap-1.5 min-w-0 flex-1">
             <h1 className="text-xl sm:text-2xl font-black text-title leading-tight tracking-tight truncate">

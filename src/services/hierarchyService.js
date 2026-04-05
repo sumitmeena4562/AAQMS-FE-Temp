@@ -1,7 +1,7 @@
-﻿import api from './api';
+import api from './api';
 
 /**
- * ΓöÇΓöÇ HIERARCHY (SITE, FLOOR, ZONE) API SERVICE ΓöÇΓöÇ
+ * ── HIERARCHY (SITE, FLOOR, ZONE) API SERVICE ──
  * 
  * TODO [BACKEND INTEGRATION]: Update the URLs below once the backend is ready.
  */

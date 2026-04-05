@@ -1,11 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../UI/DataTable';
 import Button from '../UI/Button';
 import { FiFilter, FiBox } from 'react-icons/fi';
 import { useRecentActivity } from '../../hooks/useDashboardQueries';
 
-// ΓöÇΓöÇ Column definitions ΓöÇΓöÇ
+// ── Column definitions ──
 const columns = [
     {
         header: 'Event Type',

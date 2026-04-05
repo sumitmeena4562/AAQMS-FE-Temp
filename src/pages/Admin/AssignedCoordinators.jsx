@@ -40,23 +40,30 @@ const AssignedCoordinators = () => {
   }, [selectedOrg, passedOrgName, setOrg, users.length, fetchUsers, orgs.length, fetchOrgs, orgs]);
 
   const isOrgSelected = !!(selectedOrg || passedOrgName);
-  const orgUsers = isOrgSelected ? users.filter(u => u.organization === orgName) : [];
+  
+  // Resilient filtering: check by Name AND ID for consistency between mock/live data
+  const orgUsers = isOrgSelected 
+    ? users.filter(u => {
+        const matchesName = (u.organization || "").trim().toLowerCase() === (orgName || "").trim().toLowerCase();
+        const matchesId = (selectedOrg && u.organisation_id === selectedOrg);
+        const isCoordinator = (u.role || "").toLowerCase() === 'coordinator';
+        
+        return (matchesName || matchesId) && isCoordinator;
+      }) 
+    : [];
 
   const coordinatorsList = orgUsers.map(user => {
-    // True Relational Cascade
-    const userSites = sites.filter(s => s.coordId?.toString() === user.id.toString());
-    const siteIds = userSites.map(s => s.id);
-    const userFloors = floors.filter(f => siteIds.includes(f.siteId));
-    const floorIds = userFloors.map(f => f.id);
-    const userZones = zones.filter(z => floorIds.includes(z.floorId));
+    // Correctly aggregate statistics for each coordinator
+    const coordSites = sites.filter(s => s.coordId === user.id.toString());
+    const totalZones = coordSites.reduce((sum, s) => sum + (s.stats?.zones || 0), 0);
 
     return {
       name: user.name,
-      id: `USER-${user.id.toString().padStart(3, '0')}`,
+      id: user.employee_id || `COORD-${user.id.toString().substring(0, 4)}`,
       status: user.status === 'active' ? 'ACTIVE' : 'AWAY',
-      sites: userSites.length,
-      zones: userZones.length,
-      image: null
+      sites: coordSites.length,
+      zones: totalZones,
+      image: user.avatar || null
     };
   });
 
