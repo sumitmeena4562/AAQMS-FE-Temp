@@ -1,8 +1,6 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
 import { organizationService } from '../services/organizationService';
 import { inventoryService } from '../services/inventoryService';
-import { MOCK_MODE } from '../services/api';
 import toast from 'react-hot-toast';
 
 /**
@@ -17,20 +15,8 @@ export const useOrgStore = create((set, get) => ({
   error: null,
   inventory: [],
   inventoryStats: null,
-  
-  // UI State
-  viewMode: 'grid',
-  filters: {
-    industry: 'all',
-    status: 'all',
-    search: ''
-  },
 
   // --- ACTIONS ---
-  setViewMode: (mode) => set({ viewMode: mode }),
-  setFilters: (newFilters) => set((state) => ({ filters: { ...state.filters, ...newFilters } })),
-  resetFilters: () => set({ filters: { industry: 'all', status: 'all', search: '' } }),
-
   fetchOrgs: async (filters = {}) => {
     set({ isLoading: true, error: null });
     try {
@@ -39,10 +25,10 @@ export const useOrgStore = create((set, get) => ({
       const data = response.data || response.results || response;
       set({ orgs: Array.isArray(data) ? data : [], isLoading: false });
     } catch (err) {
-      set({
-        error: "We couldn't load the organizations. Please refresh the page.",
-        orgs: [],
-        isLoading: false
+      set({ 
+        error: "We couldn't load the organizations. Please refresh the page.", 
+        orgs: [], 
+        isLoading: false 
       });
       console.error("Organization fetch failed:", err);
     }
@@ -55,7 +41,7 @@ export const useOrgStore = create((set, get) => ({
       const data = response.data || response;
       set((state) => ({ orgs: [...state.orgs, data], isSubmitting: false }));
       toast.success("Success! The organization has been added.");
-      return true;
+      return true; 
     } catch (err) {
       set({ error: err.message, isSubmitting: false });
       toast.error("Oops! We couldn't add the organization. Please check the details.");
@@ -81,25 +67,10 @@ export const useOrgStore = create((set, get) => ({
     }
   },
 
-  blockOrg: async (id) => {
-    set({ isSubmitting: true, error: null });
-    try {
-      await organizationService.blockOrganization(id);
-      set((state) => ({
-        orgs: state.orgs.map(org => org.id === id ? { ...org, isBlocked: true } : org),
-        isSubmitting: false
-      }));
-      toast.success("Organization has been blocked.");
-    } catch (err) {
-      set({ error: err.message, isSubmitting: false });
-      toast.error("Failed to block organization.");
-    }
-  },
-
   removeOrg: async (id) => {
     set({ isSubmitting: true, error: null });
     try {
-      await organizationService.deleteUnit('organisation', id);
+      await organizationService.deleteOrganization(id);
       set((state) => ({
         orgs: state.orgs.filter(org => org.id !== id),
         isSubmitting: false
@@ -121,14 +92,14 @@ export const useOrgStore = create((set, get) => ({
         site: filters.site !== 'all' ? filters.site : undefined,
         floor: filters.floor !== 'all' ? filters.floor : undefined,
         zone: filters.zone !== 'all' ? filters.zone : undefined,
-        category: filters.type?.length ? filters.type[0] : undefined,
+        category: filters.type?.length ? filters.type[0] : undefined, 
         search: filters.search || undefined
       };
-
+      
       const response = await inventoryService.getInventory(params);
-      set({
-        inventory: response.results || response,
-        isLoading: false
+      set({ 
+        inventory: response.results || response, 
+        isLoading: false 
       });
     } catch (err) {
       const msg = err.message || "Failed to fetch inventory";
