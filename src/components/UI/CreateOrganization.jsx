@@ -287,100 +287,157 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                   {step === 1 && (
                     <Motion.div
                       key="step1"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-8"
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        visible: { 
+                          opacity: 1,
+                          transition: { staggerChildren: 0.08 }
+                        },
+                        exit: { opacity: 0, x: -20 }
+                      }}
+                      className="flex flex-col gap-8"
                     >
-                      <InputField
-                        label="Full Legal Name"
-                        required
-                        icon={<Building />}
-                        placeholder="e.g. Apex Global Industries"
-                        {...register("name")}
-                        error={errors.name?.message}
-                        isValid={isNameValid}
-                        disabled={isViewOnly}
-                      />
-                      <SelectField
-                        label="Industry Category"
-                        icon={<Badge size={14} />}
-                        {...register("industry")}
-                        error={errors.industry?.message}
-                        options={["Manufacturing & Heavy Industry", "Construction", "Healthcare", "Warehousing"]}
-                        disabled={isViewOnly}
-                      />
-                      <SelectField
-                        label="Occupancy Type"
-                        {...register("occupancyType")}
-                        error={errors.occupancyType?.message}
-                        options={["Industrial Factory", "Commercial Complex", "High-Rise Warehouse", "Retail Outlet"]}
-                        disabled={isViewOnly}
-                      />
-                      <SelectField
-                        label="Building Classification"
-                        {...register("classification")}
-                        error={errors.classification?.message}
-                        options={[
-                          "Group H - High Hazard",
-                          "Group B - Business",
-                          "Group S - Storage",
-                          "Group F - Factory"
-                        ]}
-                        disabled={isViewOnly}
-                      />
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-6">
+                        <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                          <InputField
+                            label="Organization Name"
+                            required
+                            icon={<Building />}
+                            placeholder="e.g. Apex Global Industries"
+                            {...register("name")}
+                            error={errors.name?.message}
+                            isValid={isNameValid}
+                            disabled={isViewOnly}
+                          />
+                        </Motion.div>
+                        <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                          <SelectField
+                            label="Industry Category"
+                            icon={<Badge size={14} />}
+                            {...register("industry")}
+                            error={errors.industry?.message}
+                            options={["Manufacturing & Heavy Industry", "Construction", "Healthcare", "Warehousing"]}
+                            disabled={isViewOnly}
+                          />
+                        </Motion.div>
+                        <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                          <SelectField
+                            label="Occupancy Type"
+                            {...register("occupancyType")}
+                            error={errors.occupancyType?.message}
+                            options={["Industrial Factory", "Commercial Complex", "High-Rise Warehouse", "Retail Outlet"]}
+                            disabled={isViewOnly}
+                          />
+                        </Motion.div>
+                        <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                          <SelectField
+                            label="Building Classification"
+                            {...register("classification")}
+                            error={errors.classification?.message}
+                            options={[
+                              "Group H - High Hazard",
+                              "Group B - Business",
+                              "Group S - Storage",
+                              "Group F - Factory"
+                            ]}
+                            disabled={isViewOnly}
+                          />
+                        </Motion.div>
+                      </div>
+
+                      <Motion.div 
+                        variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
+                        className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4 border-t border-border-main/50"
+                      >
+                        <div className="lg:col-span-1">
+                          <ImageUploadCard 
+                            label="Identity Logo" 
+                            value={imageryValues?.profile} 
+                            onUpload={(url, file) => handleImage('profile', url, file)} 
+                          />
+                        </div>
+                        <div className="lg:col-span-2">
+                          <label className="text-[12px] font-bold text-gray uppercase tracking-widest mb-2 block ml-1">About Organization</label>
+                          <textarea
+                            {...register("otherInfo")}
+                            placeholder="Nature of business, facility highlights, or unique operational details..."
+                            className="w-full h-[120px] p-4 rounded-xl border-1.5 border-border-main bg-base/30 text-[13px] text-title placeholder:text-gray/50 focus:border-primary focus:bg-white outline-none transition-all duration-300 resize-none"
+                          />
+                        </div>
+                      </Motion.div>
                     </Motion.div>
                   )}
 
                   {step === 2 && (
                     <Motion.div
                       key="step2"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        visible: { 
+                          opacity: 1,
+                          transition: { staggerChildren: 0.08 }
+                        },
+                        exit: { opacity: 0, x: -20 }
+                      }}
                       className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-8"
                     >
-                      <InputField
-                        label="Contact Representative"
-                        icon={<User />}
-                        required
-                        placeholder="Full Name"
-                        {...register("contactPerson")}
-                        error={errors.contactPerson?.message}
-                      />
-                      <InputField
-                        label="Work Email"
-                        icon={<Mail />}
-                        type="email"
-                        required
-                        placeholder="contact@org.com"
-                        {...register("contactEmail")}
-                        error={errors.contactEmail?.message}
-                      />
-                      <InputField
-                        label="Mobile Number"
-                        icon={<Phone />}
-                        type="tel"
-                        required
-                        placeholder="10-digit number"
-                        {...register("contactPhone")}
-                        error={errors.contactPhone?.message}
-                      />
-                      <InputField
-                        label="Operational Address"
-                        icon={<MapPin />}
-                        required
-                        placeholder="Street, Building No."
-                        {...register("address")}
-                        error={errors.address?.message}
-                      />
-                      <InputField
-                        label="City / Region"
-                        placeholder="Current City"
-                        {...register("city")}
-                        error={errors.city?.message}
-                      />
-                      <div className="grid grid-cols-2 gap-4">
+                      <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                        <InputField
+                          label="Contact Representative"
+                          icon={<User />}
+                          required
+                          placeholder="Full Name"
+                          {...register("contactPerson")}
+                          error={errors.contactPerson?.message}
+                        />
+                      </Motion.div>
+                      <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                        <InputField
+                          label="Work Email"
+                          icon={<Mail />}
+                          type="email"
+                          required
+                          placeholder="contact@org.com"
+                          {...register("contactEmail")}
+                          error={errors.contactEmail?.message}
+                        />
+                      </Motion.div>
+                      <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                        <InputField
+                          label="Mobile Number"
+                          icon={<Phone />}
+                          type="tel"
+                          required
+                          placeholder="10-digit number"
+                          {...register("contactPhone")}
+                          error={errors.contactPhone?.message}
+                        />
+                      </Motion.div>
+                      <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                        <InputField
+                          label="Operational Address"
+                          icon={<MapPin />}
+                          required
+                          placeholder="Street, Building No."
+                          {...register("address")}
+                          error={errors.address?.message}
+                        />
+                      </Motion.div>
+                      <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                        <InputField
+                          label="City / Region"
+                          placeholder="Current City"
+                          {...register("city")}
+                          error={errors.city?.message}
+                        />
+                      </Motion.div>
+                      <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }} className="grid grid-cols-2 gap-4">
                         <InputField
                           label="Province"
                           placeholder="State"
@@ -392,20 +449,28 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                           placeholder="India"
                           {...register("country")}
                         />
-                      </div>
+                      </Motion.div>
                     </Motion.div>
                   )}
 
                   {step === 3 && (
                     <Motion.div
                       key="step3"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      variants={{
+                        hidden: { opacity: 0 },
+                        visible: { 
+                          opacity: 1,
+                          transition: { staggerChildren: 0.08 }
+                        },
+                        exit: { opacity: 0, x: -20 }
+                      }}
                       className="flex flex-col gap-8"
                     >
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div className="space-y-4">
+                      <div className="grid grid-cols-1 gap-8">
+                        <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }} className="space-y-4">
                           <div className="flex items-center justify-between border-b border-border-main pb-2">
                             <h3 className="text-sm font-bold text-title flex items-center gap-2">
                               <ImageIcon className="text-primary" size={16} /> Site Perspectives
@@ -419,35 +484,20 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                             </button>
                           </div>
                           
-                          <div className="grid grid-cols-2 gap-6">
+                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                             <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url, file) => handleImage('north', url, file)} />
                             <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url, file) => handleImage('south', url, file)} />
                             <ImageUploadCard label="East View →" value={imageryValues?.east} onUpload={(url, file) => handleImage('east', url, file)} />
                             <ImageUploadCard label="West View ←" value={imageryValues?.west} onUpload={(url, file) => handleImage('west', url, file)} />
                           </div>
-                        </div>
-
-                        <div className="space-y-6">
-                          <div>
-                            <h3 className="text-sm font-bold text-title border-b border-border-main pb-2 mb-4 flex items-center gap-2">
-                              <Building className="text-primary" size={16} /> Branding & Meta
-                            </h3>
-                            <div className="w-1/2">
-                              <ImageUploadCard label="Profile Logo" value={imageryValues?.profile} onUpload={(url, file) => handleImage('profile', url, file)} />
-                            </div>
-                          </div>
-                          
-                          <InputField
-                            label="Additional Overview"
-                            icon={<FileText />}
-                            placeholder="Nature of business, facility highlights..."
-                            {...register("otherInfo")}
-                          />
-                        </div>
+                        </Motion.div>
                       </div>
 
                       {extraImages.length > 0 && (
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-border-main">
+                        <Motion.div 
+                          variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
+                          className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-border-main"
+                        >
                           {extraImages.map((value, index) => (
                             <ImageUploadCard
                               key={`extra-${index}`}
@@ -456,7 +506,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                               onUpload={(url, file) => handleExtraImage(index, url, file)}
                             />
                           ))}
-                        </div>
+                        </Motion.div>
                       )}
                     </Motion.div>
                   )}
@@ -466,31 +516,37 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
 
             {/* Modal Footer */}
             <div className="p-6 bg-base/50 border-t border-border-main flex items-center justify-between">
-              <button
+              <motion.button
                 type="button"
+                whileHover={{ x: -4 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={step === 1 ? onClose : prevStep}
                 className="h-11 px-6 rounded-xl text-[11px] font-bold uppercase tracking-wider text-gray hover:text-title hover:bg-base transition-all flex items-center gap-2"
               >
                 <ChevronLeft size={16} /> {step === 1 ? 'Cancel' : 'Back'}
-              </button>
+              </motion.button>
 
               <div className="flex items-center gap-3">
                 {step < 3 ? (
-                  <button
+                  <motion.button
                     type="button"
+                    whileHover={{ x: 4 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={nextStep}
                     className="h-11 px-8 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
                   >
                     Continue <ChevronRight size={16} />
-                  </button>
+                  </motion.button>
                 ) : (
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={handleSubmit(submitForm)}
                     disabled={isSubmitting}
                     className={`h-11 px-8 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 ${isSubmitting ? 'bg-base text-gray cursor-not-allowed' : 'bg-primary hover:bg-primary/95 text-white shadow-primary/20'}`}
                   >
                     {isSubmitting ? 'Processing...' : org ? 'Commit Changes' : 'Finalize Registration'}
-                  </button>
+                  </motion.button>
                 )}
               </div>
             </div>
