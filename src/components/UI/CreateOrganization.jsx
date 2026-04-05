@@ -516,7 +516,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
 
             {/* Modal Footer */}
             <div className="p-6 bg-base/50 border-t border-border-main flex items-center justify-between">
-              <motion.button
+              <Motion.button
                 type="button"
                 whileHover={{ x: -4 }}
                 whileTap={{ scale: 0.95 }}
@@ -524,11 +524,11 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                 className="h-11 px-6 rounded-xl text-[11px] font-bold uppercase tracking-wider text-gray hover:text-title hover:bg-base transition-all flex items-center gap-2"
               >
                 <ChevronLeft size={16} /> {step === 1 ? 'Cancel' : 'Back'}
-              </motion.button>
+              </Motion.button>
 
               <div className="flex items-center gap-3">
                 {step < 3 ? (
-                  <motion.button
+                  <Motion.button
                     type="button"
                     whileHover={{ x: 4 }}
                     whileTap={{ scale: 0.95 }}
@@ -536,9 +536,9 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                     className="h-11 px-8 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
                   >
                     Continue <ChevronRight size={16} />
-                  </motion.button>
+                  </Motion.button>
                 ) : (
-                  <motion.button
+                  <Motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSubmit(submitForm)}
@@ -546,7 +546,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                     className={`h-11 px-8 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 ${isSubmitting ? 'bg-base text-gray cursor-not-allowed' : 'bg-primary hover:bg-primary/95 text-white shadow-primary/20'}`}
                   >
                     {isSubmitting ? 'Processing...' : org ? 'Commit Changes' : 'Finalize Registration'}
-                  </motion.button>
+                  </Motion.button>
                 )}
               </div>
             </div>
