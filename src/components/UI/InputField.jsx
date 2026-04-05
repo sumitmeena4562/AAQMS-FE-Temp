@@ -1,4 +1,4 @@
-﻿import React, { useState, forwardRef } from 'react';
+import React, { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertCircle } from 'react-icons/fi';
 import { t } from '../../theme/theme';
@@ -77,27 +77,28 @@ const InputField = forwardRef(({
                     required={required}
                     style={{
                         width: '100%',
-                        padding: icon ? '12px 14px 12px 38px' : '12px 14px',
-                        paddingRight: isPassword || isValid ? '38px' : '14px',
+                        padding: icon ? '13px 14px 13px 42px' : '13px 16px',
+                        paddingRight: isPassword || isValid ? '42px' : '16px',
                         fontSize: t.fontSize.md,
                         color: t.color.text,
                         backgroundColor: isFocused ? t.color.bg : t.color.bgHover,
                         border: `1.5px solid ${error ? t.color.danger : (isValid ? '#10B981' : (isFocused ? t.color.primary : t.color.border))}`,
-                        borderRadius: 'var(--radius-input)',
+                        borderRadius: '12px',
                         outline: 'none',
-                        transition: 'all 0.2s ease-in-out',
+                        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                         boxShadow: isFocused 
-                            ? (error ? '0 0 0 3px rgba(239, 68, 68, 0.1)' : `0 0 0 3px ${t.color.primary}15`) 
-                            : t.shadow.sm,
-                        fontWeight: t.fontWeight.medium
+                            ? (error ? '0 0 0 4px rgba(239, 68, 68, 0.08)' : `0 0 0 4px rgba(7, 34, 103, 0.06)`) 
+                            : '0 2px 4px rgba(0,0,0,0.02)',
+                        fontWeight: t.fontWeight.medium,
+                        letterSpacing: '0.01em'
                     }}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     onMouseEnter={(e) => {
-                        if (!isFocused && !error) e.target.style.borderColor = 'var(--color-border-hover)';
+                        if (!isFocused && !error) e.target.style.borderColor = 'rgba(7, 34, 103, 0.2)';
                     }}
                     onMouseLeave={(e) => {
-                        if (!isFocused && !error) e.target.style.borderColor = 'var(--color-border)';
+                        if (!isFocused && !error) e.target.style.borderColor = t.color.border;
                     }}
                     {...props}
                 />
