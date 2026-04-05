@@ -111,7 +111,7 @@ const ConfirmModal = ({
                 </div>
             )}
         </AnimatePresence>,
-        document.body
+        document.getElementById('root') || document.body
     );
 };
 
