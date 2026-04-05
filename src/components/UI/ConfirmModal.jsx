@@ -1,4 +1,5 @@
-﻿import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiX } from 'react-icons/fi';
 import { t } from '../../theme/theme';
@@ -15,11 +16,19 @@ const ConfirmModal = ({
     danger = false,
     loading = false,
 }) => {
-    return (
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <div 
-                    style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+                    style={{ position: 'fixed', inset: 0, zIndex: 99999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
                 >
                     {/* Backdrop */}
                     <motion.div
@@ -101,7 +110,8 @@ const ConfirmModal = ({
                     </motion.div>
                 </div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 };
 
