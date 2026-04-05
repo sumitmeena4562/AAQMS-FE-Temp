@@ -49,11 +49,14 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     if (isSiteCard) {
       const currentOrg = location.state?.orgName || new URLSearchParams(location.search).get('org') || '';
       const coordName = coordinatorContext?.name || new URLSearchParams(location.search).get('coord') || '';
-      navigate(`/admin/floor-plan?org=${encodeURIComponent(currentOrg)}&coord=${encodeURIComponent(coordName)}&site=${encodeURIComponent(org.name)}`, {
+      navigate(`/admin/floor-plan?org_id=${org.id}&org_name=${encodeURIComponent(currentOrg)}&coord=${encodeURIComponent(coordName)}&site=${encodeURIComponent(org.name)}`, {
         state: { site: org, orgName: currentOrg, coordinator: coordinatorContext }
       });
     } else {
-      navigate(`/admin/coordinators?org=${encodeURIComponent(org.name)}`, { state: { org } });
+      // Navigate to coordinators page with specific org filter
+      navigate(`/admin/coordinators?org_id=${org.id}&org_name=${encodeURIComponent(org.name)}`, { 
+        state: { org, from: 'org_card' } 
+      });
     }
   };
 
