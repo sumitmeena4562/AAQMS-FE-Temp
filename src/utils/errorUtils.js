@@ -20,7 +20,7 @@ export const extractError = (err, fallback = "Something went wrong. Please try a
       if (data.message) return data.message;
   
       // 3. Nested Field Errors
-      if (typeof data === 'object') {
+      if (typeof data === 'object' && data !== null) {
         const messages = Object.entries(data)
           .map(([key, val]) => {
             const msg = Array.isArray(val) ? val[0] : val;
