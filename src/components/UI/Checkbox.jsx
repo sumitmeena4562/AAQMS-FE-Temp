@@ -1,49 +1,10 @@
-import React, { useId, forwardRef, useState, useEffect } from 'react';
+﻿import React, { useId } from 'react';
 import { motion } from 'framer-motion';
 import { t } from '../../theme/theme';
 
-const Checkbox = forwardRef(({ label, checked, onChange, required = false, id, defaultChecked, ...props }, ref) => {
+const Checkbox = ({ label, checked, onChange, required = false, id, ...props }) => {
     const reactId = useId();
     const inputId = id || `checkbox-${reactId}`;
-    const localRef = React.useRef(null);
-
-    // Merge refs
-    const setRefs = (node) => {
-        localRef.current = node;
-        if (typeof ref === 'function') {
-            ref(node);
-        } else if (ref) {
-            ref.current = node;
-        }
-    };
-    
-    // Support for both controlled (passed from parent) and uncontrolled (RHF)
-    const [internalChecked, setInternalChecked] = useState(checked ?? defaultChecked ?? false);
-
-    useEffect(() => {
-        // Sync with controlled prop
-        if (checked !== undefined) {
-            setInternalChecked(checked);
-        } else if (localRef.current) {
-            // Sync with actual DOM state (for RHF initialization)
-            setInternalChecked(localRef.current.checked);
-        }
-    }, [checked]);
-
-    // Extra sync on mount to catch RHF initialization
-    useEffect(() => {
-        if (localRef.current && checked === undefined) {
-            setInternalChecked(localRef.current.checked);
-        }
-    }, []);
-
-    const handleToggle = (e) => {
-        const newValue = e.target.checked;
-        if (checked === undefined) {
-            setInternalChecked(newValue);
-        }
-        onChange?.(e);
-    };
 
     return (
         <label 
@@ -59,13 +20,10 @@ const Checkbox = forwardRef(({ label, checked, onChange, required = false, id, d
         >
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <input
-                    ref={setRefs}
                     id={inputId}
                     type="checkbox"
-                    {...props}
                     checked={checked}
-                    defaultChecked={defaultChecked}
-                    onChange={handleToggle}
+                    onChange={onChange}
                     required={required}
                     style={{
                         position: 'absolute',
@@ -74,11 +32,12 @@ const Checkbox = forwardRef(({ label, checked, onChange, required = false, id, d
                         height: 0,
                         margin: 0
                     }}
+                    {...props}
                 />
                 <motion.div
                     animate={{
-                        backgroundColor: internalChecked ? t.color.primary : 'transparent',
-                        borderColor: internalChecked ? t.color.primary : '#CBD5E1',
+                        backgroundColor: checked ? t.color.primary : 'transparent',
+                        borderColor: checked ? t.color.primary : '#CBD5E1',
                     }}
                     initial={false}
                     transition={{ duration: 0.2 }}
@@ -95,7 +54,7 @@ const Checkbox = forwardRef(({ label, checked, onChange, required = false, id, d
                 >
                     <motion.svg
                         initial={false}
-                        animate={{ opacity: internalChecked ? 1 : 0, scale: internalChecked ? 1 : 0.5 }}
+                        animate={{ opacity: checked ? 1 : 0, scale: checked ? 1 : 0.5 }}
                         transition={{ duration: 0.2, type: 'spring', stiffness: 300, damping: 20 }}
                         viewBox="0 0 24 24"
                         fill="none"
@@ -122,8 +81,6 @@ const Checkbox = forwardRef(({ label, checked, onChange, required = false, id, d
             )}
         </label>
     );
-});
-
-Checkbox.displayName = 'Checkbox';
+};
 
 export default Checkbox;

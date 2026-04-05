@@ -1,5 +1,4 @@
-import React from 'react';
-import { createPortal } from 'react-dom';
+﻿import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertTriangle, FiX } from 'react-icons/fi';
 import { t } from '../../theme/theme';
@@ -16,11 +15,11 @@ const ConfirmModal = ({
     danger = false,
     loading = false,
 }) => {
-    return createPortal(
+    return (
         <AnimatePresence>
             {isOpen && (
                 <div 
-                    style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 999999, display: 'grid', placeItems: 'center', padding: 24, pointerEvents: 'auto' }}
+                    style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
                 >
                     {/* Backdrop */}
                     <motion.div
@@ -30,12 +29,12 @@ const ConfirmModal = ({
                         onClick={onClose}
                         style={{
                             position: 'absolute', inset: 0,
-                            background: 'rgba(0,0,0,0.7)',
-                            backdropFilter: 'blur(10px)',
+                            background: 'rgba(0,0,0,0.2)',
+                            backdropFilter: 'blur(8px)',
                         }}
                     />
 
-                    {/* Elite Warning Dialog */}
+                    {/* Elite Warning Dialog (Left Aligned Based on Reference) */}
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.95, y: 10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -45,7 +44,7 @@ const ConfirmModal = ({
                             width: 'min(440px, 100%)',
                             background: 'white',
                             borderRadius: 16,
-                            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                            boxShadow: '0 20px 50px -12px rgba(0,0,0,0.15)',
                             overflow: 'hidden',
                         }}
                     >
@@ -62,7 +61,7 @@ const ConfirmModal = ({
                                 <h3 style={{ fontSize: 18, fontWeight: 900, color: '#1E293B', margin: 0, letterSpacing: '-0.02em' }}>
                                     {title}
                                 </h3>
-                             </div>
+                            </div>
                             <button 
                                 onClick={onClose} 
                                 style={{ 
@@ -102,8 +101,7 @@ const ConfirmModal = ({
                     </motion.div>
                 </div>
             )}
-        </AnimatePresence>,
-        document.body
+        </AnimatePresence>
     );
 };
 

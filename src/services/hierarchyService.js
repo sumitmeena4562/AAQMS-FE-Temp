@@ -1,47 +1,56 @@
-import api from './api';
+﻿import api from './api';
 
 /**
- * ── HIERARCHY (SITE, FLOOR, ZONE) API SERVICE ──
- * Aligned with standardized Backend path: api/organisations/
+ * ΓöÇΓöÇ HIERARCHY (SITE, FLOOR, ZONE) API SERVICE ΓöÇΓöÇ
+ * 
+ * TODO [BACKEND INTEGRATION]: Update the URLs below once the backend is ready.
  */
 export const hierarchyService = {
     // --- SITES ---
     getSites: async (filters = {}) => {
         /**
-         * Standardized: Use the organisations/sites/ path.
+         * @ENDPOINT: GET /api/organization/sites/
+         * @QUERY_PARAMS: ?org_id=12&coord_id=45
+         * @EXPECTED_RESPONSE: [{ id, name, location, org_id, coord_id ... }]
          */
-        const response = await api.get('organisations/sites/', { params: filters });
+        const response = await api.get('organization/sites/', { params: filters });
         return response.data;
     },
 
     createSite: async (siteData) => {
-        const response = await api.post('organisations/sites/', siteData);
+        const response = await api.post('organization/sites/', siteData);
         return response.data;
     },
 
     // --- FLOORS ---
     getFloors: async (filters = {}) => {
-        const response = await api.get('organisations/floors/', { params: filters });
+        /**
+         * @ENDPOINT: GET /api/organization/floors/
+         * @QUERY_PARAMS: ?site_id=89
+         * @EXPECTED_RESPONSE: [{ id, name, level, site_id, floorPlanImage ... }]
+         */
+        const response = await api.get('organization/floors/', { params: filters });
         return response.data;
     },
 
     createFloor: async (floorData) => {
         /**
+         * @ENDPOINT: POST /api/organization/floors/
          * Note: Usually involves uploading a floor map/blueprint image.
-         * Ensure multipart header if necessary.
          */
-        const response = await api.post('organisations/floors/', floorData);
+        const response = await api.post('organization/floors/', floorData);
         return response.data;
     },
 
     // --- ZONES ---
     getZones: async (filters = {}) => {
-        const response = await api.get('organisations/zones/', { params: filters });
+    
+        const response = await api.get('organization/zones/', { params: filters });
         return response.data;
     },
 
     createZone: async (zoneData) => {
-        const response = await api.post('organisations/zones/', zoneData);
+        const response = await api.post('organization/zones/', zoneData);
         return response.data;
     }
 };

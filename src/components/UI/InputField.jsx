@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from 'react';
+﻿import React, { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiAlertCircle } from 'react-icons/fi';
 import { t } from '../../theme/theme';
@@ -16,7 +16,6 @@ const InputField = forwardRef(({
     containerStyle = {},
     isValid,
     helperText,
-    disabled = false,
     ...props
 }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -100,7 +99,6 @@ const InputField = forwardRef(({
                     onMouseLeave={(e) => {
                         if (!isFocused && !error) e.target.style.borderColor = 'var(--color-border)';
                     }}
-                    disabled={disabled}
                     {...props}
                 />
 

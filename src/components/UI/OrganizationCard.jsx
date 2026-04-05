@@ -1,9 +1,9 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+﻿import { useNavigate, useLocation } from 'react-router-dom';
 import useUserStore from '../../store/userStore';
 import { sites, floors, zones, assets } from '../../data/mockFilterData';
 import { FiEdit2, FiTrash2 } from 'react-icons/fi';
 
-const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onDelete, onView }) => {
+const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onDelete }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const users = useUserStore(state => state.users);
@@ -14,7 +14,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     (u.role || "").toLowerCase() === 'coordinator'
   );
 
-  // 🔹 STRICT RELATIONAL COMPUTATION: 
+  // ≡ƒö╣ STRICT RELATIONAL COMPUTATION: 
   // If orgCoordinators is empty, NO sites and NO floors will exist!
   const coordIds = orgCoordinators.map(c => c.id.toString());
   const activeSites = sites.filter(s => coordIds.includes(s.coordId?.toString()));
@@ -56,13 +56,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     }
   }
 
-  const handleView = (e) => {
-    if (e) e.stopPropagation();
-    onView?.(org);
-  };
-
-  const handleManage = (e) => {
-    if (e) e.stopPropagation();
+  const handleAction = () => {
     if (isSiteCard) {
       const currentOrg = location.state?.orgName || new URLSearchParams(location.search).get('org') || '';
       const coordName = coordinatorContext?.name || new URLSearchParams(location.search).get('coord') || '';
@@ -70,16 +64,14 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         state: { site: org, orgName: currentOrg, coordinator: coordinatorContext }
       });
     } else {
-      navigate(`/admin/coordinators?org=${encodeURIComponent(org.name)}`, { 
-        state: { org } 
-      });
+      navigate(`/admin/coordinators?org=${encodeURIComponent(org.name)}`, { state: { org } });
     }
   };
 
   return (
     <div 
-      className={`h-[360px] bg-card rounded-[var(--radius-card)] shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col border border-border-main overflow-hidden group/card cursor-pointer`}
-      onClick={handleView}
+      className={`h-[360px] bg-card rounded-[var(--radius-card)] shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col border border-border-main overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
+      onClick={handleAction}
     >
 
       {/* Top Image Section */}
@@ -144,7 +136,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
             </div>
           ) : (
             <p className="text-[9px] text-gray font-bold tracking-widest uppercase opacity-80">
-              {org.industry} • {org.region}
+              {org.industry} ΓÇó {org.region}
             </p>
           )}
         </div>
@@ -179,7 +171,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
         {/* Bottom Button */}
         <button
-          onClick={handleManage}
+          onClick={handleAction}
           className="mt-auto w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-2 group">
           <span>
             {isSiteCard ? 'View Floors' : 'Manage Org'}

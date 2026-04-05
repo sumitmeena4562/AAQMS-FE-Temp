@@ -1,79 +1,78 @@
-import React, { useEffect } from 'react';
+﻿
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import FloorCard from '../../components/UI/FloorCard';
 import { useFilterStore } from '../../store/useFilterStore';
-import { organizations, coordinators, sites, floors, zones, assets } from '../../data/mockFilterData';
-import { FiHome, FiBriefcase } from 'react-icons/fi';
+import { hierarchyService } from '../../services/hierarchyService';
+import { FiHome, FiBriefcase, FiAlertCircle, FiLoader } from 'react-icons/fi';
+
+/**
+ * ΓöÇΓöÇ FLOOR PLAN SELECTION PAGE ΓöÇΓöÇ
+ * 
+ * This page manages the selection of a specific floor plan within a selected Site.
+ * Transitioned from Mock Data to production API integration.
+ */
 
 const FloorPlan = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
+  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite, setFloor } = useFilterStore();
+  
+  // PRODUCTION STATE: Handling dynamic floor list, loading, and errors
+  const [floorList, setFloorList] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
 
-  const passedOrgName = location.state?.orgName || new URLSearchParams(location.search).get('org');
-  const passedCoordName = location.state?.coordinator?.name || new URLSearchParams(location.search).get('coord');
-  const passedSiteName = location.state?.site?.name || new URLSearchParams(location.search).get('site');
+
+  // UI HELPERS (Removed unused legacy mock variables)
+
 
   useEffect(() => {
-    let currentOrgId = selectedOrg;
-    let currentCoordId = selectedCoord;
-
-    if (!currentOrgId && passedOrgName) {
-      const matchOrg = organizations.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
-      if (matchOrg) {
-        setOrg(matchOrg.id);
-        currentOrgId = matchOrg.id;
-      }
+    // Breadcrumb logic removed (mock-based) or updated in future to fetch org/site info
+    // For now, focusing on FETCHING the actual floors
+    if (selectedSite) {
+        fetchFloors(selectedSite);
+    } else {
+        setFloorList([]);
     }
-    if (!currentCoordId && passedCoordName) {
-      const matchCoord = coordinators.find(c => c.name.toLowerCase() === passedCoordName.toLowerCase() && (!currentOrgId || c.orgId === currentOrgId));
-      if (matchCoord) {
-        setCoord(matchCoord.id);
-        currentCoordId = matchCoord.id;
-      }
+  }, [selectedSite]);
+
+  const fetchFloors = async (siteId) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+        // PROFESSIONAL INTEGRATION: Fetching from hierarchy API with site_id filter
+        const data = await hierarchyService.getFloors({ site_id: siteId });
+        setFloorList(data || []);
+    } catch (err) {
+        console.error("Failed to fetch floors:", err);
+        setError("Could not load floor plans. Please try again.");
+    } finally {
+        setIsLoading(false);
     }
-    if (!selectedSite && passedSiteName) {
-      const matchSite = sites.find(s => s.name.toLowerCase() === passedSiteName.toLowerCase() && (!currentCoordId || s.coordId === currentCoordId));
-      if (matchSite) setSite(matchSite.id);
-    }
-  }, [selectedOrg, selectedCoord, selectedSite, passedOrgName, passedCoordName, passedSiteName, setOrg, setCoord, setSite]);
+  };
 
-  const activeOrgId = selectedOrg || organizations.find(o => o.name.toLowerCase() === passedOrgName?.toLowerCase())?.id;
-  const activeCoordId = selectedCoord || coordinators.find(c => c.name.toLowerCase() === passedCoordName?.toLowerCase())?.id;
-  const activeSiteId = selectedSite || sites.find(s => s.name.toLowerCase() === passedSiteName?.toLowerCase())?.id;
-
-  const orgInfo = activeOrgId ? organizations.find(o => o.id === activeOrgId) : null;
-  const coordInfo = activeCoordId ? coordinators.find(c => c.id === activeCoordId) : null;
-  const siteInfo = activeSiteId ? sites.find(s => s.id === activeSiteId) : null;
-
+  // Breadcrumbs updated to focus on the active selection
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-    { label: orgInfo?.name || "Organization", path: `/admin/coordinators` },
-    { label: coordInfo?.name || "Site Plan", path: `/admin/site-plan` },
-    { label: siteInfo?.name || "Floor Plan", path: "#", isActive: true }
+    { label: "Site Plan", path: `/admin/site-plan` },
+    { label: "Floor Plan", path: "#", isActive: true }
   ];
 
-  // We explicitly fetch matched floors from the relational store to keep UI accurate
-  const floorList = activeSiteId ? floors.filter(f => f.siteId === activeSiteId).map(f => {
-      const floorZones = zones.filter(z => z.floorId === f.id);
-      const zoneIds = floorZones.map(z => z.id);
-      const floorAssets = assets.filter(a => zoneIds.includes(a.zoneId));
+  // ACTIVE FILTER COUNT: Tracks how many floors have an 'ACTIVE' status (case-insensitive) for the UI header
+  const activePlansCount = floorList.filter(f => f?.status?.toUpperCase() === 'ACTIVE').length;
 
-      return {
-          ...f, 
-          status: 'ACTIVE',
-          stats: { zones: floorZones.length, assets: floorAssets.length }
-      };
-  }) : [];
-
-  const activePlansCount = floorList.filter(f => f.status === 'ACTIVE').length;
-
+  /**
+   * ΓöÇΓöÇ NAVIGATION HANDLER ΓöÇΓöÇ
+   * Redirects the user to the Zone mapping for the specific floor.
+   */
   const handleFloorClick = (floor) => {
-    navigate(`/admin/zones?org=${encodeURIComponent(orgInfo?.name || "")}&coord=${encodeURIComponent(coordInfo?.name || "")}&site=${encodeURIComponent(siteInfo?.name || "")}&floor=${encodeURIComponent(floor.name || "")}`, {
-      state: { floor, site: siteInfo, coordinator: coordInfo, orgName: orgInfo?.name }
+    setFloor(floor.id);
+    navigate(`/admin/zones?site=${selectedSite}&floor=${floor.id}`, {
+      state: { floor, siteId: selectedSite }
     });
   };
 
@@ -83,11 +82,11 @@ const FloorPlan = () => {
       {/* HEADER */}
       <PageHeader 
         title="Floor Plan Selection"
-        subtitle={activeSiteId ? `Managing ${activePlansCount} active floor plans for ${siteInfo?.name}` : "Please use the filter bar to select a site"}
+        subtitle={selectedSite ? `Showing ${activePlansCount} active floor levels for the current site selection` : "Please choose a site from the filter bar to view available floor plans"}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
-          activeSiteId ? (
+          selectedSite ? (
             <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                 {floorList.length} Total Levels
             </span>
@@ -99,30 +98,33 @@ const FloorPlan = () => {
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
         <FilterBar activeLevel="floors" />
 
-        {!activeSiteId ? (
-          <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
-            <p className="text-gray font-medium tracking-wide">
-              Please select an Organization, Coordinator, and Site to view floors.
-            </p>
-          </div>
-        ) : floorList.length === 0 ? (
-          <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
-            <p className="text-gray font-medium tracking-wide">
-              No floors found for this site.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-4">
-            {floorList.map((floor, index) => (
+        {/* CARDS LIST/GRID SECTION */}
+        <div className="flex flex-wrap gap-6 px-4 sm:px-0">
+          {isLoading ? (
+            <div className="w-full py-20 flex flex-col items-center justify-center text-gray/50">
+               <FiLoader className="w-8 h-8 animate-spin mb-3" />
+               <p className="text-sm font-medium">Fetching floor plans from server...</p>
+            </div>
+          ) : error ? (
+            <div className="w-full py-20 flex flex-col items-center justify-center text-red-500/70">
+               <FiAlertCircle className="w-8 h-8 mb-3" />
+               <p className="text-sm font-medium">{error}</p>
+            </div>
+          ) : floorList.length > 0 ? (
+            floorList.map((floor, index) => (
               <FloorCard 
                 key={floor.id || index} 
                 floor={floor} 
-                site={siteInfo}
                 onClick={() => handleFloorClick(floor)} 
               />
-            ))}
-          </div>
-        )}
+            ))
+          ) : (
+            <div className="w-full py-20 flex flex-col items-center justify-center text-gray/40 border-2 border-dashed border-border-main/50 rounded-3xl">
+               <p className="text-sm font-medium">No floor plans found for the selected site.</p>
+               <p className="text-[10px] uppercase tracking-widest mt-2">Check the filters or upload a new plan</p>
+            </div>
+          )}
+        </div>
 
         {/* FOOTER */}
         <div className="mt-auto pt-16 flex items-center justify-center gap-1.5 text-xs text-gray/60 font-medium pb-6">

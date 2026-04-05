@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+﻿import React, { useRef } from 'react';
 import { ImagePlus, X } from 'lucide-react';
 
-const ImageUploadCard = ({ label, value, onUpload, error, onBlur, disabled = false }) => {
+const ImageUploadCard = ({ label, value, onUpload, error, onBlur }) => {
   const fileInputRef = useRef(null);
 
   const handleClick = () => {
@@ -12,7 +12,7 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur, disabled = fal
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      onUpload(url);
+      onUpload(url, file);
     }
   };
 
@@ -33,10 +33,9 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur, disabled = fal
       <div className="w-full h-[120px] relative group">
         <button
           type="button"
-          onClick={() => !disabled && handleClick()}
+          onClick={handleClick}
           onBlur={onBlur}
-          disabled={disabled}
-          className={`w-full h-full rounded-[var(--radius-card)] border border-dashed ${error ? 'border-red-500 bg-red-50/50' : 'border-border-main bg-base/50 ' + (!disabled ? 'hover:bg-base hover:border-blue-400' : 'cursor-default')} flex flex-col items-center justify-center gap-2 transition-colors relative overflow-hidden`}
+          className={`w-full h-full rounded-[var(--radius-card)] border border-dashed ${error ? 'border-red-500 bg-red-50/50' : 'border-border-main bg-base/50 hover:bg-base hover:border-blue-400'} flex flex-col items-center justify-center gap-2 transition-colors relative overflow-hidden`}
         >
           {value ? (
             <img src={value} alt={label || "Profile"} className="absolute inset-0 w-full h-full object-cover" />
@@ -49,7 +48,7 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur, disabled = fal
             </>
           )}
         </button>
-        {value && !disabled && (
+        {value && (
           <button
             type="button"
             onClick={(e) => {

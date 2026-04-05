@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import Table from './Table';
 import Button from './Button';
 import { FiFilter, FiSearch } from 'react-icons/fi';
@@ -43,9 +43,7 @@ const DataTable = ({
     footer,
     selectionFooter,
     children,
-    className = "",
-    maxHeight,
-    rowClassName
+    className = ""
 }) => {
     const hasSelection = selectable && selectedIds.length > 0;
     const scrollRef = useRef(null);
@@ -183,9 +181,7 @@ const DataTable = ({
                     selectable={selectable}
                     selectedIds={selectedIds}
                     onSelectionChange={onSelectionChange}
-                    rowClassName={rowClassName}
                     emptyMessage={emptyMessage}
-                    loading={loading}
                 />
             </div>
 

@@ -1,91 +1,38 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+﻿import React, { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
 import FilterBar from '../../components/UI/FilterBar';
-import FilterDropdown from '../../components/UI/FilterDropdown';
-import Button from '../../components/UI/Button';
-import { FiSquare, FiCheckSquare, FiRefreshCcw, FiHome, FiBriefcase } from 'react-icons/fi';
+import { FiHome, FiBriefcase } from 'react-icons/fi';
 import { List, Layout, Truck, Fuel, Monitor } from 'lucide-react';
-import { useBreadcrumb } from '../../hooks/useBreadcrumb';
-import { organizations, coordinators, sites, floors, zones, assets } from '../../data/mockFilterData';
 import { useFilterStore } from '../../store/useFilterStore';
-
-const filterOptions = {
-    organizations: ['Acme Corp', 'Stark Industries', 'Wayne Enterprises', 'Globex', 'Initech'],
-    roles: ['Admin', 'Coordinator', 'Field Officer', 'System AI'],
-    sites: ['Site Alpha', 'Site Beta', 'Site Gamma', 'HQ'],
-    floors: ['Ground Floor', 'Level 1', 'Level 2', 'Level 3'],
-    zones: ['Zone 15-12', 'Zone B-12', 'Restricted Area', 'Loading Dock'],
-    zoneTypes: ['Storage', 'Loading Bay', 'Office']
-};
+import { hierarchyService } from '../../services/hierarchyService';
 
 const Zones = () => {
     const [activeView, setActiveView] = useState('list');
     const [selectionMode, setSelectionMode] = useState(false);
-    const [filters, setFilters] = useState({
-        zoneType: '',
-        organization: '',
-        role: '',
-        site: '',
-        floor: '',
-        zone: ''
+
+    const { selectedOrg, selectedCoord, selectedSite, selectedFloor } = useFilterStore();
+
+    // The activeFloorId comes directly from the FilterBar's global store
+    const activeFloorId = selectedFloor;
+
+    // ΓöÇΓöÇ FETCH ZONES FROM BACKEND ΓöÇΓöÇ
+    // useQuery automatically handles: loading, error, caching, retries, refetching
+    const { data: rawZones = [], isLoading, isError } = useQuery({
+        queryKey: ['zones', activeFloorId],
+        queryFn: async () => {
+            const response = await hierarchyService.getZones({ floor_id: activeFloorId });
+            // DRF returns paginated { count, results: [...] } or a flat array
+            return Array.isArray(response) ? response : (response?.results || []);
+        },
+        enabled: !!activeFloorId, // Only fetch when a floor is actually selected
+        staleTime: 1000 * 60 * 5, // Cache for 5 minutes ΓÇö avoid redundant DB hits
     });
 
-    const activeFilterCount = Object.values(filters).filter(v => v !== '').length;
-
-    const resetFilters = () => {
-        setFilters({
-            zoneType: '', organization: '', role: '', site: '', floor: '', zone: ''
-        });
-    };
-
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { selectedOrg, selectedCoord, selectedSite, selectedFloor, setOrg, setCoord, setSite, setFloor } = useFilterStore();
-
-    const passedOrgName = location.state?.orgName || new URLSearchParams(location.search).get('org');
-    const passedCoordName = location.state?.coordinator?.name || new URLSearchParams(location.search).get('coord');
-    const passedSiteName = location.state?.site?.name || location.state?.siteInfo?.name || new URLSearchParams(location.search).get('site');
-    const passedFloorName = location.state?.floor?.name || new URLSearchParams(location.search).get('floor');
-
-    useEffect(() => {
-        let currentOrgId = selectedOrg;
-        let currentCoordId = selectedCoord;
-        let currentSiteId = selectedSite;
-
-        if (!currentOrgId && passedOrgName) {
-            const matchOrg = organizations.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
-            if (matchOrg) { setOrg(matchOrg.id); currentOrgId = matchOrg.id; }
-        }
-        if (!currentCoordId && passedCoordName) {
-            const matchCoord = coordinators.find(c => c.name.toLowerCase() === passedCoordName.toLowerCase() && (!currentOrgId || c.orgId === currentOrgId));
-            if (matchCoord) { setCoord(matchCoord.id); currentCoordId = matchCoord.id; }
-        }
-        if (!currentSiteId && passedSiteName) {
-            const matchSite = sites.find(s => s.name.toLowerCase() === passedSiteName.toLowerCase() && (!currentCoordId || s.coordId === currentCoordId));
-            if (matchSite) { setSite(matchSite.id); currentSiteId = matchSite.id; }
-        }
-        if (!selectedFloor && passedFloorName) {
-            const matchFloor = floors.find(f => f.name.toLowerCase() === passedFloorName.toLowerCase() && (!currentSiteId || f.siteId === currentSiteId));
-            if (matchFloor) setFloor(matchFloor.id);
-        }
-    }, [selectedOrg, selectedCoord, selectedSite, selectedFloor, passedOrgName, passedCoordName, passedSiteName, passedFloorName, setOrg, setCoord, setSite, setFloor]);
-
-    const activeOrgId = selectedOrg || organizations.find(o => o.name.toLowerCase() === passedOrgName?.toLowerCase())?.id;
-    const activeCoordId = selectedCoord || coordinators.find(c => c.name.toLowerCase() === passedCoordName?.toLowerCase())?.id;
-    const activeSiteId = selectedSite || sites.find(s => s.name.toLowerCase() === passedSiteName?.toLowerCase())?.id;
-    const activeFloorId = selectedFloor || floors.find(f => f.name.toLowerCase() === passedFloorName?.toLowerCase())?.id;
-
-    const orgInfo = activeOrgId ? organizations.find(o => o.id === activeOrgId) : null;
-    const coordInfo = activeCoordId ? coordinators.find(c => c.id === activeCoordId) : null;
-    const siteInfo = activeSiteId ? sites.find(s => s.id === activeSiteId) : null;
-    const floorInfo = activeFloorId ? floors.find(f => f.id === activeFloorId) : null;
-
+    // ΓöÇΓöÇ MAP UI PROPS (icons/colors) onto the raw API data ΓöÇΓöÇ
     const floorZones = useMemo(() => {
-        if (!activeFloorId) return [];
-        return zones.filter(z => z.floorId === activeFloorId).map(z => {
-            const zoneAssets = assets.filter(a => a.zoneId === z.id);
+        return rawZones.map(z => {
             let Icon = Layout;
             let bgClass = 'bg-blue-50';
             let txtClass = 'text-blue-600';
@@ -99,26 +46,18 @@ const Zones = () => {
                 icon: Icon,
                 iconBgClass: bgClass,
                 iconTextClass: txtClass,
-                count: `${zoneAssets.length} Assets`
+                count: `${z.count ?? 0} Assets` // count comes pre-calculated from backend
             };
         });
-    }, [activeFloorId]);
-
-    const filteredZones = useMemo(() => {
-        let result = [...floorZones];
-        if (filters.zoneType) {
-            result = result.filter(z => z.type === filters.zoneType);
-        }
-        return result;
-    }, [floorZones, filters.zoneType]);
+    }, [rawZones]);
 
     const breadcrumbs = [
         { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
         { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-        { label: orgInfo?.name || "Organization", path: `/admin/coordinators` },
-        { label: coordInfo?.name || "Site Plan", path: `/admin/site-plan` },
-        { label: siteInfo?.name || "Floor Plan", path: `/admin/floor-plan` },
-        { label: floorInfo?.name || "Zones", path: "#", isActive: true }
+        { label: "Organization", path: `/admin/coordinators` },
+        { label: "Site Plan", path: `/admin/site-plan` },
+        { label: "Floor Plan", path: `/admin/floor-plan` },
+        { label: "Zones", path: "#", isActive: true }
     ];
 
     return (
@@ -126,8 +65,8 @@ const Zones = () => {
 
             {/* HEADER */}
             <PageHeader
-                title={floorInfo ? `Zones in ${floorInfo.name}` : "Zones Management"}
-                subtitle={floorInfo ? `Operational safety zones for ${siteInfo?.name}` : "Please use the filter bar to select a specific floor"}
+                title={activeFloorId ? `Zones` : "Zones Management"}
+                subtitle={activeFloorId ? `Operational safety zones` : "Please use the filter bar to select a specific floor"}
                 breadcrumbs={breadcrumbs}
                 hideAddButton={true}
             />
@@ -135,143 +74,31 @@ const Zones = () => {
             {/* MAIN BODY */}
             <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
 
-                <FilterBar className="mb-6">
-                    {/* FRONT SECTION: "Select" Button (and mobile View toggle) */}
-                    <div className="flex items-center justify-between w-full md:w-auto md:justify-start gap-3 shrink-0">
-                        <div className="flex items-center gap-3">
-                            <Button
-                                variant={selectionMode ? "primary" : "outline"}
-                                onClick={() => setSelectionMode(!selectionMode)}
-                                className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : ''}`}
-                            >
-                                {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
-                                Select
-                            </Button>
-                            <FilterBar.Separator className="hidden md:block" />
-                        </div>
-
-                        {/* MOBILE ONLY: List/Drawing Buttons */}
-                        <div className="flex md:hidden items-center bg-base p-1 rounded-lg border border-border-main/60 shrink-0">
-                            <button
-                                onClick={() => setActiveView('list')}
-                                className={`flex items-center justify-center gap-2 h-[28px] px-3 sm:px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${activeView === 'list'
-                                        ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5'
-                                        : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
-                                    }`}
-                                title="List View"
-                            >
-                                <List size={16} className={activeView === 'list' ? "text-title" : "text-gray"} />
-                            </button>
-                            <button
-                                onClick={() => setActiveView('drawing')}
-                                className={`flex items-center justify-center gap-2 h-[28px] px-3 sm:px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${activeView === 'drawing'
-                                        ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5'
-                                        : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
-                                    }`}
-                                title="Drawing View"
-                            >
-                                <svg className={`w-4 h-4 ${activeView === 'drawing' ? "text-title" : "text-gray"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* MIDDLE SECTION: Dropdown Ribbon */}
-                    {/* On Desktop: wraps normally. On Mobile: beautiful horizontal scrolling ribbon so it doesn't take up 4 lines of screen space! */}
-                    <div className="flex flex-nowrap md:flex-wrap items-center gap-2 flex-1 w-full md:w-auto overflow-x-auto no-scrollbar pb-1 md:pb-0">
-                        {activeFilterCount > 0 && (
-                            <button
-                                onClick={resetFilters}
-                                className="md:hidden h-9 flex items-center gap-1.5 px-3 mr-1 shrink-0 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 border border-transparent hover:border-rose-100"
-                            >
-                                <FiRefreshCcw size={12} />
-                                <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px]">{activeFilterCount}</span>
-                            </button>
-                        )}
-
-                        <FilterDropdown
-                            label="Organization"
-                            options={filterOptions.organizations}
-                            value={filters.organization}
-                            onChange={(v) => setFilters(prev => ({ ...prev, organization: v }))}
-                            allLabel="All Orgs"
-                        />
-                        <FilterDropdown
-                            label="Role"
-                            options={filterOptions.roles}
-                            value={filters.role}
-                            onChange={(v) => setFilters(prev => ({ ...prev, role: v }))}
-                            allLabel="All Roles"
-                        />
-                        <FilterDropdown
-                            label="Site"
-                            options={filterOptions.sites}
-                            value={filters.site}
-                            onChange={(v) => setFilters(prev => ({ ...prev, site: v }))}
-                            allLabel="All Sites"
-                        />
-                        <FilterDropdown
-                            label="Floor"
-                            options={filterOptions.floors}
-                            value={filters.floor}
-                            onChange={(v) => setFilters(prev => ({ ...prev, floor: v }))}
-                            allLabel="All Floors"
-                        />
-                        <FilterDropdown
-                            label="Zone"
-                            options={filterOptions.zones}
-                            value={filters.zone}
-                            onChange={(v) => setFilters(prev => ({ ...prev, zone: v }))}
-                            allLabel="All Zones"
-                        />
-                        <FilterDropdown
-                            label="Zone Type"
-                            options={filterOptions.zoneTypes}
-                            value={filters.zoneType}
-                            onChange={(v) => setFilters(prev => ({ ...prev, zoneType: v }))}
-                            allLabel="All Types"
-                        />
-                    </div>
-
-                    {/* DESKTOP ONLY: Right Tools (Reset + List/Drawing) */}
-                    <div className="hidden md:flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
-
-                        {activeFilterCount > 0 && (
-                            <button
-                                onClick={resetFilters}
-                                className="h-9 flex items-center gap-1.5 px-3 mr-1 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 shadow-sm border border-transparent hover:border-rose-100 animate-in zoom-in duration-300 group"
-                            >
-                                <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
-                                <span className="hidden lg:inline">Reset</span>
-                                <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px] sm:ml-1">{activeFilterCount}</span>
-                            </button>
-                        )}
-
-                        <div className="flex items-center bg-base p-1 rounded-lg border border-border-main/60 shrink-0">
-                            <button
-                                onClick={() => setActiveView('list')}
-                                className={`flex items-center justify-center gap-2 h-[28px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${activeView === 'list'
-                                        ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5'
-                                        : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
-                                    }`}
-                                title="List View"
-                            >
-                                <List size={16} className={activeView === 'list' ? "text-title" : "text-gray"} />
-                            </button>
-                            <button
-                                onClick={() => setActiveView('drawing')}
-                                className={`flex items-center justify-center gap-2 h-[28px] px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${activeView === 'drawing'
-                                        ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5'
-                                        : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
-                                    }`}
-                                title="Drawing View"
-                            >
-                                <svg className={`w-4 h-4 ${activeView === 'drawing' ? "text-title" : "text-gray"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                </svg>
-                            </button>
-                        </div>
+                <FilterBar activeLevel="zones" className="mb-6">
+                    {/* View toggles pushed to the right */}
+                    <div className="flex items-center bg-base p-1 rounded-lg border border-border-main/60 shrink-0 ml-auto mr-1 sm:mr-0">
+                        <button
+                            onClick={() => setActiveView('list')}
+                            className={`flex items-center justify-center gap-2 h-[28px] px-3 sm:px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${activeView === 'list'
+                                    ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5'
+                                    : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
+                                }`}
+                            title="List View"
+                        >
+                            <List size={16} className={activeView === 'list' ? "text-title" : "text-gray"} />
+                        </button>
+                        <button
+                            onClick={() => setActiveView('drawing')}
+                            className={`flex items-center justify-center gap-2 h-[28px] px-3 sm:px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${activeView === 'drawing'
+                                    ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5'
+                                    : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
+                                }`}
+                            title="Drawing View"
+                        >
+                            <svg className={`w-4 h-4 ${activeView === 'drawing' ? "text-title" : "text-gray"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </button>
                     </div>
                 </FilterBar>
 
@@ -281,11 +108,28 @@ const Zones = () => {
                             Please sequentially select an Organization, Coordinator, Site, and Floor to view zones.
                         </p>
                     </div>
+                ) : isLoading ? (
+                    <div className="text-center py-16 bg-card rounded-lg border border-border-main mt-4 animate-pulse">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+                            <p className="text-sm text-gray font-medium">Loading zones...</p>
+                        </div>
+                    </div>
+                ) : isError ? (
+                    <div className="text-center py-16 bg-card rounded-lg border border-rose-200 mt-4">
+                        <div className="flex flex-col items-center gap-3">
+                            <svg className="w-10 h-10 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                            <p className="text-sm font-semibold text-rose-600">Failed to load zones</p>
+                            <p className="text-xs text-gray">Please check your connection and try again.</p>
+                        </div>
+                    </div>
                 ) : (
                     <>
                         {/* TABLE */}
                         <div className={`transition-all duration-300 w-full ${activeView === 'list' ? 'block animate-in fade-in duration-500' : 'hidden'}`}>
-                            <ZonesTable data={filteredZones} selectionMode={selectionMode} />
+                            <ZonesTable data={floorZones} selectionMode={selectionMode} />
                         </div>
                         {activeView === 'drawing' && (
                             <div className="w-full h-[600px] border border-border-main rounded-xl flex items-center justify-center bg-card text-gray animate-in fade-in duration-500 mt-4">
