@@ -26,7 +26,7 @@ export const useOrgStore = create((set, get) => ({
       set({ orgs: Array.isArray(data) ? data : [], isLoading: false });
     } catch (err) {
       set({ 
-        error: err.message || "Failed to fetch organizations", 
+        error: "We couldn't load the organizations. Please refresh the page.", 
         orgs: [], 
         isLoading: false 
       });
@@ -40,11 +40,11 @@ export const useOrgStore = create((set, get) => ({
       const response = await organizationService.createOrganization(newOrg);
       const data = response.data || response;
       set((state) => ({ orgs: [...state.orgs, data], isSubmitting: false }));
-      toast.success("Organization created successfully");
+      toast.success("Success! The organization has been added.");
       return true; 
     } catch (err) {
       set({ error: err.message, isSubmitting: false });
-      toast.error(err.message || "Failed to create organization");
+      toast.error("Oops! We couldn't add the organization. Please check the details.");
       return false;
     }
   },
@@ -58,11 +58,11 @@ export const useOrgStore = create((set, get) => ({
         orgs: state.orgs.map(org => org.id === id ? { ...org, ...data } : org),
         isSubmitting: false
       }));
-      toast.success("Organization updated successfully");
+      toast.success("Changes saved successfully!");
       return true;
     } catch (err) {
       set({ error: err.message, isSubmitting: false });
-      toast.error(err.message || "Failed to update organization");
+      toast.error("We couldn't save your changes. Please try again.");
       return false;
     }
   },
@@ -75,10 +75,10 @@ export const useOrgStore = create((set, get) => ({
         orgs: state.orgs.filter(org => org.id !== id),
         isSubmitting: false
       }));
-      toast.success("Organization deleted successfully");
+      toast.success("Organization deleted successfully.");
     } catch (err) {
       set({ error: err.message, isSubmitting: false });
-      toast.error(err.message || "Failed to delete organization");
+      toast.error("Could not delete organization. Please try again.");
     }
   },
 

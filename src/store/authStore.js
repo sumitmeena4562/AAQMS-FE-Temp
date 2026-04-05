@@ -69,7 +69,7 @@ const useAuthStore = create((set, get) => ({
         
         return { success: true, user: userData };
       } else {
-        throw new Error("Could not load user profile after login.");
+        throw new Error("We couldn't load your profile. Please try refreshing.");
       }
 
     } catch (err) {
@@ -121,7 +121,7 @@ const useAuthStore = create((set, get) => ({
         isBootstrapping: false,
         isLoading: false,
       });
-      return { success: false, error: "Session expired or timed out" };
+      return { success: false, error: "Your session has ended. Please sign in again." };
     }
   },
 
@@ -132,7 +132,7 @@ const useAuthStore = create((set, get) => ({
     // 1. Instant UI update for snappy UX
     set({ isLoggingOut: true, isAuthenticated: false, user: null, error: null });
     storage.clearSession();
-    toast.success("Logged out successfully");
+    toast.success("You have been signed out.");
 
     // 2. Explicitly clear backend session
     try {
@@ -167,7 +167,7 @@ const useAuthStore = create((set, get) => ({
       set({ isLoading: false });
       return { success: true };
     } catch (err) {
-      const errorMsg = extractError(err, "Registration failed. Please try again.");
+      const errorMsg = extractError(err, "We couldn't create your account. Please check the details.");
       set({ error: errorMsg, isLoading: false });
       return { success: false, error: errorMsg };
     }

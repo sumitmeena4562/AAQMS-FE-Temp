@@ -23,7 +23,7 @@ function LoginPage() {
 
     const onSubmit = async (data) => {
         if (lockoutTimer > 0) {
-            toast.error(`Too many attempts. Please wait ${lockoutTimer}s.`);
+            toast.error(`Too many attempts! Please wait ${lockoutTimer}s before trying again.`);
             return;
         }
 
@@ -34,7 +34,7 @@ function LoginPage() {
         
         if (result.success) {
             setFailedAttempts(0);
-            toast.success(`Welcome back, ${result.user.name || 'User'}!`);
+            toast.success(`Hi ${result.user.name || 'User'}, welcome back!`);
             
             const role = (result.user.role || '').toLowerCase();
             if (role === 'coordinator') {
@@ -49,7 +49,7 @@ function LoginPage() {
             setFailedAttempts(newFailedAttempts);
 
             // 1. Handle Server Lockout (403) or specific Locked messages
-            const errorMsg = result.error || "Invalid credentials.";
+            const errorMsg = result.error || "Oops! That's not the right email or password.";
             if (errorMsg.toLowerCase().includes("locked")) {
                 setLocalError(errorMsg); // Use the backend's specific "Account is locked" message
                 return;

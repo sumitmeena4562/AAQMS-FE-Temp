@@ -60,7 +60,7 @@ const useUserStore = create((set, get) => ({
             });
         } catch (err) {
             set({ users: [], error: err.message, loading: false });
-            toast.error(err.message || "Failed to load dashboard data");
+            toast.error("We couldn't connect to the dashboard. Please try again.");
         }
     },
 
@@ -141,9 +141,10 @@ const useUserStore = create((set, get) => ({
             await userService.bulkAction(ids, action);
             set({ selectedIds: [] }); 
             await get().fetchInitialData();
+            toast.success("Done! The changes have been applied.");
             return { success: true };
         } catch (err) {
-            const msg = err.message || `Bulk ${action} failed`;
+            const msg = err.message || `Problem updating users. Please try again.`;
             toast.error(msg);
             set({ loading: false, error: msg });
             return { success: false, error: msg };
@@ -207,10 +208,10 @@ const useUserStore = create((set, get) => ({
             });
 
             doc.save(`AAQMS_Personnel_${new Date().toISOString().split('T')[0]}.pdf`);
-            toast.success("PDF Report Exported");
+            toast.success("Success! Your PDF report is ready.");
         } catch (err) {
             console.error("PDF Export failed:", err);
-            toast.error("Failed to generate PDF report");
+            toast.error("Oops! Something went wrong while making the PDF.");
         }
     },
 
@@ -227,9 +228,9 @@ const useUserStore = create((set, get) => ({
             a.download = `AAQMS_Personnel_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
-            toast.success("CSV Exported");
+            toast.success("Success! Your CSV data is ready.");
         } catch (err) {
-            toast.error("CSV Export failed");
+            toast.error("Oops! Something went wrong while making the CSV.");
         }
     },
 
