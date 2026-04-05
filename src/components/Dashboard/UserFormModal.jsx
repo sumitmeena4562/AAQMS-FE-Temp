@@ -458,6 +458,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 error={errors.organisation_id?.message}
                                                                 options={(availableOrgs || []).map(o => ({ value: o.id, label: o.name || 'Unnamed' }))}
                                                                 loading={isLoadingOrgs}
+                                                                required={['coordinator', 'field_officer'].includes(currentRole)}
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
                                                                     setValue('organisation_id', val);

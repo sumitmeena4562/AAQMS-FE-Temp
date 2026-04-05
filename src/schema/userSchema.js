@@ -23,4 +23,13 @@ export const userSchema = z.object({
         .min(8, { message: "Password must be at least 8 characters" })
         .or(z.literal(''))
         .optional(),
+}).refine((data) => {
+    // If role is coordinator or field officer, organisation_id MUST be present
+    if (['coordinator', 'field_officer'].includes(data.role.toLowerCase())) {
+        return !!data.organisation_id;
+    }
+    return true;
+}, {
+    message: "Organization is mandatory for this role",
+    path: ["organisation_id"]
 });
