@@ -74,12 +74,9 @@ api.interceptors.response.use(
                     // Refresh failed -> Local cleanup
                     localStorage.removeItem('user'); 
                     
-                    // CRITICAL: Avoid infinite reload loop if already on login/guest pages
-                    const path = window.location.pathname;
-                    if (path !== '/login' && path !== '/' && path !== '/register') {
-                        window.location.href = '/login';
-                    }
-                    
+                    // DO NOT force window.location.href here. 
+                    // Let the application state (Zustand/AppRoutes) handle the redirect 
+                    // to avoid infinite loops and maintain React state control.
                     return Promise.reject(refreshError);
                 }
             }
