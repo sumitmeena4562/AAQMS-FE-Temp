@@ -48,8 +48,23 @@ api.interceptors.request.use(
 
 /**
  * ── RESPONSE INTERCEPTOR ──
- * Handles token automatic refreshment and global error alerts.
+ * Handles token automatic refreshment with race condition protection (Queuing).
  */
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    
+    failedQueue = [];
+};
+
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -59,27 +74,36 @@ api.interceptors.response.use(
         if (error.response) {
             const { status } = error.response;
 
-            // 1. Handling Unauthorized (401) with Token Refresh
-            // Note: We also consider status: false if the backend has wrapped a 401
+            // 1. Handling Unauthorized (401) with Token Refresh (and Queuing)
             const isUnauthorized = status === 401 || (error.response.data?.status === false && error.response.data?.errors?.code === 'token_not_valid');
             
             if (isUnauthorized && !originalRequest._retry) {
+                if (isRefreshing) {
+                    // Queue the request until refresh finishes
+                    return new Promise(function(resolve, reject) {
+                        failedQueue.push({ resolve, reject });
+                    })
+                    .then(() => api(originalRequest))
+                    .catch(err => Promise.reject(err));
+                }
+
                 originalRequest._retry = true;
+                isRefreshing = true;
 
                 try {
-                    // Browser automatically sends the refresh_token cookie
+                    // Start Background Token Rotation
                     await axios.post(`${API_BASE_URL}users/token/refresh/`, {}, { withCredentials: true });
                     
-                    // If successful, the new access_token will be in a cookie.
-                    // Retry the original request without manual header setting.
+                    isRefreshing = false;
+                    processQueue(null); // Resolve all pending in queue
+                    
                     return api(originalRequest);
                 } catch (refreshError) {
+                    processQueue(refreshError); // Reject all pending
+                    isRefreshing = false;
+                    
                     // Refresh failed -> Local cleanup
                     localStorage.removeItem('user'); 
-                    
-                    // DO NOT force window.location.href here. 
-                    // Let the application state (Zustand/AppRoutes) handle the redirect 
-                    // to avoid infinite loops and maintain React state control.
                     return Promise.reject(refreshError);
                 }
             }
