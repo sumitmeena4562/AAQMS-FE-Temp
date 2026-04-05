@@ -27,21 +27,24 @@ const ImageIconIcon = () => (
 );
 
 const orgSchema = z.object({
-  name: z.string().min(3, "Name of Organization is required"),
+  name: z.string().trim().min(3, "Name of Organization must be at least 3 characters").max(255, "Name too long"),
   industry: z.string().min(1, "Industry Type is required"),
   occupancyType: z.string().min(1, "Occupancy Type is required"),
   classification: z.string().min(1, "Classification of Occupancy is required"),
-  contactPerson: z.string().min(1, "Contact Person Name is required"),
-  contactEmail: z.string().min(1, "Contact Email is required").email("Invalid email"),
-  contactPhone: z.string().regex(/^\d{10}$/, "Must be exactly 10 digits with no characters"),
-  address: z.string().trim().min(3, "Address must be at least 3 characters"),
+  contactPerson: z.string().trim().min(2, "Contact Person Name is required"),
+  contactEmail: z.string().trim().min(1, "Contact Email is required").email("Invalid email format"),
+  contactPhone: z.string().trim().regex(/^\d{10}$/, "Must be exactly 10 digits"),
+  address: z.string().trim().min(5, "Address must be at least 5 characters"),
+  city: z.string().trim().min(1, "City is required"),
+  state: z.string().trim().min(1, "State is required"),
+  country: z.string().trim().min(1, "Country is required"),
   otherInfo: z.string().optional(),
   imagery: z.object({
-    north: z.string().min(1, "Upload an image"),
-    south: z.string().min(1, "Upload an image"),
-    east: z.string().min(1, "Upload an image"),
-    west: z.string().min(1, "Upload an image"),
-    profile: z.string().min(1, "Upload an image"),
+    north: z.string().min(1, "North view image is required"),
+    south: z.string().min(1, "South view image is required"),
+    east: z.string().min(1, "East view image is required"),
+    west: z.string().min(1, "West view image is required"),
+    profile: z.string().min(1, "Profile logo is required"),
     extra: z.array(z.string().min(1, "Upload an image")).optional()
   })
 });
@@ -60,6 +63,9 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
       contactEmail: '',
       contactPhone: '',
       address: '',
+      city: '',
+      state: '',
+      country: 'India',
       otherInfo: '',
       imagery: {
         north: '',
@@ -72,9 +78,48 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
     }
   });
 
+  // Helper to map Backend data back to Frontend form format
+  const mapOrgBackendToFrontend = (data) => {
+    if (!data) return null;
+    
+    // Map imagery array back to form object
+    const imagery = {
+      north: '', south: '', east: '', west: '', profile: '', extra: []
+    };
+    
+    if (Array.isArray(data.images)) {
+      data.images.forEach(img => {
+        const type = (img.image_type || '').toLowerCase();
+        if (['north', 'south', 'east', 'west', 'profile'].includes(type)) {
+          imagery[type] = img.image_url;
+        } else if (type === 'extra') {
+          imagery.extra.push(img.image_url);
+        }
+      });
+    }
+
+    return {
+      name: data.organisation_name || '',
+      industry: data.industry_type || 'Manufacturing & Heavy Industry',
+      occupancyType: data.occupancy_type || 'Industrial Factory',
+      classification: data.classification || 'Group H - High Hazard',
+      contactPerson: data.contact_person_name || '',
+      contactEmail: data.contact_email || '',
+      contactPhone: data.contact_phone || '',
+      address: data.address || '',
+      city: data.city || '',
+      state: data.state || '',
+      country: data.country || 'India',
+      otherInfo: data.description || '',
+      imagery
+    };
+  };
+
   useEffect(() => {
-    if (org) {
-      reset(org);
+    if (org && org.id) {
+      // Map backend data to frontend form names before resetting
+      const formData = mapOrgBackendToFrontend(org);
+      reset(formData);
     } else {
       reset({
         name: '',
@@ -85,6 +130,9 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
         contactEmail: '',
         contactPhone: '',
         address: '',
+        city: '',
+        state: '',
+        country: 'India',
         otherInfo: '',
         imagery: {
           north: '',
@@ -141,7 +189,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
         id: org?.id,
         ...data,
         imageFiles: imageFiles, // Pass actual files for backend processing
-        status: org?.status || "ACTIVE",
+        status: org?.status || "PENDING",
         lastInventoryAudit: org?.lastInventoryAudit || new Date().toISOString(),
         stats: org?.stats || { sites: 0, floors: 0, zones: 0 }
       });
@@ -274,6 +322,30 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                     required
                     {...register("address")}
                     error={errors.address?.message}
+                    disabled={isViewOnly || isSubmitting}
+                  />
+                  <InputField
+                    label="City"
+                    placeholder="City Name"
+                    required
+                    {...register("city")}
+                    error={errors.city?.message}
+                    disabled={isViewOnly || isSubmitting}
+                  />
+                  <InputField
+                    label="State"
+                    placeholder="State/Province"
+                    required
+                    {...register("state")}
+                    error={errors.state?.message}
+                    disabled={isViewOnly || isSubmitting}
+                  />
+                  <InputField
+                    label="Country"
+                    placeholder="Country Name"
+                    required
+                    {...register("country")}
+                    error={errors.country?.message}
                     disabled={isViewOnly || isSubmitting}
                   />
                   <InputField

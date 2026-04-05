@@ -57,7 +57,10 @@ api.interceptors.response.use(
             const { status } = error.response;
 
             // 1. Handling Unauthorized (401) with Token Refresh
-            if (status === 401 && !originalRequest._retry) {
+            // Note: We also consider status: false if the backend has wrapped a 401
+            const isUnauthorized = status === 401 || (error.response.data?.status === false && error.response.data?.errors?.code === 'token_not_valid');
+            
+            if (isUnauthorized && !originalRequest._retry) {
                 originalRequest._retry = true;
 
                 try {

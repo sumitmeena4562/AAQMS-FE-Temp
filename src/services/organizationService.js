@@ -10,7 +10,7 @@ import { extractError } from "../utils/errorUtils";
 // Helper to map frontend data to backend fields for Organisation
 const mapOrgFrontendToBackend = (data) => {
     return {
-        name: data.name,
+        organisation_name: data.name,
         industry_type: data.industry,
         occupancy_type: data.occupancyType,
         classification: data.classification,
@@ -21,7 +21,7 @@ const mapOrgFrontendToBackend = (data) => {
         city: data.city,
         state: data.state,
         country: data.country,
-        description: data.description || data.otherInfo,
+        description: data.otherInfo,
         status: (data.status || 'PENDING').toUpperCase(),
         is_active: data.is_active !== undefined ? data.is_active : true
     };
@@ -42,16 +42,16 @@ const createOrgFormData = (data) => {
     // Handle files if they exist
     if (data.imageFiles) {
         Object.entries(data.imageFiles).forEach(([key, file]) => {
-            if (Array.isArray(file)) {
-                file.forEach((item) => {
+            if (key === 'extra' && Array.isArray(file)) {
+                file.forEach((item, index) => {
                     if (item instanceof File) {
-                        formData.append('images', item);
+                        formData.append(`image_extra_${index}`, item);
                     }
                 });
                 return;
             }
             if (file instanceof File) {
-                formData.append('images', file); // Uniform key for multiple image uploads
+                formData.append(`image_${key}`, file); // Specific key for each image view (e.g., image_north)
             }
         });
     }
