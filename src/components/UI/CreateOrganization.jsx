@@ -3,21 +3,18 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, ChevronRight, ChevronLeft, Building, User, Mail, Phone, MapPin, Globe, FileText, Image as ImageIcon } from 'lucide-react';
 import InputField from './InputField';
 import SelectField from './SelectField';
 import ImageUploadCard from './ImageUploadCard';
+import Badge from './Badge';
 
 const BuildingIcon = () => (
-  <svg className="w-5 h-5 text-gray" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-  </svg>
+  <Building className="w-5 h-5 text-primary" />
 );
 
 const CreateButtonIcon = () => (
-  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m-9 0v-5a1 1 0 011-1h2a1 1 0 011 1v5m4 0h4" />
-  </svg>
+  <Plus className="w-4 h-4 mr-2" />
 );
 
 const ImageIconIcon = () => (
@@ -50,6 +47,7 @@ const orgSchema = z.object({
 });
 
 const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEdit, isViewOnly = false, isSubmitting = false }) => {
+  const [step, setStep] = React.useState(1);
   const [imageFiles, setImageFiles] = React.useState({});
   const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, reset, trigger } = useForm({
     resolver: zodResolver(orgSchema),
@@ -116,8 +114,10 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
   };
 
   useEffect(() => {
+    if (!isOpen) {
+      setTimeout(() => setStep(1), 300); // Reset after exit animation
+    }
     if (org && org.id) {
-      // Map backend data to frontend form names before resetting
       const formData = mapOrgBackendToFrontend(org);
       reset(formData);
     } else {
@@ -198,6 +198,44 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
 
   const isNameValid = nameValue?.trim()?.length > 0 && !errors.name;
 
+  const nextStep = async () => {
+    let fieldsToValidate = [];
+    if (step === 1) fieldsToValidate = ['name', 'industry', 'occupancyType', 'classification'];
+    if (step === 2) fieldsToValidate = ['contactPerson', 'contactEmail', 'contactPhone', 'address', 'city', 'state', 'country'];
+    
+    const result = await trigger(fieldsToValidate);
+    if (result) setStep(step + 1);
+  };
+
+  const prevStep = () => setStep(step - 1);
+
+  const ProgressIndicator = () => (
+    <div className="px-6 mb-4">
+      <div className="flex items-center justify-between relative">
+        {/* Progress Line */}
+        <div className="absolute top-1/2 left-0 w-full h-[2px] bg-border-main -translate-y-1/2 z-0" />
+        <div 
+          className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-500 ease-out" 
+          style={{ width: `${((step - 1) / 2) * 100}%` }}
+        />
+        
+        {/* Steps */}
+        {[1, 2, 3].map((s) => (
+          <div key={s} className="relative z-10 flex flex-col items-center">
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 border-2 ${
+              step >= s ? 'bg-primary border-primary text-white scale-110 shadow-md' : 'bg-base border-border-main text-gray'
+            }`}>
+              {step > s ? '✓' : s}
+            </div>
+            <span className={`text-[9px] font-bold uppercase tracking-wider mt-1.5 ${step >= s ? 'text-primary' : 'text-gray'}`}>
+              {s === 1 ? 'Primary' : s === 2 ? 'Contact' : 'Imagery'}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -207,233 +245,251 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl"
           />
 
           <Motion.div
-            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.98, y: 10 }}
-            className="relative w-full max-w-[800px] max-h-[90vh] sm:max-h-[85vh] bg-card border border-border-main rounded-[var(--radius-card)] shadow-xl flex flex-col overflow-hidden"
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative w-full max-w-[850px] max-h-[90vh] bg-card/95 border border-white/10 backdrop-blur-2xl rounded-[var(--radius-card)] shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Modal Header */}
-            <div className="relative z-10 p-6 pb-2 flex items-start justify-between">
+            <div className="relative z-10 p-6 pb-4 flex items-start justify-between">
               <div>
-                <h2 className="text-xl font-bold text-title tracking-tight leading-none mb-1.5 flex items-center gap-2">
-                  <BuildingIcon /> {isViewOnly ? 'Organization Details' : org ? 'Update Organization' : 'Create Organization'}
+                <h2 className="text-2xl font-bold text-title tracking-tight leading-none mb-2 flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-xl">
+                    <Building size={22} className="text-primary" />
+                  </div>
+                  {isViewOnly ? 'Organization Details' : org ? 'Update Organization' : 'Register New Organization'}
                 </h2>
                 <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <span className="text-[10px] font-bold text-gray uppercase tracking-wider">
-                    {isViewOnly ? 'View Mode' : org ? 'Modify Details' : 'New Setup'}
-                  </span>
+                  <Badge variant={isViewOnly ? 'info' : 'success'} className="px-3 py-1">
+                    {isViewOnly ? 'Review Mode' : org ? 'Modification' : 'Fresh Setup'}
+                  </Badge>
+                  <span className="text-[10px] text-gray uppercase tracking-widest font-bold">Step {step} of 3</span>
                 </div>
               </div>
-              {onClose && (
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="p-2 text-gray hover:bg-base hover:text-body rounded-lg transition-colors"
-                >
-                  <X size={18} />
-                </button>
-              )}
+              <button 
+                onClick={onClose}
+                className="p-2.5 rounded-full hover:bg-base text-gray hover:text-title transition-all duration-200"
+              >
+                <X size={20} />
+              </button>
             </div>
 
+            <ProgressIndicator />
+
             {/* Modal Body */}
-            <div className="relative z-10 flex-1 overflow-y-auto px-6 pb-6 custom-scrollbar mt-4 pt-1">
+            <div className="relative z-10 flex-1 overflow-y-auto px-8 pb-8 custom-scrollbar pt-4">
               <form onSubmit={handleSubmit(submitForm)} className="flex flex-col">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-7 mb-8">
-                  <InputField
-                    label="Name of Organization"
-                    required
-                    placeholder="Apex Global Solutions"
-                    {...register("name")}
-                    error={errors.name?.message}
-                    isValid={isNameValid}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-                  <SelectField
-                    label="Industry Type"
-                    {...register("industry")}
-                    error={errors.industry?.message}
-                    options={[
-                      "Manufacturing & Heavy Industry",
-                      "Construction",
-                      "Healthcare",
-                      "Education"
-                    ]}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-
-                  <SelectField
-                    label="Occupancy Type"
-                    {...register("occupancyType")}
-                    error={errors.occupancyType?.message}
-                    options={[
-                      "Industrial Factory",
-                      "Commercial Building",
-                      "Warehouse"
-                    ]}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-                  <SelectField
-                    label="Classification of Occupancy"
-                    {...register("classification")}
-                    error={errors.classification?.message}
-                    options={[
-                      "Group H - High Hazard",
-                      "Group B - Business",
-                      "Group S - Storage"
-                    ]}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-
-                  <InputField
-                    label="Contact Person Name"
-                    placeholder="John Doe"
-                    required
-                    {...register("contactPerson")}
-                    error={errors.contactPerson?.message}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-                  <InputField
-                    label="Contact Email"
-                    type="email"
-                    placeholder="email@company.com"
-                    required
-                    {...register("contactEmail")}
-                    error={errors.contactEmail?.message}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-                  <InputField
-                    label="Contact Number"
-                    type="tel"
-                    placeholder="+1 234 567 8900"
-                    required
-                    {...register("contactPhone")}
-                    error={errors.contactPhone?.message}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-
-                  <InputField
-                    label="Full Address"
-                    placeholder="Enter full address"
-                    required
-                    {...register("address")}
-                    error={errors.address?.message}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-                  <InputField
-                    label="City"
-                    placeholder="City Name"
-                    required
-                    {...register("city")}
-                    error={errors.city?.message}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-                  <InputField
-                    label="State"
-                    placeholder="State/Province"
-                    required
-                    {...register("state")}
-                    error={errors.state?.message}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-                  <InputField
-                    label="Country"
-                    placeholder="Country Name"
-                    required
-                    {...register("country")}
-                    error={errors.country?.message}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-                  <InputField
-                    label="Other Information (Optional)"
-                    placeholder="Any additional details..."
-                    {...register("otherInfo")}
-                    disabled={isViewOnly || isSubmitting}
-                  />
-                </div>
-
-                {/* Site Imagery Section */}
-                <div className="mt-8 mb-6">
-                  <div className="col-span-2 flex items-center justify-between pb-1 border-b border-border-main mt-2 mb-4">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Site Imagery</h3>
-                      {!isViewOnly && <span className="text-[9px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full uppercase tracking-wider">Required</span>}
-                    </div>
-                    {!isViewOnly && (
-                      <button
-                        type="button"
-                        onClick={() => setValue('imagery.extra', [...extraImages, ''], { shouldValidate: false, shouldDirty: true })}
-                        className="bg-primary hover:bg-primary/90 text-white rounded-[var(--radius-button)] px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors shadow-sm"
-                        disabled={isSubmitting}
-                      >
-                        <Plus size={14} strokeWidth={2.5} />
-                        Add More
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Upload Grid */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-[24px] pt-2">
-                    <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url, file) => handleImage('north', url, file)} error={errors.imagery?.north?.message} disabled={isViewOnly || isSubmitting} />
-                    <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url, file) => handleImage('south', url, file)} error={errors.imagery?.south?.message} disabled={isViewOnly || isSubmitting} />
-                    <ImageUploadCard label="East View →" value={imageryValues?.east} onUpload={(url, file) => handleImage('east', url, file)} error={errors.imagery?.east?.message} disabled={isViewOnly || isSubmitting} />
-                    <ImageUploadCard label="West View ←" value={imageryValues?.west} onUpload={(url, file) => handleImage('west', url, file)} error={errors.imagery?.west?.message} disabled={isViewOnly || isSubmitting} />
-                    {extraImages.map((value, index) => (
-                      <ImageUploadCard
-                        key={`extra-${index}`}
-                        label={`Other View ${index + 1}`}
-                        value={value}
-                        onUpload={(url, file) => handleExtraImage(index, url, file)}
-                        error={errors.imagery?.extra?.[index]?.message}
-                        disabled={isViewOnly || isSubmitting}
+                <AnimatePresence mode="wait">
+                  {step === 1 && (
+                    <Motion.div
+                      key="step1"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-8"
+                    >
+                      <InputField
+                        label="Full Legal Name"
+                        required
+                        icon={<Building />}
+                        placeholder="e.g. Apex Global Industries"
+                        {...register("name")}
+                        error={errors.name?.message}
+                        isValid={isNameValid}
+                        disabled={isViewOnly}
                       />
-                    ))}
-                  </div>
-                </div>
+                      <SelectField
+                        label="Industry Category"
+                        icon={<Badge size={14} />}
+                        {...register("industry")}
+                        error={errors.industry?.message}
+                        options={["Manufacturing & Heavy Industry", "Construction", "Healthcare", "Warehousing"]}
+                        disabled={isViewOnly}
+                      />
+                      <SelectField
+                        label="Occupancy Type"
+                        {...register("occupancyType")}
+                        error={errors.occupancyType?.message}
+                        options={["Industrial Factory", "Commercial Complex", "High-Rise Warehouse", "Retail Outlet"]}
+                        disabled={isViewOnly}
+                      />
+                      <SelectField
+                        label="Building Classification"
+                        {...register("classification")}
+                        error={errors.classification?.message}
+                        options={[
+                          "Group H - High Hazard",
+                          "Group B - Business",
+                          "Group S - Storage",
+                          "Group F - Factory"
+                        ]}
+                        disabled={isViewOnly}
+                      />
+                    </Motion.div>
+                  )}
 
-                {/* Profile Section */}
-                <div className="mt-6 mb-2">
-                  <div className="col-span-2 flex items-center gap-2 pb-1 border-b border-border-main mt-2">
-                    <h3 className="text-[11px] font-bold text-gray uppercase tracking-wider">Add Profile Logo</h3>
-                  </div>
-                  <div className="w-full lg:w-1/4 pb-4 pt-3">
-                    <ImageUploadCard value={imageryValues?.profile} onUpload={(url, file) => handleImage('profile', url, file)} error={errors.imagery?.profile?.message} disabled={isViewOnly || isSubmitting} />
-                  </div>
-                </div>
+                  {step === 2 && (
+                    <Motion.div
+                      key="step2"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-8"
+                    >
+                      <InputField
+                        label="Contact Representative"
+                        icon={<User />}
+                        required
+                        placeholder="Full Name"
+                        {...register("contactPerson")}
+                        error={errors.contactPerson?.message}
+                      />
+                      <InputField
+                        label="Work Email"
+                        icon={<Mail />}
+                        type="email"
+                        required
+                        placeholder="contact@org.com"
+                        {...register("contactEmail")}
+                        error={errors.contactEmail?.message}
+                      />
+                      <InputField
+                        label="Mobile Number"
+                        icon={<Phone />}
+                        type="tel"
+                        required
+                        placeholder="10-digit number"
+                        {...register("contactPhone")}
+                        error={errors.contactPhone?.message}
+                      />
+                      <InputField
+                        label="Operational Address"
+                        icon={<MapPin />}
+                        required
+                        placeholder="Street, Building No."
+                        {...register("address")}
+                        error={errors.address?.message}
+                      />
+                      <InputField
+                        label="City / Region"
+                        placeholder="Current City"
+                        {...register("city")}
+                        error={errors.city?.message}
+                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <InputField
+                          label="Province"
+                          placeholder="State"
+                          {...register("state")}
+                        />
+                        <InputField
+                          label="Country"
+                          icon={<Globe size={14} />}
+                          placeholder="India"
+                          {...register("country")}
+                        />
+                      </div>
+                    </Motion.div>
+                  )}
+
+                  {step === 3 && (
+                    <Motion.div
+                      key="step3"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      className="flex flex-col gap-8"
+                    >
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between border-b border-border-main pb-2">
+                            <h3 className="text-sm font-bold text-title flex items-center gap-2">
+                              <ImageIcon className="text-primary" size={16} /> Site Perspectives
+                            </h3>
+                            <button
+                              type="button"
+                              onClick={() => setValue('imagery.extra', [...extraImages, ''])}
+                              className="text-[10px] bg-primary/5 hover:bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full font-bold uppercase transition-all"
+                            >
+                              + Add View
+                            </button>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-6">
+                            <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url, file) => handleImage('north', url, file)} />
+                            <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url, file) => handleImage('south', url, file)} />
+                            <ImageUploadCard label="East View →" value={imageryValues?.east} onUpload={(url, file) => handleImage('east', url, file)} />
+                            <ImageUploadCard label="West View ←" value={imageryValues?.west} onUpload={(url, file) => handleImage('west', url, file)} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-6">
+                          <div>
+                            <h3 className="text-sm font-bold text-title border-b border-border-main pb-2 mb-4 flex items-center gap-2">
+                              <Building className="text-primary" size={16} /> Branding & Meta
+                            </h3>
+                            <div className="w-1/2">
+                              <ImageUploadCard label="Profile Logo" value={imageryValues?.profile} onUpload={(url, file) => handleImage('profile', url, file)} />
+                            </div>
+                          </div>
+                          
+                          <InputField
+                            label="Additional Overview"
+                            icon={<FileText />}
+                            placeholder="Nature of business, facility highlights..."
+                            {...register("otherInfo")}
+                          />
+                        </div>
+                      </div>
+
+                      {extraImages.length > 0 && (
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-border-main">
+                          {extraImages.map((value, index) => (
+                            <ImageUploadCard
+                              key={`extra-${index}`}
+                              label={`Ext View ${index + 1}`}
+                              value={value}
+                              onUpload={(url, file) => handleExtraImage(index, url, file)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </Motion.div>
+                  )}
+                </AnimatePresence>
               </form>
             </div>
 
             {/* Modal Footer */}
-            <div className="relative z-10 p-5 bg-base border-t border-border-main flex items-center justify-end">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="h-10 px-4 hover:bg-base rounded-[var(--radius-button)] text-[11px] font-bold uppercase tracking-wider text-gray hover:text-title transition-colors flex items-center justify-center"
-                  disabled={isSubmitting}
-                >
-                  {isViewOnly ? 'Close' : 'Cancel'}
-                </button>
-                {isViewOnly && (
+            <div className="p-6 bg-base/50 border-t border-border-main flex items-center justify-between">
+              <button
+                type="button"
+                onClick={step === 1 ? onClose : prevStep}
+                className="h-11 px-6 rounded-xl text-[11px] font-bold uppercase tracking-wider text-gray hover:text-title hover:bg-base transition-all flex items-center gap-2"
+              >
+                <ChevronLeft size={16} /> {step === 1 ? 'Cancel' : 'Back'}
+              </button>
+
+              <div className="flex items-center gap-3">
+                {step < 3 ? (
                   <button
                     type="button"
-                    onClick={() => onEdit?.(org)}
-                    className="h-10 px-6 rounded-[var(--radius-button)] text-[11px] font-bold uppercase tracking-wider bg-primary hover:bg-primary/95 text-white transition-colors shadow-sm flex items-center justify-center gap-2"
+                    onClick={nextStep}
+                    className="h-11 px-8 rounded-xl text-[11px] font-bold uppercase tracking-wider bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
                   >
-                    Edit Details
+                    Continue <ChevronRight size={16} />
                   </button>
-                )}
-                {!isViewOnly && (
+                ) : (
                   <button
                     onClick={handleSubmit(submitForm)}
-                    disabled={!isValid || isSubmitting}
-                    className={`h-10 px-6 rounded-[var(--radius-button)] text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-2 ${(!isValid || isSubmitting) ? 'bg-base text-gray cursor-not-allowed border-transparent shadow-none' : 'bg-primary hover:bg-primary/95 text-white'}`}
+                    disabled={isSubmitting}
+                    className={`h-11 px-8 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 ${isSubmitting ? 'bg-base text-gray cursor-not-allowed' : 'bg-primary hover:bg-primary/95 text-white shadow-primary/20'}`}
                   >
-                    {isSubmitting ? 'Saving...' : org ? 'Save Changes' : 'Create Organization'}
+                    {isSubmitting ? 'Processing...' : org ? 'Commit Changes' : 'Finalize Registration'}
                   </button>
                 )}
               </div>
