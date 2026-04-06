@@ -73,11 +73,44 @@ const useUserStore = create((set, get) => ({
         }
     },
 
-    /**
-     * COORDINATOR SPECIFIC LOAD: For the Admin/Coordinators page
-     */
-    fetchCoordinatorData: async () => { ... },
-    
+    fetchCoordinatorData: async () => {
+        // Cancel previous fetch if still in flight
+        const { abortController } = get();
+        if (abortController) abortController.abort();
+        
+        const newController = new AbortController();
+        set({ loading: true, error: null, abortController: newController });
+
+        try {
+            const { filters, search, limit, offset } = get();
+            
+            // Ensure role is locked to coordinator for this view
+            const coordFilters = { ...filters, role: 'coordinator' };
+            const apiFilters = { ...coordFilters };
+            if (apiFilters.organization) {
+                apiFilters.organisation_id = apiFilters.organization;
+                delete apiFilters.organization;
+            }
+
+            const [usersData, stats, filterOptions] = await Promise.all([
+                userService.getUsers(apiFilters, search, limit, offset),
+                userService.getCoordinatorStats(apiFilters.organisation_id),
+                userService.getFilterOptions()
+            ]);
+
+            set({ 
+                users: usersData.users || [], 
+                totalCount: usersData.totalCount || 0,
+                stats: stats || { total: 0, active: 0, inactive: 0 }, 
+                filterOptions: filterOptions || { organizations: [], roles: [], regions: [] }, 
+                loading: false 
+            });
+        } catch (err) {
+            set({ users: [], error: err.message, loading: false });
+            toast.error("Failed to load Coordinator analytics.");
+        }
+    },
+
     fetchLookupCoordinators: async (orgId = null) => {
         try {
             const data = await userService.getCoordinators(orgId);

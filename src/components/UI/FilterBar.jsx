@@ -3,8 +3,9 @@ import { FiGrid, FiList, FiRefreshCcw } from 'react-icons/fi';
 import FilterDropdown from './FilterDropdown';
 import Search from './Search';
 import { useFilterStore } from '../../store/useFilterStore';
-import { coordinators, sites, floors } from '../../data/mockFilterData';
+import { useHierarchyStore } from '../../store/useHierarchyStore';
 import { useOrgStore } from '../../store/useOrgStore';
+import useUserStore from '../../store/userStore';
 import { useEffect } from 'react';
 
 const FilterBar = ({ 
@@ -26,10 +27,28 @@ const FilterBar = ({
     } = useFilterStore();
 
     const { orgs, fetchOrgs } = useOrgStore();
+    const { allCoordinators, fetchLookupCoordinators } = useUserStore();
+    const { allSites, allFloors, fetchLookupSites, fetchLookupFloors } = useHierarchyStore();
 
+    // 1. Initial Load: Organizations
     useEffect(() => {
         if (orgs.length === 0) fetchOrgs();
     }, [orgs.length, fetchOrgs]);
+
+    // 2. Cascading Sync: coordinators depend on Org
+    useEffect(() => {
+        fetchLookupCoordinators(selectedOrg);
+    }, [selectedOrg, fetchLookupCoordinators]);
+
+    // 3. Cascading Sync: Sites depend on Coordinator (or Org)
+    useEffect(() => {
+        fetchLookupSites(selectedOrg);
+    }, [selectedOrg, fetchLookupSites]);
+
+    // 4. Cascading Sync: Floors depend on Site
+    useEffect(() => {
+        if (selectedSite) fetchLookupFloors(selectedSite);
+    }, [selectedSite, fetchLookupFloors]);
 
     // Safely strip singular/plural mapping for consistent tiering
     const normalizedLevel = activeLevel?.replace(/s$/, '') || ''; 
@@ -40,11 +59,11 @@ const FilterBar = ({
     const renderSite = ['floor', 'zone'].includes(normalizedLevel);
     const renderFloor = ['zone'].includes(normalizedLevel);
 
-    // Dynamic Relational Options mapping
+    // Dynamic Relational Options mapping (using Real IDs)
     const orgOptions = orgs.map(o => ({ value: o.id, label: o.name }));
-    const coordOptions = coordinators.filter(c => c.orgId === selectedOrg).map(c => ({ value: c.id, label: c.name }));
-    const siteOptions = sites.filter(s => s.coordId === selectedCoord).map(s => ({ value: s.id, label: s.name }));
-    const floorOptions = floors.filter(f => f.siteId === selectedSite).map(f => ({ value: f.id, label: f.name }));
+    const coordOptions = allCoordinators.map(c => ({ value: c.id, label: c.name }));
+    const siteOptions = allSites.map(s => ({ value: s.id, label: s.site_name || s.name }));
+    const floorOptions = allFloors.map(f => ({ value: f.id, label: f.name }));
 
     const isFilterActive = selectedOrg !== '' || selectedCoord !== '' || selectedSite !== '' || selectedFloor !== '' || selectedStatus !== 'all' || searchTerm !== '';
 

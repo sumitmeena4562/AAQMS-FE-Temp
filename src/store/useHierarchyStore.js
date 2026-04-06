@@ -12,6 +12,8 @@ export const useHierarchyStore = create((set, get) => ({
     zones: [],
     loading: false,
     error: null,
+    allSites: [], // Lookup list for FilterBar
+    allFloors: [], // Lookup list for FilterBar
 
     // --- SITES ---
     fetchSites: async (filters = {}) => {
@@ -24,6 +26,31 @@ export const useHierarchyStore = create((set, get) => ({
         } catch (err) {
             set({ error: err.message, loading: false, sites: [] });
             console.error("Failed to fetch sites:", err);
+        }
+    },
+    
+    // --- LOOKUPS FOR FILTERBAR ---
+    fetchLookupSites: async (orgId = null) => {
+        try {
+            const data = await hierarchyService.getSites({ organisation: orgId });
+            const sites = Array.isArray(data) ? data : (data.results || []);
+            set({ allSites: sites });
+        } catch (err) {
+            console.error("FilterBar Site Fetch Failed", err);
+        }
+    },
+
+    fetchLookupFloors: async (siteId = null) => {
+        if (!siteId) {
+            set({ allFloors: [] });
+            return;
+        }
+        try {
+            const data = await hierarchyService.getFloors(siteId);
+            const floors = Array.isArray(data) ? data : (data.results || []);
+            set({ allFloors: floors });
+        } catch (err) {
+            console.error("FilterBar Floor Fetch Failed", err);
         }
     },
 

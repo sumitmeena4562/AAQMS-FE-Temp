@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiEdit2, FiEye, FiShieldOff } from 'react-icons/fi';
+import { useFilterStore } from '../../store/useFilterStore';
 
 const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onView, onBlock }) => {
   const navigate = useNavigate();
@@ -31,15 +32,19 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     }
   }
 
+  const { setOrg, setSite } = useFilterStore();
+
   const handleManage = (e) => {
     e.stopPropagation(); // Prevents card click
     if (isSiteCard) {
+      setSite(org.id);
       const currentOrg = location.state?.orgName || new URLSearchParams(location.search).get('org') || '';
       const coordName = coordinatorContext?.name || new URLSearchParams(location.search).get('coord') || '';
       navigate(`/admin/floor-plan?org_id=${org.id}&org_name=${encodeURIComponent(currentOrg)}&coord=${encodeURIComponent(coordName)}&site=${encodeURIComponent(org.name)}`, {
         state: { site: org, orgName: currentOrg, coordinator: coordinatorContext }
       });
     } else {
+      setOrg(org.id);
       // Navigate to coordinators page with specific org filter
       navigate(`/admin/coordinators?org_id=${org.id}&org_name=${encodeURIComponent(org.name)}`, { 
         state: { org, from: 'org_card' } 

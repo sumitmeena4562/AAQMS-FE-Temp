@@ -3,6 +3,17 @@ import { organizationService } from '../services/organizationService';
 import { inventoryService } from '../services/inventoryService';
 import toast from 'react-hot-toast';
 
+// Helper to clean mangled Cloudinary URLs (400 Bad Request Fix)
+const cleanImageUrl = (url) => {
+    if (typeof url !== 'string') return url;
+    // Pattern: https://res.cloudinary.com/.../media/https://...
+    if (url.includes('http') && url.split('http').length > 2) {
+        const parts = url.split('http');
+        return 'http' + parts[parts.length - 1]; // Take the last absolute URL part
+    }
+    return url;
+};
+
 // Helper to map Backend data to Frontend format globally
 const mapOrgToFrontend = (data) => {
   if (!data) return null;
@@ -15,13 +26,17 @@ const mapOrgToFrontend = (data) => {
   if (Array.isArray(data.images)) {
     data.images.forEach(img => {
       const type = (img.image_type || '').toLowerCase();
+      const cleanedUrl = cleanImageUrl(img.image_url);
+
       if (['north', 'south', 'east', 'west', 'profile'].includes(type)) {
-        imagery[type] = img.image_url;
+        imagery[type] = cleanedUrl;
       } else if (type === 'extra') {
-        imagery.extra.push(img.image_url);
+        imagery.extra.push(cleanedUrl);
       }
     });
   }
+
+  const profileImg = imagery.profile || cleanImageUrl(data.image) || '';
 
   return {
     ...data,
@@ -38,9 +53,8 @@ const mapOrgToFrontend = (data) => {
     country: data.country || '',
     plannedSites: data.planned_sites || 0,
     otherInfo: data.description || data.otherInfo || '',
-    isActive: data.is_active !== undefined ? data.is_active : true,
     isBlocked: data.is_blocked || false,
-    imagery: imagery.profile ? imagery : { ...imagery, profile: data.image || '' },
+    imagery: { ...imagery, profile: profileImg },
     stats: {
       sites: data.sites_count || 0,
       floors: data.floors_count || 0,

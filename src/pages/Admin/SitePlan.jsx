@@ -41,8 +41,11 @@ const SitePlan = () => {
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-    { label: orgInfo?.name || "Organization", path: `/admin/coordinators?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}` },
-    { label: coordInfo?.name || "Site Plan", path: "#", isActive: true }
+    { 
+        label: orgInfo?.name || "Organization", 
+        path: activeOrgId ? `/admin/coordinators?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}` : '/admin/organizations'
+    },
+    { label: activeCoordId ? coordInfo?.name : "Site Plan", path: "#", isActive: true }
   ];
 
   // Logic: Show sites belonging strictly to the currently selected context
@@ -57,7 +60,13 @@ const SitePlan = () => {
       {/* HEADER */}
       <PageHeader
         title="Site Plan Selection"
-        subtitle={activeCoordId ? `Managing ${activePlansCount} active site plans for ${coordInfo?.name}` : "Please use the filter bar to select a coordinator"}
+        subtitle={
+            !activeOrgId 
+                ? "Please select an Organization to view its operational sites"
+                : activeCoordId 
+                    ? `Managing ${activePlansCount} active site plans for ${coordInfo?.name}` 
+                    : `Showing all sites for ${orgInfo?.name}`
+        }
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
