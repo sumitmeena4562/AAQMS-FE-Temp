@@ -112,14 +112,21 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
           </h3>
 
           {isSiteCard ? (
-            <div className="flex items-start gap-1.5 mt-1.5">
-              <svg className="w-3 h-3 text-gray shrink-0 relative top-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <p className="text-[11px] text-secondary font-medium leading-tight line-clamp-2">
-                {org.address}
-              </p>
+            <div className="space-y-1.5">
+              {org.organisation_name && (
+                <p className="text-[9px] text-primary/60 font-bold tracking-widest uppercase truncate">
+                  {org.organisation_name}
+                </p>
+              )}
+              <div className="flex items-start gap-1.5">
+                <svg className="w-3 h-3 text-gray shrink-0 relative top-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <p className="text-[11px] text-secondary font-medium leading-tight line-clamp-1">
+                  {org.address}
+                </p>
+              </div>
             </div>
           ) : (
             <p className="text-[9px] text-gray font-bold tracking-widest uppercase opacity-80 mt-1">

@@ -35,22 +35,28 @@ const SitePlan = () => {
   const activeOrgId = selectedOrg || passedOrgId;
   const activeCoordId = selectedCoord || passedCoordId;
 
-  const orgInfo = orgs.find(o => o.id === activeOrgId) || { name: passedOrgNameFromUrl };
-  const coordInfo = { name: passedCoordNameFromUrl || "Coordinator" };
+  const orgInfo = orgs.find(o => o.id === activeOrgId) || (passedOrgNameFromUrl ? { name: passedOrgNameFromUrl } : null);
+  const coordInfo = activeCoordId ? { name: passedCoordNameFromUrl || "Coordinator" } : null;
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-    { 
-        label: orgInfo?.name || "Organization", 
-        path: activeOrgId ? `/admin/coordinators?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}` : '/admin/organizations'
-    },
-    { label: activeCoordId ? coordInfo?.name : "Site Plan", path: "#", isActive: true }
   ];
 
-  // Logic: Show sites belonging strictly to the currently selected context
-  const sitePlans = sites;
+  if (activeOrgId) {
+    breadcrumbs.push({ 
+        label: orgInfo?.name || "Organization", 
+        path: `/admin/coordinators?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}`
+    });
+  }
 
+  breadcrumbs.push({ 
+    label: coordInfo?.name || "Site Plan", 
+    path: "#", 
+    isActive: true 
+  });
+
+  const sitePlans = sites;
   const totalPlans = sitePlans.length;
   const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
 
@@ -59,18 +65,18 @@ const SitePlan = () => {
 
       {/* HEADER */}
       <PageHeader
-        title="Site Plan Selection"
+        title={activeOrgId ? "Site Plan Selection" : "All Operational Sites"}
         subtitle={
-            !activeOrgId 
-                ? "Please select an Organization to view its operational sites"
-                : activeCoordId 
-                    ? `Managing ${activePlansCount} active site plans for ${coordInfo?.name}` 
-                    : `Showing all sites for ${orgInfo?.name}`
+            activeCoordId 
+                ? `Managing ${activePlansCount} active site plans for ${coordInfo?.name}` 
+                : activeOrgId
+                    ? `Showing all sites for ${orgInfo?.name}`
+                    : "Viewing all sites across all organizations"
         }
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
-          activeCoordId ? (
+          totalPlans > 0 ? (
             <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                 {totalPlans} Total Projects
             </span>
@@ -87,18 +93,6 @@ const SitePlan = () => {
                  <FiLoader className="w-10 h-10 text-primary animate-spin mb-4" />
                  <p className="text-gray font-bold tracking-widest text-[10px] uppercase">Retrieving live site data...</p>
              </div>
-        ) : !activeOrgId ? (
-          <div className="text-center py-24 bg-card rounded-2xl border border-border-main mt-4 shadow-sm animate-in fade-in zoom-in">
-             <div className="w-16 h-16 rounded-3xl bg-base border border-border-main flex items-center justify-center mx-auto mb-6">
-                <FiBriefcase className="w-6 h-6 text-gray/30" />
-             </div>
-            <p className="text-title font-bold tracking-tight text-lg mb-1">
-              Organization Context Missing
-            </p>
-            <p className="text-gray text-xs">
-              Please select an Organization to view its operational sites.
-            </p>
-          </div>
         ) : sitePlans.length === 0 ? (
            <div className="text-center py-24 bg-card rounded-2xl border border-border-main mt-4 shadow-sm animate-in fade-in zoom-in">
              <div className="w-16 h-16 rounded-3xl bg-base border border-border-main flex items-center justify-center mx-auto mb-6">
@@ -108,7 +102,7 @@ const SitePlan = () => {
               No Operational Sites Found
             </p>
             <p className="text-gray text-xs">
-              {orgInfo?.name || 'Selected organization'} does not have any sites registered yet.
+              {activeOrgId ? `${orgInfo?.name || 'Selected organization'} does not have any sites registered yet.` : "No sites have been registered in the system yet."}
             </p>
           </div>
         ) : (
@@ -118,7 +112,7 @@ const SitePlan = () => {
                 <OrganizationCard
                   org={item}
                   isSiteCard={true}
-                  coordinatorContext={{ name: coordInfo?.name }}
+                  coordinatorContext={coordInfo}
                 />
               </div>
             ))}

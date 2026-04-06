@@ -85,15 +85,13 @@ const FilterBar = ({
                     )}
 
                     {renderCoord && (
-                        <div className={!selectedOrg ? 'opacity-50 pointer-events-none' : ''}>
-                            <FilterDropdown 
-                                label="Coordinator"
-                                options={coordOptions}
-                                value={selectedCoord}
-                                onChange={(val) => setCoord(val)}
-                                allLabel="Select Coordinator"
-                            />
-                        </div>
+                        <FilterDropdown 
+                            label="Coordinator"
+                            options={coordOptions}
+                            value={selectedCoord}
+                            onChange={(val) => setCoord(val)}
+                            allLabel="All Coordinators"
+                        />
                     )}
 
                     {renderSite && (
