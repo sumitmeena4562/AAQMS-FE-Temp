@@ -8,7 +8,7 @@ import { ArrowRight, Map } from 'lucide-react';
  * Fonts: Standardized 7.5px labels / 15px values
  */
 const FloorCard = ({ floor, onClick }) => {
-  const { level, name, description, stats, status } = floor;
+  const { level, name, description, status, zones_count, inventory_count } = floor;
 
   return (
     <div
@@ -58,7 +58,7 @@ const FloorCard = ({ floor, onClick }) => {
               ZONES
             </span>
             <span className="text-2xl font-bold text-title leading-none group-hover:text-blue-800 transition-colors">
-              {stats?.zones || 0}
+              {zones_count || 0}
             </span>
           </div>
           <div className="flex-1 bg-gray-50 rounded-[16px] py-4 px-2 flex flex-col items-center justify-center group-hover:bg-blue-50 transition-colors border border-transparent">
@@ -66,7 +66,7 @@ const FloorCard = ({ floor, onClick }) => {
               ASSETS
             </span>
             <span className="text-2xl font-bold text-title leading-none group-hover:text-blue-800 transition-colors">
-              {stats?.assets || 0}
+              {inventory_count || 0}
             </span>
           </div>
         </div>

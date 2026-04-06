@@ -23,6 +23,7 @@ const mapOrgFrontendToBackend = (data) => {
         country: data.country,
         description: data.otherInfo,
         status: (data.status || 'PENDING').toUpperCase(),
+        planned_sites: data.plannedSites || 0,
         is_active: data.is_active !== undefined ? data.is_active : true
     };
 };

@@ -1,51 +1,52 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import OrganizationCard from '../../components/UI/OrganizationCard';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import { useFilterStore } from '../../store/useFilterStore';
-import { organizations, coordinators, sites } from '../../data/mockFilterData';
-import { FiHome, FiBriefcase } from 'react-icons/fi';
+import { useHierarchyStore } from '../../store/useHierarchyStore';
+import { useOrgStore } from '../../store/useOrgStore';
+import { FiHome, FiBriefcase, FiLoader } from 'react-icons/fi';
 
 const SitePlan = () => {
   const location = useLocation();
   const { selectedOrg, selectedCoord, setOrg, setCoord } = useFilterStore();
-
-  const passedOrgName = location.state?.orgName || new URLSearchParams(location.search).get('org');
-  const passedCoordName = location.state?.coordinator?.name || new URLSearchParams(location.search).get('coord');
+  const { sites, fetchSites, loading } = useHierarchyStore();
+  const { orgs } = useOrgStore();
+  
+  const searchParams = new URLSearchParams(location.search);
+  const passedOrgId = searchParams.get('org_id');
+  const passedOrgNameFromUrl = searchParams.get('org_name');
+  const passedCoordId = searchParams.get('coord_id');
+  const passedCoordNameFromUrl = searchParams.get('coord');
 
   useEffect(() => {
-    let currentOrgId = selectedOrg;
-    if (!currentOrgId && passedOrgName) {
-      const matchOrg = organizations.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
-      if (matchOrg) {
-        setOrg(matchOrg.id);
-        currentOrgId = matchOrg.id;
-      }
-    }
-    if (!selectedCoord && passedCoordName) {
-      const matchCoord = coordinators.find(c => c.name.toLowerCase() === passedCoordName.toLowerCase() && (!currentOrgId || c.orgId === currentOrgId));
-      if (matchCoord) {
-        setCoord(matchCoord.id);
-      }
-    }
-  }, [selectedOrg, selectedCoord, passedOrgName, passedCoordName, setOrg, setCoord]);
+    // 1. Sync global filters if passed through URL
+    if (passedOrgId) setOrg(passedOrgId);
+    if (passedCoordId) setCoord(passedCoordId);
+    
+    // 2. Fetch sites specifically for this context
+    fetchSites({ 
+        organisation: passedOrgId || selectedOrg, 
+        coord_id: passedCoordId || selectedCoord 
+    });
+  }, [passedOrgId, passedCoordId, selectedOrg, selectedCoord, setOrg, setCoord, fetchSites]);
 
-  const activeOrgId = selectedOrg || organizations.find(o => o.name.toLowerCase() === passedOrgName?.toLowerCase())?.id;
-  const activeCoordId = selectedCoord || coordinators.find(c => c.name.toLowerCase() === passedCoordName?.toLowerCase())?.id;
+  const activeOrgId = selectedOrg || passedOrgId;
+  const activeCoordId = selectedCoord || passedCoordId;
 
-  const orgInfo = activeOrgId ? organizations.find(o => o.id === activeOrgId) : null;
-  const coordInfo = activeCoordId ? coordinators.find(c => c.id === activeCoordId) : null;
+  const orgInfo = orgs.find(o => o.id === activeOrgId) || { name: passedOrgNameFromUrl };
+  const coordInfo = { name: passedCoordNameFromUrl || "Coordinator" };
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-    { label: orgInfo?.name || "Organization", path: `/admin/coordinators` },
+    { label: orgInfo?.name || "Organization", path: `/admin/coordinators?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}` },
     { label: coordInfo?.name || "Site Plan", path: "#", isActive: true }
   ];
 
-  // Logic: Show sites belonging strictly to the currently selected coordinator
-  const sitePlans = activeCoordId ? sites.filter(s => s.coordId === activeCoordId) : [];
+  // Logic: Show sites belonging strictly to the currently selected context
+  const sitePlans = sites;
 
   const totalPlans = sitePlans.length;
   const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
@@ -72,16 +73,33 @@ const SitePlan = () => {
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
         <FilterBar activeLevel="sites" />
 
-        {!activeCoordId ? (
-          <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
-            <p className="text-gray font-medium tracking-wide">
-              Please select an Organization and Coordinator to view sites.
+        {loading ? (
+             <div className="flex flex-col items-center justify-center py-32 bg-base/10 rounded-2xl border border-dashed border-border-main mt-4">
+                 <FiLoader className="w-10 h-10 text-primary animate-spin mb-4" />
+                 <p className="text-gray font-bold tracking-widest text-[10px] uppercase">Retrieving live site data...</p>
+             </div>
+        ) : !activeOrgId ? (
+          <div className="text-center py-24 bg-card rounded-2xl border border-border-main mt-4 shadow-sm animate-in fade-in zoom-in">
+             <div className="w-16 h-16 rounded-3xl bg-base border border-border-main flex items-center justify-center mx-auto mb-6">
+                <FiBriefcase className="w-6 h-6 text-gray/30" />
+             </div>
+            <p className="text-title font-bold tracking-tight text-lg mb-1">
+              Organization Context Missing
+            </p>
+            <p className="text-gray text-xs">
+              Please select an Organization to view its operational sites.
             </p>
           </div>
         ) : sitePlans.length === 0 ? (
-          <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
-            <p className="text-gray font-medium tracking-wide">
-              No sites found for this coordinator.
+           <div className="text-center py-24 bg-card rounded-2xl border border-border-main mt-4 shadow-sm animate-in fade-in zoom-in">
+             <div className="w-16 h-16 rounded-3xl bg-base border border-border-main flex items-center justify-center mx-auto mb-6">
+                <FiBriefcase className="w-6 h-6 text-gray/30" />
+             </div>
+            <p className="text-title font-bold tracking-tight text-lg mb-1">
+              No Operational Sites Found
+            </p>
+            <p className="text-gray text-xs">
+              {orgInfo?.name || 'Selected organization'} does not have any sites registered yet.
             </p>
           </div>
         ) : (

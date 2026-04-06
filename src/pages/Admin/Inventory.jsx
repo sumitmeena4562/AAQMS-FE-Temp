@@ -153,10 +153,13 @@ const Inventory = () => {
         
         // Fetch inventory (Server-side filtering & search)
         const fetchTimeout = setTimeout(() => {
-            fetchInventory({
+            // Map FE multi-select filters to backend single category if needed, or join
+            const backendFilters = {
                 ...filters,
+                category: filters.type.length > 0 ? filters.type[0] : undefined,
                 search: searchQuery
-            });
+            };
+            fetchInventory(backendFilters);
         }, 300); // Debounce search
 
         return () => clearTimeout(fetchTimeout);

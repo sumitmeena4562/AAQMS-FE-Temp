@@ -12,22 +12,38 @@ const Zones = () => {
     const [activeView, setActiveView] = useState('list');
     const [selectionMode, setSelectionMode] = useState(false);
 
-    const { selectedOrg, selectedCoord, selectedSite, selectedFloor } = useFilterStore();
+    const { selectedOrg, selectedCoord, selectedSite, selectedFloor, setOrg, setCoord, setSite, setFloor } = useFilterStore();
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    const passedOrgId = searchParams.get('org_id');
+    const passedOrgName = searchParams.get('org_name');
+    const passedCoordId = searchParams.get('coord_id');
+    const passedCoordName = searchParams.get('coord');
+    const passedSiteId = searchParams.get('site_id');
+    const passedSiteName = searchParams.get('site');
+    const passedFloorId = searchParams.get('floor_id');
+    const passedFloorName = searchParams.get('floor');
 
-    // The activeFloorId comes directly from the FilterBar's global store
-    const activeFloorId = selectedFloor;
+    useState(() => {
+        if (passedOrgId) setOrg(passedOrgId);
+        if (passedCoordId) setCoord(passedCoordId);
+        if (passedSiteId) setSite(passedSiteId);
+        if (passedFloorId) setFloor(passedFloorId);
+    });
+
+    // The activeFloorId comes from the URL or the global store
+    const activeFloorId = passedFloorId || selectedFloor;
 
     // ── FETCH ZONES FROM BACKEND ──
     // useQuery automatically handles: loading, error, caching, retries, refetching
     const { data: rawZones = [], isLoading, isError } = useQuery({
         queryKey: ['zones', activeFloorId],
         queryFn: async () => {
-            const response = await hierarchyService.getZones({ floor_id: activeFloorId });
-            // DRF returns paginated { count, results: [...] } or a flat array
+            const response = await hierarchyService.getZones(activeFloorId);
             return Array.isArray(response) ? response : (response?.results || []);
         },
-        enabled: !!activeFloorId, // Only fetch when a floor is actually selected
-        staleTime: 1000 * 60 * 5, // Cache for 5 minutes — avoid redundant DB hits
+        enabled: !!activeFloorId,
+        staleTime: 1000 * 60 * 5,
     });
 
     // ── MAP UI PROPS (icons/colors) onto the raw API data ──
@@ -54,9 +70,9 @@ const Zones = () => {
     const breadcrumbs = [
         { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
         { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-        { label: "Organization", path: `/admin/coordinators` },
-        { label: "Site Plan", path: `/admin/site-plan` },
-        { label: "Floor Plan", path: `/admin/floor-plan` },
+        { label: passedOrgName || "Organization", path: `/admin/coordinators?org_id=${passedOrgId}&org_name=${encodeURIComponent(passedOrgName || '')}` },
+        { label: passedSiteName || "Site Plan", path: `/admin/site-plan?org_id=${passedOrgId}&org_name=${encodeURIComponent(passedOrgName || '')}&coord=${encodeURIComponent(passedCoordName || '')}&coord_id=${passedCoordId}` },
+        { label: passedFloorName || "Floor Plan", path: `/admin/floor-plan?org_id=${passedOrgId}&org_name=${encodeURIComponent(passedOrgName || '')}&coord=${encodeURIComponent(passedCoordName || '')}&coord_id=${passedCoordId}&site_id=${passedSiteId}&site=${encodeURIComponent(passedSiteName || '')}` },
         { label: "Zones", path: "#", isActive: true }
     ];
 

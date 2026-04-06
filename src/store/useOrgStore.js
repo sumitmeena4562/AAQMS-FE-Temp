@@ -38,6 +38,8 @@ const mapOrgToFrontend = (data) => {
     country: data.country || '',
     plannedSites: data.planned_sites || 0,
     otherInfo: data.description || data.otherInfo || '',
+    isActive: data.is_active !== undefined ? data.is_active : true,
+    isBlocked: data.is_blocked || false,
     imagery: imagery.profile ? imagery : { ...imagery, profile: data.image || '' },
     stats: {
       sites: data.sites_count || 0,

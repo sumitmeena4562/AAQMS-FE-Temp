@@ -1,5 +1,4 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { sites, floors, zones, assets } from '../../data/mockFilterData';
 import { FiEdit2, FiEye, FiShieldOff } from 'react-icons/fi';
 
 const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onView, onBlock }) => {
@@ -10,21 +9,9 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
   const totalComputedFloors = org.stats?.floors || 0;
   const coordinatorNames = org.stats?.coordinatorNames || [];
 
-  let siteComputedFloors = 0;
-  let siteComputedZones = 0;
-  let siteComputedAssets = 0;
-
-  if (isSiteCard) {
-    const sFloors = floors.filter(f => f.siteId === org.id);
-    const floorIds = sFloors.map(f => f.id);
-    const sZones = zones.filter(z => floorIds.includes(z.floorId));
-    const zoneIds = sZones.map(z => z.id);
-    const sAssets = assets.filter(a => zoneIds.includes(a.zoneId));
-
-    siteComputedFloors = sFloors.length;
-    siteComputedZones = sZones.length;
-    siteComputedAssets = sAssets.length;
-  }
+  let siteComputedFloors = org.floors_count || 0;
+  let siteComputedZones = org.zones_count || 0;
+  let siteComputedAssets = org.inventory_count || 0;
 
   let currentStatus = org.status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE';
 
@@ -116,7 +103,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         {/* Header Section */}
         <div>
           <h3 className="text-lg font-bold text-primary tracking-tight leading-none mb-2 truncate">
-            {org.name}
+            {org.site_name || org.name}
           </h3>
 
           {isSiteCard ? (
