@@ -10,7 +10,7 @@ import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import {
     FiUsers, FiRefreshCw, FiRefreshCcw, FiCheckCircle, FiAlertCircle, FiClock,
-    FiExternalLink, FiHome, FiShield,  FiActivity, FiLayers, FiMail, FiPhone
+    FiExternalLink, FiHome, FiShield,  FiActivity, FiLayers, FiMail, FiPhone, FiX
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
@@ -54,25 +54,21 @@ const Coordinator = () => {
     // ── DATA FETCHING ──
     const fetchCoordinatorData = store.fetchCoordinatorData;
     
+    // Sync URL params to store filters on mount or URL change
     useEffect(() => {
-        // Initialize with Coordinator role and Org ID from URL if provided
-        const initialFilters = { 
-            role: 'coordinator', 
-            organization: orgIdFromUrl || '', 
-            status: '', 
-            region: '' 
-        };
-        setFilters(initialFilters);
-        fetchCoordinatorData(); // Use specialized stats + users fetch
-        
-        // Cleanup on unmount
-        return () => resetFilters();
-    }, [fetchCoordinatorData, orgIdFromUrl, setFilters, resetFilters]);
+        if (orgIdFromUrl) {
+            setFilters({ ...filters, organization: orgIdFromUrl, role: 'coordinator' });
+        } else {
+            // Explicitly clear organization filter if not in URL
+            setFilters({ ...filters, organization: '', role: 'coordinator' });
+        }
+    }, [orgIdFromUrl]);
 
+    // Main data fetch when filters or search changes
     useEffect(() => {
-        if (!loading) fetchUsers();
+        fetchCoordinatorData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedSearch, JSON.stringify(filters), offset]);
+    }, [debouncedSearch, JSON.stringify(filters), offset, orgIdFromUrl]);
 
     const sortedUsers = useMemo(() => {
         if (!Array.isArray(users)) return [];
@@ -130,7 +126,6 @@ const Coordinator = () => {
     const handleResetAll = () => {
         setSearchParams({});
         resetFilters();
-        setFilters({ role: 'coordinator', organization: '', status: '', region: '' });
     };
 
     const columns = useMemo(() => [
@@ -220,20 +215,37 @@ const Coordinator = () => {
     return (
         <div className="flex flex-col gap-6 w-full pb-10 animate-in fade-in duration-500">
             <PageHeader
-                title={orgNameFromUrl ? `Personnel: ${orgNameFromUrl}` : "Coordinator Management"}
-                subtitle={orgNameFromUrl ? `Viewing staff assigned to this organization` : "System-wide administrative resource control"}
+                title={orgNameFromUrl ? (
+                    <div className="flex items-center gap-3">
+                        <span className="text-primary/40">Personnel:</span>
+                        <span>{orgNameFromUrl}</span>
+                        <div className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest border border-primary/20 animate-pulse">
+                            Context Active
+                        </div>
+                    </div>
+                ) : "Coordinator Management"}
+                subtitle={orgNameFromUrl ? `Authorized staff assigned to ${orgNameFromUrl}` : "System-wide administrative resource control"}
                 onAdd={handleAddUser}
                 addButtonText="Add Coordinator"
                 breadcrumbs={[
                     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
                     { label: "Organizations", path: "/admin/organisations" },
-                    { label: orgNameFromUrl ? `Personnel: ${orgNameFromUrl}` : "Coordinators", path: "/admin/coordinators", isActive: true }
+                    { label: orgNameFromUrl ? `Personnel Records` : "Coordinators", path: "/admin/coordinators", isActive: true }
                 ]}
                 rightContent={
-                    <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30">
-                        <FiRefreshCcw size={14} />
-                        <span className="font-black text-[10px] uppercase tracking-widest">Reset All</span>
-                    </Button>
+                    <div className="flex items-center gap-3">
+                         <div className="flex flex-col items-end px-4 border-r border-border-main/50 translate-y-[2px]">
+                            <span className="text-[9px] font-black text-gray uppercase tracking-widest opacity-60 leading-none mb-1">Status</span>
+                            <div className="flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                <span className="text-[11px] font-bold text-title uppercase">Live Ops</span>
+                            </div>
+                        </div>
+                        <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
+                            <FiRefreshCcw size={14} className={loading ? 'animate-spin' : ''} />
+                            <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
+                        </Button>
+                    </div>
                 }
             />
 
@@ -247,6 +259,15 @@ const Coordinator = () => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-3">
+                    {filters.organization && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/5 text-primary border border-primary/20 rounded-xl animate-in zoom-in duration-300">
+                             <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Organization |</span>
+                             <span className="text-[11px] font-bold">{orgNameFromUrl || filters.organization}</span>
+                             <button onClick={handleResetAll} className="p-0.5 hover:bg-primary/10 rounded-full transition-colors ml-1">
+                                <FiX size={10} />
+                             </button>
+                        </div>
+                    )}
                     <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All Organizations" />
                     <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" />
                 </div>
@@ -283,11 +304,20 @@ const Coordinator = () => {
                     <DataTable columns={columns} data={sortedUsers} loading={loading} selectable={selectionMode} selectedIds={selectedIds} onSelectionChange={(ids) => setSelectedIds(ids)} footer={paginationFooter} />
                 )
             ) : (
-                <div className="flex flex-col items-center justify-center py-20 px-6 bg-card/30 border-2 border-dashed border-border-main rounded-2xl">
-                    <FiLayers className="w-12 h-12 text-gray/20 mb-4" />
-                    <h3 className="text-lg font-bold text-title mb-1">No Personnel Located</h3>
-                    <p className="text-gray text-[12px] mb-8 font-medium italic">Refine search parameters or reset context.</p>
-                    <Button onClick={handleResetAll} variant="primary" size="md" className="!px-8 !font-black !uppercase !tracking-widest">View All Profiles</Button>
+                <div className="flex flex-col items-center justify-center py-20 px-6 bg-card/30 border-2 border-dashed border-border-main rounded-[24px]">
+                    <div className="w-20 h-20 rounded-full bg-base border border-border-main/50 flex items-center justify-center mb-6 shadow-sm">
+                        <FiLayers className="w-8 h-8 text-gray/20" />
+                    </div>
+                    <h3 className="text-xl font-bold text-title mb-2">No Personnel Located</h3>
+                    <p className="text-gray text-[13px] mb-8 font-medium italic max-w-[300px] text-center">
+                        We couldn't find any coordinators {orgNameFromUrl ? `assigned to ${orgNameFromUrl}` : 'in the system'}.
+                    </p>
+                    <div className="flex gap-4">
+                        {orgNameFromUrl && (
+                            <Button onClick={handleResetAll} variant="outline" className="!px-8 !font-black !uppercase !tracking-widest !rounded-xl">View All Profiles</Button>
+                        )}
+                        <Button onClick={handleAddUser} variant="primary" className="!px-8 !font-black !uppercase !tracking-widest !rounded-xl shadow-lg shadow-primary/20">Add Coordinator</Button>
+                    </div>
                 </div>
             )}
 
