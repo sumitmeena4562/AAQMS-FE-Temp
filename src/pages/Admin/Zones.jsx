@@ -1,20 +1,30 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
 import FilterBar from '../../components/UI/FilterBar';
-import { FiHome, FiBriefcase } from 'react-icons/fi';
-import { List, Layout, Truck, Fuel, Monitor } from 'lucide-react';
+import Button from '../../components/UI/Button';
 import { useFilterStore } from '../../store/useFilterStore';
-import { hierarchyService } from '../../services/hierarchyService';
+import { useHierarchyStore } from '../../store/useHierarchyStore';
+import { useOrgStore } from '../../store/useOrgStore';
+import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
+import { Layout, Truck, Fuel, Monitor } from 'lucide-react';
 
 const Zones = () => {
-    const [activeView, setActiveView] = useState('list');
-    const [selectionMode, setSelectionMode] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const { selectedOrg, selectedCoord, selectedSite, selectedFloor, setOrg, setCoord, setSite, setFloor } = useFilterStore();
-    const searchParams = new URLSearchParams(window.location.search);
+    // ── STORES & STATE ──
+    const { 
+        selectedOrg, selectedCoord, selectedSite, selectedFloor, 
+        setOrg, setCoord, setSite, setFloor, resetFilters 
+    } = useFilterStore();
     
+    const { zones, fetchZones, loading, error: hierarchyError } = useHierarchyStore();
+    const { orgs } = useOrgStore();
+
+    // ── URL PARAMETERS (for direct access/deep linking) ──
     const passedOrgId = searchParams.get('org_id');
     const passedOrgName = searchParams.get('org_name');
     const passedCoordId = searchParams.get('coord_id');
@@ -24,141 +34,152 @@ const Zones = () => {
     const passedFloorId = searchParams.get('floor_id');
     const passedFloorName = searchParams.get('floor');
 
-    useState(() => {
-        if (passedOrgId) setOrg(passedOrgId);
-        if (passedCoordId) setCoord(passedCoordId);
-        if (passedSiteId) setSite(passedSiteId);
-        if (passedFloorId) setFloor(passedFloorId);
-    });
+    useEffect(() => {
+        // 1. Sync global filters ONLY if passed through URL and store is empty
+        if (passedOrgId && !selectedOrg) setOrg(passedOrgId);
+        if (passedCoordId && !selectedCoord) setCoord(passedCoordId);
+        if (passedSiteId && !selectedSite) setSite(passedSiteId);
+        if (passedFloorId && !selectedFloor) setFloor(passedFloorId);
+        
+        // 2. Fetch zones (Global or Scoped)
+        const activeFloorId = (passedFloorId === 'undefined' || !passedFloorId) ? selectedFloor : passedFloorId;
+        fetchZones(activeFloorId || null);
+    }, [passedOrgId, passedCoordId, passedSiteId, passedFloorId, selectedFloor, setOrg, setCoord, setSite, setFloor, fetchZones]);
 
-    // The activeFloorId comes from the URL or the global store
-    const activeFloorId = passedFloorId || selectedFloor;
+    const activeFloorId = selectedFloor || passedFloorId;
+    const activeSiteId = selectedSite || passedSiteId;
+    const activeOrgId = selectedOrg || passedOrgId;
 
-    // ── FETCH ZONES FROM BACKEND ──
-    // useQuery automatically handles: loading, error, caching, retries, refetching
-    const { data: rawZones = [], isLoading, isError } = useQuery({
-        queryKey: ['zones', activeFloorId],
-        queryFn: async () => {
-            const response = await hierarchyService.getZones(activeFloorId);
-            return Array.isArray(response) ? response : (response?.results || []);
-        },
-        enabled: !!activeFloorId,
-        staleTime: 1000 * 60 * 5,
-    });
+    const orgInfo = orgs.find(o => o.id === activeOrgId) || (passedOrgName ? { name: passedOrgName } : null);
 
-    // ── MAP UI PROPS (icons/colors) onto the raw API data ──
-    const floorZones = useMemo(() => {
-        return rawZones.map(z => {
-            let Icon = Layout;
-            let bgClass = 'bg-blue-50';
-            let txtClass = 'text-blue-600';
-
-            if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
-            if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
-            if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
-
-            return {
-                ...z,
-                icon: Icon,
-                iconBgClass: bgClass,
-                iconTextClass: txtClass,
-                count: `${z.count ?? 0} Assets` // count comes pre-calculated from backend
-            };
-        });
-    }, [rawZones]);
-
+    // ── BREADCRUMBS LOGIC (Dynamic Hierarchy) ──
     const breadcrumbs = [
         { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
         { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-        { label: passedOrgName || "Organization", path: `/admin/coordinators?org_id=${passedOrgId}&org_name=${encodeURIComponent(passedOrgName || '')}` },
-        { label: passedSiteName || "Site Plan", path: `/admin/site-plan?org_id=${passedOrgId}&org_name=${encodeURIComponent(passedOrgName || '')}&coord=${encodeURIComponent(passedCoordName || '')}&coord_id=${passedCoordId}` },
-        { label: passedFloorName || "Floor Plan", path: `/admin/floor-plan?org_id=${passedOrgId}&org_name=${encodeURIComponent(passedOrgName || '')}&coord=${encodeURIComponent(passedCoordName || '')}&coord_id=${passedCoordId}&site_id=${passedSiteId}&site=${encodeURIComponent(passedSiteName || '')}` },
-        { label: "Zones", path: "#", isActive: true }
     ];
+
+    if (activeOrgId) {
+        breadcrumbs.push({ 
+            label: orgInfo?.name || "Organization", 
+            path: `/admin/coordinators?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}` 
+        });
+    }
+
+    if (activeSiteId) {
+        breadcrumbs.push({ 
+            label: passedSiteName || "Site Plan", 
+            path: `/admin/site-plan?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}&coord_id=${passedCoordId}&coord=${encodeURIComponent(passedCoordName || '')}` 
+        });
+    }
+
+    if (activeFloorId) {
+        breadcrumbs.push({ 
+            label: passedFloorName || "Floor Plan", 
+            path: `/admin/floor-plan?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}&coord_id=${passedCoordId}&coord=${encodeURIComponent(passedCoordName || '')}&site_id=${activeSiteId}&site=${encodeURIComponent(passedSiteName || '')}` 
+        });
+    }
+
+    breadcrumbs.push({ label: "Zones", path: "#", isActive: true });
+
+    // ── MAPPING ICONS TO ZONES ──
+    const processedZones = zones.map(z => {
+        let Icon = Layout;
+        let bgClass = 'bg-blue-50';
+        let txtClass = 'text-blue-600';
+
+        if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
+        if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
+        if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
+
+        return {
+            ...z,
+            icon: Icon,
+            iconBgClass: bgClass,
+            iconTextClass: txtClass,
+            count: `${z.count ?? 0} Assets`
+        };
+    });
+
+    const handleResetAll = () => {
+        resetFilters();
+        setSearchParams({});
+        fetchZones(null);
+    };
 
     return (
         <div className="flex flex-col font-sans h-full">
 
             {/* HEADER */}
             <PageHeader
-                title={activeFloorId ? `Zones` : "Zones Management"}
-                subtitle={activeFloorId ? `Operational safety zones` : "Please use the filter bar to select a specific floor"}
+                title={passedFloorName ? `Zones for ${passedFloorName}` : "All Active Zones"}
+                subtitle={activeFloorId 
+                    ? `Managing operational safety zones and risk levels for the current floor` 
+                    : "Viewing all mapped zones across the entire organization hierarchy"}
                 breadcrumbs={breadcrumbs}
                 hideAddButton={true}
+                rightContent={
+                    <div className="flex items-center gap-3">
+                        <Button 
+                            onClick={handleResetAll} 
+                            variant="outline" 
+                            size="sm" 
+                            className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all"
+                        >
+                            <FiLoader size={14} className={loading ? 'animate-spin' : ''} />
+                            <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
+                        </Button>
+                        {zones.length > 0 && (
+                            <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
+                                {zones.length} Active Zones
+                            </span>
+                        )}
+                    </div>
+                }
             />
 
             {/* MAIN BODY */}
-            <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
+            <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6 overflow-hidden">
+                
+                <div className="mb-6">
+                    <FilterBar activeLevel="zones" />
+                </div>
 
-                <FilterBar activeLevel="zones" className="mb-6">
-                    {/* View toggles pushed to the right */}
-                    <div className="flex items-center bg-base p-1 rounded-lg border border-border-main/60 shrink-0 ml-auto mr-1 sm:mr-0">
-                        <button
-                            onClick={() => setActiveView('list')}
-                            className={`flex items-center justify-center gap-2 h-[28px] px-3 sm:px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${activeView === 'list'
-                                    ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5'
-                                    : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
-                                }`}
-                            title="List View"
-                        >
-                            <List size={16} className={activeView === 'list' ? "text-title" : "text-gray"} />
-                        </button>
-                        <button
-                            onClick={() => setActiveView('drawing')}
-                            className={`flex items-center justify-center gap-2 h-[28px] px-3 sm:px-5 rounded-md text-sm font-semibold transition-all shadow-sm outline-none cursor-pointer ${activeView === 'drawing'
-                                    ? 'bg-card text-title shadow-[0_1px_3px_0_rgba(0,0,0,0.1)] border border-border-main ring-1 ring-black/5'
-                                    : 'bg-transparent text-gray hover:text-title border-transparent shadow-none'
-                                }`}
-                            title="Drawing View"
-                        >
-                            <svg className={`w-4 h-4 ${activeView === 'drawing' ? "text-title" : "text-gray"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                        </button>
-                    </div>
-                </FilterBar>
-
-                {!activeFloorId ? (
-                    <div className="text-center py-12 bg-card rounded-lg border border-border-main mt-4">
-                        <p className="text-gray font-medium tracking-wide">
-                            Please sequentially select an Organization, Coordinator, Site, and Floor to view zones.
-                        </p>
-                    </div>
-                ) : isLoading ? (
-                    <div className="text-center py-16 bg-card rounded-lg border border-border-main mt-4 animate-pulse">
-                        <div className="flex flex-col items-center gap-3">
-                            <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
-                            <p className="text-sm text-gray font-medium">Loading zones...</p>
+                <div className="flex-1 overflow-auto px-4 sm:px-0">
+                    {loading ? (
+                        <div className="w-full py-32 flex flex-col items-center justify-center text-gray/50 animate-pulse">
+                            <FiLoader className="w-10 h-10 animate-spin mb-4 text-primary/40" />
+                            <p className="text-sm font-bold uppercase tracking-widest opacity-50">Synchronizing Zones...</p>
                         </div>
-                    </div>
-                ) : isError ? (
-                    <div className="text-center py-16 bg-card rounded-lg border border-rose-200 mt-4">
-                        <div className="flex flex-col items-center gap-3">
-                            <svg className="w-10 h-10 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                            </svg>
-                            <p className="text-sm font-semibold text-rose-600">Failed to load zones</p>
-                            <p className="text-xs text-gray">Please check your connection and try again.</p>
+                    ) : hierarchyError ? (
+                        <div className="w-full py-24 flex flex-col items-center justify-center text-rose-500 bg-rose-50/50 rounded-3xl border border-rose-100">
+                            <FiAlertCircle className="w-10 h-10 mb-4" />
+                            <h4 className="text-lg font-bold">Fetch Error</h4>
+                            <p className="text-sm opacity-80">{hierarchyError}</p>
+                            <Button onClick={() => fetchZones(activeFloorId || null)} variant="outline" className="mt-6">Try Again</Button>
                         </div>
-                    </div>
-                ) : (
-                    <>
-                        {/* TABLE */}
-                        <div className={`transition-all duration-300 w-full ${activeView === 'list' ? 'block animate-in fade-in duration-500' : 'hidden'}`}>
-                            <ZonesTable data={floorZones} selectionMode={selectionMode} />
+                    ) : zones.length > 0 ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 h-full">
+                            <ZonesTable data={processedZones} selectionMode={false} />
                         </div>
-                        {activeView === 'drawing' && (
-                            <div className="w-full h-[600px] border border-border-main rounded-xl flex items-center justify-center bg-card text-gray animate-in fade-in duration-500 mt-4">
-                                <div className="flex flex-col items-center gap-3">
-                                    <svg className="w-10 h-10 text-border-main" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <span>Interactive Floor Plan acts exactly like the Drawing tab here.</span>
-                                </div>
+                    ) : (
+                        <div className="w-full py-32 flex flex-col items-center justify-center text-center bg-card/50 rounded-[var(--radius-card)] border-2 border-dashed border-border-main/50">
+                            <div className="w-20 h-20 bg-base rounded-full flex items-center justify-center mb-6 shadow-sm border border-border-main/30">
+                                <Layout className="w-8 h-8 text-primary shadow-glow" />
                             </div>
-                        )}
-                    </>
-                )}
+                            <h3 className="text-xl font-bold text-title mb-2">No Zones Found</h3>
+                            <p className="text-sm text-gray max-w-[280px] mb-8">
+                                {activeFloorId 
+                                    ? "This floor doesn't have any zones mapped yet. Please coordinate with the site manager." 
+                                    : "No zones have been registered in the system yet across the current selection."}
+                            </p>
+                            {!activeFloorId && (
+                                <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/10">
+                                    <span className="text-[10px] font-black text-primary uppercase tracking-widest">Select a floor for specific data</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </main>
         </div>
     );

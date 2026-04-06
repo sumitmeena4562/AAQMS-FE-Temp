@@ -110,6 +110,11 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
         {/* Header Section */}
         <div>
+          <div className="flex items-center justify-between mb-1">
+             <span className="text-[8px] font-black text-gray/50 uppercase tracking-[0.2em]">
+               {isSiteCard ? 'OPERATIONAL SITE' : 'REGISTERED ORG'}
+             </span>
+          </div>
           <h3 className="text-lg font-bold text-primary tracking-tight leading-none mb-2 truncate">
             {org.site_name || org.name}
           </h3>

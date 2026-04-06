@@ -68,11 +68,7 @@ export const useHierarchyStore = create((set, get) => ({
     },
 
     // --- ZONES ---
-    fetchZones: async (floorId) => {
-        if (!floorId) {
-            set({ zones: [] });
-            return;
-        }
+    fetchZones: async (floorId = null) => {
         set({ loading: true, error: null });
         try {
             const data = await hierarchyService.getZones(floorId);
