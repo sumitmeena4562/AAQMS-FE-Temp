@@ -16,7 +16,7 @@ const MediaModal = ({ isOpen, onClose, zone }) => {
     const blueprintUrl = zone?.floor_blueprint || 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=1200&auto=format&fit=crop';
     
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
             <div className="absolute inset-0 bg-title/40 backdrop-blur-md" onClick={onClose} />
             <div className="relative bg-card w-full max-w-5xl h-[85vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-border-main animate-in zoom-in-95 duration-300">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-main bg-base/50">
