@@ -38,10 +38,13 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     e.stopPropagation(); // Prevents card click
     if (isSiteCard) {
       setSite(org.id);
-      const currentOrg = location.state?.orgName || new URLSearchParams(location.search).get('org') || '';
+      const orgId = org.organisation_id || '';
+      const orgName = org.organisation_name || location.state?.orgName || new URLSearchParams(location.search).get('org_name') || '';
       const coordName = coordinatorContext?.name || new URLSearchParams(location.search).get('coord') || '';
-      navigate(`/admin/floor-plan?org_id=${org.id}&org_name=${encodeURIComponent(currentOrg)}&coord=${encodeURIComponent(coordName)}&site=${encodeURIComponent(org.name)}`, {
-        state: { site: org, orgName: currentOrg, coordinator: coordinatorContext }
+      const coordId = coordinatorContext?.id || new URLSearchParams(location.search).get('coord_id') || '';
+      
+      navigate(`/admin/floor-plan?org_id=${orgId}&org_name=${encodeURIComponent(orgName)}&coord_id=${coordId}&coord=${encodeURIComponent(coordName)}&site_id=${org.id}&site=${encodeURIComponent(org.site_name || org.name)}`, {
+        state: { site: org, orgName, coordinator: coordinatorContext }
       });
     } else {
       setOrg(org.id);

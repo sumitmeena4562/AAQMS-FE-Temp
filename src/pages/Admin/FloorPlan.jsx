@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import FloorCard from '../../components/UI/FloorCard';
+import Button from '../../components/UI/Button';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchyStore } from '../../store/useHierarchyStore';
+import { useOrgStore } from '../../store/useOrgStore';
 import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
 
 const FloorPlan = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
-  const { floors, fetchFloors, loading, error: hierarchyError } = useHierarchyStore();
-  const searchParams = new URLSearchParams(location.search);
+  const [searchParams, setSearchParams] = useSearchParams();
   
   const passedOrgId = searchParams.get('org_id');
   const passedOrgName = searchParams.get('org_name');
@@ -21,31 +21,61 @@ const FloorPlan = () => {
   const passedSiteId = searchParams.get('site_id');
   const passedSiteName = searchParams.get('site');
 
+  const { resetFilters } = useFilterStore();
+  const { orgs } = useOrgStore();
+
+  const handleResetAll = () => {
+      setSearchParams({});
+      resetFilters();
+  };
+
+  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
+  const { floors, fetchFloors, loading, error: hierarchyError } = useHierarchyStore();
+
   useEffect(() => {
-    // 1. Sync global filters
-    if (passedOrgId) setOrg(passedOrgId);
-    if (passedCoordId) setCoord(passedCoordId);
-    if (passedSiteId) setSite(passedSiteId);
+    // 1. Sync global filters ONLY if passed through URL and store is empty
+    if (passedOrgId && !selectedOrg) setOrg(passedOrgId);
+    if (passedCoordId && !selectedCoord) setCoord(passedCoordId);
+    if (passedSiteId && !selectedSite) setSite(passedSiteId);
     
     // 2. Fetch floors for the site
-    if (passedSiteId || selectedSite) {
-        fetchFloors(passedSiteId || selectedSite);
+    const activeSiteId = (passedSiteId === 'undefined' || !passedSiteId) ? selectedSite : passedSiteId;
+    if (activeSiteId) {
+        fetchFloors(activeSiteId);
     }
-  }, [passedOrgId, passedCoordId, passedSiteId, selectedSite]);
+  }, [passedOrgId, passedCoordId, passedSiteId, selectedSite, setOrg, setCoord, setSite, fetchFloors]);
+
+  const activeSiteId = selectedSite || passedSiteId;
+  const activeOrgId = selectedOrg || passedOrgId;
+  const activeCoordId = selectedCoord || passedCoordId;
+
+  const orgInfo = orgs.find(o => o.id === activeOrgId) || (passedOrgName ? { name: passedOrgName } : null);
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
-    { label: passedOrgName || "Organization", path: `/admin/coordinators?org_id=${passedOrgId}&org_name=${encodeURIComponent(passedOrgName || '')}` },
-    { label: passedSiteName || "Site Plan", path: `/admin/site-plan?org_id=${passedOrgId}&org_name=${encodeURIComponent(passedOrgName || '')}&coord=${encodeURIComponent(passedCoordName || '')}&coord_id=${passedCoordId}` },
-    { label: "Floor Plan", path: "#", isActive: true }
   ];
+
+  if (activeOrgId) {
+    breadcrumbs.push({ 
+        label: orgInfo?.name || "Organization", 
+        path: `/admin/coordinators?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}` 
+    });
+  }
+
+  if (passedSiteId || selectedSite) {
+    breadcrumbs.push({ 
+        label: passedSiteName || "Site Plan", 
+        path: `/admin/site-plan?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}&coord_id=${passedCoordId}&coord=${encodeURIComponent(passedCoordName || '')}` 
+    });
+  }
+
+  breadcrumbs.push({ label: "Floor Plan", path: "#", isActive: true });
 
   const floorList = floors;
   const isLoading = loading;
   const siteInfo = { name: passedSiteName || "Site" };
-  const orgInfo = { name: passedOrgName || "Organization" };
-  const coordInfo = { name: passedCoordName || "Coordinator" };
+  const coordInfo = activeCoordId ? { name: passedCoordName || "Coordinator" } : null;
 
   const activePlansCount = floorList.length;
 
@@ -64,16 +94,22 @@ const FloorPlan = () => {
       
       {/* HEADER */}
       <PageHeader 
-        title="Floor Plan Selection"
-        subtitle={selectedSite ? `Showing ${activePlansCount} active floor levels for the current site selection` : "Please choose a site from the filter bar to view available floor plans"}
+        title={passedSiteName ? `Floors for ${passedSiteName}` : "Section Floor Plans"}
+        subtitle={activeSiteId ? `Showing ${activePlansCount} active floor levels for the current selection` : "Select a site to explore its architectural hierarchy and inventory"}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
-          selectedSite ? (
-            <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
-                {floorList.length} Total Levels
-            </span>
-          ) : null
+          <div className="flex items-center gap-3">
+             <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
+                  <FiLoader size={14} className={loading ? 'animate-spin' : ''} />
+                  <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
+              </Button>
+              {activeSiteId > 0 && (
+                 <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
+                    {floorList.length} Total Levels
+                </span>
+              )}
+          </div>
         }
       />
 
@@ -93,6 +129,20 @@ const FloorPlan = () => {
                <FiAlertCircle className="w-8 h-8 mb-3" />
                <p className="text-sm font-medium">{hierarchyError}</p>
             </div>
+          ) : !activeSiteId ? (
+            <div className="w-full py-32 flex flex-col items-center justify-center text-center bg-card/50 rounded-[var(--radius-card)] border-2 border-dashed border-border-main/50 animate-in fade-in zoom-in duration-500">
+               <div className="w-20 h-20 bg-base rounded-full flex items-center justify-center mb-6 shadow-sm border border-border-main/30">
+                  <FiBriefcase className="w-8 h-8 text-primary shadow-glow" />
+               </div>
+               <h3 className="text-xl font-bold text-title mb-2">No Site Selected</h3>
+               <p className="text-sm text-gray max-w-[280px] mb-8">
+                 Please use the filter bar above to select a specific site and view its architectural floor plans.
+               </p>
+               <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/10">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">Waiting for selection</span>
+               </div>
+            </div>
           ) : floorList.length > 0 ? (
             floorList.map((floor, index) => (
               <FloorCard 
@@ -103,9 +153,10 @@ const FloorPlan = () => {
               />
             ))
           ) : (
-            <div className="w-full py-20 flex flex-col items-center justify-center text-gray/40 border-2 border-dashed border-border-main/50 rounded-3xl">
-               <p className="text-sm font-medium">No floor plans found for the selected site.</p>
-               <p className="text-[10px] uppercase tracking-widest mt-2">Check the filters or upload a new plan</p>
+            <div className="w-full py-24 flex flex-col items-center justify-center text-gray/40 bg-base/20 rounded-[var(--radius-card)] border border-border-main/40 mt-4">
+               <FiAlertCircle className="w-10 h-10 mb-4 opacity-20" />
+               <p className="text-sm font-bold text-title">No Floor Plans Found</p>
+               <p className="text-[10px] uppercase tracking-widest mt-1">This site doesn't have any registered floor levels yet</p>
             </div>
           )}
         </div>
