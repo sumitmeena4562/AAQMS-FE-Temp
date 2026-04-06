@@ -26,9 +26,12 @@ const SitePlan = () => {
     if (passedCoordId) setCoord(passedCoordId);
     
     // 2. Fetch sites specifically for this context
+    const cleanOrg = (passedOrgId === 'undefined' || !passedOrgId) ? selectedOrg : passedOrgId;
+    const cleanCoord = (passedCoordId === 'undefined' || !passedCoordId) ? selectedCoord : passedCoordId;
+
     fetchSites({ 
-        organisation: passedOrgId || selectedOrg, 
-        coord_id: passedCoordId || selectedCoord 
+        organisation: cleanOrg || '', 
+        coord_id: cleanCoord || '' 
     });
   }, [passedOrgId, passedCoordId, selectedOrg, selectedCoord, setOrg, setCoord, fetchSites]);
 

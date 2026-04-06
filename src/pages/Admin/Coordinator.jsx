@@ -130,7 +130,9 @@ const Coordinator = () => {
 
     const navigate = useNavigate();
     const handleViewSites = (user) => {
-        navigate(`/admin/site-plan?org_id=${user.organisation_id}&org_name=${encodeURIComponent(user.org_name || '')}&coord_id=${user.id}&coord=${encodeURIComponent(user.name)}`);
+        const orgId = user.organisation_id || '';
+        const orgName = user.org_name || '';
+        navigate(`/admin/site-plan?org_id=${orgId}&org_name=${encodeURIComponent(orgName)}&coord_id=${user.id}&coord=${encodeURIComponent(user.name)}`);
     };
 
     const columns = useMemo(() => [
@@ -196,7 +198,9 @@ const Coordinator = () => {
                     <button 
                         onClick={(e) => { 
                             e.stopPropagation(); 
-                            navigate(`/admin/site-plan?org_id=${row.organisation_id}&org_name=${encodeURIComponent(row.org_name || '')}&coord_id=${row.id}&coord=${encodeURIComponent(row.name)}`); 
+                            const orgId = row.organisation_id || '';
+                            const orgName = row.org_name || '';
+                            navigate(`/admin/site-plan?org_id=${orgId}&org_name=${encodeURIComponent(orgName)}&coord_id=${row.id}&coord=${encodeURIComponent(row.name)}`); 
                         }} 
                         className="w-8 h-8 flex items-center justify-center text-primary border border-primary/20 hover:bg-primary hover:text-white rounded-xl transition-all shadow-sm bg-primary/5"
                         title="View Managed Sites"
