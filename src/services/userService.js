@@ -107,7 +107,7 @@ export const userService = {
 
     getCoordinatorStats: async (orgId = null) => {
         try {
-            const response = await api.get('users/coordinators/stats/', {
+            const response = await api.get('users/coordinator/stats/', {
                 params: orgId ? { organisation_id: orgId } : {}
             });
             return response.data;
@@ -172,18 +172,5 @@ export const userService = {
         }
     },
 
-    /**
-     * FETCH COORDINATOR STATS
-     */
-    getCoordinatorStats: async (orgId = null) => {
-        try {
-            const response = await api.get('users/coordinators/stats/', {
-                params: orgId ? { organisation_id: orgId } : {}
-            });
-            return response.data;
-        } catch (error) {
-            console.error("Failed to load coordinator stats:", error);
-            return { total: 0, active: 0, inactive: 0 };
-        }
-    }
+
 };

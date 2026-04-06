@@ -24,8 +24,8 @@ const AdminRoutes = () => {
 
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="organizations" element={<Organizations />} />
-                <Route path="coordinators" element={<AssignedCoordinators />} />
-                {/* <Route path="coordinators" element={<Coordinator />} /> */}
+                <Route path="coordinators" element={<Coordinator />} />
+                {/* <Route path="coordinators" element={<AssignedCoordinators />} /> */}
                 <Route path="site-plan" element={<SitePlan />} />
                 <Route path="floor-plan" element={<FloorPlan />} />
                 <Route path="zones" element={<Zones />} />
