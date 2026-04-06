@@ -96,13 +96,10 @@ const Organizations = () => {
 
     const industryOptions = useMemo(() => {
         const uniqueIndustries = [...new Set(orgs.map(o => o.industry).filter(Boolean))];
-        return [
-            { value: 'all', label: 'All Industries' },
-            ...uniqueIndustries.map(i => ({
-                value: i,
-                label: i.charAt(0).toUpperCase() + i.slice(1)
-            }))
-        ];
+        return uniqueIndustries.map(i => ({
+            value: i,
+            label: i.charAt(0).toUpperCase() + i.slice(1)
+        }));
     }, [orgs]);
 
     const activeFiltersCount = useMemo(() => {

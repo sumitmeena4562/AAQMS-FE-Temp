@@ -456,7 +456,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 label="Organization / Company"
                                                                 {...register('organisation_id')}
                                                                 error={errors.organisation_id?.message}
-                                                                options={(availableOrgs || []).map(o => ({ value: o.id, label: o.name || 'Unnamed' }))}
+                                                                options={(availableOrgs || []).map(o => ({ value: o.id, label: o.organisation_name || o.name || 'Unnamed' }))}
                                                                 loading={isLoadingOrgs}
                                                                 required={['coordinator', 'field_officer'].includes(currentRole)}
                                                                 onChange={(e) => {
@@ -466,23 +466,22 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 }}
                                                             />
 
-                                                            {(currentRole === 'coordinator' || currentRole === 'field_officer') && (
+                                                            {currentRole === 'field_officer' && (
                                                                 <>
                                                                     <SelectField
-                                                                        label={currentRole === 'coordinator' ? "Work Region / Area" : "Operational Zone"}
-                                                                        placeholder={currentRole === 'coordinator' ? "Select region..." : "Select zone..."}
-                                                                        {...register(currentRole === 'coordinator' ? 'region' : 'zone')}
-                                                                        error={errors[currentRole === 'coordinator' ? 'region' : 'zone']?.message}
+                                                                        label="Operational Zone"
+                                                                        placeholder="Select zone..."
+                                                                        {...register('zone')}
+                                                                        error={errors.zone?.message}
                                                                         options={(assignmentData || []).map(item => ({ 
                                                                             value: item?.id, 
-                                                                            label: currentRole === 'coordinator' ? item?.site_name : item?.zone_name 
+                                                                            label: item?.zone_name 
                                                                         })).filter(opt => opt.value)}
                                                                         disabled={!watch('organisation_id')}
                                                                         loading={isLoadingSites}
                                                                     />
 
-                                                                    {currentRole === 'field_officer' && (
-                                                                        <SelectField
+                                                                    <SelectField
                                                                             label="Reporting Coordinator"
                                                                             placeholder="Select supervisor..."
                                                                             {...register('coordinator_id')}
@@ -495,7 +494,6 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                             loading={isLoadingCoordinators}
                                                                             required
                                                                         />
-                                                                    )}
                                                                 </>
                                                             )}
                                                         </div>
