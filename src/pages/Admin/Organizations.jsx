@@ -77,8 +77,10 @@ const Organizations = () => {
                 ...org,
                 stats: {
                     ...org.stats, // Preservation of backend stats (sites, floors, zones)
-                    coordinators: orgCoordinators.length,
-                    coordinatorNames: orgCoordinators.map(c => c.name)
+                    coordinators: orgCoordinators.length || org.stats?.coordinators || 0,
+                    coordinatorNames: orgCoordinators.length > 0 
+                        ? orgCoordinators.map(c => c.name) 
+                        : (org.stats?.coordinatorNames || [])
                 }
             };
         });
@@ -206,13 +208,8 @@ const Organizations = () => {
             width: '15%',
             className: 'hidden sm:table-cell',
             render: (status, org) => {
-                const orgCoordinators = users.filter(u =>
-                    (u.organization || "").trim().toLowerCase() === (org.name || "").trim().toLowerCase() &&
-                    (u.role || "").toLowerCase() === 'coordinator'
-                );
-
                 let computedStatus = org.isBlocked ? 'INACTIVE' : (status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE');
-                if (orgCoordinators.length === 0) {
+                if ((org.stats?.coordinators || 0) === 0) {
                     computedStatus = 'PENDING';
                 }
                 if (org.isBlocked) {

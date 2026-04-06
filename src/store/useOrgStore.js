@@ -37,7 +37,13 @@ const mapOrgToFrontend = (data) => {
     state: data.state || '',
     country: data.country || '',
     otherInfo: data.description || data.otherInfo || '',
-    imagery: imagery.profile ? imagery : { ...imagery, profile: data.image || '' }
+    imagery: imagery.profile ? imagery : { ...imagery, profile: data.image || '' },
+    stats: {
+      sites: data.sites_count || 0,
+      floors: data.floors_count || 0,
+      coordinators: data.coordinators_count || 0,
+      coordinatorNames: data.coordinator_names || []
+    }
   };
 };
 /**
