@@ -149,7 +149,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
   // eslint-disable-next-line react-hooks/incompatible-library
   const imageryValues = watch('imagery');
   const nameValue = watch('name');
-  const extraImages = imageryValues?.extra || [];
+  const extraImages = watch('imagery.extra') || [];
 
   const handleImage = (view, url, file) => {
     if (isViewOnly) return;
@@ -477,7 +477,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                             </h3>
                             <button
                               type="button"
-                              onClick={() => setValue('imagery.extra', [...extraImages, ''])}
+                              onClick={() => setValue('imagery.extra', [...extraImages, ''], { shouldDirty: true, shouldValidate: true })}
                               className="text-[10px] bg-primary/5 hover:bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full font-bold uppercase transition-all"
                             >
                               + Add View

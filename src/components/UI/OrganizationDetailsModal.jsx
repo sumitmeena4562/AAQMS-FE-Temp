@@ -83,8 +83,10 @@ const OrganizationDetailsModal = ({ isOpen, org, onClose, onEdit }) => {
                                         <h2 className="text-2xl font-black text-title leading-tight tracking-tight mb-1">{org.name}</h2>
                                         <div className="flex items-center gap-3">
                                             <Badge variant="soft" className="!text-[9px] !px-2.5 !py-0.5 text-primary bg-primary/5">{org.industry}</Badge>
-                                            <span className="w-1 h-1 rounded-full bg-gray/30" />
-                                            <span className="text-[10px] font-black text-gray uppercase tracking-widest opacity-70">ID: {org.id?.toString().substring(0, 8)}</span>
+                                            <span className="w-1 h-1 rounded-full bg-title/40" />
+                                            <span className="text-[10px] font-black text-title uppercase tracking-widest bg-card px-2 py-0.5 rounded-md border border-border-main shadow-sm flex items-center justify-center">
+                                                ID: {org.id?.toString().substring(0, 8)}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
