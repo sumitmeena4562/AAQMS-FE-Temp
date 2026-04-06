@@ -118,7 +118,7 @@ const FloorPlan = () => {
         <FilterBar activeLevel="floors" />
 
         {/* CARDS LIST/GRID SECTION */}
-        <div className="flex flex-wrap gap-6 px-4 sm:px-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-5 gap-6 gap-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 sm:px-0">
           {isLoading ? (
             <div className="w-full py-20 flex flex-col items-center justify-center text-gray/50">
                <FiLoader className="w-8 h-8 animate-spin mb-3" />
