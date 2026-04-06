@@ -166,7 +166,9 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               {isSiteCard ? 'ZONES' : 'SITES'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
-              {isSiteCard ? siteComputedZones : totalComputedSites}
+              {isSiteCard ? siteComputedZones : (
+                org.plannedSites > 0 ? `${totalComputedSites}/${org.plannedSites}` : totalComputedSites
+              )}
             </p>
           </div>
           <div className="flex flex-col">

@@ -27,8 +27,9 @@ const orgSchema = z.object({
   name: z.string().trim().min(3, "Name of Organization must be at least 3 characters").max(255, "Name too long"),
   industry: z.string().min(1, "Industry Type is required"),
   occupancyType: z.string().min(1, "Occupancy Type is required"),
-  classification: z.string().min(1, "Classification of Occupancy is required"),
-  contactPerson: z.string().trim().min(2, "Contact Person Name is required"),
+  classification: z.string().min(1, 'Classification is required'),
+  plannedSites: z.number().min(0, 'Must be 0 or more').default(0),
+  contactPerson: z.string().min(1, 'Contact person is required'),
   contactEmail: z.string().trim().min(1, "Contact Email is required").email("Invalid email format"),
   contactPhone: z.string().trim().regex(/^\d{10}$/, "Must be exactly 10 digits"),
   address: z.string().trim().min(5, "Address must be at least 5 characters"),
@@ -49,7 +50,7 @@ const orgSchema = z.object({
 const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEdit, isViewOnly = false, isSubmitting = false }) => {
   const [step, setStep] = React.useState(1);
   const [imageFiles, setImageFiles] = React.useState({});
-  const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, reset, trigger } = useForm({
+  const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, reset, trigger, getValues } = useForm({
     resolver: zodResolver(orgSchema),
     mode: "all",
     defaultValues: {
@@ -57,6 +58,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
       industry: 'Manufacturing & Heavy Industry',
       occupancyType: 'Industrial Factory',
       classification: 'Group H - High Hazard',
+      plannedSites: 0,
       contactPerson: '',
       contactEmail: '',
       contactPhone: '',
@@ -101,6 +103,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
       industry: data.industry_type || 'Manufacturing & Heavy Industry',
       occupancyType: data.occupancy_type || 'Industrial Factory',
       classification: data.classification || 'Group H - High Hazard',
+      plannedSites: data.plannedSites || 0,
       contactPerson: data.contact_person_name || '',
       contactEmail: data.contact_email || '',
       contactPhone: data.contact_phone || '',
@@ -126,6 +129,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
         industry: 'Manufacturing & Heavy Industry',
         occupancyType: 'Industrial Factory',
         classification: 'Group H - High Hazard',
+        plannedSites: 0,
         contactPerson: '',
         contactEmail: '',
         contactPhone: '',
@@ -200,7 +204,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
 
   const nextStep = async () => {
     let fieldsToValidate = [];
-    if (step === 1) fieldsToValidate = ['name', 'industry', 'occupancyType', 'classification'];
+    if (step === 1) fieldsToValidate = ['name', 'industry', 'occupancyType', 'classification', 'plannedSites'];
     if (step === 2) fieldsToValidate = ['contactPerson', 'contactEmail', 'contactPhone', 'address', 'city', 'state', 'country'];
     
     const result = await trigger(fieldsToValidate);
@@ -346,6 +350,16 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                             disabled={isViewOnly}
                           />
                         </Motion.div>
+                        <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                          <InputField
+                            label="Total Sites"
+                            type="number"
+                            placeholder="e.g., 5"
+                            {...register('plannedSites', { valueAsNumber: true })}
+                            error={errors.plannedSites?.message}
+                            disabled={isViewOnly}
+                          />
+                        </Motion.div>
                       </div>
 
                       <Motion.div 
@@ -477,10 +491,13 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                             </h3>
                             <button
                               type="button"
-                              onClick={() => setValue('imagery.extra', [...extraImages, ''])}
-                              className="text-[10px] bg-primary/5 hover:bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full font-bold uppercase transition-all"
+                              className="flex items-center gap-2 px-4 py-2 bg-primary/5 hover:bg-primary/10 text-primary border border-primary/20 rounded-xl transition-all duration-300 font-bold text-[11px] uppercase tracking-wider group"
+                              onClick={() => {
+                                const currentExtra = getValues('imagery.extra') || [];
+                                setValue('imagery.extra', [...currentExtra, '']);
+                              }}
                             >
-                              + Add View
+                              <Plus size={14} /> Add View
                             </button>
                           </div>
                           
