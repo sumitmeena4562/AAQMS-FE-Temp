@@ -41,6 +41,19 @@ api.interceptors.request.use(
             }
         }
         
+        // ── PARAMETER SANITIZATION ──
+        // Remove 'undefined', 'null' or literal "undefined" strings from query params
+        if (config.params) {
+            const cleanParams = { ...config.params };
+            Object.keys(cleanParams).forEach(key => {
+                const val = cleanParams[key];
+                if (val === undefined || val === null || val === 'undefined' || val === 'null' || val === '') {
+                    delete cleanParams[key];
+                }
+            });
+            config.params = cleanParams;
+        }
+
         return config;
     },
     (error) => Promise.reject(error)

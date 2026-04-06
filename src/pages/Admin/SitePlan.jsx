@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
+import Button from '../../components/UI/Button';
 import OrganizationCard from '../../components/UI/OrganizationCard';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
@@ -14,16 +15,23 @@ const SitePlan = () => {
   const { sites, fetchSites, loading } = useHierarchyStore();
   const { orgs } = useOrgStore();
   
-  const searchParams = new URLSearchParams(location.search);
+  const [searchParams, setSearchParams] = useSearchParams();
   const passedOrgId = searchParams.get('org_id');
   const passedOrgNameFromUrl = searchParams.get('org_name');
   const passedCoordId = searchParams.get('coord_id');
   const passedCoordNameFromUrl = searchParams.get('coord');
 
+  const { resetFilters } = useFilterStore();
+
+  const handleResetAll = () => {
+      setSearchParams({});
+      resetFilters();
+  };
+
   useEffect(() => {
-    // 1. Sync global filters if passed through URL
-    if (passedOrgId) setOrg(passedOrgId);
-    if (passedCoordId) setCoord(passedCoordId);
+    // 1. Sync global filters ONLY if passed through URL and store is empty
+    if (passedOrgId && !selectedOrg) setOrg(passedOrgId);
+    if (passedCoordId && !selectedCoord) setCoord(passedCoordId);
     
     // 2. Fetch sites specifically for this context
     const cleanOrg = (passedOrgId === 'undefined' || !passedOrgId) ? selectedOrg : passedOrgId;
@@ -79,11 +87,17 @@ const SitePlan = () => {
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
-          totalPlans > 0 ? (
-            <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
-                {totalPlans} Total Projects
-            </span>
-          ) : null
+          <div className="flex items-center gap-3">
+             <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
+                  <FiLoader size={14} className={loading ? 'animate-spin' : ''} />
+                  <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
+              </Button>
+              {totalPlans > 0 && (
+                <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
+                    {totalPlans} Total Projects
+                </span>
+              )}
+          </div>
         }
       />
 

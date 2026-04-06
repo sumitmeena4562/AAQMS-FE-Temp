@@ -7,6 +7,7 @@ import { useHierarchyStore } from '../../store/useHierarchyStore';
 import { useOrgStore } from '../../store/useOrgStore';
 import useUserStore from '../../store/userStore';
 import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const FilterBar = ({ 
     activeLevel, // 'coordinators', 'sites', 'floors', 'zones'
@@ -25,6 +26,13 @@ const FilterBar = ({
         searchTerm, setSearch,
         resetFilters
     } = useFilterStore();
+
+    const [_, setSearchParams] = useSearchParams();
+
+    const handleResetAll = () => {
+        resetFilters();
+        setSearchParams({});
+    };
 
     const { orgs, fetchOrgs } = useOrgStore();
     const { allCoordinators, fetchLookupCoordinators } = useUserStore();
@@ -147,7 +155,7 @@ const FilterBar = ({
                 <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
                     {isFilterActive && (
                         <button 
-                            onClick={resetFilters}
+                            onClick={handleResetAll}
                             className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 shadow-sm border border-transparent hover:border-rose-100 group animate-in zoom-in duration-300"
                         >
                             <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
