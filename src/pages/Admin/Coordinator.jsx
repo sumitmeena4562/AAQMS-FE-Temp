@@ -156,7 +156,7 @@ const Coordinator = () => {
         },
         {
             header: 'ORGANIZATION',
-            accessor: 'organization',
+            accessor: 'org_name',
             width: '20%',
             render: (value, row) => (
                 <div className="flex flex-col">
@@ -229,7 +229,7 @@ const Coordinator = () => {
                 addButtonText="Add Coordinator"
                 breadcrumbs={[
                     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-                    { label: "Organizations", path: "/admin/organisations" },
+                    { label: "Organizations", path: "/admin/organizations" },
                     { label: orgNameFromUrl ? `Personnel Records` : "Coordinators", path: "/admin/coordinators", isActive: true }
                 ]}
                 rightContent={
@@ -249,7 +249,7 @@ const Coordinator = () => {
                 }
             />
 
-            <StatsRow items={statsData} />
+
 
             <FilterBar className="!p-2.5">
                 <div className="flex items-center gap-2 pr-3 border-r border-border-main/40">
@@ -271,10 +271,6 @@ const Coordinator = () => {
                     <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All Organizations" />
                     <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" />
                 </div>
-
-                <div className="ml-auto">
-                    <FilterBar.ViewToggle mode={viewMode} onChange={setViewMode} />
-                </div>
             </FilterBar>
 
             {selectionMode && selectedIds.length > 0 && (
@@ -291,18 +287,7 @@ const Coordinator = () => {
             )}
 
             {sortedUsers.length > 0 ? (
-                viewMode === 'grid' ? (
-                    <div className="flex flex-col gap-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-                            {sortedUsers.map(user => (
-                                <UserCard key={user.id} user={user} selectable={selectionMode} isSelected={selectedIds.includes(user.id)} onSelect={(id) => store.toggleSelectRow(id)} onEdit={handleEditUser} onView={(u) => { setPeekUser(u); setIsPeekOpen(true); }} />
-                            ))}
-                        </div>
-                        {paginationFooter}
-                    </div>
-                ) : (
-                    <DataTable columns={columns} data={sortedUsers} loading={loading} selectable={selectionMode} selectedIds={selectedIds} onSelectionChange={(ids) => setSelectedIds(ids)} footer={paginationFooter} />
-                )
+                <DataTable columns={columns} data={sortedUsers} loading={loading} selectable={selectionMode} selectedIds={selectedIds} onSelectionChange={(ids) => setSelectedIds(ids)} footer={paginationFooter} />
             ) : (
                 <div className="flex flex-col items-center justify-center py-20 px-6 bg-card/30 border-2 border-dashed border-border-main rounded-[24px]">
                     <div className="w-20 h-20 rounded-full bg-base border border-border-main/50 flex items-center justify-center mb-6 shadow-sm">
