@@ -135,7 +135,7 @@ export const userService = {
             ];
 
             return {
-                organizations: orgs.map(o => ({ value: o.id, label: o.name })),
+                organizations: orgs.map(o => ({ value: o.id, label: o.organisation_name || o.name || 'Unnamed Org' })),
                 roles: roles,
                 regions: sites.map(s => ({ value: s.id, label: s.site_name })),
             };
