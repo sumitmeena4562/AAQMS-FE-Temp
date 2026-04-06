@@ -73,7 +73,7 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur, disabled }) =>
               ? 'border-red-500 bg-red-50/10' 
               : isDragging 
                 ? 'border-primary bg-primary/10 ring-4 ring-primary/10' 
-                : 'border-border-main bg-base/30 hover:bg-white hover:border-primary/40'
+                : 'border-gray/40 bg-slate-50/50 hover:bg-white hover:border-primary/40'
           }`}
         >
           <AnimatePresence mode="wait">
