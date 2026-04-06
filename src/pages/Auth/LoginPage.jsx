@@ -33,7 +33,15 @@ function LoginPage() {
         const result = await login(data);
         
         if (result.success) {
+            // 🔹 Handle Remember Me
+            if (data.rememberMe) {
+                localStorage.setItem("rememberedEmail", data.email);
+            } else {
+                localStorage.removeItem("rememberedEmail");
+            }
+
             setFailedAttempts(0);
+
             toast.success(`Hi ${result.user.name || 'User'}, welcome back!`);
             
             const role = (result.user.role || '').toLowerCase();
