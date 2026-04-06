@@ -1,6 +1,6 @@
 import React from 'react';
 import { AnimatePresence, motion as Motion } from 'framer-motion';
-import { FiX, FiShield, FiBriefcase, FiClock, FiCalendar, FiEdit2, FiTrash2, FiMapPin, FiUser, FiPhone } from 'react-icons/fi';
+import { FiX, FiShield, FiBriefcase, FiClock, FiCalendar, FiEdit2, FiTrash2, FiMapPin, FiUser, FiPhone, FiLayers } from 'react-icons/fi';
 import { t } from '../../theme/theme';
 
 const AVATAR_COLORS = t.color.avatarGradients;
@@ -13,7 +13,7 @@ function getAvatar(name) {
 
 import Button from '../UI/Button';
 
-const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate }) => {
+const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate, onViewSites }) => {
     if (!user) return null;
     const { initials, colors } = getAvatar(user.name);
 
@@ -148,7 +148,17 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate }) => {
                         </div>
 
                         {/* Modal Footer */}
-                        <div className="relative z-10 p-5 bg-base border-t border-border-main flex items-center justify-end gap-2">
+                        <div className="relative z-10 p-5 bg-base border-t border-border-main flex items-center justify-end gap-2 text-right">
+                            {user.role === 'coordinator' && (
+                                <Button
+                                    variant="outline"
+                                    onClick={() => { onClose(); onViewSites?.(user); }}
+                                    className="!h-10 !px-5 !text-[11px] !font-bold !uppercase !tracking-wider border-primary/30 text-primary hover:bg-primary/5 mr-auto"
+                                >
+                                    <FiLayers size={14} className="mr-2 inline" />
+                                    View Managed Sites
+                                </Button>
+                            )}
                             {user.status === 'active' && (
                                 <Button
                                     variant="danger"

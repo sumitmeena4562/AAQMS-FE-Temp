@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
@@ -128,6 +128,11 @@ const Coordinator = () => {
         resetFilters();
     };
 
+    const navigate = useNavigate();
+    const handleViewSites = (user) => {
+        navigate(`/admin/site-plan?org_id=${user.organisation_id}&org_name=${encodeURIComponent(user.org_name || '')}&coord_id=${user.id}&coord=${encodeURIComponent(user.name)}`);
+    };
+
     const columns = useMemo(() => [
         {
             header: 'COORDINATOR',
@@ -188,12 +193,22 @@ const Coordinator = () => {
             align: 'right',
             render: (_, row) => (
                 <div className="flex items-center justify-end gap-1.5 pr-2">
+                    <button 
+                        onClick={(e) => { 
+                            e.stopPropagation(); 
+                            navigate(`/admin/site-plan?org_id=${row.organisation_id}&org_name=${encodeURIComponent(row.org_name || '')}&coord_id=${row.id}&coord=${encodeURIComponent(row.name)}`); 
+                        }} 
+                        className="w-8 h-8 flex items-center justify-center text-primary border border-primary/20 hover:bg-primary hover:text-white rounded-xl transition-all shadow-sm bg-primary/5"
+                        title="View Managed Sites"
+                    >
+                        <FiLayers size={12} />
+                    </button>
                     <button onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }} className="w-8 h-8 flex items-center justify-center text-gray border border-border-main hover:bg-title hover:text-white rounded-xl transition-all shadow-sm"><FiExternalLink size={12} /></button>
                     <button onClick={(e) => { e.stopPropagation(); handleEditUser(row); }} className="px-3 h-8 flex items-center justify-center text-gray border border-border-main hover:bg-primary hover:text-white rounded-xl transition-all text-[9px] font-black uppercase">Edit</button>
                 </div>
             )
         }
-    ], [handleEditUser]);
+    ], [handleEditUser, navigate]);
 
     const statsData = [
         { title: 'Total Coordinators', value: stats.total || 0, icon: FiUsers, iconColorClass: 'text-primary', iconBgClass: 'bg-primary/10', description: 'Assigned personnel' },
@@ -306,7 +321,7 @@ const Coordinator = () => {
                 </div>
             )}
 
-            <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={peekUser} onEdit={handleEditUser} />
+            <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={peekUser} onEdit={handleEditUser} onViewSites={handleViewSites} />
             <UserFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} user={editingUser} loading={loading} />
             <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Status Lock" message={`Are you sure you want to change status?`} confirmText="Confirm" danger={true} />
             <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Change" message={`Update ${selectedIds.length} profiles?`} confirmText="Confirm All" danger={true} />
