@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QrCode } from 'lucide-react';
 
-const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false }) => {
+const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false, onViewMedia }) => {
     const navigate = useNavigate();
     return (
         <div className="bg-card border border-border-main rounded-xl shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] flex flex-col w-full overflow-hidden">
@@ -54,7 +54,7 @@ const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false }) =>
                                     )}
                                     <td className="py-4 pr-6 pl-6 align-middle">
                                         <span className="text-xs font-semibold px-2.5 py-1 bg-base text-gray rounded-[4px] whitespace-nowrap">
-                                            {zone.id}
+                                            {zone.id.substring(0, 8)}...
                                         </span>
                                     </td>
                                     <td className="py-4 px-6 align-middle">
@@ -69,15 +69,18 @@ const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false }) =>
                                     </td>
                                     <td className="py-4 px-6 align-middle">
                                         <div className="relative inline-block w-[140px]">
-                                            {zone.type}
+                                            <span className="text-[11px] font-bold text-gray/80 px-2.5 py-1 bg-base border border-border-main/50 rounded-lg uppercase tracking-tight">
+                                                {zone.type}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="py-4 px-6 align-middle">
                                         <button
-                                            onClick={() => navigate(`/admin/inventory?zone=${zone.id}`)}
-                                            className="text-sm text-blue-600 font-bold hover:underline cursor-pointer bg-transparent border-none p-0"
+                                            onClick={() => navigate(`/admin/inventory?zone_id=${zone.id}`)}
+                                            className="text-sm text-blue-600 font-bold hover:underline cursor-pointer bg-transparent border-none p-0 flex items-center gap-1.5"
                                         >
-                                            {zone.count}
+                                            <span className="px-2 py-0.5 bg-blue-50 border border-blue-100 rounded text-[11px]">{zone.count}</span>
+                                            Assets
                                         </button>
                                     </td>
                                     {showQRCode && (
@@ -89,16 +92,19 @@ const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false }) =>
                                     )}
                                     <td className="py-4 pl-6 align-middle">
                                         <div className="flex items-center gap-2">
-                                            <button className="flex items-center justify-center h-[32px] px-3 bg-card border border-border-main rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-base transition-colors cursor-pointer outline-none">
-                                                <span className="text-[11px] font-semibold text-body whitespace-nowrap">
+                                            <button 
+                                                onClick={() => onViewMedia?.(zone)}
+                                                className="flex items-center justify-center h-[32px] px-3 bg-card border border-border-main rounded-md shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] hover:bg-base transition-colors cursor-pointer outline-none group/media"
+                                            >
+                                                <span className="text-[11px] font-black text-primary/70 group-hover/media:text-primary uppercase tracking-widest whitespace-nowrap">
                                                     View media
                                                 </span>
                                             </button>
                                             <button
-                                                onClick={() => navigate(`/admin/inventory?zone=${zone.id}`)}
-                                                className="flex items-center justify-center h-[32px] px-3 bg-primary text-white border-none rounded-md shadow-sm hover:bg-primary/90 transition-all cursor-pointer outline-none"
+                                                onClick={() => navigate(`/admin/inventory?zone_id=${zone.id}`)}
+                                                className="flex items-center justify-center h-[32px] px-3 bg-primary text-white border-none rounded-md shadow-sm hover:translate-y-[-1px] active:translate-y-[0px] transition-all cursor-pointer outline-none"
                                             >
-                                                <span className="text-[11px] font-bold whitespace-nowrap">
+                                                <span className="text-[11px] font-bold whitespace-nowrap uppercase tracking-widest">
                                                     Manage
                                                 </span>
                                             </button>

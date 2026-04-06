@@ -40,12 +40,12 @@ export const hierarchyService = {
     },
 
     // --- ZONES ---
-    getZones: async (floorId = null) => {
+    getZones: async (floorId = null, filters = {}) => {
         /**
          * @ENDPOINT: GET /api/organisations/floors/<floor_id>/zones/ OR /api/organisations/all-zones/
          */
-        const url = floorId ? `organisations/floors/${floorId}/zones/` : `organisations/all-zones/`;
-        const response = await api.get(url);
+        const url = (floorId && floorId !== 'all') ? `organisations/floors/${floorId}/zones/` : `organisations/all-zones/`;
+        const response = await api.get(url, { params: filters });
         return response.data;
     },
 

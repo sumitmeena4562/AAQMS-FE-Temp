@@ -68,11 +68,11 @@ export const useHierarchyStore = create((set, get) => ({
     },
 
     // --- ZONES ---
-    fetchZones: async (floorId = null) => {
+    fetchZones: async (floorId = null, filters = {}) => {
         set({ loading: true, error: null });
         try {
-            const data = await hierarchyService.getZones(floorId);
-            const zones = Array.isArray(data) ? data : (data.results || []);
+            const data = await hierarchyService.getZones(floorId, filters);
+            const zones = Array.isArray(data) ? data : (data?.results || []);
             set({ zones, loading: false });
         } catch (err) {
             set({ error: err.message, loading: false, zones: [] });
