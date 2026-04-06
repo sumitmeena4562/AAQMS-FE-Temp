@@ -36,6 +36,7 @@ const mapOrgToFrontend = (data) => {
     city: data.city || '',
     state: data.state || '',
     country: data.country || '',
+    plannedSites: data.planned_sites || 0,
     otherInfo: data.description || data.otherInfo || '',
     imagery: imagery.profile ? imagery : { ...imagery, profile: data.image || '' },
     stats: {

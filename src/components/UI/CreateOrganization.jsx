@@ -27,8 +27,9 @@ const orgSchema = z.object({
   name: z.string().trim().min(3, "Name of Organization must be at least 3 characters").max(255, "Name too long"),
   industry: z.string().min(1, "Industry Type is required"),
   occupancyType: z.string().min(1, "Occupancy Type is required"),
-  classification: z.string().min(1, "Classification of Occupancy is required"),
-  contactPerson: z.string().trim().min(2, "Contact Person Name is required"),
+  classification: z.string().min(1, 'Classification is required'),
+  plannedSites: z.number().min(0, 'Must be 0 or more').default(0),
+  contactPerson: z.string().min(1, 'Contact person is required'),
   contactEmail: z.string().trim().min(1, "Contact Email is required").email("Invalid email format"),
   contactPhone: z.string().trim().regex(/^\d{10}$/, "Must be exactly 10 digits"),
   address: z.string().trim().min(5, "Address must be at least 5 characters"),
@@ -49,7 +50,7 @@ const orgSchema = z.object({
 const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEdit, isViewOnly = false, isSubmitting = false }) => {
   const [step, setStep] = React.useState(1);
   const [imageFiles, setImageFiles] = React.useState({});
-  const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, reset, trigger } = useForm({
+  const { register, handleSubmit, formState: { errors, isValid }, setValue, watch, reset, trigger, getValues } = useForm({
     resolver: zodResolver(orgSchema),
     mode: "all",
     defaultValues: {
@@ -57,6 +58,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
       industry: 'Manufacturing & Heavy Industry',
       occupancyType: 'Industrial Factory',
       classification: 'Group H - High Hazard',
+      plannedSites: 0,
       contactPerson: '',
       contactEmail: '',
       contactPhone: '',
@@ -79,12 +81,12 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
   // Helper to map Backend data back to Frontend form format
   const mapOrgBackendToFrontend = (data) => {
     if (!data) return null;
-    
+
     // Map imagery array back to form object
     const imagery = {
       north: '', south: '', east: '', west: '', profile: '', extra: []
     };
-    
+
     if (Array.isArray(data.images)) {
       data.images.forEach(img => {
         const type = (img.image_type || '').toLowerCase();
@@ -101,6 +103,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
       industry: data.industry_type || 'Manufacturing & Heavy Industry',
       occupancyType: data.occupancy_type || 'Industrial Factory',
       classification: data.classification || 'Group H - High Hazard',
+      plannedSites: data.plannedSites || 0,
       contactPerson: data.contact_person_name || '',
       contactEmail: data.contact_email || '',
       contactPhone: data.contact_phone || '',
@@ -126,6 +129,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
         industry: 'Manufacturing & Heavy Industry',
         occupancyType: 'Industrial Factory',
         classification: 'Group H - High Hazard',
+        plannedSites: 0,
         contactPerson: '',
         contactEmail: '',
         contactPhone: '',
@@ -200,9 +204,9 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
 
   const nextStep = async () => {
     let fieldsToValidate = [];
-    if (step === 1) fieldsToValidate = ['name', 'industry', 'occupancyType', 'classification'];
+    if (step === 1) fieldsToValidate = ['name', 'industry', 'occupancyType', 'classification', 'plannedSites'];
     if (step === 2) fieldsToValidate = ['contactPerson', 'contactEmail', 'contactPhone', 'address', 'city', 'state', 'country'];
-    
+
     const result = await trigger(fieldsToValidate);
     if (result) setStep(step + 1);
   };
@@ -214,17 +218,16 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
       <div className="flex items-center justify-between relative">
         {/* Progress Line */}
         <div className="absolute top-1/2 left-0 w-full h-[2px] bg-border-main -translate-y-1/2 z-0" />
-        <div 
-          className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-500 ease-out" 
+        <div
+          className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-500 ease-out"
           style={{ width: `${((step - 1) / 2) * 100}%` }}
         />
-        
+
         {/* Steps */}
         {[1, 2, 3].map((s) => (
           <div key={s} className="relative z-10 flex flex-col items-center">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 border-2 ${
-              step >= s ? 'bg-primary border-primary text-white scale-110 shadow-md' : 'bg-base border-border-main text-gray'
-            }`}>
+            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 border-2 ${step >= s ? 'bg-primary border-primary text-white scale-110 shadow-md' : 'bg-base border-border-main text-gray'
+              }`}>
               {step > s ? '✓' : s}
             </div>
             <span className={`text-[9px] font-bold uppercase tracking-wider mt-1.5 ${step >= s ? 'text-primary' : 'text-gray'}`}>
@@ -270,7 +273,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                   <span className="text-[10px] text-gray uppercase tracking-widest font-bold">Step {step} of 3</span>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={onClose}
                 className="p-2.5 rounded-full hover:bg-base text-gray hover:text-title transition-all duration-200"
               >
@@ -292,7 +295,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                       exit="exit"
                       variants={{
                         hidden: { opacity: 0 },
-                        visible: { 
+                        visible: {
                           opacity: 1,
                           transition: { staggerChildren: 0.08 }
                         },
@@ -346,17 +349,27 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                             disabled={isViewOnly}
                           />
                         </Motion.div>
+                        <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                          <InputField
+                            label="Total Sites"
+                            type="number"
+                            placeholder="e.g., 5"
+                            {...register('plannedSites', { valueAsNumber: true })}
+                            error={errors.plannedSites?.message}
+                            disabled={isViewOnly}
+                          />
+                        </Motion.div>
                       </div>
 
-                      <Motion.div 
+                      <Motion.div
                         variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
                         className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4 border-t border-border-main/50"
                       >
                         <div className="lg:col-span-1">
-                          <ImageUploadCard 
-                            label="Identity Logo" 
-                            value={imageryValues?.profile} 
-                            onUpload={(url, file) => handleImage('profile', url, file)} 
+                          <ImageUploadCard
+                            label="Identity Logo"
+                            value={imageryValues?.profile}
+                            onUpload={(url, file) => handleImage('profile', url, file)}
                           />
                         </div>
                         <div className="lg:col-span-2">
@@ -379,7 +392,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                       exit="exit"
                       variants={{
                         hidden: { opacity: 0 },
-                        visible: { 
+                        visible: {
                           opacity: 1,
                           transition: { staggerChildren: 0.08 }
                         },
@@ -461,7 +474,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                       exit="exit"
                       variants={{
                         hidden: { opacity: 0 },
-                        visible: { 
+                        visible: {
                           opacity: 1,
                           transition: { staggerChildren: 0.08 }
                         },
@@ -477,13 +490,16 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                             </h3>
                             <button
                               type="button"
-                              onClick={() => setValue('imagery.extra', [...extraImages, ''], { shouldDirty: true, shouldValidate: true })}
-                              className="text-[10px] bg-primary/5 hover:bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full font-bold uppercase transition-all"
+                              className="flex items-center gap-2 px-4 py-2 bg-primary/5 hover:bg-primary/10 text-primary border border-primary/20 rounded-xl transition-all duration-300 font-bold text-[11px] uppercase tracking-wider group"
+                              onClick={() => {
+                                const currentExtra = getValues('imagery.extra') || [];
+                                setValue('imagery.extra', [...currentExtra, '']);
+                              }}
                             >
-                              + Add View
+                              <Plus size={14} /> Add View
                             </button>
                           </div>
-                          
+
                           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                             <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url, file) => handleImage('north', url, file)} />
                             <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url, file) => handleImage('south', url, file)} />
@@ -494,7 +510,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                       </div>
 
                       {extraImages.length > 0 && (
-                        <Motion.div 
+                        <Motion.div
                           variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
                           className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-border-main"
                         >
