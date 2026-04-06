@@ -38,11 +38,9 @@ const FloorPlan = () => {
     if (passedCoordId && !selectedCoord) setCoord(passedCoordId);
     if (passedSiteId && !selectedSite) setSite(passedSiteId);
     
-    // 2. Fetch floors for the site
+    // 2. Fetch floors (Global or Site-specific)
     const activeSiteId = (passedSiteId === 'undefined' || !passedSiteId) ? selectedSite : passedSiteId;
-    if (activeSiteId) {
-        fetchFloors(activeSiteId);
-    }
+    fetchFloors(activeSiteId || null);
   }, [passedOrgId, passedCoordId, passedSiteId, selectedSite, setOrg, setCoord, setSite, fetchFloors]);
 
   const activeSiteId = selectedSite || passedSiteId;
@@ -94,8 +92,10 @@ const FloorPlan = () => {
       
       {/* HEADER */}
       <PageHeader 
-        title={passedSiteName ? `Floors for ${passedSiteName}` : "Section Floor Plans"}
-        subtitle={activeSiteId ? `Showing ${activePlansCount} active floor levels for the current selection` : "Select a site to explore its architectural hierarchy and inventory"}
+        title={passedSiteName ? `Floors for ${passedSiteName}` : "All Floor Plans"}
+        subtitle={activeSiteId 
+            ? `Showing ${activePlansCount} active floor levels for ${passedSiteName || 'the selected site'}` 
+            : "Viewing all architectural levels across all sites"}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
@@ -104,7 +104,7 @@ const FloorPlan = () => {
                   <FiLoader size={14} className={loading ? 'animate-spin' : ''} />
                   <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
               </Button>
-              {activeSiteId > 0 && (
+              {floorList.length > 0 && (
                  <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                     {floorList.length} Total Levels
                 </span>
@@ -129,20 +129,6 @@ const FloorPlan = () => {
                <FiAlertCircle className="w-8 h-8 mb-3" />
                <p className="text-sm font-medium">{hierarchyError}</p>
             </div>
-          ) : !activeSiteId ? (
-            <div className="w-full py-32 flex flex-col items-center justify-center text-center bg-card/50 rounded-[var(--radius-card)] border-2 border-dashed border-border-main/50 animate-in fade-in zoom-in duration-500">
-               <div className="w-20 h-20 bg-base rounded-full flex items-center justify-center mb-6 shadow-sm border border-border-main/30">
-                  <FiBriefcase className="w-8 h-8 text-primary shadow-glow" />
-               </div>
-               <h3 className="text-xl font-bold text-title mb-2">No Site Selected</h3>
-               <p className="text-sm text-gray max-w-[280px] mb-8">
-                 Please use the filter bar above to select a specific site and view its architectural floor plans.
-               </p>
-               <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 rounded-full border border-primary/10">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">Waiting for selection</span>
-               </div>
-            </div>
           ) : floorList.length > 0 ? (
             floorList.map((floor, index) => (
               <FloorCard 
@@ -156,7 +142,9 @@ const FloorPlan = () => {
             <div className="w-full py-24 flex flex-col items-center justify-center text-gray/40 bg-base/20 rounded-[var(--radius-card)] border border-border-main/40 mt-4">
                <FiAlertCircle className="w-10 h-10 mb-4 opacity-20" />
                <p className="text-sm font-bold text-title">No Floor Plans Found</p>
-               <p className="text-[10px] uppercase tracking-widest mt-1">This site doesn't have any registered floor levels yet</p>
+               <p className="text-[10px] uppercase tracking-widest mt-1">
+                 {activeSiteId ? "This site doesn't have any registered floor levels yet" : "No floor plans have been registered in the system yet"}
+               </p>
             </div>
           )}
         </div>

@@ -22,12 +22,12 @@ export const hierarchyService = {
     },
 
     // --- FLOORS ---
-    getFloors: async (siteId) => {
+    getFloors: async (siteId = null) => {
         /**
-         * @ENDPOINT: GET /api/organisations/floors/<site_id>/
+         * @ENDPOINT: GET /api/organisations/floors/<site_id>/ OR /api/organisations/all-floors/
          */
-        if (!siteId) return [];
-        const response = await api.get(`organisations/floors/${siteId}/`);
+        const url = siteId ? `organisations/floors/${siteId}/` : `organisations/all-floors/`;
+        const response = await api.get(url);
         return response.data;
     },
 
