@@ -97,7 +97,7 @@ function LoginPage() {
                 }}
                 footer={null}
             >
-                {({ register, errors, itemVariants }) => (
+                {({ register, errors, watch, itemVariants }) => (
                     <motion.div 
                         animate={localError ? { x: [-5, 5, -5, 5, 0] } : {}}
                         transition={{ duration: 0.4 }}
@@ -143,6 +143,7 @@ function LoginPage() {
                         >
                             <Checkbox
                                 label="Remember me"
+                                checked={watch('rememberMe')}
                                 {...register('rememberMe')}
                             />
                             <button 
@@ -157,7 +158,7 @@ function LoginPage() {
                 )}
             </AuthForm>
 
-            <div className="text-center mt-6">
+            {/* <div className="text-center mt-6">
                 <span className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">
                     Don't have an account? 
                     <Link 
@@ -167,7 +168,7 @@ function LoginPage() {
                         Create One
                     </Link>
                 </span>
-            </div>
+            </div> */}
 
             <ForgotPasswordModal 
                 isOpen={isForgotPasswordOpen} 

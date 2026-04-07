@@ -44,14 +44,14 @@ function AuthForm({
     grid = false,
     defaultValues = {}
 }) {
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, watch, control, formState: { errors } } = useForm({
         resolver: zodResolver(schema),
         mode: 'onChange',
         defaultValues
     });
 
     const renderedChildren = typeof children === 'function'
-        ? children({ register, errors, itemVariants })
+        ? children({ register, errors, watch, control, itemVariants })
         : children;
 
     return (
