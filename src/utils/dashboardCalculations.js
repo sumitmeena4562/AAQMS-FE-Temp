@@ -198,8 +198,8 @@ export const mapToActivityFeed = (rawData) => {
     return rawData.map(item => {
         // Default styling for generic activities
         let icon = FiActivity;
-        let iconBgClass = 'bg-base';
-        let iconTextClass = 'text-gray';
+        let iconBgClass = 'bg-slate-50';
+        let iconTextClass = 'text-slate-600';
         
         // Dynamically assign aesthetics based on business logic
         const typeStr = (item.type || '').toLowerCase();
@@ -227,11 +227,19 @@ export const mapToActivityFeed = (rawData) => {
             iconTextClass = 'text-gray-600';
         }
         
+        // Determine status variant for badges/dots
+        let statusVariant = 'info';
+        if (iconBgClass.includes('red')) statusVariant = 'danger';
+        else if (iconBgClass.includes('orange')) statusVariant = 'warning';
+        else if (iconBgClass.includes('purple')) statusVariant = 'success';
+        
         return {
             ...item,
+            type: (item.type || 'Event').charAt(0).toUpperCase() + (item.type || 'Event').slice(1).toLowerCase(),
             icon,
             iconBgClass,
             iconTextClass,
+            statusVariant,
             time: formatRelativeTime(item.time)
         };
     });
