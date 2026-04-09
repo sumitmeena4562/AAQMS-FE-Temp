@@ -3,6 +3,7 @@ import PageHeader from "../../components/UI/PageHeader";
 import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
 import RecentActivityTable from "../../components/Dashboard/RecentactivityTable";
+import { MatricCardSkeleton } from "../../components/Dashboard/StatsCardSkeleton";
 import { FiHome, FiBox } from "react-icons/fi";
 import { useDashboardMetrics, useDashboardStats, useRecentActivity } from "../../hooks/useDashboardQueries";
 
@@ -84,7 +85,11 @@ const Dashboard = () => {
 
             {!isError && (
                 <motion.div variants={itemVariants}>
-                    <MatricCardRow items={metricCards || []} />
+                    {isLoading ? (
+                        <MatricCardSkeleton count={3} />
+                    ) : (
+                        <MatricCardRow items={metricCards || []} />
+                    )}
                 </motion.div>
             )}
 

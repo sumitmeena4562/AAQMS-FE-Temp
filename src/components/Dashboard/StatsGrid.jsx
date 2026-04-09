@@ -1,5 +1,6 @@
 import React from "react";
 import StatsCard, { StatsRow } from "./StatsCard";
+import { StatsGridSkeleton } from "./StatsCardSkeleton";
 import { FiBox } from "react-icons/fi";
 import { useDashboardStats } from "../../hooks/useDashboardQueries";
 
@@ -10,6 +11,7 @@ import { useDashboardStats } from "../../hooks/useDashboardQueries";
 export const StatGrid = () => {
     const { data: stats, isLoading, isError } = useDashboardStats();
 
+    if (isLoading) return <StatsGridSkeleton count={4} />;
     if (isError) return null;
 
     return (

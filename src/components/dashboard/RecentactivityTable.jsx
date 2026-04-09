@@ -81,6 +81,7 @@ const RecentActivityTable = () => {
             }
             columns={columns}
             data={activityList || []}
+            loading={isLoading}
             emptyMessage="No recent activity"
         />
     );

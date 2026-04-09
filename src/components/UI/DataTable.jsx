@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Table from './Table';
 import Button from './Button';
 import GlobalLoader from './GlobalLoader';
+import TableSkeleton from './TableSkeleton';
 import { FiFilter, FiSearch } from 'react-icons/fi';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -170,7 +171,9 @@ const DataTable = ({
             {/* 3. Table Body */}
             <div className="w-full flex-1 relative min-h-[300px]">
                 {loading ? (
-                    <GlobalLoader mode="overlay" text="Syncing Data..." />
+                    <div className="absolute inset-0 bg-card/60 z-20 overflow-hidden">
+                        <TableSkeleton rows={8} />
+                    </div>
                 ) : null}
                 
                 <Table
