@@ -71,10 +71,20 @@ const Dashboard = () => {
                 title="System Overview"
                 subtitle="Monitoring real-time operational metrics and AI risk triggers"
                 rightContent={
-                    <div className="px-3 py-1.5 bg-base/50 border border-border-main/50 rounded-lg shadow-inner">
-                        <span className="text-[10px] font-black text-gray uppercase tracking-widest whitespace-nowrap">
-                            Last Sync: <span className="text-primary">{syncText}</span>
-                        </span>
+                    <div className="flex items-center gap-2.5 px-4 py-2 bg-white border border-border-main rounded-xl shadow-sm hover:shadow-md transition-all duration-300 group cursor-default">
+                        <div className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-gray uppercase tracking-[0.15em] leading-none mb-0.5">
+                                System Status
+                            </span>
+                            <span className="text-[11px] font-bold text-title whitespace-nowrap leading-none flex items-center gap-1.5">
+                                <span className="text-gray/60 font-medium italic">Synced</span>
+                                <span className="text-primary">{syncText}</span>
+                            </span>
+                        </div>
                     </div>
                 }
             />
