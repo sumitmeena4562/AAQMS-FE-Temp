@@ -3,7 +3,7 @@ import PageHeader from "../../components/UI/PageHeader";
 import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
 import RecentActivityTable from "../../components/Dashboard/RecentactivityTable";
-import { MatricCardSkeleton } from "../../components/Dashboard/StatsCardSkeleton";
+import { MatricCardSkeleton, StatsGridSkeleton } from "../../components/Dashboard/StatsCardSkeleton";
 import { FiHome, FiBox } from "react-icons/fi";
 import { useDashboardMetrics, useDashboardStats, useRecentActivity } from "../../hooks/useDashboardQueries";
 
@@ -36,12 +36,13 @@ const itemVariants = {
 };
 
 const Dashboard = () => {
-    const { data: metricCards, isLoading, isError, dataUpdatedAt: metricTime } = useDashboardMetrics();
+    const { data: metricCards, isLoading: isMetricsLoading, isError: isMetricsError, dataUpdatedAt: metricTime } = useDashboardMetrics();
+    const { data: stats, isLoading: isStatsLoading, isError: isStatsError, dataUpdatedAt: statsTime } = useDashboardStats();
+    const { data: activity, isLoading: isActivityLoading, isError: isActivityError, dataUpdatedAt: activityTime } = useRecentActivity();
 
-    // Call the hooks just to access their update timestamps. 
-    // React Query is smart enough to NOT make duplicate network requests!
-    const { dataUpdatedAt: statsTime } = useDashboardStats();
-    const { dataUpdatedAt: activityTime } = useRecentActivity();
+    // Unified loading state for the entire core dashboard area
+    const isDashboardLoading = isMetricsLoading || isStatsLoading;
+    const isDashboardError = isMetricsError || isStatsError;
 
     // PRO LEVEL: We mathematically find the single most recent timestamp out of all 3 APIs
     const latestTimestamp = Math.max(metricTime || 0, statsTime || 0, activityTime || 0);
@@ -65,7 +66,7 @@ const Dashboard = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="flex flex-col gap-6"
+            className="flex flex-col gap-8 pb-10"
         >
             <PageHeader
                 title="System Overview"
@@ -90,21 +91,19 @@ const Dashboard = () => {
             />
 
             <motion.div variants={itemVariants}>
-                <StatGrid />
+                <StatGrid data={stats} isLoading={isStatsLoading} />
             </motion.div>
 
-            {!isError && (
-                <motion.div variants={itemVariants}>
-                    {isLoading ? (
-                        <MatricCardSkeleton count={3} />
-                    ) : (
-                        <MatricCardRow items={metricCards || []} />
-                    )}
-                </motion.div>
-            )}
+            <motion.div variants={itemVariants}>
+                {isMetricsLoading ? (
+                    <MatricCardSkeleton count={3} />
+                ) : !isMetricsError ? (
+                    <MatricCardRow items={metricCards || []} />
+                ) : null}
+            </motion.div>
 
             <motion.div variants={itemVariants}>
-                <RecentActivityTable />
+                <RecentActivityTable data={activity} isLoading={isActivityLoading} />
             </motion.div>
 
         </motion.div>

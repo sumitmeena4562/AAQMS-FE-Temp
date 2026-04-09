@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../UI/DataTable';
 import Button from '../UI/Button';
-import { FiFilter, FiBox } from 'react-icons/fi';
 import { useRecentActivity } from '../../hooks/useDashboardQueries';
 
 // ── Column definitions ──
@@ -54,11 +53,12 @@ const columns = [
     },
 ];
 
-const RecentActivityTable = () => {
-    const { data: activityList, isLoading, isError } = useRecentActivity();
-    const navigate = useNavigate();
-
-
+const RecentActivityTable = ({ data: externalData, isLoading: externalLoading }) => {
+    const internal = useRecentActivity();
+    
+    const activityList = externalData !== undefined ? externalData : internal.data;
+    const isLoading = externalLoading !== undefined ? externalLoading : internal.isLoading;
+    const isError = internal.isError;
 
     if (isError) return null;
 
@@ -67,17 +67,14 @@ const RecentActivityTable = () => {
             title="Recent Activity"
             subtitle="Live Feed"
             rightContent={
-                <>
-                
-                    <Button 
-                        onClick={() => navigate('/admin/history')}
-                        variant="ghost" 
-                        size="sm" 
-                        className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10"
-                    >
-                        View All History
-                    </Button>
-                </>
+                <Button 
+                    onClick={() => window.location.href = '/admin/history'}
+                    variant="ghost" 
+                    size="sm" 
+                    className="!rounded-md !h-[30px] !text-[12px] !text-primary !bg-primary/5 !border !border-primary/20 hover:!bg-primary/10"
+                >
+                    View All History
+                </Button>
             }
             columns={columns}
             data={activityList || []}

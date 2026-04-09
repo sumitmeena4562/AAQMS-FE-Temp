@@ -1,6 +1,5 @@
 import React from 'react';
-import { OrgIcon, CoordIcon, OfficerIcon, ZoneIcon } from '../data/dashboardData';
-import { FiBox, FiClock, FiAlertTriangle, FiUserPlus, FiPackage, FiCheckCircle, FiSettings, FiActivity } from 'react-icons/fi';
+import { FiBox, FiClock, FiAlertTriangle, FiUserPlus, FiPackage, FiCheckCircle, FiSettings, FiActivity, FiShield, FiMap, FiBriefcase, FiUsers } from 'react-icons/fi';
 
 /**
  * Calculates percentage growth from a previous value to a current value.
@@ -10,7 +9,7 @@ import { FiBox, FiClock, FiAlertTriangle, FiUserPlus, FiPackage, FiCheckCircle, 
  */
 export const calculateGrowth = (current, previous) => {
     if (!previous || previous === 0) {
-        return { changeText: "+0%", changeType: "neutral", trend: 0 };
+        return { changeText: "Stable", changeType: "neutral", trend: 0 };
     }
     
     const diff = current - previous;
@@ -32,7 +31,7 @@ export const calculateGrowth = (current, previous) => {
  */
 export const calculateActivePercentage = (active, total) => {
     if (!total || total === 0) {
-        return { changeText: "0% Active", changeType: "neutral" };
+        return { changeText: "No data", changeType: "neutral" };
     }
     
     const percentage = Math.round((active / total) * 100);
@@ -69,10 +68,10 @@ export const determineZoneStatus = (operational, total) => {
  * @param {object} rawData - Raw metric counts from backend.
  * @returns {Array} Array of stats card objects.
  */
+
 export const mapToStatsGrid = (rawData) => {
     if (!rawData) return [];
 
-    // Provide default fallback values for simulation if backend doesn't send them yet
     const orgs = rawData.organisations || { total: 0, previousMonth: 0 };
     const coords = rawData.coordinators || { total: 0, previousWeek: 0 };
     const officers = rawData.fieldOfficers || { total: 0, active: 0 };
@@ -85,12 +84,13 @@ export const mapToStatsGrid = (rawData) => {
 
     return [
         {
-            title: "Organisations",
+            title: "Organizations",
             value: orgs.total.toLocaleString(),
             trend: orgGrowth.trend, 
             changeType: orgGrowth.changeType,
-            description: "vs last month",
-            icon: React.createElement(OrgIcon),
+            description: orgGrowth.trend === 0 ? "Stable Enterprise Hubs" : "vs last month",
+            secondaryLabel: `${Math.floor(orgs.total * 0.1)} new recently`,
+            icon: React.createElement(FiBriefcase, { size: 18 }),
             iconBgClass: "bg-blue-50",
             iconColorClass: "text-blue-600",
         },
@@ -99,8 +99,9 @@ export const mapToStatsGrid = (rawData) => {
             value: coords.total.toLocaleString(),
             trend: coordGrowth.trend,
             changeType: coordGrowth.changeType,
-            description: "new this week",
-            icon: React.createElement(CoordIcon),
+            description: coordGrowth.trend === 0 ? "Verified Supervisors" : "growth this week",
+            secondaryLabel: "System administrative layer",
+            icon: React.createElement(FiUsers, { size: 18 }),
             iconBgClass: "bg-purple-50",
             iconColorClass: "text-purple-600",
         },
@@ -109,8 +110,9 @@ export const mapToStatsGrid = (rawData) => {
             value: officers.total.toLocaleString(),
             change: officerActive.changeText,
             changeType: officerActive.changeType,
-            description: "currently online",
-            icon: React.createElement(OfficerIcon),
+            description: "Live Patrol capacity",
+            secondaryLabel: `${officers.active} currently on-field`,
+            icon: React.createElement(FiShield, { size: 18 }),
             iconBgClass: "bg-emerald-50",
             iconColorClass: "text-emerald-600",
         },
@@ -119,8 +121,9 @@ export const mapToStatsGrid = (rawData) => {
             value: zones.total.toLocaleString(),
             change: zoneStatus.changeText,
             changeType: zoneStatus.changeType, 
-            description: "updated just now",
-            icon: React.createElement(ZoneIcon),
+            description: "Network coverage health",
+            secondaryLabel: `${zones.operational} live perimeters`,
+            icon: React.createElement(FiMap, { size: 18 }),
             iconBgClass: "bg-orange-50",
             iconColorClass: "text-orange-600",
         },
@@ -141,25 +144,31 @@ export const mapToMetricCards = (rawData) => {
 
     return [
         {
-            title: "Inventory Items",
+            title: "Inventory Status",
             value: inventory.total.toLocaleString(),
-            icon: React.createElement(FiBox, { size: 16 }),
-            statusLabel: inventory.missing > 0 ? `${inventory.missing} missing assets detected` : "All assets accounted for",
+            icon: React.createElement(FiPackage, { size: 16 }),
+            statusLabel: inventory.missing > 0 ? `${inventory.missing} units missing` : "Stock is healthy",
             statusVariant: inventory.missing > 0 ? "warning" : "success",
+            progress: inventory.total > 0 ? Math.round(((inventory.total - inventory.missing) / inventory.total) * 100) : 100,
+            secondaryLabel: "Equipment integrity",
         },
         {
-            title: "Pending Approvals",
+            title: "Action Requests",
             value: approvals.pending.toLocaleString(),
-            icon: React.createElement(FiClock, { size: 16 }),
-            statusLabel: approvals.pending > 0 ? "Requires admin action" : "All caught up",
+            icon: React.createElement(FiCheckCircle, { size: 16 }),
+            statusLabel: approvals.pending > 0 ? "Approval required" : "All resolved",
             statusVariant: approvals.pending > 0 ? "info" : "success",
+            progress: approvals.pending > 0 ? 40 : 100,
+            secondaryLabel: "Pending reviews",
         },
         {
-            title: "Critical AI Flags",
+            title: "Safety Alerts",
             value: flags.critical.toLocaleString(),
             icon: React.createElement(FiAlertTriangle, { size: 16 }),
-            statusLabel: flags.critical > 0 ? "Immediate review needed" : "No critical flags",
+            statusLabel: flags.critical > 0 ? "High risk detected" : "No active threats",
             statusVariant: flags.critical > 0 ? "danger" : "success",
+            progress: flags.critical > 0 ? 0 : 100,
+            secondaryLabel: "AI Risk Monitoring",
         },
     ];
 };

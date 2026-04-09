@@ -7,12 +7,9 @@ const StatsCardSkeleton = () => {
             {/* Header Area Placeholder */}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex flex-col flex-1 gap-2">
-                    {/* Title Placeholder */}
                     <Skeleton width="60%" height="12px" radius="6px" />
-                    {/* Value Placeholder */}
                     <Skeleton width="40%" height="32px" radius="8px" className="mt-1" />
                 </div>
-                {/* Icon Box Placeholder */}
                 <Skeleton width="40px" height="40px" radius="12px" />
             </div>
 
@@ -20,7 +17,7 @@ const StatsCardSkeleton = () => {
             <div className="h-[1.5px] w-full bg-border-main/50 my-4" />
 
             {/* Footer Placeholder */}
-            <div className="flex items-center justify-between pt-0.5">
+            <div className="flex items-center justify-between pt-0.5 mt-auto">
                 <Skeleton width="30%" height="18px" radius="99px" />
                 <Skeleton width="40%" height="14px" radius="6px" />
             </div>
@@ -50,8 +47,13 @@ export const MatricCardSkeleton = ({ count = 3 }) => {
                         </div>
                         <Skeleton width="36px" height="36px" radius="10px" />
                     </div>
+
+                    <div className="h-[1.5px] w-full bg-border-main/20 my-1" />
+                    
                     {/* Status Label Placeholder */}
-                    <Skeleton width="100%" height="32px" radius="var(--radius-card)" />
+                    <div className="mt-auto">
+                        <Skeleton width="100%" height="32px" radius="var(--radius-card)" />
+                    </div>
                 </div>
             ))}
         </div>
