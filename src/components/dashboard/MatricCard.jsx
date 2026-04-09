@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import AlertCard from './AlertCard';
 
 const VARIANTS = {
@@ -23,9 +23,12 @@ export const MatricCard = ({
 
     return (
         <div
-            className="bg-card border border-border-main rounded-[var(--radius-card)] !py-[21px] !px-[24px] flex flex-col gap-3 min-h-[148px] h-auto shadow-card hover:shadow-card-hover transition-all duration-200 cursor-default"
+            className="bg-card border border-border-main/80 rounded-[var(--radius-card)] !py-[21px] !px-[24px] flex flex-col gap-3 min-h-[148px] h-auto shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 cursor-default group relative overflow-hidden"
         >
-            <div className="flex items-start justify-between gap-3">
+            {/* Subtle Hover Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+            <div className="flex items-start justify-between gap-3 relative z-10">
                 <div className="min-w-0">
                     <p className="text-[11px] font-semibold tracking-wider text-gray uppercase !mb-1">
                         {title}

@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import useAuthStore from '../store/authStore';
+import GlobalLoader from '../components/UI/GlobalLoader';
 
 // Lazy loading components
 const LandingPage = lazy(() => import('../pages/Home/LandingPage'));
@@ -22,16 +23,7 @@ const NotFound = lazy(() => import('../pages/NotFound'));
  * Clean, light-themed loading state for session bootstrapping.
  */
 const PageLoader = () => (
-    <div className="flex items-center justify-center min-h-screen bg-white overflow-hidden relative">
-        <div className="relative flex flex-col items-center gap-4 z-10">
-             {/* Simple modern spinner */}
-            <div className="w-10 h-10 border-2 border-slate-100 border-t-primary rounded-full animate-spin" />
-            
-            <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">
-                Checking Session...
-            </div>
-        </div>
-    </div>
+    <GlobalLoader mode="fullScreen" text="Secure Session Check..." size="lg" />
 );
 
 const AppRoutes = () => {

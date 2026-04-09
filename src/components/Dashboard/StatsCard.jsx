@@ -67,11 +67,11 @@ const StatsCard = ({
     const finalChange = change || autoChange;
 
     return (
-        <div className={`bg-card px-6 py-5 rounded-[var(--radius-card)] w-full border border-border-main shadow-card flex flex-col min-h-[148px] 
-            hover:shadow-card-hover transition-all duration-300 cursor-default group relative overflow-hidden ${className}`}>
+        <div className={`bg-card px-6 py-5 rounded-[var(--radius-card)] w-full border border-border-main/80 shadow-card flex flex-col min-h-[148px] 
+            hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 cursor-default group relative overflow-hidden ${className}`}>
             
-            {/* Subtle Hover Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            {/* Subtle Hover Gradient (Not Blur) */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
             {/* Header Area */}
             <div className="flex items-start justify-between gap-4 relative z-10">
