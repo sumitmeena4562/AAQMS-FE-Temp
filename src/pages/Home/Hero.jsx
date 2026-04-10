@@ -84,44 +84,44 @@ const Hero = () => {
                     Asset Intelligence System
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="w-full max-w-3xl">
-                    <Heading className="mb-8 drop-shadow-sm">
-                        Intelligent Asset Audits. <br />
-                        <span className="text-gradient italic font-extrabold tracking-tight">Simplified.</span>
+                <motion.div variants={itemVariants} className="w-full max-w-4xl">
+                    <Heading className="mb-8 drop-shadow-sm text-5xl sm:text-6xl lg:text-7xl tracking-tighter leading-[1.05]">
+                        Next-Gen Asset Intelligence. <br />
+                        <span className="text-gradient italic font-black">Refined.</span>
                     </Heading>
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="w-full max-w-2xl px-4 sm:px-0">
-                    <Text className="mb-12 text-muted/90 md:text-lg">
-                        Deploy professional-grade safety audits across multiple sites <br className="hidden md:block" />
-                        with real-time AI tracking and digital twin integration.
+                    <Text className="mb-12 text-muted/90 text-base md:text-xl font-medium !leading-relaxed">
+                        Enterprise-grade safety audits and real-time AI tracking <br className="hidden md:block" />
+                        seamlessly integrated with your digital twin ecosystem.
                     </Text>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10 w-full sm:w-auto px-4 sm:px-0">
+                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6 sm:gap-12 w-full sm:w-auto px-4 sm:px-0">
                     <Link to="/login" className="w-full sm:w-auto">
                         <Button 
                             variant="primary" 
                             size="lg" 
-                            className="w-full sm:w-auto px-12 group rounded-full"
+                            className="w-full sm:w-auto px-14 py-7 text-lg group rounded-full shadow-xl shadow-primary/20"
                         >
-                            Start Auditing
-                            <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            Get Started
+                            <svg className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M5 12h14m-7-7 7 7-7 7" />
                             </svg>
                         </Button>
                     </Link>
                     
-                    <div className="flex items-center gap-4 sm:border-l sm:border-border sm:pl-8 group cursor-default">
+                    <div className="flex items-center gap-5 sm:border-l sm:border-border sm:pl-10 group cursor-default">
                         <motion.span 
                             initial={{ scale: 1 }}
-                            whileHover={{ scale: 1.1 }}
-                            className="text-4xl sm:text-5xl font-black text-primary tracking-tighter"
+                            whileHover={{ scale: 1.05 }}
+                            className="text-5xl sm:text-6xl font-black text-primary tracking-tighter"
                         >
                             10
                         </motion.span>
-                        <div className="text-[10px] sm:text-[11px] font-bold text-muted/60 leading-tight text-left uppercase tracking-tighter">
-                            years of <br /> <span className="text-primary/70">exceptional</span> reliability
+                        <div className="text-[10px] sm:text-[12px] font-bold text-muted/60 leading-tight text-left uppercase tracking-tighter">
+                            years of <br /> <span className="text-primary/70">unmatched</span> field reliability
                         </div>
                     </div>
                 </motion.div>
@@ -132,9 +132,9 @@ const Hero = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1, duration: 1 }}
-                className="relative w-full max-w-5xl px-4 sm:px-8 z-30 mt-10 sm:mt-12"
+                className="relative w-full max-w-4xl px-4 sm:px-8 z-30 mt-10 sm:mt-12"
             >
-                <div className="glass-panel rounded-3xl px-6 sm:px-10 py-4 sm:py-3.5 flex flex-col xs:grid xs:grid-cols-2 lg:flex lg:flex-row items-center justify-center gap-8 sm:gap-14">
+                <div className="glass-panel rounded-3xl px-8 sm:px-12 py-4 sm:py-3.5 flex flex-col xs:grid xs:grid-cols-2 lg:flex lg:flex-row items-center justify-center gap-8 sm:gap-10 md:gap-12 lg:gap-14">
                     {capabilities.map((cap, i) => (
                         <div key={i} className="flex items-center gap-3 sm:gap-3 group cursor-pointer transition-all hover:translate-y-[-1px] w-full xs:w-auto justify-center">
                             <div className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-primary/5 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm flex-shrink-0">

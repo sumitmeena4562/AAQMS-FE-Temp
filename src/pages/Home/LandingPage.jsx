@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LandingNavbar from '../../components/Navbar/LandingNavbar';
 import Footer from '../../components/Navbar/Footer';
@@ -22,11 +22,16 @@ const SectionLoader = () => (
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    const [activeLabel, setActiveLabel] = useState('Home');
+    const isScrollingRef = useRef(false);
 
     // Enhanced scroll function with better easing and timing
-    const scrollToSection = (id) => {
+    const scrollToSection = (id, label) => {
         const element = document.getElementById(id);
         if (element) {
+            isScrollingRef.current = true;
+            setActiveLabel(label);
+            
             const offset = 80; // Standard Navbar height
             const bodyRect = document.body.getBoundingClientRect().top;
             const elementRect = element.getBoundingClientRect().top;
@@ -37,24 +42,74 @@ const LandingPage = () => {
                 top: offsetPosition,
                 behavior: 'smooth'
             });
+
+            // Re-enable observer after scroll animation finishes
+            setTimeout(() => {
+                isScrollingRef.current = false;
+            }, 1200);
         }
     };
 
     const navLinks = [
-        { label: 'Home', onClick: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
-        { label: 'Roles', onClick: () => scrollToSection('roles') },
-        { label: 'Capabilities', onClick: () => scrollToSection('capabilities') },
-        { label: 'Planning', onClick: () => scrollToSection('planning') },
-        { label: 'Workflow', onClick: () => scrollToSection('workflow') },
-        { label: 'Mobile App', onClick: () => scrollToSection('mobile') },
-        { label: 'Analytics', onClick: () => scrollToSection('analytics') },
+        { label: 'Home', onClick: () => {
+            isScrollingRef.current = true;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setActiveLabel('Home');
+            setTimeout(() => isScrollingRef.current = false, 1000);
+        }},
+        { label: 'Roles', onClick: () => scrollToSection('roles', 'Roles') },
+        { label: 'Capabilities', onClick: () => scrollToSection('capabilities', 'Capabilities') },
+        { label: 'Planning', onClick: () => scrollToSection('planning', 'Planning') },
+        { label: 'Workflow', onClick: () => scrollToSection('workflow', 'Workflow') },
+        { label: 'Mobile App', onClick: () => scrollToSection('mobile', 'Mobile App') },
+        { label: 'Analytics', onClick: () => scrollToSection('analytics', 'Analytics') },
     ];
+
+    // Pixel-Perfect Scroll Tracking for Navigation Sync
+    useEffect(() => {
+        const handleScrollTracking = () => {
+            if (isScrollingRef.current) return;
+
+            const scrollY = window.scrollY;
+            const triggerOffset = 200; // Snappier detection
+
+            if (scrollY < 50) {
+                setActiveLabel('Home');
+                return;
+            }
+
+            const sections = [
+                { id: 'home', label: 'Home' },
+                { id: 'roles', label: 'Roles' },
+                { id: 'capabilities', label: 'Capabilities' },
+                { id: 'planning', label: 'Planning' },
+                { id: 'workflow', label: 'Workflow' },
+                { id: 'mobile', label: 'Mobile App' },
+                { id: 'analytics', label: 'Analytics' }
+            ];
+
+            let newActive = 'Home';
+            for (const section of sections) {
+                const element = document.getElementById(section.id);
+                if (element && element.offsetTop <= scrollY + triggerOffset) {
+                    newActive = section.label;
+                }
+            }
+
+            setActiveLabel(prev => prev !== newActive ? newActive : prev);
+        };
+
+        window.addEventListener('scroll', handleScrollTracking, { passive: true });
+        return () => window.removeEventListener('scroll', handleScrollTracking);
+    }, []);
 
     return (
         <div className="min-h-screen bg-white overflow-x-hidden selection:bg-primary/20 selection:text-primary-dark">
             {/* Elite Navbar */}
             <LandingNavbar
                 navLinks={navLinks}
+                activeLabel={activeLabel}
+                onLinkClick={(label) => setActiveLabel(label)}
                 buttons={[
                     { label: 'Login', variant: 'filled', href: '/login' }
                 ]}
