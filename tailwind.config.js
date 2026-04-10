@@ -3,17 +3,39 @@ export default {
         "./index.html",
         "./src/**/*.{js,jsx,ts,tsx}",
     ],
-    // ADD THIS LINE
     important: true,
     theme: {
         extend: {
+            colors: {
+                primary: 'var(--color-primary)',
+                secondary: 'var(--color-secondary)',
+                background: 'var(--color-background)',
+                text: 'var(--color-text)',
+                muted: 'var(--color-muted)',
+                border: 'var(--color-border)',
+            },
             fontFamily: {
-                inter: ['Inter', 'sans-serif'], // Use 'inter' specifically
+                heading: 'var(--font-heading)',
+                body: 'var(--font-body)',
+            },
+            spacing: {
+                xs: 'var(--spacing-xs)',
+                sm: 'var(--spacing-sm)',
+                md: 'var(--spacing-md)',
+                lg: 'var(--spacing-lg)',
+                xl: 'var(--spacing-xl)',
+            },
+            borderRadius: {
+                xs: 'var(--radius-xs)',
+                sm: 'var(--radius-sm)',
+                md: 'var(--radius-md)',
+                lg: 'var(--radius-lg)',
+                xl: 'var(--radius-xl)',
             },
             boxShadow: {
-                'figma': '0px 1px 2px 0px rgba(0, 0, 0, 0.05)',
-                'card': '0px 2px 18px -2px #10224F60',
-                'stat-card': '0px 0px 16.6px -4px rgba(16, 34, 79, 0.25)',
+                soft: 'var(--shadow-soft)',
+                md: 'var(--shadow-md)',
+                lg: 'var(--shadow-lg)',
             }
         },
     },

@@ -1,57 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import Card from '../../components/UI/Card';
-
-// Icon components for decorative elements
-const DroneIcon = ({ size = 24, className }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-        <path d="M8 2L12 12L16 2" />
-        <path d="M2 8L12 12L2 16" />
-        <path d="M22 8L12 12L22 16" />
-        <path d="M8 22L12 12L16 22" />
-    </svg>
-);
-
-const ShieldIcon = ({ size = 24, className }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-);
-
-// Status icons
-const CheckIcon = ({ size = 18 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-);
-
-const AlertIcon = ({ size = 18 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-);
-
-const MonitorStatusTag = ({ text, type = "success" }) => {
-    const styles = {
-        success: "bg-success-bg text-success border-success/20",
-        warning: "bg-warning/10 text-warning border-warning/20",
-        danger: "bg-danger/10 text-danger border-danger/20"
-    };
-    return (
-        <span className={`px-2 py-0.5 rounded-md border text-[8px] font-black uppercase tracking-widest ${styles[type]}`}>
-            {text}
-        </span>
-    );
-};
-
-const CommandPanelRow = ({ label, value, icon: Icon }) => (
-    <div className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-        <div className="flex items-center gap-2">
-            <div className={`p-1.5 rounded-lg bg-slate-50 text-slate-400 group-hover:text-primary transition-colors`}>
-                <Icon size={14} />
-            </div>
-            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tight">{label}</span>
-        </div>
-        <span className="text-[10px] font-black text-slate-900">{value}</span>
-    </div>
-);
+import { Heading, Text } from '../../components/ui/Typography';
+import Button from '../../components/ui/Button';
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
     const containerVariants = {
@@ -79,26 +30,32 @@ const Hero = () => {
     ];
 
     return (
-        <section className="relative min-h-[90vh] flex flex-col items-center justify-between pt-32 sm:pt-40 pb-16 overflow-hidden bg-white">
-            {/* --- Alchemy Background (Halo Effect) --- */}
-            <div className="absolute inset-0 pointer-events-none">
-                {/* Large Background Glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-white" />
+        <section className="relative min-h-[90vh] flex flex-col items-center justify-between pt-32 sm:pt-40 pb-16 overflow-hidden bg-background">
+            {/* --- Enhanced Alchemy Background (High-Octane Glow) --- */}
+            <div className="absolute inset-0 pointer-events-none select-none">
+                {/* Core Radial Glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-radial-gradient from-primary/5 via-transparent to-transparent opacity-60" />
                 
-                {/* Main Purple Arcs - Responsive Scaling */}
-                <div className="absolute top-[20%] sm:top-[25%] left-1/2 -translate-x-1/2 w-[180%] sm:w-[150%] max-w-[1500px] aspect-square rounded-full border-[1px] border-primary/10 blur-[2px]" />
-                <div className="absolute top-[25%] sm:top-[30%] left-1/2 -translate-x-1/2 w-[160%] sm:w-[130%] max-w-[1300px] aspect-square rounded-full border-[40px] sm:border-[80px] border-primary/5 blur-3xl opacity-60" />
-                <div className="absolute top-[30%] sm:top-[35%] left-1/2 -translate-x-1/2 w-[140%] sm:w-[110%] max-w-[1100px] aspect-square rounded-full border-[30px] sm:border-[60px] border-primary/10 blur-2xl opacity-70" />
-                <div className="absolute top-[35%] sm:top-[40%] left-1/2 -translate-x-1/2 w-[120%] sm:w-[90%] max-w-[900px] aspect-square rounded-full border-[20px] sm:border-[40px] border-primary/[0.15] blur-xl opacity-80" />
-                <div className="absolute top-[40%] sm:top-[42%] left-1/2 -translate-x-1/2 w-[100%] sm:w-[80%] max-w-[800px] aspect-square rounded-full bg-gradient-to-b from-primary/[0.08] to-transparent blur-3xl opacity-50" />
+                {/* Main Glowing Arcs */}
+                <div className="absolute top-[15%] sm:top-[20%] left-1/2 -translate-x-1/2 w-[160%] sm:w-[130%] max-w-[1400px] aspect-square rounded-full border-[1.5px] border-primary/20 blur-[1px] animate-[spin_60s_linear_infinite]" />
+                <div className="absolute top-[20%] sm:top-[25%] left-1/2 -translate-x-1/2 w-[140%] sm:w-[110%] max-w-[1200px] aspect-square rounded-full border-[40px] sm:border-[100px] border-primary/[0.04] blur-3xl saturate-200" />
+                <div className="absolute top-[25%] sm:top-[30%] left-1/2 -translate-x-1/2 w-[120%] sm:w-[90%] max-w-[1000px] aspect-square rounded-full border-[30px] sm:border-[60px] border-primary/[0.08] blur-2xl saturate-150" />
+                
+                {/* High Contrast Accents */}
+                <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-[100%] sm:w-[70%] max-w-[800px] aspect-square border-t-[2px] border-primary/30 rounded-full blur-sm" />
+                <div className="absolute top-[35%] left-1/2 -translate-x-1/2 w-[100%] sm:w-[70%] max-w-[800px] aspect-square rounded-full bg-gradient-to-b from-primary/10 to-transparent blur-3xl opacity-40 translate-y-[-10%]" />
 
-                {/* Orbital Lines - Responsive Sizes */}
-                <div className="absolute top-[42%] sm:top-[45%] left-1/2 -translate-x-1/2 w-[110%] sm:w-[85%] max-w-[850px] aspect-square rounded-full border border-primary/[0.08]" />
-                <div className="absolute top-[45%] sm:top-[48%] left-1/2 -translate-x-1/2 w-[100%] sm:w-[75%] max-w-[750px] aspect-square rounded-full border border-primary/[0.05]" />
-                
-                {/* Floating Nodes */}
-                <div className="absolute top-[38%] left-[28%] w-1.5 h-1.5 rounded-full bg-primary/20" />
-                <div className="absolute top-[42%] right-[22%] w-2 h-2 rounded-full bg-primary/10" />
+                {/* Pulsing Nodes */}
+                <motion.div 
+                    animate={{ opacity: [0.3, 0.7, 0.3], scale: [1, 1.2, 1] }} 
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute top-[35%] left-[30%] w-2 h-2 rounded-full bg-primary/40 shadow-[0_0_15px_rgba(7,34,103,0.5)]" 
+                />
+                <motion.div 
+                    animate={{ opacity: [0.2, 0.6, 0.2], scale: [1, 1.3, 1] }} 
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                    className="absolute top-[40%] right-[25%] w-3 h-3 rounded-full bg-primary/20 shadow-[0_0_20px_rgba(7,34,103,0.3)]" 
+                />
             </div>
 
             {/* --- Main Content --- */}
@@ -111,60 +68,66 @@ const Hero = () => {
                 {/* Mini Badge */}
                 <motion.div 
                     variants={itemVariants} 
-                    className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-[10px] font-black tracking-[0.2em] text-primary/70 bg-white border border-slate-100 rounded-full shadow-sm cursor-default uppercase"
+                    className="inline-flex items-center gap-2 px-3 py-1 mb-10 text-[10px] font-black tracking-[0.25em] text-primary/80 bg-white shadow-soft border border-border/50 rounded-full uppercase"
                 >
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
                     Asset Intelligence System
                 </motion.div>
 
-                <motion.h1
-                    variants={itemVariants}
-                    className="mb-8 font-black leading-[1.05] tracking-tighter text-slate-900 text-[clamp(2rem,7vw,4rem)] px-4"
-                >
-                    Next-Gen Asset Audits <br />
-                    Made <span className="text-primary">Simple & Precise</span>
-                </motion.h1>
+                <motion.div variants={itemVariants} className="w-full max-w-3xl">
+                    <Heading className="mb-8 drop-shadow-sm">
+                        Intelligent Asset Audits. <br />
+                        <span className="text-primary italic">Simplified.</span>
+                    </Heading>
+                </motion.div>
 
-                <motion.p
-                    variants={itemVariants}
-                    className="mb-12 text-sm lg:text-base font-bold leading-relaxed text-slate-500 max-w-xl px-6"
-                >
-                    The complete platform for field inspections, QR tracking, <br className="hidden md:block" />
-                    and real-time safety management. Professional audits, simplified.
-                </motion.p>
+                <motion.div variants={itemVariants} className="w-full max-w-2xl">
+                    <Text className="mb-12 text-muted/90 md:text-lg">
+                        Deploy professional-grade safety audits across multiple sites <br className="hidden md:block" />
+                        with real-time AI tracking and digital twin integration.
+                    </Text>
+                </motion.div>
 
                 <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
-                    <motion.button
-                        whileHover={{ scale: 1.02, backgroundColor: 'var(--color-primary-dark)' }}
-                        whileTap={{ scale: 0.98 }}
-                        className="w-full sm:w-auto px-10 py-4 text-xs font-black text-white bg-primary rounded-xl shadow-xl shadow-primary/20 uppercase tracking-[0.2em] transition-all"
-                    >
-                        Start Auditing
-                    </motion.button>
+                    <Link to="/login">
+                        <Button 
+                            variant="primary" 
+                            size="lg" 
+                            className="w-full sm:w-auto px-12 group"
+                        >
+                            Start Auditing
+                            <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M5 12h14m-7-7 7 7-7 7" />
+                            </svg>
+                        </Button>
+                    </Link>
                     
-                    <div className="flex items-center gap-4 border-l-0 sm:border-l border-slate-100 pl-0 sm:pl-8">
-                        <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter">10</span>
-                        <div className="text-[10px] font-bold text-slate-400 leading-tight text-left uppercase tracking-tighter">
+                    <div className="flex items-center gap-4 sm:border-l sm:border-border sm:pl-8">
+                        <span className="text-4xl font-black text-text tracking-tighter">10</span>
+                        <div className="text-[10px] font-bold text-muted/60 leading-tight text-left uppercase tracking-tighter">
                             years of <br /> reliability
                         </div>
                     </div>
                 </motion.div>
             </motion.div>
 
-            {/* --- Capability Bar --- */}
+            {/* --- Static Capability Bar --- */}
             <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8, duration: 1 }}
                 className="relative w-full max-w-6xl px-12 z-30 mt-12 sm:mt-20"
             >
-                <div className="grid grid-cols-2 md:flex md:flex-wrap items-center justify-between gap-6 sm:gap-12 pt-8 sm:pt-12 border-t border-slate-100/80">
+                <div className="grid grid-cols-2 lg:flex lg:flex-wrap items-center justify-between gap-8 pt-12 border-t border-border/40">
                     {capabilities.map((cap, i) => (
-                        <div key={i} className="flex items-center gap-3 sm:gap-5 group cursor-pointer transition-all hover:translate-y-[-4px]">
-                            <div className="text-2xl sm:text-3xl filter grayscale group-hover:grayscale-0 transition-all group-hover:scale-110 drop-shadow-sm">{cap.icon}</div>
+                        <div key={i} className="flex items-center gap-4 group cursor-pointer transition-all hover:translate-y-[-2px]">
+                            <div className="text-2xl filter grayscale-[0.5] group-hover:grayscale-0 transition-all group-hover:drop-shadow-lg scale-100 group-hover:scale-110">{cap.icon}</div>
                             <div className="flex flex-col">
-                                <span className="text-[12px] sm:text-[14px] font-black text-slate-800 tracking-tight leading-none mb-1">{cap.label}</span>
-                                <span className="text-[8px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest opacity-80">Management</span>
+                                <span className="text-xs font-black text-text tracking-tight mb-0.5">{cap.label}</span>
+                                <span className="text-[9px] font-bold text-muted uppercase tracking-widest opacity-60">Management</span>
                             </div>
                         </div>
                     ))}
