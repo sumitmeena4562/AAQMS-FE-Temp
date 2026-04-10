@@ -116,16 +116,16 @@ api.interceptors.response.use(
                     isRefreshing = false;
                     processQueue(null); 
                     
-                    // Final Retry logic: Ensure headers are fresh if browser didn't auto-update
+                    // Final Retry logic
                     return api(originalRequest);
                 } catch (refreshError) {
                     processQueue(refreshError);
                     isRefreshing = false;
                     
-                    // Proactive Logout on permanent failure
-                    localStorage.removeItem('user');
-                    if (!window.location.pathname.includes('/login')) {
-                        window.location.href = '/login?session_expired=true';
+                    // 🛡️ Cleanup localStorage ONLY if it's a terminal AUTHENTICATION failure.
+                    // This prevents losing the session during transient 500/Database errors.
+                    if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+                        localStorage.removeItem('user');
                     }
                     return Promise.reject(refreshError);
                 }

@@ -14,16 +14,6 @@ import autoTable from 'jspdf-autotable';
  * Manages all user-related data, stats, and filtering for the Admin panel.
  */
 const useUserStore = create((set, get) => ({
-    // --- DATA STATE ---
-    users: [],
-    totalCount: 0,
-    stats: { total: 0, active: 0, inactive: 0, unassigned: 0 },
-    filterOptions: { organizations: [], roles: [], regions: [] },
-    loading: false,
-    error: null,
-    abortController: null,
-    allCoordinators: [], // Lookup list for FilterBar
-
     // --- UI, FILTER & PAGINATION STATE ---
     search: '',
     filters: {
@@ -35,121 +25,16 @@ const useUserStore = create((set, get) => ({
     sortKey: 'created_at',
     sortDir: 'desc',
     selectedIds: [],
-    limit: 20,
-    offset: 0,
+    limit: 20,  // page_size
+    page: 1,    // current page
+    loading: false, // kept for mutation-specific loading if needed
+    error: null,
 
-    /**
-     * INITIAL LOAD: Fetch everything needed for first mount
-     */
-    fetchInitialData: async () => {
-        set({ loading: true, error: null });
-        try {
-            const { filters, search, limit, offset } = get();
-            
-            // Map FE 'organization' filter to BE 'organisation_id' for the initial API call
-            const apiFilters = { ...filters };
-            if (apiFilters.organization) {
-                apiFilters.organisation_id = apiFilters.organization;
-                delete apiFilters.organization;
-            }
+    // Mutation helpers (Internal loading states)
+    setLoading: (loading) => set({ loading }),
+    setError: (error) => set({ error }),
 
-            // Fetch everything in parallel: Users, Stats, and Real Filter Options
-            const [usersData, stats, filterOptions] = await Promise.all([
-                userService.getUsers(apiFilters, search, limit, offset),
-                userService.getUserStats(),
-                userService.getFilterOptions()
-            ]);
-
-            set({ 
-                users: usersData.users || [], 
-                totalCount: usersData.totalCount || 0,
-                stats: stats || { total: 0, active: 0, inactive: 0, unassigned: 0 }, 
-                filterOptions: filterOptions || { organizations: [], roles: [], regions: [] }, 
-                loading: false 
-            });
-        } catch (err) {
-            set({ users: [], error: err.message, loading: false });
-            toast.error("We couldn't connect to the dashboard. Please try again.");
-        }
-    },
-
-    fetchCoordinatorData: async () => {
-        // Cancel previous fetch if still in flight
-        const { abortController } = get();
-        if (abortController) abortController.abort();
-        
-        const newController = new AbortController();
-        set({ loading: true, error: null, abortController: newController });
-
-        try {
-            const { filters, search, limit, offset } = get();
-            
-            // Ensure role is locked to coordinator for this view
-            const coordFilters = { ...filters, role: 'coordinator' };
-            const apiFilters = { ...coordFilters };
-            if (apiFilters.organization) {
-                apiFilters.organisation_id = apiFilters.organization;
-                delete apiFilters.organization;
-            }
-
-            const [usersData, stats, filterOptions] = await Promise.all([
-                userService.getUsers(apiFilters, search, limit, offset),
-                userService.getCoordinatorStats(apiFilters.organisation_id),
-                userService.getFilterOptions()
-            ]);
-
-            set({ 
-                users: usersData.users || [], 
-                totalCount: usersData.totalCount || 0,
-                stats: stats || { total: 0, active: 0, inactive: 0 }, 
-                filterOptions: filterOptions || { organizations: [], roles: [], regions: [] }, 
-                loading: false 
-            });
-        } catch (err) {
-            set({ users: [], error: err.message, loading: false });
-            toast.error("Failed to load Coordinator analytics.");
-        }
-    },
-
-    fetchLookupCoordinators: async (orgId = null) => {
-        try {
-            const data = await userService.getCoordinators(orgId);
-            set({ allCoordinators: data });
-        } catch (err) {
-            console.error("FilterBar Coordinator Fetch Failed", err);
-        }
-    },
-
-    /**
-     * FETCH LIST: Only refresh the user list (for search, filters, pagination)
-     */
-    fetchUsers: async () => {
-        // Cancel previous fetch if still in flight
-        const { abortController } = get();
-        if (abortController) abortController.abort();
-        
-        const newController = new AbortController();
-        set({ loading: true, error: null, abortController: newController });
-
-        try {
-            const { filters, search, limit, offset } = get();
-            const { users, totalCount } = await userService.getUsers(filters, search, limit, offset);
-            set({ 
-                users: Array.isArray(users) ? users : [], 
-                totalCount: totalCount || 0, 
-                loading: false 
-            });
-        } catch (err) {
-            set({ users: [], error: err.message, loading: false });
-        }
-    },
-
-    setPage: async (pageNumber) => {
-        const { limit } = get();
-        const newOffset = (pageNumber - 1) * limit;
-        set({ offset: newOffset });
-        await get().fetchUsers();
-    },
+    setPage: (pageNumber) => set({ page: pageNumber }),
 
     /**
      * CRUD Operations
@@ -297,8 +182,18 @@ const useUserStore = create((set, get) => ({
     },
 
     // --- UI HELPERS ---
-    setSearch: (search) => set({ search, offset: 0 }),
-    setFilters: (filters) => set({ filters, offset: 0 }),
+    setSearch: (newSearch) => {
+        if (get().search === newSearch) return;
+        set({ search: newSearch, page: 1 });
+    },
+    setFilters: (newFilters) => {
+        const current = get().filters;
+        const merged = typeof newFilters === 'object' ? { ...current, ...newFilters } : newFilters;
+        // Only update if values actually changed
+        const changed = Object.keys(merged).some(k => merged[k] !== current[k]);
+        if (!changed) return;
+        set({ filters: merged, page: 1 });
+    },
     setSortKey: (sortKey) => set({ sortKey }),
     setSortDir: (sortDir) => set({ sortDir }),
     toggleSelectRow: (id) => {
@@ -309,7 +204,7 @@ const useUserStore = create((set, get) => ({
     setSelectedIds: (selectedIds) => set({ selectedIds }),
     resetFilters: () => set({
         search: '',
-        offset: 0,
+        page: 1,
         filters: { organization: '', role: '', status: '', region: '' },
     }),
 }));

@@ -27,11 +27,11 @@ import { extractError } from "../utils/errorUtils";
 
 const useAuthStore = create((set, get) => ({
   // --- INITIAL STATE ---
-  isAuthenticated: false, // Initially false, verified during bootstrap
+  isAuthenticated: !!storage.getUser(), // Initial state based on local data
   user: storage.getUser() || null,
   isLoading: false,
-  isBootstrapping: true, // Start as true to check cookie session
-  isLoggingOut: false, // Prevents immediate re-bootstrap on manual logout
+  isBootstrapping: false, // Still bootstrap to verify with server
+  isLoggingOut: false,
   error: null,
 
   // --- ACTIONS ---
@@ -73,7 +73,6 @@ const useAuthStore = create((set, get) => ({
       }
 
     } catch (err) {
-      storage.clearSession();
       const errorMsg = extractError(err, "Invalid email or password.");
       set({ error: errorMsg, isLoading: false, isAuthenticated: false });
       return { success: false, error: errorMsg };
@@ -84,18 +83,25 @@ const useAuthStore = create((set, get) => ({
    * FETCH PROFILE: Verifies the session cookie and gets user details.
    */
   fetchProfile: async () => {
-    // DO NOT re-bootstrap if we just manually logged out
-    if (get().isLoggingOut) return { success: false, error: "Logging out" };
+    const { isBootstrapping, isAuthenticated, isLoggingOut, user } = get();
 
-    // Set a fail-safe timeout to prevent infinite "Checking Session..." loop
-    // if the backend is slow or unreachable.
+    // ── Singleton Guard: prevent concurrent bootstrapping ──
+    if (isBootstrapping) return { success: true, message: "Verification already in flight" };
+    
+    // ── Cache Guard: don't re-fetch if already have a user in memory ──
+    if (isAuthenticated && user) return { success: true, user };
+
+    // ── UI Lock: don't bootstrap if manually logging out ──
+    if (isLoggingOut) return { success: false, error: "Logging out" };
+
+    set({ isBootstrapping: true, error: null });
+    
+    // Set a fail-safe timeout
     const timeoutPromise = new Promise((_, reject) =>
       setTimeout(() => reject(new Error("Request timed out")), 10000)
     );
 
-    set({ isBootstrapping: true, error: null });
     try {
-      // Race the API call against the timeout
       const response = await Promise.race([
         api.get("users/profile/", { _silent: true }),
         timeoutPromise
@@ -114,14 +120,21 @@ const useAuthStore = create((set, get) => ({
       });
       return { success: true, user: userData };
     } catch (err) {
-      storage.clearSession();
-      set({
-        isAuthenticated: false,
-        user: null,
-        isBootstrapping: false,
-        isLoading: false,
-      });
-      return { success: false, error: "Your session has ended. Please sign in again." };
+      const isAuthError = err.response?.status === 401 || err.response?.status === 403;
+
+      if (isAuthError) {
+        storage.clearSession();
+        set({
+          isAuthenticated: false,
+          user: null,
+          isBootstrapping: false,
+          isLoading: false,
+        });
+      } else {
+        // Network errors/timeouts: finish bootstrapping but keep local state
+        set({ isBootstrapping: false, isLoading: false });
+      }
+      return { success: false, error: err.message };
     }
   },
 

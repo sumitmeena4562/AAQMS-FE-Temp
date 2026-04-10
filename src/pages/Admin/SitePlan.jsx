@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import OrganizationCard from '../../components/UI/OrganizationCard';
@@ -7,44 +7,47 @@ import FilterBar from '../../components/UI/FilterBar';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchyStore } from '../../store/useHierarchyStore';
 import { useOrgStore } from '../../store/useOrgStore';
-import { FiHome, FiBriefcase, FiLoader } from 'react-icons/fi';
+import { useHierarchy } from '../../hooks/api/useHierarchy';
+import { useSites } from '../../hooks/api/useHierarchyQueries';
+import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
+import CardSkeleton from '../../components/UI/CardSkeleton';
 
 const SitePlan = () => {
   const location = useLocation();
   const { selectedOrg, selectedCoord, setOrg, setCoord } = useFilterStore();
-  const { sites, fetchSites, loading } = useHierarchyStore();
-  const { orgs } = useOrgStore();
+  const { clearHierarchy } = useHierarchyStore();
   
   const [searchParams, setSearchParams] = useSearchParams();
+  const { resetFilters } = useFilterStore();
+  
   const passedOrgId = searchParams.get('org_id');
   const passedOrgNameFromUrl = searchParams.get('org_name');
   const passedCoordId = searchParams.get('coord_id');
   const passedCoordNameFromUrl = searchParams.get('coord');
 
-  const { resetFilters } = useFilterStore();
+  const activeOrgId = selectedOrg || passedOrgId || '';
+  const activeCoordId = selectedCoord || passedCoordId || '';
+
+  // --- QUERY HOOKS ---
+  const { organizations: orgs } = useHierarchy();
+  const { data: sites = [], isLoading: loading, error: hierarchyError } = useSites({ 
+      organisation: activeOrgId, 
+      coord_id: activeCoordId 
+  });
 
   const handleResetAll = () => {
       setSearchParams({});
       resetFilters();
   };
 
+  // URL → Store sync (mount-only, guarded)
+  const hasSynced = useRef(false);
   useEffect(() => {
-    // 1. Sync global filters ONLY if passed through URL and store is empty
-    if (passedOrgId && !selectedOrg) setOrg(passedOrgId);
-    if (passedCoordId && !selectedCoord) setCoord(passedCoordId);
-    
-    // 2. Fetch sites specifically for this context
-    const cleanOrg = (passedOrgId === 'undefined' || !passedOrgId) ? selectedOrg : passedOrgId;
-    const cleanCoord = (passedCoordId === 'undefined' || !passedCoordId) ? selectedCoord : passedCoordId;
-
-    fetchSites({ 
-        organisation: cleanOrg || '', 
-        coord_id: cleanCoord || '' 
-    });
-  }, [passedOrgId, passedCoordId, selectedOrg, selectedCoord, setOrg, setCoord, fetchSites]);
-
-  const activeOrgId = selectedOrg || passedOrgId;
-  const activeCoordId = selectedCoord || passedCoordId;
+    if (hasSynced.current) return;
+    hasSynced.current = true;
+    if (passedOrgId) setOrg(passedOrgId);
+    if (passedCoordId) setCoord(passedCoordId);
+  }, [passedOrgId, passedCoordId, setOrg, setCoord]); 
 
   const orgInfo = orgs.find(o => o.id === activeOrgId) || (passedOrgNameFromUrl ? { name: passedOrgNameFromUrl } : null);
   const coordInfo = activeCoordId ? { name: passedCoordNameFromUrl || "Coordinator" } : null;
@@ -106,10 +109,14 @@ const SitePlan = () => {
         <FilterBar activeLevel="sites" />
 
         {loading ? (
-             <div className="flex flex-col items-center justify-center py-32 bg-base/10 rounded-2xl border border-dashed border-border-main mt-4">
-                 <FiLoader className="w-10 h-10 text-primary animate-spin mb-4" />
-                 <p className="text-gray font-bold tracking-widest text-[10px] uppercase">Retrieving live site data...</p>
-             </div>
+            <div className="w-full mt-4">
+               <CardSkeleton count={8} columns={4} />
+            </div>
+        ) : hierarchyError ? (
+          <div className="text-center py-24 bg-card rounded-2xl border border-red-200 mt-4 shadow-sm">
+            <FiAlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+            <p className="text-red-600 font-bold">Failed to load sites</p>
+          </div>
         ) : sitePlans.length === 0 ? (
            <div className="text-center py-24 bg-card rounded-2xl border border-border-main mt-4 shadow-sm animate-in fade-in zoom-in">
              <div className="w-16 h-16 rounded-3xl bg-base border border-border-main flex items-center justify-center mx-auto mb-6">

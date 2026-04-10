@@ -14,22 +14,52 @@ import {
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
-import UserCard from '../../components/UI/UserCard';
-import useDebounce from '../../hooks/useDebounce';
 import UserAvatar from '../../components/UI/UserAvatar';
 import Badge from '../../components/UI/Badge';
 import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 import FilterBar from '../../components/UI/FilterBar';
+import useDebounce from '../../hooks/useDebounce';
+import TableSkeleton from '../../components/UI/TableSkeleton';
+import CardSkeleton from '../../components/UI/CardSkeleton';
+import UserCard from '../../components/UI/UserCard';
+import { useUsers, useUserStats } from '../../hooks/api/useUserQueries';
+import { useHierarchy } from '../../hooks/api/useHierarchy';
 
 export default function Users() {
-    const store = useUserStore();
-    const {
-        users, stats, filterOptions, loading, totalCount, limit, offset,
-        search, filters, sortKey, sortDir, selectedIds,
-        fetchUsers, fetchInitialData, exportPDF, setPage,
-        setFilters, toggleSelectRow,
-        clearSelection, resetFilters,
-    } = store;
+    // ── STORES (UI state only) ──
+    const { 
+        search, filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
+        setPage, setFilters, toggleSelectRow, clearSelection, resetFilters,
+        setSelectedIds, setLoading, setError // Keeping for mutations
+    } = useUserStore();
+
+    const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
+
+    // ── QUERY HOOKS (NEW) ──
+    const debouncedSearch = useDebounce(search, 400);
+    
+    // Sync React Query with local state
+    const { data: usersData, isLoading: isUsersLoading } = useUsers(filters, debouncedSearch, page);
+    const { data: stats = { total: 0, active: 0, inactive: 0, unassigned: 0 } } = useUserStats();
+    
+    // ── HIERARCHY DATA (UNIFIED) ──
+    const { organizations, sites } = useHierarchy();
+    
+    // Roles are static for the product
+    const STATIC_ROLES = [
+        { value: 'admin', label: 'Admin' },
+        { value: 'coordinator', label: 'Coordinator' },
+        { value: 'field_officer', label: 'Field Officer' }
+    ];
+
+    const filterOptions = {
+        organizations: organizations.map(o => ({ value: o.id, label: o.name })),
+        regions: sites.map(s => ({ value: s.id, label: s.site_name || s.name })),
+        roles: STATIC_ROLES
+    };
+
+    const users = usersData?.users || [];
+    const totalCount = usersData?.totalCount || 0;
 
     // ── Modal & UI state ──
     const [peekUser, setPeekUser] = useState(null);
@@ -40,19 +70,6 @@ export default function Users() {
     const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
     const [selectionMode, setSelectionMode] = useState(false);
     const [viewMode, setViewMode] = useState('list');
-
-    // Search Debounce
-    const debouncedSearch = useDebounce(search, 300);
-
-    // ── DATA FETCHING ──
-    useEffect(() => {
-        fetchInitialData();
-    }, [fetchInitialData]);
-
-    useEffect(() => {
-        if (!loading) fetchUsers();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedSearch, JSON.stringify(filters), offset]);
 
     const sortedUsers = useMemo(() => {
         if (!Array.isArray(users)) return [];
@@ -82,8 +99,8 @@ export default function Users() {
 
     const handleFormSubmit = async (data) => {
         const res = editingUser
-            ? await store.updateUser(editingUser.id, data)
-            : await store.createUser(data);
+            ? await updateUser(editingUser.id, data)
+            : await createUser(data);
 
         if (res.success) {
             toast.success(editingUser ? 'Changes to user profile have been saved' : 'New personnel successfully added to the system');
@@ -96,13 +113,13 @@ export default function Users() {
     };
 
     const handleBulkActivate = async () => {
-        const res = await store.bulkAction('activate', selectedIds);
+        const res = await bulkAction('activate', selectedIds);
         if (res.success) toast.success(`Selected ${selectedIds.length} users have been activated`);
     };
 
     const handleConfirmDeactivate = async () => {
         const targets = statusTarget ? [statusTarget.id] : selectedIds;
-        const res = await store.bulkAction('deactivate', targets);
+        const res = await bulkAction('deactivate', targets);
         if (res.success) {
             toast.success(`Selected ${targets.length} personnel have been deactivated`);
             setStatusTarget(null);
@@ -236,24 +253,25 @@ export default function Users() {
     const paginationFooter = (
         <div className="flex justify-between items-center w-full bg-card py-6 px-8 rounded-b-2xl border-t border-border-main/50">
             <div className="text-sm text-gray font-medium">
-                Showing <span className="font-bold text-title">{totalCount > 0 ? offset + 1 : 0} to {Math.min(offset + limit, totalCount)}</span> of <span className="font-bold text-title">{totalCount}</span> results
+                Showing <span className="font-bold text-title">{totalCount > 0 ? (page - 1) * limit + 1 : 0} to {Math.min(page * limit, totalCount)}</span> of <span className="font-bold text-title">{totalCount.toLocaleString()}</span> results
             </div>
-            
-            <div className="flex gap-3">
-                <Button 
-                    variant="outline" 
+
+            <div className="flex items-center gap-3">
+                <span className="text-[11px] font-bold text-gray/60">Page {page} of {Math.ceil(totalCount / limit) || 1}</span>
+                <Button
+                    variant="outline"
                     size="sm"
-                    onClick={() => setPage(Math.floor(offset / limit))}
-                    disabled={offset === 0 || loading}
+                    onClick={() => setPage(page - 1)}
+                    disabled={page <= 1 || isUsersLoading}
                     className="px-6 font-bold tracking-wider uppercase text-[11px] h-10 border-border-main hover:bg-base"
                 >
                     Previous
                 </Button>
-                <Button 
-                    variant="outline" 
+                <Button
+                    variant="outline"
                     size="sm"
-                    onClick={() => setPage(Math.floor(offset / limit) + 2)}
-                    disabled={offset + limit >= totalCount || loading}
+                    onClick={() => setPage(page + 1)}
+                    disabled={page * limit >= totalCount || isUsersLoading}
                     className="px-6 font-bold tracking-wider uppercase text-[11px] h-10 border-border-main hover:bg-base"
                 >
                     Next
@@ -261,6 +279,7 @@ export default function Users() {
             </div>
         </div>
     );
+
 
     return (
         <div className="flex flex-col gap-6 w-full pb-10 animate-in fade-in duration-500 relative">
@@ -306,7 +325,7 @@ export default function Users() {
 
                 <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
                     <FilterBar.ViewToggle mode={viewMode} onChange={setViewMode} />
-                    {activeFilterCount > 0 && <button onClick={resetFilters} className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest bg-title/5 rounded-xl group"><FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />Reset</button>}
+                    {activeFilterCount > 0 && <button onClick={resetFilters} className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest bg-title/5 rounded-xl group"><FiRefreshCcw size={12} className={`group-hover:rotate-180 transition-transform duration-500 ${isUsersLoading ? 'animate-spin' : ''}`} />Reset</button>}
                 </div>
             </FilterBar>
 
@@ -327,14 +346,17 @@ export default function Users() {
                     </div>
                 </div>
             )}
+        
 
             {/* Main Content Area */}
-            {sortedUsers.length > 0 ? (
+            {isUsersLoading ? (
+                viewMode === 'grid' ? <CardSkeleton count={8} columns={5} /> : <TableSkeleton rows={10} />
+            ) : users.length > 0 ? (
                 viewMode === 'grid' ? (
                     <div className="flex flex-col gap-6 w-full">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
                             {sortedUsers.map(user => (
-                                <UserCard key={user.id} user={user} selectable={selectionMode} isSelected={selectedIds.includes(user.id)} onSelect={(id) => store.toggleSelectRow(id)} onEdit={handleEditUser} onView={(u) => { setPeekUser(u); setIsPeekOpen(true); }} />
+                                <UserCard key={user.id} user={user} selectable={selectionMode} isSelected={selectedIds.includes(user.id)} onSelect={(id) => toggleSelectRow(id)} onEdit={handleEditUser} onView={(u) => { setPeekUser(u); setIsPeekOpen(true); }} />
                             ))}
                         </div>
                         {paginationFooter}
@@ -343,10 +365,10 @@ export default function Users() {
                     <DataTable
                         columns={columns}
                         data={sortedUsers}
-                        loading={loading}
+                        loading={isUsersLoading}
                         selectable={selectionMode}
                         selectedIds={selectedIds}
-                        onSelectionChange={(ids) => store.setSelectedIds(ids)}
+                        onSelectionChange={(ids) => setSelectedIds(ids)}
                         onRowClick={(user) => { setPeekUser(user); setIsPeekOpen(true); }}
                         rowClassName={(row) => (row.status?.toLowerCase() === 'deactive' || row.status?.toLowerCase() === 'inactive') ? 'bg-rose-50/10 opacity-80' : ''}
                         emptyMessage="No personnel records discovered"
@@ -377,9 +399,9 @@ export default function Users() {
 
             {/* Modals */}
             <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={peekUser} onEdit={handleEditUser} onDeactivate={(u) => { setPeekUser(null); setIsPeekOpen(false); setStatusTarget(u); }} />
-            <UserFormModal isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingUser(null); }} onSubmit={handleFormSubmit} user={editingUser} loading={loading} />
-            <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Deactivate Account" message={`Are you sure you want to deactivate "${statusTarget?.name}"?`} confirmText="Confirm Deactivation" danger={true} loading={loading} />
-            <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Deactivation" message={`You are about to deactivate ${selectedIds.length} users. Continue?`} confirmText={`Deactivate (${selectedIds.length})`} danger={true} loading={loading} />
+            <UserFormModal isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingUser(null); }} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} />
+            <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Deactivate Account" message={`Are you sure you want to deactivate "${statusTarget?.name}"?`} confirmText="Confirm Deactivation" danger={true} loading={storeLoading} />
+            <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Deactivation" message={`You are about to deactivate ${selectedIds.length} users. Continue?`} confirmText={`Deactivate (${selectedIds.length})`} danger={true} loading={storeLoading} />
         </div>
     );
 }

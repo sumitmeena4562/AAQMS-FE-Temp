@@ -1,0 +1,31 @@
+import { useQuery } from '@tanstack/react-query';
+import * as dashboardService from '../../services/dashboardService';
+
+/**
+ * useDashboardSummary
+ * Fetches the unified dashboard summary (stats, metrics, recent_activity)
+ */
+export const useDashboardSummary = () => {
+  return useQuery({
+    queryKey: ['dashboard', 'summary'],
+    queryFn: dashboardService.getDashboardSummary,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+/**
+ * useAllHistory
+ * Fetches paginated activity history with filters
+ */
+export const useAllHistory = (filters = {}) => {
+  // Normalize filters for query key stability
+  const cleanFilters = Object.fromEntries(
+    Object.entries(filters).filter(([_, v]) => v !== undefined && v !== null && v !== 'all' && v !== '')
+  );
+
+  return useQuery({
+    queryKey: ['dashboard', 'history', cleanFilters],
+    queryFn: () => dashboardService.getAllHistory(cleanFilters),
+    staleTime: 5 * 60 * 1000,
+  });
+};

@@ -6,15 +6,19 @@ import FilterBar from '../../components/UI/FilterBar';
 import useUserStore from '../../store/userStore';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useOrgStore } from '../../store/useOrgStore';
-import { sites, floors, zones } from '../../data/mockFilterData';
+import { useHierarchy } from '../../hooks/api/useHierarchy';
+import { useCoordinators } from '../../hooks/api/useUserQueries';
+import CardSkeleton from '../../components/UI/CardSkeleton';
 import { FiHome, FiBriefcase, FiGrid, FiList } from 'react-icons/fi';
 
 const AssignedCoordinators = () => {
   const location = useLocation();
   const [view, setView] = React.useState('list');
   const { selectedOrg, setOrg } = useFilterStore();
-  const { orgs, fetchOrgs } = useOrgStore();
   
+  // --- QUERY HOOKS (UNIFIED) ---
+  const { organizations: orgs, coordinators: coordinatorsListRaw, isLoading } = useHierarchy();
+
   const passedOrgName = location.state?.org?.name || new URLSearchParams(location.search).get('org');
   const orgInfo = selectedOrg ? orgs.find(o => o.id === selectedOrg) : null;
   
@@ -22,8 +26,7 @@ const AssignedCoordinators = () => {
   const finalOrgName = orgInfo?.name || (passedOrgName && !passedOrgName.includes(" ") ? passedOrgName : "Organisation");
   const orgName = finalOrgName === "Organisation" && passedOrgName ? passedOrgName : finalOrgName;
 
-  const users = useUserStore(state => state.users);
-  const fetchUsers = useUserStore(state => state.fetchUsers);
+  const isOrgSelected = !!(selectedOrg || passedOrgName);
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
@@ -31,40 +34,26 @@ const AssignedCoordinators = () => {
     { label: orgName, path: "#", isActive: true }
   ];
 
+  // URL → Store sync (mount-only)
   useEffect(() => {
-    if (orgs.length === 0) fetchOrgs();
     if (!selectedOrg && passedOrgName && orgs.length > 0) {
       const match = orgs.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
-      if (match) {
-        setOrg(match.id);
-      }
+      if (match) setOrg(match.id);
     }
-    if (users.length === 0) fetchUsers();
-  }, [selectedOrg, passedOrgName, setOrg, users.length, fetchUsers, orgs.length, fetchOrgs, orgs]);
+  }, [orgs.length, selectedOrg, passedOrgName, setOrg, orgs]); 
 
-  const isOrgSelected = !!(selectedOrg || passedOrgName);
-  
-  // Resilient filtering: check by Name AND ID for consistency between mock/live data
-  const orgUsers = isOrgSelected 
-    ? users.filter(u => {
-        const matchesName = (u.organization || "").trim().toLowerCase() === (orgName || "").trim().toLowerCase();
-        const matchesId = (selectedOrg && u.organisation_id === selectedOrg);
-        const isCoordinator = (u.role || "").toLowerCase() === 'coordinator';
-        
-        return (matchesName || matchesId) && isCoordinator;
-      }) 
-    : [];
+  // fetchUsers effect removed - handled by useCoordinators query hook
 
-  const coordinatorsList = orgUsers.map(user => {
-    // Correctly aggregate statistics for each coordinator
-    const coordSites = sites.filter(s => s.coordId === user.id.toString());
-    const totalZones = coordSites.reduce((sum, s) => sum + (s.stats?.zones || 0), 0);
+  const coordinatorsList = coordinatorsListRaw.map(user => {
+    // Backend already returns pre-filtered coordinators for the given org
+    const totalSites = user.coordinator_profile?.total_sites ?? user.total_sites ?? 0;
+    const totalZones = user.coordinator_profile?.total_zones ?? user.total_zones ?? 0;
 
     return {
       name: user.name,
       id: user.employee_id || `COORD-${user.id.toString().substring(0, 4)}`,
       status: user.status === 'active' ? 'ACTIVE' : 'AWAY',
-      sites: coordSites.length,
+      sites: totalSites,
       zones: totalZones,
       image: user.avatar || null
     };
@@ -122,7 +111,9 @@ const AssignedCoordinators = () => {
             </div>
 
             <div className={view === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
-              {coordinatorsList.length > 0 ? (
+              {isLoading ? (
+                <CardSkeleton count={6} columns={3} />
+              ) : coordinatorsList.length > 0 ? (
                 coordinatorsList.map((coord, index) => (
                   <CoordinatorCard key={index} coordinator={coord} orgName={orgName} view={view} />
                 ))

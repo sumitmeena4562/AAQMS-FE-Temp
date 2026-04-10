@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../UI/DataTable';
 import Button from '../UI/Button';
-import { useRecentActivity } from '../../hooks/useDashboardQueries';
 
 // ── Column definitions ──
 const columns = [
@@ -58,14 +57,8 @@ const columns = [
     },
 ];
 
-const RecentActivityTable = ({ data: externalData, isLoading: externalLoading }) => {
-    const internal = useRecentActivity();
+const RecentActivityTable = ({ data, isLoading, isError }) => {
     const navigate = useNavigate();
-    
-    const activityList = externalData !== undefined ? externalData : internal.data;
-    const isLoading = externalLoading !== undefined ? externalLoading : internal.isLoading;
-    const isError = internal.isError;
-
     if (isError) return null;
 
     return (
@@ -83,7 +76,7 @@ const RecentActivityTable = ({ data: externalData, isLoading: externalLoading })
                 </Button>
             }
             columns={columns}
-            data={activityList || []}
+            data={data || []}
             loading={isLoading}
             emptyMessage="No recent activity"
         />

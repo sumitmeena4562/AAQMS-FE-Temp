@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import useUserStore from '../../store/userStore';
@@ -18,6 +18,10 @@ import UserCard from '../../components/UI/UserCard';
 import useDebounce from '../../hooks/useDebounce';
 import UserAvatar from '../../components/UI/UserAvatar';
 import FilterBar from '../../components/UI/FilterBar';
+import { useUsers, useCoordinatorStats } from '../../hooks/api/useUserQueries';
+import { useHierarchy } from '../../hooks/api/useHierarchy';
+import TableSkeleton from '../../components/UI/TableSkeleton';
+import CardSkeleton from '../../components/UI/CardSkeleton';
 
 /**
  * COORDINATOR MANAGEMENT PAGE
@@ -29,14 +33,43 @@ const Coordinator = () => {
     const orgIdFromUrl = searchParams.get('org_id');
     const orgNameFromUrl = searchParams.get('org_name');
 
-    const store = useUserStore();
-    const {
-        users, stats, filterOptions, loading, totalCount, limit, offset,
-        search, filters, sortKey, sortDir, selectedIds,
-        fetchUsers, fetchInitialData, setPage,
-        setFilters, toggleSelectRow,
-        setSelectedIds, resetFilters,
-    } = store;
+    // ── STORES (UI state only) ──
+    const { 
+        search, filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
+        setPage, setFilters, toggleSelectRow, setSelectedIds, resetFilters,
+        setLoading, setError
+    } = useUserStore();
+
+    const { updateUser, createUser, bulkAction } = useUserStore();
+
+    // ── QUERY HOOKS (NEW) ──
+    const debouncedSearch = useDebounce(search, 400);
+    
+    // URL Sync for Org Context
+    useEffect(() => {
+        if (orgIdFromUrl) {
+            setFilters({ organization: orgIdFromUrl, role: 'coordinator' });
+        } else {
+            setFilters({ role: 'coordinator' });
+        }
+    }, [orgIdFromUrl]);
+
+    // Role-locked Users Query
+    const queryFilters = { ...filters, role: 'coordinator' };
+    const { data: usersData, isLoading: isUsersLoading } = useUsers(queryFilters, debouncedSearch, page);
+    const { data: stats = { total: 0, active: 0, inactive: 0, unassigned: 0 } } = useCoordinatorStats(filters.organization);
+    
+    // ── HIERARCHY DATA (UNIFIED) ──
+    const { organizations } = useHierarchy();
+    
+    // Roles are static for the product
+    const filterOptions = {
+        organizations: organizations.map(o => ({ value: o.id, label: o.name })),
+        roles: [{ value: 'coordinator', label: 'Coordinator' }]
+    };
+
+    const users = usersData?.users || [];
+    const totalCount = usersData?.totalCount || 0;
 
     // ── Modal & UI state ──
     const [peekUser, setPeekUser] = useState(null);
@@ -48,27 +81,7 @@ const Coordinator = () => {
     const [selectionMode, setSelectionMode] = useState(false);
     const [viewMode, setViewMode] = useState('list');
 
-    // Search Debounce
-    const debouncedSearch = useDebounce(search, 300);
 
-    // ── DATA FETCHING ──
-    const fetchCoordinatorData = store.fetchCoordinatorData;
-    
-    // Sync URL params to store filters on mount or URL change
-    useEffect(() => {
-        if (orgIdFromUrl) {
-            setFilters({ ...filters, organization: orgIdFromUrl, role: 'coordinator' });
-        } else {
-            // Explicitly clear organization filter if not in URL
-            setFilters({ ...filters, organization: '', role: 'coordinator' });
-        }
-    }, [orgIdFromUrl]);
-
-    // Main data fetch when filters or search changes
-    useEffect(() => {
-        fetchCoordinatorData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedSearch, JSON.stringify(filters), offset, orgIdFromUrl]);
 
     const sortedUsers = useMemo(() => {
         if (!Array.isArray(users)) return [];
@@ -95,8 +108,8 @@ const Coordinator = () => {
         // Force role as coordinator
         const finalData = { ...data, role: 'coordinator' };
         const res = editingUser?.id
-            ? await store.updateUser(editingUser.id, finalData)
-            : await store.createUser(finalData);
+            ? await updateUser(editingUser.id, finalData)
+            : await createUser(finalData);
 
         if (res.success) {
             toast.success(editingUser?.id ? 'Profile updated' : 'Coordinator added');
@@ -109,13 +122,13 @@ const Coordinator = () => {
     };
 
     const handleBulkActivate = async () => {
-        const res = await store.bulkAction('activate', selectedIds);
+        const res = await bulkAction('activate', selectedIds);
         if (res.success) toast.success(`Activated ${selectedIds.length} profiles`);
     };
 
     const handleConfirmDeactivate = async () => {
         const targets = statusTarget ? [statusTarget.id] : selectedIds;
-        const res = await store.bulkAction('deactivate', targets);
+        const res = await bulkAction('deactivate', targets);
         if (res.success) {
             toast.success(`Deactivated records`);
             setStatusTarget(null);
@@ -224,9 +237,10 @@ const Coordinator = () => {
     const paginationFooter = (
         <div className="flex justify-between items-center w-full bg-card py-6 px-8 rounded-b-2xl border-t border-border-main/50">
             <div className="text-[12px] text-gray font-medium uppercase tracking-tight">Personnel Records Found: <span className="font-black text-title">{totalCount}</span></div>
-            <div className="flex gap-3">
-                <Button variant="outline" size="sm" onClick={() => setPage(Math.floor(offset / limit))} disabled={offset === 0 || loading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Previous</Button>
-                <Button variant="outline" size="sm" onClick={() => setPage(Math.floor(offset / limit) + 2)} disabled={offset + limit >= totalCount || loading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Next</Button>
+            <div className="flex items-center gap-3">
+                <span className="text-[11px] font-bold text-gray/60">Page {page} of {Math.ceil(totalCount / limit) || 1}</span>
+                <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page <= 1 || isUsersLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Previous</Button>
+                <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page * limit >= totalCount || isUsersLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Next</Button>
             </div>
         </div>
     );
@@ -261,7 +275,7 @@ const Coordinator = () => {
                             </div>
                         </div>
                         <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
-                            <FiRefreshCcw size={14} className={loading ? 'animate-spin' : ''} />
+                            <FiRefreshCcw size={14} className={isUsersLoading ? 'animate-spin' : ''} />
                             <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
                         </Button>
                     </div>
@@ -305,8 +319,10 @@ const Coordinator = () => {
                 </div>
             )}
 
-            {sortedUsers.length > 0 ? (
-                <DataTable columns={columns} data={sortedUsers} loading={loading} selectable={selectionMode} selectedIds={selectedIds} onSelectionChange={(ids) => setSelectedIds(ids)} footer={paginationFooter} />
+            {isUsersLoading ? (
+                viewMode === 'grid' ? <CardSkeleton count={8} columns={5} /> : <TableSkeleton rows={10} />
+            ) : sortedUsers.length > 0 ? (
+                <DataTable columns={columns} data={sortedUsers} loading={isUsersLoading} selectable={selectionMode} selectedIds={selectedIds} onSelectionChange={(ids) => setSelectedIds(ids)} footer={paginationFooter} />
             ) : (
                 <div className="flex flex-col items-center justify-center py-20 px-6 bg-card/30 border-2 border-dashed border-border-main rounded-[24px]">
                     <div className="w-20 h-20 rounded-full bg-base border border-border-main/50 flex items-center justify-center mb-6 shadow-sm">
@@ -326,7 +342,7 @@ const Coordinator = () => {
             )}
 
             <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={peekUser} onEdit={handleEditUser} onViewSites={handleViewSites} />
-            <UserFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} user={editingUser} loading={loading} />
+            <UserFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} />
             <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Status Lock" message={`Are you sure you want to change status?`} confirmText="Confirm" danger={true} />
             <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Change" message={`Update ${selectedIds.length} profiles?`} confirmText="Confirm All" danger={true} />
         </div>

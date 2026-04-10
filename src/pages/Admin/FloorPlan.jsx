@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
@@ -7,7 +7,10 @@ import Button from '../../components/UI/Button';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchyStore } from '../../store/useHierarchyStore';
 import { useOrgStore } from '../../store/useOrgStore';
+import { useHierarchy } from '../../hooks/api/useHierarchy';
+import { useFloors } from '../../hooks/api/useHierarchyQueries';
 import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
+import CardSkeleton from '../../components/UI/CardSkeleton';
 
 const FloorPlan = () => {
   const navigate = useNavigate();
@@ -22,30 +25,35 @@ const FloorPlan = () => {
   const passedSiteName = searchParams.get('site');
 
   const { resetFilters } = useFilterStore();
-  const { orgs } = useOrgStore();
+  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
+  const { clearHierarchy } = useHierarchyStore();
+
+  const activeSiteId = selectedSite || searchParams.get('site_id');
+  const activeOrgId = selectedOrg || searchParams.get('org_id');
+  const activeCoordId = selectedCoord || searchParams.get('coord_id');
+
+  // --- QUERY HOOKS (UNIFIED) ---
+  const { organizations: orgs } = useHierarchy();
+  const { data: floors = [], isLoading, error: hierarchyError } = useFloors(activeSiteId);
 
   const handleResetAll = () => {
-      setSearchParams({});
-      resetFilters();
+    setSearchParams({});
+    resetFilters();
   };
 
-  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
-  const { floors, fetchFloors, loading, error: hierarchyError } = useHierarchyStore();
-
+  // URL → Store sync (mount-only, guarded)
+  const hasSynced = useRef(false);
   useEffect(() => {
-    // 1. Sync global filters ONLY if passed through URL and store is empty
-    if (passedOrgId && !selectedOrg) setOrg(passedOrgId);
-    if (passedCoordId && !selectedCoord) setCoord(passedCoordId);
-    if (passedSiteId && !selectedSite) setSite(passedSiteId);
-    
-    // 2. Fetch floors (Global or Site-specific)
-    const activeSiteId = (passedSiteId === 'undefined' || !passedSiteId) ? selectedSite : passedSiteId;
-    fetchFloors(activeSiteId || null);
-  }, [passedOrgId, passedCoordId, passedSiteId, selectedSite, setOrg, setCoord, setSite, fetchFloors]);
+    if (hasSynced.current) return;
+    hasSynced.current = true;
+    if (passedOrgId) setOrg(passedOrgId);
+    if (passedCoordId) setCoord(passedCoordId);
+    if (passedSiteId) setSite(passedSiteId);
+  }, [passedOrgId, passedCoordId, passedSiteId, setOrg, setCoord, setSite]); 
 
-  const activeSiteId = selectedSite || passedSiteId;
-  const activeOrgId = selectedOrg || passedOrgId;
-  const activeCoordId = selectedCoord || passedCoordId;
+  // fetchFloors effect removed - handled by useFloors query dependency
+
+
 
   const orgInfo = orgs.find(o => o.id === activeOrgId) || (passedOrgName ? { name: passedOrgName } : null);
 
@@ -71,7 +79,6 @@ const FloorPlan = () => {
   breadcrumbs.push({ label: "Floor Plan", path: "#", isActive: true });
 
   const floorList = floors;
-  const isLoading = loading;
   const siteInfo = { name: passedSiteName || "Site" };
   const coordInfo = activeCoordId ? { name: passedCoordName || "Coordinator" } : null;
 
@@ -101,7 +108,7 @@ const FloorPlan = () => {
         rightContent={
           <div className="flex items-center gap-3">
              <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
-                  <FiLoader size={14} className={loading ? 'animate-spin' : ''} />
+                  <FiLoader size={14} className={isLoading ? 'animate-spin' : ''} />
                   <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
               </Button>
               {floorList.length > 0 && (
@@ -120,9 +127,8 @@ const FloorPlan = () => {
         {/* CARDS LIST/GRID SECTION */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-5 gap-6 gap-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 sm:px-0">
           {isLoading ? (
-            <div className="w-full py-20 flex flex-col items-center justify-center text-gray/50">
-               <FiLoader className="w-8 h-8 animate-spin mb-3" />
-               <p className="text-sm font-bold uppercase tracking-widest text-[10px]">Fetching live floor plans...</p>
+            <div className="w-full mt-4">
+               <CardSkeleton count={8} columns={4} />
             </div>
           ) : hierarchyError ? (
             <div className="w-full py-20 flex flex-col items-center justify-center text-red-500/70 bg-rose-50/50 rounded-3xl border border-dashed border-rose-200">

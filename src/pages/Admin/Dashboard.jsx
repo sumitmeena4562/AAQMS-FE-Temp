@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { FiBriefcase, FiUsers, FiShield, FiBox, FiActivity } from "react-icons/fi";
 import PageHeader from "../../components/UI/PageHeader";
 import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
 import RecentActivityTable from "../../components/Dashboard/RecentactivityTable";
-import { MatricCardSkeleton, StatsGridSkeleton } from "../../components/Dashboard/StatsCardSkeleton";
-import { FiHome, FiBox } from "react-icons/fi";
-import { useDashboardMetrics, useDashboardStats, useRecentActivity } from "../../hooks/useDashboardQueries";
-
-import { motion } from "framer-motion";
+import { MatricCardSkeleton } from "../../components/Dashboard/StatsCardSkeleton";
+import { useDashboardSummary } from "../../hooks/api/useDashboardQueries";
+import { mapToActivityFeed } from "../../utils/dashboardCalculations";
 
 // Helper outside component to format elapsed time elegantly
 const formatLastSync = (timestamp) => {
@@ -36,16 +36,77 @@ const itemVariants = {
 };
 
 const Dashboard = () => {
-    const { data: metricCards, isLoading: isMetricsLoading, isError: isMetricsError, dataUpdatedAt: metricTime } = useDashboardMetrics();
-    const { data: stats, isLoading: isStatsLoading, isError: isStatsError, dataUpdatedAt: statsTime } = useDashboardStats();
-    const { data: activity, isLoading: isActivityLoading, isError: isActivityError, dataUpdatedAt: activityTime } = useRecentActivity();
+    // ── SINGLE unified call: 1 request replaces 3 ──
+    const { data: summary, isLoading, isError, dataUpdatedAt } = useDashboardSummary();
 
-    // Unified loading state for the entire core dashboard area
-    const isDashboardLoading = isMetricsLoading || isStatsLoading;
-    const isDashboardError = isMetricsError || isStatsError;
+    // ── Map unified summary → UI shapes ──
+    // stats: flat keys from /dashboard/summary/ — build StatsGrid format directly
+    const stats = summary?.stats ? [
+        {
+            title: "Organizations",
+            value: (summary.stats.total_organisations || 0).toLocaleString(),
+            trend: 0, changeType: "neutral",
+            description: "Active enterprise hubs",
+            secondaryLabel: `${summary.stats.total_sites || 0} sites total`,
+            icon: React.createElement(FiBriefcase, { size: 18 }),
+            iconBgClass: "bg-blue-50", iconColorClass: "text-blue-600",
+        },
+        {
+            title: "Coordinators",
+            value: (summary.stats.total_coordinators || 0).toLocaleString(),
+            trend: 0, changeType: "neutral",
+            description: "Verified supervisors",
+            secondaryLabel: "System administrative layer",
+            icon: React.createElement(FiUsers, { size: 18 }),
+            iconBgClass: "bg-purple-50", iconColorClass: "text-purple-600",
+        },
+        {
+            title: "Total Users",
+            value: (summary.stats.total_users || 0).toLocaleString(),
+            trend: 0, changeType: "neutral",
+            description: "Registered identities",
+            secondaryLabel: `${summary.stats.active_users || 0} active`,
+            icon: React.createElement(FiShield, { size: 18 }),
+            iconBgClass: "bg-emerald-50", iconColorClass: "text-emerald-600",
+        },
+        {
+            title: "Total Assets",
+            value: (summary.stats.total_assets || 0).toLocaleString(),
+            trend: 0, changeType: "neutral",
+            description: "Equipment tracked",
+            secondaryLabel: `${summary.stats.risk_alerts || 0} risk alerts`,
+            icon: React.createElement(FiBox, { size: 18 }),
+            iconBgClass: "bg-orange-50", iconColorClass: "text-orange-600",
+        },
+    ] : null;
 
-    // PRO LEVEL: We mathematically find the single most recent timestamp out of all 3 APIs
-    const latestTimestamp = Math.max(metricTime || 0, statsTime || 0, activityTime || 0);
+    // metricCards: use inline metrics array directly from API (already shaped correctly)
+    const metricCards = summary?.metrics
+        ? summary.metrics.map(m => ({
+            title: m.label,
+            value: m.unit ? `${m.value}${m.unit}` : String(m.value ?? 0),
+            icon: React.createElement(FiActivity, { size: 16 }),
+            statusLabel: m.change,
+            statusVariant: m.trend === 'up' ? 'success' : m.trend === 'down' ? 'danger' : 'info',
+            progress: 70,
+            secondaryLabel: m.trend === 'up' ? 'Increasing' : 'Decreasing',
+        }))
+        : null;
+
+    // activity: BE sends `action` field, mapToActivityFeed expects `type` — remap
+    const rawActivity = (summary?.recent_activity || []).map(item => ({
+        ...item,
+        type: item.action || item.type || 'Event',
+        user: item.user_name || item.user?.name || item.user || 'System',
+        entity: item.entity_type || item.entity || '',
+        time: item.created_at || item.time,
+    }));
+    const activity = mapToActivityFeed(rawActivity);
+
+    const isDashboardLoading = isLoading;
+    const isDashboardError   = isError;
+    const latestTimestamp    = dataUpdatedAt || 0;
+
 
     // Local state to ticking exactly how long since the last background update
     const [syncText, setSyncText] = useState('Fetching...');
@@ -91,20 +152,21 @@ const Dashboard = () => {
             />
 
             <motion.div variants={itemVariants}>
-                <StatGrid data={stats} isLoading={isStatsLoading} />
+                <StatGrid data={stats} isLoading={isDashboardLoading} />
             </motion.div>
 
             <motion.div variants={itemVariants}>
-                {isMetricsLoading ? (
+                {isDashboardLoading ? (
                     <MatricCardSkeleton count={3} />
-                ) : !isMetricsError ? (
+                ) : !isDashboardError ? (
                     <MatricCardRow items={metricCards || []} />
                 ) : null}
             </motion.div>
 
             <motion.div variants={itemVariants}>
-                <RecentActivityTable data={activity} isLoading={isActivityLoading} />
+                <RecentActivityTable data={activity} isLoading={isDashboardLoading} />
             </motion.div>
+
 
         </motion.div>
     );

@@ -8,6 +8,8 @@ import { useOrgStore } from '../../store/useOrgStore';
 import useUserStore from '../../store/userStore';
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useHierarchy } from '../../hooks/api/useHierarchy';
+import { useFloors } from '../../hooks/api/useHierarchyQueries';
 
 const FilterBar = ({ 
     activeLevel, // 'coordinators', 'sites', 'floors', 'zones'
@@ -34,29 +36,17 @@ const FilterBar = ({
         setSearchParams({});
     };
 
-    const { orgs, fetchOrgs } = useOrgStore();
-    const { allCoordinators, fetchLookupCoordinators } = useUserStore();
-    const { allSites, allFloors, fetchLookupSites, fetchLookupFloors } = useHierarchyStore();
+    const { orgs: cachedOrgs, setFilters: setOrgFilters } = useOrgStore();
+    const { 
+        // We still use userStore for selection state if it exists there, 
+        // but coordinators list now comes from Query
+    } = useUserStore();
 
-    // 1. Initial Load: Organizations
-    useEffect(() => {
-        if (orgs.length === 0) fetchOrgs();
-    }, [orgs.length, fetchOrgs]);
+    // ─── QUERY HOOKS (UNIFIED) ───
+    const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading: isHierarchyLoading } = useHierarchy();
+    const { data: allFloors = [] } = useFloors(selectedSite);
 
-    // 2. Cascading Sync: coordinators depend on Org
-    useEffect(() => {
-        fetchLookupCoordinators(selectedOrg);
-    }, [selectedOrg, fetchLookupCoordinators]);
-
-    // 3. Cascading Sync: Sites depend on Coordinator (or Org)
-    useEffect(() => {
-        fetchLookupSites(selectedOrg);
-    }, [selectedOrg, fetchLookupSites]);
-
-    // 4. Cascading Sync: Floors depend on Site
-    useEffect(() => {
-        if (selectedSite) fetchLookupFloors(selectedSite);
-    }, [selectedSite, fetchLookupFloors]);
+    // Initial Load / Cascading Sync: Handled by React Query dependencies above
 
     // Safely strip singular/plural mapping for consistent tiering
     const normalizedLevel = activeLevel?.replace(/s$/, '') || ''; 

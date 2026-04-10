@@ -7,7 +7,7 @@ export const userService = {
     /**
      * GET USERS: Fetch with search & filters
      */
-    getUsers: async (filters = {}, search = '', limit = 20, offset = 0) => {
+    getUsers: async (filters = {}, search = '', page = 1, pageSize = 20) => {
         try {
             // Map FE 'organization' filter to BE 'organisation_id' if needed
             const finalFilters = { ...filters };
@@ -19,13 +19,12 @@ export const userService = {
             const response = await api.get('users/admin/', {
                 params: {
                     ...finalFilters,
-                    search: search,
-                    limit: limit,
-                    offset: offset
+                    search: search || undefined,
+                    page: page,
+                    page_size: pageSize,
                 }
             });
 
-            // Robust Pagination Handling (DRF results/count or flat array)
             const data = response.data;
             if (data && typeof data === 'object' && 'results' in data) {
                 return {
@@ -33,7 +32,7 @@ export const userService = {
                     totalCount: data.count || 0
                 };
             }
-            
+
             return {
                 users: Array.isArray(data) ? data : [],
                 totalCount: Array.isArray(data) ? data.length : 0

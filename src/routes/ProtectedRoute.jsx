@@ -9,13 +9,8 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
     // 🔹 Wait for bootstrapping if token exists
     if (isBootstrapping) return null;
 
-    // 1. If not logged in, force redirect to login
-    if (!isAuthenticated) {
-        return <Navigate to="/login" replace />;
-    }
-
-    // 2. If authenticated but no user data, session is stale — redirect to login
-    if (!user && isAuthenticated) {
+    // 1. If explicitly unauthenticated, force redirect to login
+    if (isAuthenticated === false && !isBootstrapping) {
         return <Navigate to="/login" replace />;
     }
 

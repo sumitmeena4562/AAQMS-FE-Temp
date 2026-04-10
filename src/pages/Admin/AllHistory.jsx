@@ -3,14 +3,20 @@ import { FiHome, FiClock, FiBox, FiRefreshCcw } from 'react-icons/fi';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import DataTable from '../../components/UI/DataTable';
-import { useAllHistory } from '../../hooks/useDashboardQueries';
+import Button from '../../components/UI/Button';
+import { useAllHistory } from '../../hooks/api/useDashboardQueries';
+import { useHierarchy } from '../../hooks/api/useHierarchy';
+import { useSites, useFloors } from '../../hooks/api/useHierarchyQueries';
+import TableSkeleton from '../../components/UI/TableSkeleton';
 
-// Real Application Stores
-import { useOrgStore } from '../../store/useOrgStore';
-import { useHierarchyStore } from '../../store/useHierarchyStore';
-import useUserStore from '../../store/userStore';
+// STATIC DATA
 
-// Static Categories (Can be moved to constants later)
+// Roles are static — never change at runtime, no API call needed
+const USER_ROLES = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'coordinator', label: 'Coordinator' },
+    { value: 'field_officer', label: 'Field Officer' },
+];
 const OPERATION_TYPES = [
     { value: 'CREATE', label: 'Create / Add' },
     { value: 'UPDATE', label: 'Update / Edit' },
@@ -28,12 +34,8 @@ const EVENT_CATEGORIES = [
 ];
 
 export default function AllHistory() {
-    // ── 1. Store Connections ──
-    const { orgs, fetchOrgs } = useOrgStore();
-    const { fetchLookupSites, allSites, fetchLookupFloors, allFloors } = useHierarchyStore();
-    const { filterOptions: userFilterOptions, fetchInitialData: fetchUserMeta } = useUserStore();
-
-    // ── 2. Local Filter State (Using IDs) ──
+    // ── 1. Local Filter + Pagination State ──
+    const [currentPage, setCurrentPage] = useState(1);
     const [filters, setFilters] = useState({
         organisation: '',
         site: '',
@@ -43,49 +45,39 @@ export default function AllHistory() {
         category: ''
     });
 
-    // ── 3. Cascading Data Fetching Logic ──
-    
-    // Initial Load: Fetch Orgs & User Metadata (Roles)
-    useEffect(() => {
-        if (orgs.length === 0) fetchOrgs();
-        if (userFilterOptions.roles.length === 0) fetchUserMeta();
-    }, [orgs.length, userFilterOptions.roles.length, fetchOrgs, fetchUserMeta]);
+    // ── 2. QUERY HOOKS (Declarative Cascades) ──
+    const { organizations: orgs } = useHierarchy();
+    const { data: allSites = [] } = useSites({ organisation: filters.organisation });
+    const { data: allFloors = [] } = useFloors(filters.site);
 
-    // Cascade: Fetch Sites when Org changes
-    useEffect(() => {
-        if (filters.organisation) {
-            fetchLookupSites(filters.organisation);
-        }
-    }, [filters.organisation, fetchLookupSites]);
-
-    // Cascade: Fetch Floors when Site changes
-    useEffect(() => {
-        if (filters.site) {
-            fetchLookupFloors(filters.site);
-        }
-    }, [filters.site, fetchLookupFloors]);
+    // Cascading fetches are now handled declaratively by query hooks above.
 
     // ── 4. State Management Actions ──
     const updateFilter = (key, val) => {
         const newFilters = { ...filters, [key]: val };
-        
-        // Reset dependent filters if parent changes
-        if (key === 'organisation') {
-            newFilters.site = '';
-            newFilters.floor = '';
-        } else if (key === 'site') {
-            newFilters.floor = '';
-        }
-        
+        if (key === 'organisation') { newFilters.site = ''; newFilters.floor = ''; }
+        else if (key === 'site') { newFilters.floor = ''; }
         setFilters(newFilters);
+        setCurrentPage(1); // Reset to page 1 on filter change
     };
 
     const resetFilters = () => {
         setFilters({ organisation: '', site: '', floor: '', role: '', operation: '', category: '' });
+        setCurrentPage(1);
     };
 
-    // ── 5. Fetching Activity Logs ──
-    const { data: activityList, isLoading, isError } = useAllHistory(filters);
+    // ── 5. Fetching Activity Logs (Server-side paginated) ──
+    // 🛡️ MEMOIZED: Prevents infinite fetch loops caused by new object refs on every render
+    const queryFilters = useMemo(() => ({
+        ...filters,
+        page: currentPage,
+        page_size: 50
+    }), [filters, currentPage]);
+
+    const { data: historyResponse, isLoading, isError } = useAllHistory(queryFilters);
+    const activityList = historyResponse?.results || [];
+    const totalCount = historyResponse?.count || 0;
+    const totalPages = Math.ceil(totalCount / 50);
 
     const activeFilterCount = Object.values(filters).filter(v => v !== '').length;
 
@@ -187,7 +179,7 @@ export default function AllHistory() {
 
                     <FilterDropdown
                         label="Role"
-                        options={(userFilterOptions.roles || []).map(r => ({ value: r, label: r }))}
+                        options={USER_ROLES}
                         value={filters.role}
                         onChange={v => updateFilter('role', v)}
                         allLabel="All Roles"
@@ -237,17 +229,14 @@ export default function AllHistory() {
                     <div className="flex items-center gap-2 bg-base/40 px-3 py-1.5 rounded-full border border-border-main/40">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                            {activityList?.length || 0} Synchronized Logs
+                            {totalCount.toLocaleString()} Total Logs
                         </span>
                     </div>
                 </div>
                 
                 <div className="w-full relative min-h-[400px]">
                     {isLoading ? (
-                        <div className="flex flex-col items-center justify-center py-32 bg-base/5 rounded-2xl border border-dashed border-border-main/60 m-2">
-                            <FiBox className="text-primary/40 animate-bounce mb-4" size={48} />
-                            <span className="text-sm font-bold text-gray/60 uppercase tracking-widest tracking-[0.2em]">Syncing Secure History...</span>
-                        </div>
+                        <TableSkeleton rows={10} />
                     ) : !isError && activityList ? (
                         <DataTable
                             columns={columns}
@@ -255,6 +244,19 @@ export default function AllHistory() {
                             loading={isLoading}
                             emptyMessage="No historical records matched your current filters."
                             className="!border-none !shadow-none !p-0 !rounded-none"
+                            footer={
+                                totalPages > 1 && (
+                                    <div className="flex items-center justify-between w-full pt-2">
+                                        <span className="text-[10px] font-bold text-gray">
+                                            Page {currentPage} of {totalPages} &nbsp;·&nbsp; {totalCount.toLocaleString()} records total
+                                        </span>
+                                        <div className="flex items-center gap-1.5">
+                                            <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1 || isLoading} className="!h-8 !px-3 !text-[10px] !font-black !uppercase">Previous</Button>
+                                            <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages || isLoading} className="!h-8 !px-4 !text-[10px] !font-black !uppercase">Next</Button>
+                                        </div>
+                                    </div>
+                                )
+                            }
                         />
                     ) : (
                         <div className="flex items-center justify-center py-20 text-rose-500 font-bold">

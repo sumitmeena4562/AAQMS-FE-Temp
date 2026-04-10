@@ -14,13 +14,19 @@ import {
 import Button from '../../components/UI/Button';
 import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
+import TableSkeleton from '../../components/UI/TableSkeleton';
+import CardSkeleton from '../../components/UI/CardSkeleton';
 
 import { useOrgStore } from '../../store/useOrgStore';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchyStore } from '../../store/useHierarchyStore';
+import { useHierarchy } from '../../hooks/api/useHierarchy';
+import { useFloors, useZones } from '../../hooks/api/useHierarchyQueries';
+import { useInventory } from '../../hooks/api/useInventoryQueries';
 import AssetInventoryModal from '../../components/Admin/Inventory/AssetInventoryModal';
 import EmptyState from '../../components/Admin/Inventory/EmptyState';
 import AssetCard from '../../components/Admin/Inventory/AssetCard';
+import useDebounce from '../../hooks/useDebounce';
 
 export const AssetIcon = ({ type, className = "" }) => {
     const ASSET_ICONS = {
@@ -41,27 +47,28 @@ const Inventory = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     // ── STORES ──
-    const { 
-        orgs, inventory, inventoryStats, isLoading,
-        fetchInventory, fetchInventoryStats 
-    } = useOrgStore();
+    const { setFilters: setOrgFilters } = useOrgStore(); // only for actions if needed
 
     const { 
         selectedOrg, selectedCoord, selectedSite, selectedFloor, selectedZone,
         setOrg, setCoord, setSite, setFloor, setZone, resetFilters 
     } = useFilterStore();
 
-    const { allSites, allFloors, zones: allZones, fetchLookupSites, fetchLookupFloors, fetchZones } = useHierarchyStore();
+    // ── QUERY HOOKS (UNIFIED) ──
+    const { organizations: orgs, sites: allSites } = useHierarchy();
+    const { data: allFloors = [] } = useFloors(selectedSite);
+    const { data: allZones = [] } = useZones(selectedFloor);
 
     // ── LOCAL STATE ──
     const [selectedAsset, setSelectedAsset] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState('list');
+    // Server-side pagination — page number drives the API call
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
+    const PAGE_SIZE = 20;
 
-    // ── SYNC URL PARAMS & GLOBAL FILTERS ──
+    // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only) ──
     useEffect(() => {
         const pOrg = searchParams.get('org_id') || searchParams.get('org');
         const pSite = searchParams.get('site_id') || searchParams.get('site');
@@ -69,36 +76,40 @@ const Inventory = () => {
         const pZone = searchParams.get('zone_id') || searchParams.get('zone');
         const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
 
-        if (pOrg && !selectedOrg) setOrg(pOrg);
-        if (pSite && !selectedSite) setSite(pSite);
-        if (pFloor && !selectedFloor) setFloor(pFloor);
-        if (pZone && !selectedZone) setZone(pZone);
-        if (pCoord && !selectedCoord) setCoord(pCoord);
-    }, [searchParams, selectedOrg, selectedSite, selectedFloor, selectedZone, selectedCoord, setOrg, setSite, setFloor, setZone, setCoord]);
+        if (pOrg) setOrg(pOrg);
+        if (pSite) setSite(pSite);
+        if (pFloor) setFloor(pFloor);
+        if (pZone) setZone(pZone);
+        if (pCoord) setCoord(pCoord);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // ── FETCH LOOKUP DATA ──
-    useEffect(() => {
-        if (selectedOrg) fetchLookupSites(selectedOrg);
-        if (selectedSite) fetchLookupFloors(selectedSite);
-        if (selectedFloor) fetchZones(selectedFloor);
-    }, [selectedOrg, selectedSite, selectedFloor, fetchLookupSites, fetchLookupFloors, fetchZones]);
+    // ── DEBOUNCED SEARCH ──
+    const debouncedSearch = useDebounce(searchQuery, 400);
 
-    // ── FETCH INVENTORY ──
     const activeFilters = useMemo(() => ({
         org: selectedOrg || 'all',
         site: selectedSite || 'all',
         floor: selectedFloor || 'all',
         zone: selectedZone || 'all',
-        search: searchQuery
-    }), [selectedOrg, selectedSite, selectedFloor, selectedZone, searchQuery]);
+        search: debouncedSearch
+    }), [selectedOrg, selectedSite, selectedFloor, selectedZone, debouncedSearch]);
 
+    // Reset to page 1 when filters or search change
     useEffect(() => {
-        const timer = setTimeout(() => {
-            fetchInventory(activeFilters);
-            fetchInventoryStats(activeFilters);
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [activeFilters, fetchInventory, fetchInventoryStats]);
+        setCurrentPage(1);
+    }, [activeFilters]);
+
+    // ── FETCH INVENTORY (server-side pagination) ──
+    const { data: inventoryData, isLoading, isPlaceholderData } = useInventory(activeFilters, currentPage);
+    
+    const inventory = inventoryData?.results || [];
+    const inventoryStats = inventoryData?.stats || null;
+    const inventoryTotalCount = inventoryData?.count || 0;
+
+    // Page changes handled by local state (currentPage)
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    };
 
     // ── BREADCRUMBS ──
     const currentOrg = orgs.find(o => o.id === selectedOrg);
@@ -201,8 +212,8 @@ const Inventory = () => {
     ], []);
 
     const displayedInventory = inventory || [];
-    const totalPages = Math.ceil(displayedInventory.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
+    const totalPages = Math.ceil(inventoryTotalCount / PAGE_SIZE);
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
 
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-16">
@@ -267,6 +278,7 @@ const Inventory = () => {
                 </FilterBar>
 
                 {viewMode === 'list' ? (
+                    isLoading ? <TableSkeleton rows={10} /> : (
                     <DataTable
                         columns={columns}
                         data={displayedInventory}
@@ -276,18 +288,22 @@ const Inventory = () => {
                         footer={
                             <div className="flex items-center justify-between w-full px-1">
                                 <span className="text-[11px] font-bold text-gray tracking-tight">
-                                    Showing <span className="text-title font-bold">{displayedInventory.length > 0 ? startIndex + 1 : 0} to {startIndex + displayedInventory.length}</span> of <span className="text-title font-bold">{displayedInventory.length}</span> results
+                                    Showing <span className="text-title font-bold">{inventoryTotalCount > 0 ? startIndex + 1 : 0}–{Math.min(startIndex + PAGE_SIZE, inventoryTotalCount)}</span> of <span className="text-title font-bold">{inventoryTotalCount.toLocaleString()}</span> assets
                                 </span>
                                 <div className="flex items-center gap-1.5">
-                                    <Button variant="outline" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="!h-8 !px-3 !text-[10px] !font-black !uppercase">Previous</Button>
-                                    <Button variant="outline" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0} className="!h-8 !px-4 !text-[10px] !font-black !uppercase">Next</Button>
+                                    <Button variant="outline" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1 || isLoading} className="!h-8 !px-3 !text-[10px] !font-black !uppercase">Previous</Button>
+                                    <span className="text-[10px] font-black text-gray px-2">{currentPage} / {totalPages || 1}</span>
+                                    <Button variant="outline" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage >= totalPages || isLoading} className="!h-8 !px-4 !text-[10px] !font-black !uppercase">Next</Button>
                                 </div>
                             </div>
                         }
                     />
+                   )
                 ) : (
                     <div className="flex flex-col gap-6">
-                        {displayedInventory.length > 0 ? (
+                        {isLoading ? (
+                            <CardSkeleton count={8} columns={4} />
+                        ) : displayedInventory.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-5 gap-5">
                                 {displayedInventory.map(asset => <AssetCard key={asset.id} asset={asset} onClick={handleAssetClick} />)}
                             </div>

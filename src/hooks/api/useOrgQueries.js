@@ -1,0 +1,94 @@
+import { useQuery } from '@tanstack/react-query';
+import { organizationService } from '../../services/organizationService';
+
+// Helper to clean mangled Cloudinary URLs (from useOrgStore logic)
+const cleanImageUrl = (url) => {
+    if (typeof url !== 'string') return url;
+    if (url.includes('http') && url.split('http').length > 2) {
+        const parts = url.split('http');
+        return 'http' + parts[parts.length - 1]; 
+    }
+    return url;
+};
+
+// Map Backend data to Frontend format (consistent with useOrgStore)
+const mapOrgToFrontend = (data) => {
+  if (!data) return null;
+  
+  const imagery = {
+    north: '', south: '', east: '', west: '', profile: '', extra: []
+  };
+  
+  if (Array.isArray(data.images)) {
+    data.images.forEach(img => {
+      const type = (img.image_type || '').toLowerCase();
+      const cleanedUrl = cleanImageUrl(img.image_url);
+
+      if (['north', 'south', 'east', 'west', 'profile'].includes(type)) {
+        imagery[type] = cleanedUrl;
+      } else if (type === 'extra') {
+        imagery.extra.push(cleanedUrl);
+      }
+    });
+  }
+
+  const profileImg = imagery.profile || cleanImageUrl(data.image) || '';
+
+  return {
+    ...data,
+    name: data.organisation_name || data.name || '',
+    industry: data.industry_type || data.industry || 'General',
+    occupancyType: data.occupancy_type || data.occupancyType || '',
+    classification: data.classification || '',
+    contactPerson: data.contact_person_name || data.contactPerson || '',
+    contactEmail: data.contact_email || data.contactEmail || '',
+    contactPhone: data.contact_phone || data.contactPhone || '',
+    address: data.address || '',
+    city: data.city || '',
+    state: data.state || '',
+    country: data.country || '',
+    plannedSites: data.planned_sites || 0,
+    otherInfo: data.description || data.otherInfo || '',
+    isBlocked: data.is_blocked || false,
+    imagery: { ...imagery, profile: profileImg },
+    stats: {
+      sites: data.sites_count || 0,
+      floors: data.floors_count || 0,
+      coordinators: data.coordinators_count || 0,
+      coordinatorNames: data.coordinator_names || []
+    }
+  };
+};
+
+/**
+ * ── ORGANIZATION QUERIES ──
+ */
+
+export const useOrganizations = (filters = {}) => {
+  // Normalize filters to ensure stable Query Keys
+  const cleanFilters = Object.fromEntries(
+    Object.entries(filters).filter(([_, v]) => v !== undefined && v !== null && v !== 'all' && v !== '')
+  );
+
+  return useQuery({
+    queryKey: ['organizations', cleanFilters],
+    queryFn: async () => {
+      const response = await organizationService.getOrganizations(cleanFilters);
+      const data = response.data || response.results || response;
+      return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes fresh data
+  });
+};
+
+export const useOrganizationDetails = (id) => {
+  return useQuery({
+    queryKey: ['organization', id],
+    queryFn: async () => {
+      const data = await organizationService.getOrganizationById(id);
+      return mapOrgToFrontend(data);
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000,
+  });
+};

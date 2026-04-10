@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useOrgStore } from '../../store/useOrgStore';
-import useUserStore from '../../store/userStore';
+import { useOrganizations } from '../../hooks/api/useOrgQueries';
 
 import OrganizationCard from '../../components/UI/OrganizationCard';
 import CreateOrganization from '../../components/UI/CreateOrganization';
@@ -44,12 +44,15 @@ const OrgLogo = ({ org }) => {
 const Organizations = () => {
     // --- Global State ---
     const {
-        orgs, filters, viewMode,
-        addOrg, updateOrg, fetchOrgs, blockOrg,
+        filters, viewMode,
+        addOrg, updateOrg, blockOrg,
         setFilters, setViewMode, resetFilters,
-        isLoading, isSubmitting
+        isSubmitting
     } = useOrgStore();
-    const { users, fetchUsers } = useUserStore();
+
+    // --- QUERY HOOK (NEW) ---
+    // Note: We use the global filters directly in the query key for automatic refetching
+    const { data: orgs = [], isLoading } = useOrganizations(filters);
 
     // --- Local State ---
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -57,34 +60,21 @@ const Organizations = () => {
     const [isViewOnly, setIsViewOnly] = useState(false);
 
     // --- Lifecycle / Effects ---
-    useEffect(() => {
-        fetchUsers();
-        fetchOrgs();
-    }, [fetchUsers, fetchOrgs]);
+    // fetchOrgs is now handled by useOrganizations hook automatically
 
     // --- Memoized Computations ---
+    // Coordinator counts come from org.stats (provided by backend API)
+    // No need to cross-join with user list client-side
     const enrichedOrgs = useMemo(() => {
-        return orgs.map(org => {
-            // In Production, stats should be provided by the Backend API response.
-            // We only map coordinator names for display if users are available.
-            const orgCoordinators = users.filter(u => 
-                (u.role || "").toLowerCase() === 'coordinator' &&
-                ((u.organization || "").trim().toLowerCase() === (org.name || "").trim().toLowerCase() ||
-                 u.organisation_id === org.id)
-            );
-
-            return {
-                ...org,
-                stats: {
-                    ...org.stats, // Preservation of backend stats (sites, floors, zones)
-                    coordinators: orgCoordinators.length || org.stats?.coordinators || 0,
-                    coordinatorNames: orgCoordinators.length > 0 
-                        ? orgCoordinators.map(c => c.name) 
-                        : (org.stats?.coordinatorNames || [])
-                }
-            };
-        });
-    }, [orgs, users]);
+        return orgs.map(org => ({
+            ...org,
+            stats: {
+                ...org.stats,
+                coordinators: org.stats?.coordinators || org.stats?.coordinators_count || 0,
+                coordinatorNames: org.stats?.coordinatorNames || org.stats?.coordinator_names || []
+            }
+        }));
+    }, [orgs]);
 
     const filteredOrgs = useMemo(() => {
         return enrichedOrgs.filter(org => {
@@ -265,7 +255,7 @@ const Organizations = () => {
                 </div>
             )
         }
-    ], [handleBlock, handleEdit, handleView, users]);
+    ], [handleBlock, handleEdit, handleView]);
 
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-12">

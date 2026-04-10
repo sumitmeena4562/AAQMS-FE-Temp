@@ -1,30 +1,29 @@
 import api from './api';
-import { DUMMY_METRIC_CARDS, DUMMY_STATS_GRID, DUMMY_RECENT_ACTIVITY } from '../data/dashboardData';
-import { mapToStatsGrid, mapToMetricCards, mapToActivityFeed } from '../utils/dashboardCalculations';
+import { mapToActivityFeed } from '../utils/dashboardCalculations';
 
 /**
- * ── DASHBOARD API SERVICE ──
-
+ * \u2500\u2500 DASHBOARD API SERVICE \u2500\u2500
  */
-export const getDashboardStats = async () => {
 
-    const response = await api.get('/users/dashboard/');
-    
-    // Use the professional mapping utility to format it for the UI
-    return mapToStatsGrid(response.data.data);
+// \u2500\u2500\u2500 UNIFIED DASHBOARD ENDPOINT (1 call replaces 3) \u2500\u2500\u2500
+export const getDashboardSummary = async () => {
+    const response = await api.get('/users/dashboard/summary/');
+    return response.data; // { stats, metrics, recent_activity }
 };
 
-export const getDashboardMetrics = async () => {
-    const response = await api.get('/users/dashboard/metrics/');
-    return mapToMetricCards(response.data);
-};
-
-export const getRecentActivity = async () => {
-    const response = await api.get('/users/dashboard/activity/');
-    return mapToActivityFeed(response.data);
-};
-
+// \u2500\u2500\u2500 HISTORY (server-side paginated) \u2500\u2500\u2500
 export const getAllHistory = async (filters = {}) => {
-    const response = await api.get('/users/history/', { params: filters });
-    return mapToActivityFeed(response.data.results || response.data);
+    const response = await api.get('/users/history/', {
+        params: {
+            ...filters,
+            page: filters.page || 1,
+            page_size: filters.page_size || 50,
+        }
+    });
+    return {
+        results: mapToActivityFeed(response.data.results || []),
+        count: response.data.count || 0,
+        next: response.data.next,
+        previous: response.data.previous,
+    };
 };
