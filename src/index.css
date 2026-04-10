@@ -119,7 +119,7 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--color-text-muted);
+    background: var(--color-muted);
     border-radius: var(--radius-full);
 }
 
@@ -131,4 +131,23 @@ a {
 .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* ──────────────────────────────────────────
+   PREMIUM UI UTILITIES
+   ────────────────────────────────────────── */
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #3B82F6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
 }

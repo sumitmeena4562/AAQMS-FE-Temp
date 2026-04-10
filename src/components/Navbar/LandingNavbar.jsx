@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
-import { MdSearch, MdOutlineLanguage } from 'react-icons/md';
-import { FaXTwitter, FaGithub } from 'react-icons/fa6';
+import { MdOutlineLanguage } from 'react-icons/md';
+import { FaGithub } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import Logo from '../Branding/Logo';
+import Button from '../ui/Button';
 
-// Stable motion-wrapped Link — created once outside the component
-// to avoid remounting on every render (fixes deprecated motion() warning)
+// Stable motion-wrapped Link
 const MotionLink = motion.create(Link);
 
 const LandingNavbar = ({
@@ -70,25 +70,18 @@ const LandingNavbar = ({
     };
 
     const renderButton = (btn, i, isMobile = false) => {
-        const ButtonComponent = btn.href ? MotionLink : motion.button;
-        const buttonProps = btn.href ? { to: btn.href } : { onClick: btn.onClick };
-
+        const variant = btn.variant === 'filled' ? 'primary' : 'outline';
+        
         return (
-            <ButtonComponent
-                key={i}
-                {...buttonProps}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`
-                    ${isMobile ? 'w-full py-4 text-left px-4' : 'px-4 xl:px-6 py-2 text-center ml-2'}
-                    text-[11px] xl:text-[12px] font-black uppercase tracking-widest rounded-xl transition-all whitespace-nowrap
-                    ${btn.variant === 'filled' 
-                        ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark' 
-                        : 'text-slate-600 hover:text-primary'}
-                `}
-            >
-                {btn.label}
-            </ButtonComponent>
+            <Link key={i} to={btn.href || '/login'} className={isMobile ? 'w-full' : ''}>
+                <Button
+                    variant={variant}
+                    size={isMobile ? "lg" : "md"}
+                    className={isMobile ? 'w-full shadow-none' : 'ml-2'}
+                >
+                    {btn.label}
+                </Button>
+            </Link>
         );
     };
 
@@ -101,7 +94,7 @@ const LandingNavbar = ({
                 className={`
                     ${sticky ? 'fixed' : 'relative'} top-0 left-0 right-0 z-50 px-4 sm:px-8 transition-all duration-500
                     ${isScrolled 
-                        ? 'h-16 py-2 bg-white/80 backdrop-blur-xl border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.02)]' 
+                        ? 'h-16 py-2 glass-panel !bg-white/70' 
                         : 'h-24 py-4 bg-transparent border-b border-transparent'}
                 `}
             >
@@ -114,13 +107,12 @@ const LandingNavbar = ({
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             className="cursor-pointer flex items-center"
                         >
-                            <Logo size="lg" className="text-slate-900" />
+                            <Logo size="lg" className="text-text" />
                         </motion.div>
                     </div>
 
                     {/* Center — Desktop Nav Links with Sliding Pill */}
                     <div className="hidden lg:flex items-center justify-center gap-2 xl:gap-4 flex-[2] relative">
-                        {/* Sliding Pill Background */}
                         <AnimatePresence>
                             {hoveredIdx !== null && (
                                 <motion.div
@@ -128,7 +120,7 @@ const LandingNavbar = ({
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
-                                    className="absolute bg-slate-100/80 rounded-full z-0 h-10"
+                                    className="absolute bg-primary/5 rounded-full z-0 h-10"
                                     style={{
                                         width: 'var(--pill-width)',
                                         left: 'var(--pill-left)',
@@ -159,7 +151,7 @@ const LandingNavbar = ({
                                 }}
                                 className={`
                                     relative z-10 flex flex-col items-center gap-1.5 px-3 py-2 text-[12px] xl:text-[13px] font-bold tracking-tight transition-colors duration-300 whitespace-nowrap cursor-pointer
-                                    ${activeIdx === idx ? 'text-primary' : 'text-slate-500 hover:text-slate-900'}
+                                    ${activeIdx === idx ? 'text-primary' : 'text-muted hover:text-text'}
                                 `}
                                 style={{ position: 'relative' }}
                             >
@@ -170,7 +162,6 @@ const LandingNavbar = ({
                                     )}
                                 </div>
                                 
-                                {/* Active Link Dot */}
                                 {activeIdx === idx && (
                                     <motion.div 
                                         layoutId="active-dot"
@@ -184,12 +175,11 @@ const LandingNavbar = ({
 
                     {/* Right — Desktop Buttons & Icons */}
                     <div className="hidden lg:flex items-center justify-end gap-3 xl:gap-5 flex-1">
-                        {/* Global/Social Switcher */}
-                        <div className="flex items-center gap-3 text-slate-400">
+                        <div className="flex items-center gap-3 text-muted/60">
                             <motion.button whileHover={{ scale: 1.1, color: 'var(--color-primary)' }} className="transition-colors">
                                 <MdOutlineLanguage className="text-xl" />
                             </motion.button>
-                            <motion.button whileHover={{ scale: 1.1, color: '#000' }} className="transition-colors hidden xl:block">
+                            <motion.button whileHover={{ scale: 1.1, color: 'var(--color-text)' }} className="transition-colors hidden xl:block">
                                 <FaGithub className="text-lg" />
                             </motion.button>
                         </div>
@@ -200,7 +190,7 @@ const LandingNavbar = ({
                     {/* Mobile Menu Toggle Button */}
                     <motion.button
                         whileTap={{ scale: 0.9 }}
-                        className="lg:hidden relative z-[60] p-2 bg-white/50 backdrop-blur-md border border-slate-200 rounded-xl text-slate-900 shadow-sm"
+                        className="lg:hidden relative z-[60] p-2 glass-panel !rounded-xl text-text shadow-sm"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         <div className="w-6 h-6 flex flex-col items-center justify-center gap-1.5">
@@ -235,10 +225,10 @@ const LandingNavbar = ({
                         animate="open"
                         exit="closed"
                         variants={menuVariants}
-                        className="fixed inset-0 z-[55] flex flex-col bg-white/95 backdrop-blur-2xl p-8 pt-28 gap-12 lg:hidden"
+                        className="fixed inset-0 z-[55] flex flex-col bg-background/95 backdrop-blur-2xl p-8 pt-28 gap-12 lg:hidden"
                     >
                         <div className="flex flex-col gap-8">
-                            <div className="text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">Navigation</div>
+                            <div className="text-[10px] font-black tracking-[0.3em] text-muted uppercase">Navigation</div>
                             <div className="flex flex-col gap-6">
                                 {navLinks.map((link) => (
                                     <motion.a
@@ -253,7 +243,7 @@ const LandingNavbar = ({
                                             }
                                         }}
                                         whileHover={{ x: 10 }}
-                                        className="text-2xl font-black text-slate-900 flex items-center gap-4 transition-colors hover:text-primary group"
+                                        className="text-2xl font-black text-text flex items-center gap-4 transition-colors hover:text-primary group"
                                     >
                                         <span className="w-1.5 h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                                         {link.label}
@@ -262,10 +252,10 @@ const LandingNavbar = ({
                             </div>
                         </div>
 
-                        <div className="h-px bg-slate-100 w-full" />
+                        <div className="h-px bg-border w-full" />
 
                         <div className="flex flex-col gap-8">
-                            <div className="text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase font-sans">Account</div>
+                            <div className="text-[10px] font-black tracking-[0.3em] text-muted uppercase font-sans">Account</div>
                             <div className="flex flex-col gap-5">
                                 {buttons.map((btn, i) => renderButton(btn, i, true))}
                             </div>
