@@ -67,6 +67,7 @@ const Zones = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [selectedMediaZone, setSelectedMediaZone] = useState(null);
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
     const { 
         setOrg, setCoord, setSite, setFloor, resetFilters 
@@ -144,6 +145,13 @@ const Zones = () => {
             return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.count ?? 0}` };
         });
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, selectedOrg, selectedSite, selectedFloor]);
+
+    const totalPages = Math.ceil(processedZones.length / 10);
+    const paginatedZones = processedZones.slice((currentPage - 1) * 10, currentPage * 10);
+
     const handleResetAll = () => { resetFilters(); setSearchParams({}); clearSearch(); };
     const handleViewMedia = (zone) => { setSelectedMediaZone(zone); setIsMediaModalOpen(true); };
 
@@ -181,16 +189,30 @@ const Zones = () => {
                             <Button onClick={() => fetchZones(selectedFloor || null)} variant="outline" className="mt-6">Try Again</Button>
                         </div>
                     ) : zones.length > 0 ? (
-                        <div className="h-full">
-                            <ZonesTable data={processedZones} selectionMode={false} onViewMedia={handleViewMedia} />
+                        <div className="flex flex-col gap-6">
+                            <ZonesTable data={paginatedZones} selectionMode={false} onViewMedia={handleViewMedia} />
+                            
+                            {totalPages > 1 && (
+                                <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm">
+                                    <span className="text-[10px] font-black text-gray uppercase tracking-[0.2em]">
+                                        Page {currentPage} of {totalPages} &nbsp;·&nbsp; {processedZones.length} Zones Total
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
+                                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     ) : (
-                        <div className="w-full py-32 flex flex-col items-center justify-center text-center bg-card/50 rounded-3xl border-2 border-dashed border-border-main/50 mx-4">
-                            <div className="w-16 h-16 bg-base rounded-full flex items-center justify-center mb-6 border border-border-main/30">
-                                <Layout className="w-6 h-6 text-primary" />
+                        <div className="w-full py-40 flex flex-col items-center justify-center text-center bg-card/40 rounded-[2rem] border-2 border-dashed border-border-main/60">
+                            <div className="w-20 h-20 bg-base rounded-3xl flex items-center justify-center mb-6 border border-border-main/30 rotate-6 shadow-inner">
+                                <FiInbox className="w-8 h-8 text-primary/40" />
                             </div>
-                            <h3 className="text-lg font-bold text-title mb-1">No Zones Found</h3>
-                            <p className="text-sm text-gray max-w-[260px] mb-8">Try adjusting your filters to see more results.</p>
+                            <h3 className="text-2xl font-black text-title tracking-tight mb-2">No Zones Found</h3>
+                            <p className="text-gray text-xs max-w-sm mb-8 font-medium leading-relaxed px-10">
+                                We couldn't find any zones matching your selection. Try adjusting your filters.
+                            </p>
                         </div>
                     )}
                 </div>

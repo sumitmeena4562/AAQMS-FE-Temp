@@ -60,6 +60,7 @@ const Organizations = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingOrg, setEditingOrg] = useState(null);
     const [isViewOnly, setIsViewOnly] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
     // --- Lifecycle / Effects ---
     // fetchOrgs is now handled by useOrganizations hook automatically
@@ -91,6 +92,13 @@ const Organizations = () => {
             return matchesIndustry && matchesStatus && matchesSearch;
         });
     }, [enrichedOrgs, filters, searchQuery]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filters, searchQuery]);
+
+    const totalPages = Math.ceil(filteredOrgs.length / 10);
+    const paginatedOrgs = filteredOrgs.slice((currentPage - 1) * 10, currentPage * 10);
 
     const industryOptions = useMemo(() => {
         const uniqueIndustries = [...new Set(orgs.map(o => o.industry).filter(Boolean))];
@@ -341,32 +349,58 @@ const Organizations = () => {
                     </div>
                 ) : filteredOrgs.length > 0 ? (
                     viewMode === 'grid' ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-                            {filteredOrgs.map((org, index) => (
-                                <div key={org.id || `org-${index}`} className="w-full">
-                                    <OrganizationCard
-                                        org={org}
-                                        onEdit={() => handleEdit(org)}
-                                        onView={() => handleView(org)}
-                                        onBlock={() => handleBlock(org)}
-                                    />
+                        <div className="flex flex-col gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+                                {paginatedOrgs.map((org, index) => (
+                                    <div key={org.id || `org-${index}`} className="w-full">
+                                        <OrganizationCard
+                                            org={org}
+                                            onEdit={() => handleEdit(org)}
+                                            onView={() => handleView(org)}
+                                            onBlock={() => handleBlock(org)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                            {totalPages > 1 && (
+                                <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm">
+                                    <span className="text-[10px] font-bold text-gray uppercase tracking-widest">
+                                        Page {currentPage} of {totalPages}
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
+                                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
+                                    </div>
                                 </div>
-                            ))}
+                            )}
                         </div>
                     ) : (
                         <DataTable
                             columns={tableColumns}
-                            data={filteredOrgs}
+                            data={paginatedOrgs}
                             onRowClick={handleView}
+                            footer={
+                                totalPages > 1 && (
+                                    <div className="flex items-center justify-between w-full pt-2">
+                                        <span className="text-[10px] font-bold text-gray uppercase tracking-widest">
+                                            Page {currentPage} of {totalPages}
+                                        </span>
+                                        <div className="flex items-center gap-1.5 focus-within:z-10">
+                                            <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-8 !px-3 !text-[10px] !font-black !uppercase">Previous</Button>
+                                            <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages} className="!h-8 !px-4 !text-[10px] !font-black !uppercase">Next</Button>
+                                        </div>
+                                    </div>
+                                )
+                            }
                         />
                     )
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-24 bg-card/40 border-2 border-dashed border-border-main rounded-3xl animate-in zoom-in duration-300">
+                    <div className="w-full flex flex-col items-center justify-center py-32 bg-card/40 border-2 border-dashed border-border-main rounded-3xl animate-in zoom-in duration-300">
                         <div className="w-16 h-16 bg-base rounded-2xl flex items-center justify-center mb-5 rotate-3">
                             <FiInbox className="w-7 h-7 text-gray/40" />
                         </div>
                         <h3 className="text-lg font-black text-title mb-1">No Organizations Found</h3>
-                        <p className="text-gray text-xs mb-8 text-center max-w-xs px-6 font-medium leading-relaxed">
+                        <p className="text-gray text-xs mb-8 text-center max-w-[340px] px-4 font-medium leading-relaxed whitespace-normal break-words">
                             We couldn&apos;t find any organization matching your selection. Try clearing your filters.
                         </p>
                         <button

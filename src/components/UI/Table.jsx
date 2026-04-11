@@ -63,12 +63,12 @@ const Table = ({
             <div className="overflow-x-auto custom-scrollbar">
                 <table className="w-full border-collapse min-w-[700px] lg:min-w-full">
                     <thead>
-                        <tr className="bg-base/80 backdrop-blur-sm border-b border-border-main/60">
+                        <tr className="bg-base border-b border-border-main/80">
                             {columns.map((col, i) => (
                                 <th
                                     key={i}
                                     className={`
-                                        px-2.5 py-3 text-[10px] font-bold text-gray uppercase tracking-[0.12em] whitespace-nowrap
+                                        px-6 py-4.5 text-[10px] font-black text-body uppercase tracking-[0.15em] whitespace-nowrap border-b border-border-main/50 bg-base/30
                                         ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
                                         ${col.className || ''}
                                     `}

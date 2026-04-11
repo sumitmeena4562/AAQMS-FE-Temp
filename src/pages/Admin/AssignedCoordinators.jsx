@@ -14,6 +14,7 @@ import { FiHome, FiBriefcase, FiGrid, FiList } from 'react-icons/fi';
 const AssignedCoordinators = () => {
   const location = useLocation();
   const [view, setView] = React.useState('list');
+  const [currentPage, setCurrentPage] = React.useState(1);
   const { selectedOrg, setOrg } = useFilterStore();
   
   // --- QUERY HOOKS (UNIFIED) ---
@@ -114,14 +115,32 @@ const AssignedCoordinators = () => {
               {isLoading ? (
                 <CardSkeleton count={6} columns={3} />
               ) : coordinatorsList.length > 0 ? (
-                coordinatorsList.map((coord, index) => (
-                  <CoordinatorCard key={index} coordinator={coord} orgName={orgName} view={view} />
-                ))
+                <>
+                  {coordinatorsList.slice((currentPage - 1) * 10, currentPage * 10).map((coord, index) => (
+                    <CoordinatorCard key={index} coordinator={coord} orgName={orgName} view={view} />
+                  ))}
+                  
+                  {coordinatorsList.length > 10 && (
+                    <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm mt-6 col-span-full">
+                      <span className="text-[10px] font-black text-gray uppercase tracking-widest">
+                        Page {currentPage} of {Math.ceil(coordinatorsList.length / 10)}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
+                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(coordinatorsList.length / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
+                      </div>
+                    </div>
+                  )}
+                </>
               ) : (
-                <div className="text-center py-12 bg-card rounded-lg border border-border-main col-span-full">
-                  <p className="text-gray font-medium tracking-wide">
-                    No users assigned to this organization yet.
-                    <br /><span className="text-xs text-gray/60 mt-2 block">Go to User Management to create and assign users.</span>
+                <div className="w-full flex flex-col items-center justify-center py-24 bg-card/40 rounded-3xl border-2 border-dashed border-border-main col-span-full animate-in zoom-in duration-300">
+                  <div className="w-16 h-16 bg-base rounded-2xl flex items-center justify-center mb-5 -rotate-3">
+                    <FiInbox className="w-7 h-7 text-gray/40" />
+                  </div>
+                  <h3 className="text-xl font-black text-title mb-2">No Personnel Records</h3>
+                  <p className="text-gray text-xs mb-8 text-center max-w-sm px-6 font-medium leading-relaxed">
+                    No users assigned to this organization yet. 
+                    <br />Go to User Management to create and assign users.
                   </p>
                 </div>
               )}

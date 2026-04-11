@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
@@ -19,6 +19,7 @@ const FloorPlan = () => {
   
   const passedOrgId = searchParams.get('org_id');
   const passedOrgName = searchParams.get('org_name');
+  const [currentPage, setCurrentPage] = useState(1);
   const passedCoordId = searchParams.get('coord_id');
   const passedCoordName = searchParams.get('coord');
   const passedSiteId = searchParams.get('site_id');
@@ -137,15 +138,29 @@ const FloorPlan = () => {
                <FiAlertCircle className="w-8 h-8 mb-3" />
                <p className="text-sm font-medium">{hierarchyError}</p>
             </div>
-          ) : floorList.length > 0 ? (
-            floorList.map((floor, index) => (
-              <FloorCard 
-                key={floor.id || index} 
-                floor={floor} 
-                site={siteInfo}
-                onClick={() => handleFloorClick(floor)} 
-              />
-            ))
+          ): floorList.length > 0 ? (
+            <>
+              {floorList.slice((currentPage - 1) * 10, currentPage * 10).map((floor, index) => (
+                <FloorCard 
+                  key={floor.id || index} 
+                  floor={floor} 
+                  site={siteInfo}
+                  onClick={() => handleFloorClick(floor)} 
+                />
+              ))}
+
+              {floorList.length > 10 && (
+                  <div className="flex items-center justify-between px-4 py-4 bg-card border border-border-main rounded-2xl shadow-sm mt-6 col-span-full">
+                      <span className="text-[10px] font-black text-gray uppercase tracking-widest">
+                          Page {currentPage} of {Math.ceil(floorList.length / 10)}
+                      </span>
+                      <div className="flex items-center gap-2">
+                          <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
+                          <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(floorList.length / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
+                      </div>
+                  </div>
+              )}
+            </>
           ) : (
             <div className="w-full py-24 flex flex-col items-center justify-center text-gray/40 bg-base/20 rounded-[var(--radius-card)] border border-border-main/40 mt-4">
                <FiAlertCircle className="w-10 h-10 mb-4 opacity-20" />

@@ -67,7 +67,7 @@ const Inventory = () => {
     const [viewMode, setViewMode] = useState('list');
     // Server-side pagination — page number drives the API call
     const [currentPage, setCurrentPage] = useState(1);
-    const PAGE_SIZE = 20;
+    const PAGE_SIZE = 10;
 
     // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only) ──
     useEffect(() => {
@@ -258,9 +258,9 @@ const Inventory = () => {
                 <FilterBar className="!p-2.5">
                     <div className="flex flex-wrap items-center gap-2 flex-1">
                         <FilterDropdown label="Organization" options={orgs.map(o => ({ value: o.id, label: o.name }))} value={selectedOrg} onChange={setOrg} allLabel="All Orgs" multiple={true} />
-                        <FilterDropdown label="Site" options={allSites.map(s => ({ value: s.id, label: s.name }))} value={selectedSite} onChange={setSite} allLabel="All Sites" multiple={true} />
-                        <FilterDropdown label="Floor" options={allFloors.map(f => ({ value: f.id, label: f.name }))} value={selectedFloor} onChange={setFloor} allLabel="All Floors" multiple={true} />
-                        <FilterDropdown label="Zone" options={allZones.map(z => ({ value: z.id, label: z.name }))} value={selectedZone} onChange={setZone} allLabel="All Zones" multiple={true} />
+                        <FilterDropdown label="Site" options={allSites.map(s => ({ value: s.id, label: s.name }))} value={selectedSite} onChange={setSite} allLabel="All Sites" multiple={true} disabled={selectedOrg.length === 0} />
+                        <FilterDropdown label="Floor" options={allFloors.map(f => ({ value: f.id, label: f.name }))} value={selectedFloor} onChange={setFloor} allLabel="All Floors" multiple={true} disabled={selectedSite.length === 0} />
+                        <FilterDropdown label="Zone" options={allZones.map(z => ({ value: z.id, label: z.name }))} value={selectedZone} onChange={setZone} allLabel="All Zones" multiple={true} disabled={selectedFloor.length === 0} />
                         
                         <div className="w-[1.5px] h-6 bg-border-main/40 mx-2" />
                         

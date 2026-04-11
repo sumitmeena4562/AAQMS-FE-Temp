@@ -19,6 +19,7 @@ const SitePlan = () => {
   
   const [searchParams, setSearchParams] = useSearchParams();
   const { resetFilters } = useFilterStore();
+  const [currentPage, setCurrentPage] = useState(1);
   
   const passedOrgId = searchParams.get('org_id');
   const passedOrgNameFromUrl = searchParams.get('org_name');
@@ -133,7 +134,7 @@ const SitePlan = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {sitePlans.map((item, index) => (
+            {sitePlans.slice((currentPage - 1) * 10, currentPage * 10).map((item, index) => (
               <div key={item.id || index} className="w-full max-w-[340px]">
                 <OrganizationCard
                   org={item}
@@ -142,6 +143,18 @@ const SitePlan = () => {
                 />
               </div>
             ))}
+
+            {sitePlans.length > 10 && (
+                <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm mt-6 col-span-full">
+                    <span className="text-[10px] font-black text-gray uppercase tracking-widest">
+                        Page {currentPage} of {Math.ceil(sitePlans.length / 10)}
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
+                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(sitePlans.length / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
+                    </div>
+                </div>
+            )}
           </div>
         )}
 

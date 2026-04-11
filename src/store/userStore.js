@@ -25,7 +25,7 @@ const useUserStore = create((set, get) => ({
     sortKey: 'created_at',
     sortDir: 'desc',
     selectedIds: [],
-    limit: 20,  // page_size
+    limit: 10,  // page_size
     page: 1,    // current page
     loading: false, // kept for mutation-specific loading if needed
     error: null,

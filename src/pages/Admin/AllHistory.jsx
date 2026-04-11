@@ -78,13 +78,13 @@ export default function AllHistory() {
     const queryFilters = useMemo(() => ({
         ...filters,
         page: currentPage,
-        page_size: 50
+        page_size: 10
     }), [filters, currentPage]);
 
     const { data: historyResponse, isLoading, isError } = useAllHistory(queryFilters);
     const activityList = historyResponse?.results || [];
     const totalCount = historyResponse?.count || 0;
-    const totalPages = Math.ceil(totalCount / 50);
+    const totalPages = Math.ceil(totalCount / 10);
 
     const activeFilterCount = Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v !== '').length;
 
@@ -268,6 +268,7 @@ export default function AllHistory() {
                                     </div>
                                 )
                             }
+                            pageSize={10}
                         />
                     ) : (
                         <div className="flex items-center justify-center py-20 text-rose-500 font-bold">
