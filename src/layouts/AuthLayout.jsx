@@ -39,7 +39,7 @@ const AuthLayout = ({ children }) => {
 
             {/* --- Left Side: Enterprise Sidebar (Hidden on Mobile) --- */}
             <div 
-                className="hidden lg:flex flex-1 bg-title flex-col justify-start relative overflow-hidden z-10"
+                className="hidden lg:flex flex-[1.5] bg-title flex-col justify-start relative overflow-hidden z-10 min-w-[550px]"
                 style={{ clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0 100%)' }}
             >
                 {/* Side Content Background Decoration */}
@@ -65,11 +65,11 @@ const AuthLayout = ({ children }) => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 1, 0.36, 1] }}
-                    className="relative z-10 mt-20 lg:mt-32"
+                    className="relative z-10 mt-12 lg:mt-16"
                     style={{ 
-                        paddingLeft: 'clamp(2rem, calc((100vw - 1280px) / 2), 20rem)',
-                        paddingRight: '4rem' 
-                    }}
+                        paddingLeft: 'clamp(3rem, calc((100vw - 1280px) / 2), 20rem)',
+                        paddingRight: '6rem' 
+                    } }
                 >
                     {/* Badge */}
                     <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-[10px] font-black tracking-[0.2em] text-blue-200 uppercase mb-8 shadow-xl">
@@ -77,14 +77,14 @@ const AuthLayout = ({ children }) => {
                         Enterprise Governance
                     </div>
 
-                    <h1 className="text-[clamp(2.5rem,4vw,3.5rem)] font-black text-white leading-[1.05] tracking-tighter mb-6">
-                        Structured Safety.<br />
-                        <span className="bg-gradient-to-r from-blue-300 to-indigo-200 bg-clip-text text-transparent">
+                    <h1 className="text-[clamp(2.5rem,4.5vw,4.5rem)] font-black text-white leading-[1.05] tracking-tighter mb-6 whitespace-pre-line">
+                        Structured Safety.
+                        <span className="bg-gradient-to-r from-blue-300 to-indigo-200 bg-clip-text text-transparent block mt-1">
                             Intelligent Monitoring.
                         </span>
                     </h1>
 
-                    <p className="text-lg text-gray/80 leading-relaxed max-w-xl font-medium">
+                    <p className="text-xl text-gray/90 leading-relaxed max-w-2xl font-medium">
                         Seamlessly manage environmental compliance and asset audits with our next-gen predictive engine.
                     </p>
 

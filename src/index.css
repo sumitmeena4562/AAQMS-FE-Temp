@@ -28,6 +28,8 @@
     --color-text-body: var(--color-body);
     --color-text-muted: var(--color-gray);
     --color-text-primary: var(--color-primary);
+    --color-text-inverse: #FFFFFF;
+    --color-text-sidebar: rgba(255, 255, 255, 0.7);
 
     /* ── SEMANTIC ALIASES (For Auth & Legacy Components) ── */
     --color-base: var(--color-background);
@@ -60,6 +62,9 @@
     --radius-md: 12px;
     --radius-lg: 16px;
     --radius-xl: 24px;
+    --radius-card: 32px;
+    --radius-button: 12px;
+    --radius-input: 12px;
     --radius-full: 9999px;
 
     /* ── SHADOWS ── */
