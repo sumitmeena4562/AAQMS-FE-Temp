@@ -42,7 +42,7 @@ function LoginPage() {
 
             setFailedAttempts(0);
 
-            toast.success(`Hi ${result.user.name || 'User'}, welcome back!`);
+            toast.success(`Welcome back, ${result.user.name || 'User'}! Authentication successful.`);
             
             const role = (result.user.role || '').toLowerCase();
             if (role === 'coordinator') {

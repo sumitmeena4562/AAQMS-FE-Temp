@@ -73,6 +73,9 @@ const AppRoutes = () => {
             {/* Global Toaster for notifications */}
             <Toaster 
                 position='top-center'
+                containerStyle={{
+                    zIndex: 10001,
+                }}
                 toastOptions={{
                     duration: 4000,
                     style: {

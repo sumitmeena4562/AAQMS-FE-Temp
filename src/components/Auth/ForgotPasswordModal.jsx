@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
@@ -95,10 +96,10 @@ function ForgotPasswordModal({ isOpen, onClose }) {
             setEmail(data.email);
             setStep(STEPS.OTP);
             setCooldown(60); // Start 60 second timer
-            toast.success("OTP sent to your email!");
+            toast.success("Verification code sent! Please check your inbox.");
         } else {
             // If backend throws 429 Too Many Requests, it will be caught here
-            toast.error(res.error || "Failed to send OTP. Please try again later.");
+            toast.error(res.error || "Unable to send code. Please try again after some time.");
         }
     };
 
@@ -107,9 +108,9 @@ function ForgotPasswordModal({ isOpen, onClose }) {
         if (res.success) {
             setOtp(data.otp);
             setStep(STEPS.RESET);
-            toast.success("OTP verified!");
+            toast.success("Identity verified successfully.");
         } else {
-            toast.error(res.error || "Invalid OTP");
+            toast.error(res.error || "Invalid or expired verification code.");
         }
     };
 
@@ -117,34 +118,34 @@ function ForgotPasswordModal({ isOpen, onClose }) {
         const res = await resetPassword(email, otp, data.password);
         if (res.success) {
             setStep(STEPS.SUCCESS);
-            toast.success("Password reset successful!");
+            toast.success("Password reset completed. You can now sign in.");
         } else {
-            toast.error(res.error || "Reset failed");
+            toast.error(res.error || "Reset failed. Please verify your connection.");
         }
     };
 
-    if (!isOpen) return null;
-
-    return (
+    return createPortal(
         <AnimatePresence>
-            <motion.div
-                className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-                variants={backdropVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-            >
-                {/* Backdrop */}
-                <div 
-                    className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
-                    onClick={onClose}
-                />
+            {isOpen && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                    {/* Backdrop */}
+                    <motion.div 
+                        variants={backdropVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+                        onClick={onClose}
+                    />
 
-                {/* Modal Container */}
-                <motion.div
-                    variants={modalVariants}
-                    className="bg-card/90 backdrop-blur-2xl p-8 md:p-10 rounded-[var(--radius-card)] shadow-2xl border border-white/50 relative overflow-hidden group ring-1 ring-border-main/50 w-full max-w-md z-10"
-                >
+                    {/* Modal Container */}
+                    <motion.div
+                        variants={modalVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        className="bg-white/95 backdrop-blur-2xl p-8 md:p-10 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-white relative overflow-hidden w-full max-w-[440px] z-10"
+                    >
                     {/* Close Button */}
                     <button 
                         onClick={onClose}
@@ -181,8 +182,10 @@ function ForgotPasswordModal({ isOpen, onClose }) {
                     <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
                     <div className="absolute -top-10 -left-10 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
                 </motion.div>
-            </motion.div>
-        </AnimatePresence>
+            </div>
+        )}
+    </AnimatePresence>,
+        document.body
     );
 }
 
