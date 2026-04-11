@@ -1,9 +1,10 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Heading, Text } from '../../components/UI/Typography';
 import Button from '../../components/UI/Button';
 import { Link } from 'react-router-dom';
 import { HERO_DATA } from '../../data/landingData';
+import MagneticButton from '../../components/UI/MagneticButton';
+import { BRAND_NAME, BRAND_TAGLINE } from '../../components/Branding/BrandConfig';
 
 const Hero = () => {
     const { badge, title, description, ctaText, stats, capabilities } = HERO_DATA;
@@ -26,31 +27,10 @@ const Hero = () => {
     };
 
     return (
-        <section className="relative min-h-[90vh] flex flex-col items-center justify-between pt-32 sm:pt-40 pb-16 overflow-hidden bg-background">
-            {/* --- Structural Glow (Focus on Lines) --- */}
-            <div className="absolute inset-0 pointer-events-none select-none" aria-hidden="true">
-                {/* Minimal Base Glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--color-primary)_0%,_transparent_70%)] opacity-[0.03]" />
+        <section className="relative min-h-[90vh] flex flex-col items-center justify-between pt-32 sm:pt-40 pb-16 overflow-hidden bg-transparent transition-colors duration-500">
 
-                {/* Glowing Structural Arcs (Minimized) */}
-                <motion.div
-                    animate={{ opacity: [0.05, 0.15, 0.05] }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[100%] max-w-[800px] aspect-square rounded-full border border-primary/[0.05] border-dashed animate-[spin_120s_linear_infinite]"
-                />
-
-                <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[70%] max-w-[600px] aspect-square rounded-full border border-primary/[0.03]" />
-
-                {/* Subtle Nodes with Glow */}
-                <motion.div
-                    animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.2, 1] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                    className="absolute top-[35%] left-[30%] w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_var(--color-primary)]"
-                />
-
-                {/* Content Focus Halo */}
-                <div className="absolute top-[40%] left-1/2 -translate-x-1/2 w-[30%] h-[30%] bg-primary/[0.03] blur-3xl" />
-            </div>
+            {/* Content Focus Halo */}
+            <div className="absolute top-[40%] left-1/2 -translate-x-1/2 w-[30%] h-[30%] bg-primary/[0.03] blur-3xl pointer-events-none" aria-hidden="true" />
 
             {/* --- Main Content --- */}
             <motion.div
@@ -85,19 +65,21 @@ const Hero = () => {
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10 w-full sm:w-auto px-4 sm:px-0">
-                    <Link to="/login" className="w-full sm:w-auto">
-                        <Button
-                            variant="primary"
-                            size="lg"
-                            className="w-full sm:w-auto h-[52px] px-8 group rounded-full text-sm sm:text-base border border-white/10"
-                            aria-label={`${ctaText} and access your dashboard`}
-                        >
-                            {ctaText}
-                            <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                <path d="M5 12h14m-7-7 7 7-7 7" />
-                            </svg>
-                        </Button>
-                    </Link>
+                    <MagneticButton className="w-full sm:w-auto">
+                        <Link to="/login" className="w-full sm:w-auto">
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                className="w-full sm:w-auto h-[52px] px-8 group rounded-full text-sm sm:text-base border border-white/10 shadow-lg shadow-primary/20"
+                                aria-label={`${ctaText} and access your ${BRAND_NAME} dashboard`}
+                            >
+                                {ctaText}
+                                <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                    <path d="M5 12h14m-7-7 7 7-7 7" />
+                                </svg>
+                            </Button>
+                        </Link>
+                    </MagneticButton>
 
                     <div className="flex items-center gap-5 sm:border-l sm:border-border sm:pl-8 group cursor-default">
                         <motion.span
@@ -116,12 +98,18 @@ const Hero = () => {
 
             {/* --- Sleek Capability Bar --- */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1, duration: 1 }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ 
+                    opacity: 1, 
+                    y: [0, -8, 0], // Floating Effect
+                }}
+                transition={{ 
+                    opacity: { delay: 1, duration: 1 },
+                    y: { duration: 6, repeat: Infinity, ease: "easeInOut" }
+                }}
                 className="relative w-full max-w-4xl px-4 sm:px-8 z-30 mt-10 sm:mt-12"
             >
-                <div className="glass-panel rounded-3xl px-8 sm:px-12 py-4 sm:py-3.5 flex flex-col xs:grid xs:grid-cols-2 lg:flex lg:flex-row items-center justify-center gap-8 sm:gap-10 md:gap-12 lg:gap-14">
+                <div className="glass-panel rounded-3xl px-8 sm:px-12 py-4 sm:py-3.5 flex flex-col xs:grid xs:grid-cols-2 lg:flex lg:flex-row items-center justify-center gap-8 sm:gap-10 md:gap-12 lg:gap-14 border border-white/20 shadow-xl">
                     {capabilities.map((cap, i) => (
                         <div key={i} className="flex items-center gap-3 sm:gap-3 group cursor-pointer transition-all hover:translate-y-[-1px] w-full xs:w-auto justify-center">
                             <div className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-primary/5 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm flex-shrink-0">

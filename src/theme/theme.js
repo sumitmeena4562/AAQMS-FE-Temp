@@ -12,33 +12,33 @@
 
 // ── Colors ──────────────────────────────────────────────────────────────────────
 const color = {
-    // Core
-    primary:        '#072267',
-    primaryDark:    '#051b52',
-    primaryLight:   '#0070F3',
-    primaryBg:      '#F0F7FF',
-    primaryBorder:  '#EAEAEA',
+    // Core (Synced with CSS variables)
+    primary:        'var(--color-primary)',
+    primaryDark:    'var(--color-primary-dark)',
+    primaryLight:   'var(--color-secondary)',
+    primaryBg:      'var(--color-accent-soft)',
+    primaryBorder:  'var(--color-border)',
 
     // Text
-    text:           '#111827',
-    textSecondary:  '#374151',
-    textTertiary:   '#4B5563',
-    textMuted:      '#6B7280',
+    text:           'var(--color-text-title)',
+    textSecondary:  'var(--color-text-body)',
+    textTertiary:   'var(--color-text-muted)',
+    textMuted:      'var(--color-text-muted)',
     textPlaceholder:'#9CA3AF',
     textInverse:    '#FFFFFF',
 
     // Backgrounds
-    bg:             '#FFFFFF',
-    bgPage:         '#f3f3f3',
-    bgHover:        '#F9FAFB',
-    bgMuted:        '#F3F4F6',
-    bgDark:         '#F9FAFB',
+    bg:             'var(--color-surface)',
+    bgPage:         'var(--color-background)',
+    bgHover:        'rgba(var(--color-primary-rgb), 0.03)',
+    bgMuted:        'var(--color-background)',
+    bgDark:         'var(--color-background)',
 
     // Borders
-    border:         '#E5E7EB',
-    borderLight:    '#F3F4F6',
-    borderDark:     '#D1D5DB',
-    borderInput:    '#E5E7EB',
+    border:         'var(--color-border)',
+    borderLight:    'var(--color-border-subtle)',
+    borderDark:     'var(--color-border)',
+    borderInput:    'var(--color-border)',
 
     // Status — Success
     success:        '#059669',

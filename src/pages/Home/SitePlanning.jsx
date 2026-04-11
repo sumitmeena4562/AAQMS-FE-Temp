@@ -2,14 +2,19 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import SectionHeader from '../../components/UI/SectionHeader';
 import Card from '../../components/UI/Card';
+import FeatureCard from '../../components/UI/FeatureCard';
 import { SITE_PLANNING_DATA } from '../../data/landingData';
 import { MdOutlineFilterCenterFocus, MdOutlineLayers } from 'react-icons/md';
+import SectionWrapper from '../../components/Layout/SectionWrapper';
 
 const SitePlanning = () => {
     const { badge, title, description, features } = SITE_PLANNING_DATA;
 
     return (
-        <section id="planning" className="relative py-16 sm:py-24 px-6 overflow-hidden bg-background border-y border-border/40">
+        <SectionWrapper 
+            id="planning" 
+            backgroundProps={{ showScanner: true, glowIntensity: 0.35, gridOpacity: 0.1 }}
+        >
             {/* Unified Section Header */}
             <SectionHeader
                 badge={badge}
@@ -119,34 +124,22 @@ const SitePlanning = () => {
                         </Card>
                     </motion.div>
 
-                    {/* Right Side: Features List */}
-                    <div className="flex flex-col gap-8">
+                    <div className="flex flex-col gap-6 sm:gap-8">
                         {features.map((item, idx) => (
-                            <motion.div 
-                                key={idx}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.3 + (idx * 0.1), duration: 0.8 }}
-                                className="flex gap-5 group"
-                            >
-                                <div className="min-w-[48px] h-12 rounded-xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10 group-hover:bg-primary group-hover:text-white transition-all duration-500 flex-shrink-0 shadow-sm">
-                                    <item.icon className="text-[22px]" aria-hidden="true" />
-                                </div>
-                                <div className="flex flex-col gap-1.5">
-                                    <h5 className="text-[17px] sm:text-[18px] font-black text-text-title tracking-tight group-hover:text-primary transition-colors leading-tight">
-                                        {item.title}
-                                    </h5>
-                                    <p className="text-[13.5px] sm:text-[14px] text-text-muted leading-relaxed font-medium opacity-80">
-                                        {item.desc}
-                                    </p>
-                                </div>
-                            </motion.div>
+                            <FeatureCard 
+                                key={idx} 
+                                title={item.title}
+                                description={item.desc}
+                                icon={item.icon}
+                                index={idx}
+                                className="!h-auto" // Maintain compact height for side-list
+                                delay={0.3 + (idx * 0.1)}
+                            />
                         ))}
                     </div>
                 </div>
             </div>
-        </section>
+        </SectionWrapper>
     );
 };
 

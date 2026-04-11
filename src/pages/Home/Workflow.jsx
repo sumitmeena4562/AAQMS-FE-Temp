@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import SectionHeader from '../../components/UI/SectionHeader';
 import Card from '../../components/UI/Card';
 import { WORKFLOW_DATA } from '../../data/landingData';
+import SectionWrapper from '../../components/Layout/SectionWrapper';
 
 const LineSegment = ({ scrollYProgress, index, stepsTotal }) => {
     // Each row takes an equal chunk of the container's scroll progress
@@ -11,7 +12,8 @@ const LineSegment = ({ scrollYProgress, index, stepsTotal }) => {
     const end = (index + 1) * segmentSize;
     
     // Scale the line growth within this row's scroll window
-    const scaleY = useTransform(scrollYProgress, [start, end], [0, 1]);
+    // Added a small buffer to ensure segments overlap perfectly
+    const scaleY = useTransform(scrollYProgress, [start, end], [0, 1.05]);
     
     const isFirst = index === 0;
     const isLast = index === stepsTotal - 1;
@@ -109,20 +111,11 @@ const Workflow = () => {
     });
 
     return (
-        <section 
+        <SectionWrapper 
             id="workflow" 
-            className="relative py-20 sm:py-32 px-6 overflow-hidden bg-surface"
             ref={containerRef}
+            backgroundProps={{ showScanner: false, gridOpacity: 0.1 }}
         >
-            {/* Elite Blueprint Grid Pattern */}
-            <div className="absolute inset-0 z-0 opacity-[0.35]" 
-                style={{ 
-                    backgroundImage: `radial-gradient(var(--color-primary) 0.5px, transparent 0.5px)`, 
-                    backgroundSize: '24px 24px' 
-                }} 
-                aria-hidden="true"
-            />
-            
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader badge={badge} title={title} description={description} />
 
@@ -172,7 +165,7 @@ const Workflow = () => {
                     </div>
                 </div>
             </div>
-        </section>
+        </SectionWrapper>
     );
 };
 

@@ -1,18 +1,22 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import Card from '../../components/UI/Card';
 import Button from '../../components/UI/Button';
 import { CTA_DATA } from '../../data/landingData';
+import SectionWrapper from '../../components/Layout/SectionWrapper';
 
 const CTA = () => {
     const { badge, title, description, ctaButton } = CTA_DATA;
 
     return (
-        <section id="contact" className="relative py-12 sm:py-24 px-6 overflow-hidden bg-accent-soft border-t border-border/40">
+        <SectionWrapper 
+            id="contact" 
+            backgroundProps={{ showScanner: false, gridOpacity: 0.1 }}
+            className="py-12 sm:py-24 border-t border-border/40"
+        >
             <div className="max-w-4xl mx-auto relative z-10">
-                <Card 
-                    className="bg-surface border-border/60 py-10 px-6 sm:py-16 sm:px-16 rounded-[32px] text-center shadow-premium overflow-hidden relative"
+                <div 
+                    className="bg-surface border border-border/60 py-10 px-6 sm:py-16 sm:px-16 rounded-[32px] text-center shadow-premium overflow-hidden relative"
                 >
                     {/* Decorative Arcs — Theme Synchronized */}
                     <div className="absolute top-1/2 -left-20 -translate-y-1/2 w-56 h-56 border-[10px] border-primary/5 rounded-full pointer-events-none opacity-40 hidden md:block" aria-hidden="true" />
@@ -58,9 +62,9 @@ const CTA = () => {
                             </Link>
                         </div>
                     </motion.div>
-                </Card>
+                </div>
             </div>
-        </section>
+        </SectionWrapper>
     );
 };
 

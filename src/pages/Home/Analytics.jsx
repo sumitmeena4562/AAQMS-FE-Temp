@@ -4,6 +4,8 @@ import SectionHeader from '../../components/UI/SectionHeader';
 import { motion } from 'framer-motion';
 import { MdOutlineAutoGraph } from 'react-icons/md';
 import { ANALYTICS_DATA } from '../../data/landingData';
+import SectionWrapper from '../../components/Layout/SectionWrapper';
+import { cn } from '../../utils/cn';
 
 const StatCard = ({ label, value, trend, icon: Icon, color, index }) => (
     <motion.div
@@ -45,19 +47,10 @@ const Analytics = () => {
     const { badge, title, description, features, stats } = ANALYTICS_DATA;
 
     return (
-        <section 
+        <SectionWrapper 
             id="analytics" 
-            className="relative py-16 sm:py-24 px-6 overflow-hidden bg-accent-soft"
+            backgroundProps={{ showScanner: false, gridOpacity: 0.08 }}
         >
-            {/* Blueprint Grid Pattern */}
-            <div className="absolute inset-0 z-0 opacity-[0.3]" 
-                style={{ 
-                    backgroundImage: `radial-gradient(var(--color-primary) 0.5px, transparent 0.5px)`, 
-                    backgroundSize: '24px 24px' 
-                }} 
-                aria-hidden="true"
-            />
-
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader
                     badge={badge}
@@ -90,11 +83,14 @@ const Analytics = () => {
                             className="relative w-full max-w-[340px]"
                         >
                             <Card
-                                className="bg-surface border-border/60 shadow-premium flex flex-col overflow-hidden p-0"
+                                className="bg-surface border-border/60 shadow-premium flex flex-col overflow-hidden p-0 group/card"
                             >
                                 {/* Header bar */}
                                 <div className="h-8 px-4 flex justify-between items-center border-b border-border bg-background">
-                                    <span className="text-[8px] font-black text-text-muted uppercase tracking-widest">Analytics Dashboard</span>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                        <span className="text-[8px] font-black text-text-muted uppercase tracking-widest">Live Audit Feed</span>
+                                    </div>
                                     <div className="flex gap-1.5" aria-hidden="true">
                                         <div className="w-1.5 h-1.5 rounded-full bg-border" />
                                         <div className="w-1.5 h-1.5 rounded-full bg-primary/30" />
@@ -110,7 +106,7 @@ const Analytics = () => {
                                     </div>
 
                                     {/* Mini Graph Area */}
-                                    <div className="h-28 bg-background/50 rounded-xl border border-border flex items-end p-3 gap-1.5 relative overflow-hidden group">
+                                    <div className="h-28 bg-background/50 rounded-xl border border-border flex items-end p-3 gap-1.5 relative overflow-hidden group/graph">
                                         <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:15px_15px]" aria-hidden="true" />
                                         
                                         {[40, 70, 50, 80, 60, 90, 65, 85].map((h, i) => (
@@ -119,16 +115,23 @@ const Analytics = () => {
                                                 initial={{ height: 0 }}
                                                 whileInView={{ height: `${h}%` }}
                                                 viewport={{ once: true }}
-                                                transition={{ duration: 0.8, delay: 0.4 + (i * 0.05) }}
-                                                className={`flex-1 rounded-t-sm ${i === 5 ? 'bg-primary' : 'bg-primary/10'}`}
+                                                transition={{ 
+                                                    duration: 0.8, 
+                                                    delay: 0.4 + (i * 0.05),
+                                                    ease: [0.33, 1, 0.68, 1]
+                                                }}
+                                                className={cn(
+                                                    "flex-1 rounded-t-sm transition-colors duration-500",
+                                                    i === 5 ? "bg-primary shadow-[0_0_10px_rgba(var(--color-primary-rgb),0.3)]" : "bg-primary/20 group-hover/graph:bg-primary/40"
+                                                )}
                                             />
                                         ))}
                                     </div>
 
                                     <div className="flex justify-between items-center px-1">
-                                        <span className="text-[8px] font-bold text-text-muted">Live Updates Enabled</span>
-                                        <button className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest text-white bg-primary rounded-lg flex items-center gap-1.5 shadow-lg shadow-primary/20 transition-transform active:scale-95">
-                                            <MdOutlineAutoGraph className="text-xs" aria-hidden="true" /> Report
+                                        <span className="text-[8px] font-bold text-text-muted opacity-60">System Synchronized</span>
+                                        <button className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest text-white bg-primary rounded-lg flex items-center gap-1.5 shadow-lg shadow-primary/20 transition-all hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-95">
+                                            <MdOutlineAutoGraph className="text-xs" aria-hidden="true" /> Full Report
                                         </button>
                                     </div>
                                 </div>
@@ -147,7 +150,7 @@ const Analytics = () => {
                     </div>
                 </div>
             </div>
-        </section>
+        </SectionWrapper>
     );
 };
 

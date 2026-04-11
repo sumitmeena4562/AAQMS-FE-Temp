@@ -164,11 +164,11 @@ export const SITE_PLANNING_DATA = {
 };
 
 export const CTA_DATA = {
-    badge: "Quickly test — SaaS Analytics",
+    badge: "Enterprise Security",
     title: {
-        main: "Start your",
-        highlight: "free trial today"
+        main: "Ready to unify your",
+        highlight: "safety operations?"
     },
-    description: "Unlock the full potential of your site data with our comprehensive SaaS analytics platform.",
-    ctaButton: "Get Started Now"
+    description: "Join the elite organizations using AAQMS to automate compliance, reduce risk, and maintain 100% audit integrity.",
+    ctaButton: "Get Started for Free"
 };

@@ -1,7 +1,10 @@
 import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { BRAND_FULL_NAME, BRAND_TAGLINE } from '../../components/Branding/BrandConfig';
 import LandingNavbar from '../../components/Navbar/LandingNavbar';
 import Footer from '../../components/Navbar/Footer';
+import BlueprintBackground from '../../components/Effects/BlueprintBackground';
 
 // Lazy load sections for optimized performance
 const Hero = lazy(() => import('./Hero'));
@@ -93,7 +96,16 @@ const LandingPage = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-white overflow-x-hidden selection:bg-primary/20 selection:text-primary-dark">
+        <div className="min-h-screen bg-transparent overflow-x-hidden selection:bg-primary/20 selection:text-primary-dark">
+            <Helmet>
+                <title>{`${BRAND_FULL_NAME} | ${BRAND_TAGLINE}`}</title>
+                <meta name="description" content="Advanced Asset Quality Management System (AAQMS) provides elite safety audits, digital twin mapping, and real-time AI risk intelligence for enterprise asset management." />
+                <meta name="keywords" content="AAQMS, Asset Management, Safety Audit, Digital Twin, AI Risk Intelligence, Compliance, Enterprise Safety" />
+                <meta property="og:title" content={`${BRAND_FULL_NAME} - Safety Suite`} />
+                <meta property="og:description" content="Deploy professional-grad safety audits across multiple sites with real-time AI tracking." />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+            </Helmet>
+
             {/* Elite Navbar */}
             <LandingNavbar
                 navLinks={navLinks}
@@ -103,6 +115,9 @@ const LandingPage = () => {
                     { label: 'Login', variant: 'filled', href: '/login' }
                 ]}
             />
+
+            {/* Global Fixed Blueprint Background Layer */}
+            <BlueprintBackground />
 
             {/* Main Content Sections with Lazy Loading */}
             <Suspense fallback={<SectionLoader />}>

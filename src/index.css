@@ -20,10 +20,19 @@
 
     /* ── TYPOGRAPHY ── */
     --color-text: #000000;
-    --color-text-title: #0F172A;
-    --color-text-body: #475569;
-    --color-text-muted: #64748B;
-    --color-text-primary: #072267;
+    --color-title: #0F172A;
+    --color-body: #475569;
+    --color-gray: #64748B;
+    
+    --color-text-title: var(--color-title);
+    --color-text-body: var(--color-body);
+    --color-text-muted: var(--color-gray);
+    --color-text-primary: var(--color-primary);
+
+    /* ── SEMANTIC ALIASES (For Auth & Legacy Components) ── */
+    --color-base: var(--color-background);
+    --color-card: var(--color-surface);
+    --color-border-main: var(--color-border);
 
     --font-heading: 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
@@ -96,10 +105,10 @@ html {
 }
 
 body {
-    font-family: var(--font-family);
-    font-size: var(--font-size-base);
-    background: var(--color-page);
-    color: var(--color-body);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    background: var(--color-background);
+    color: var(--color-text-body);
     min-height: 100vh;
     line-height: 1.6;
 }

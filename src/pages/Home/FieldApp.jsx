@@ -13,6 +13,7 @@ import {
 import { motion } from 'framer-motion';
 import SectionHeader from '../../components/UI/SectionHeader';
 import { FIELD_APP_DATA } from '../../data/landingData';
+import SectionWrapper from '../../components/Layout/SectionWrapper';
 
 const FieldFeature = ({ icon: Icon, title, description, index }) => (
     <motion.div 
@@ -145,19 +146,10 @@ const FieldApp = () => {
     const { badge, title, description, features } = FIELD_APP_DATA;
 
     return (
-        <section 
+        <SectionWrapper 
             id="mobile" 
-            className="relative py-16 sm:py-24 px-6 overflow-hidden bg-accent-soft"
+            backgroundProps={{ showScanner: false, gridOpacity: 0.12 }}
         >
-            {/* Blueprint Grid Pattern */}
-            <div className="absolute inset-0 z-0 opacity-[0.3]" 
-                style={{ 
-                    backgroundImage: `radial-gradient(var(--color-primary) 0.5px, transparent 0.5px)`, 
-                    backgroundSize: '24px 24px' 
-                }} 
-                aria-hidden="true"
-            />
-
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader
                     badge={badge}
@@ -179,7 +171,7 @@ const FieldApp = () => {
                     </div>
                 </div>
             </div>
-        </section>
+        </SectionWrapper>
     );
 };
 

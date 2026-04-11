@@ -1,62 +1,48 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import Card from './Card';
+import { cn } from '../../utils/cn';
 
-const FeatureCard = ({ title, description, icon: Icon, colorTheme = 'primary' }) => {
-    // Theme mapping for the icon container
-    const themes = {
-        primary: { bg: 'var(--color-primary-50)', color: 'var(--color-primary)' },
-        secondary: { bg: 'var(--color-info-bg)', color: 'var(--color-info)' },
-        success: { bg: 'var(--color-success-lighter)', color: 'var(--color-success)' },
-    };
-
-    const theme = themes[colorTheme] || themes.primary;
-
+/**
+ * --- FEATURE CARD (SIMPLE & CLEAN) ---
+ * The original clean design preferred for its simplicity.
+ */
+const FeatureCard = ({ 
+    title, 
+    description, 
+    icon: Icon, 
+    index = 0,
+    className,
+    delay = 0
+}) => {
     return (
-        <Card
-            padding="32px"
-            borderRadius="var(--radius-card)"
-            hoverEffect={true}
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-                cursor: 'default',
+        <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ 
+                duration: 0.5, 
+                delay: delay || (index * 0.1)
             }}
+            className={cn("h-full", className)}
         >
-            {/* Icon Box */}
-            <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '16px',
-                background: theme.bg,
-                color: theme.color,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-            }}>
-                {Icon && <Icon size={24} />}
-            </div>
+            <Card className="h-full p-6 bg-surface border border-border/60 shadow-soft rounded-2xl transition-all hover:shadow-md hover:-translate-y-1 group">
+                {/* Icon Box */}
+                <div className="w-12 h-12 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+                    {Icon && <Icon className="text-2xl" aria-hidden="true" />}
+                </div>
 
-            {/* Text Content */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <h3 style={{
-                    margin: 0,
-                    fontSize: '18px',
-                    fontWeight: 700,
-                    color: 'var(--color-text-primary)'
-                }}>
-                    {title}
-                </h3>
-                <p style={{
-                    margin: 0,
-                    fontSize: '14px',
-                    lineHeight: 1.6,
-                    color: 'var(--color-text-muted)'
-                }}>
-                    {description}
-                </p>
-            </div>
-        </Card>
+                {/* Content */}
+                <div className="flex flex-col gap-2">
+                    <h3 className="text-[19px] font-bold text-text-title tracking-tight group-hover:text-primary transition-colors">
+                        {title}
+                    </h3>
+                    <p className="text-[14.5px] leading-relaxed text-text-muted opacity-90 transition-opacity">
+                        {description}
+                    </p>
+                </div>
+            </Card>
+        </motion.div>
     );
 };
 

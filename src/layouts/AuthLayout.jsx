@@ -39,8 +39,8 @@ const AuthLayout = ({ children }) => {
 
             {/* --- Left Side: Enterprise Sidebar (Hidden on Mobile) --- */}
             <div 
-                className="hidden lg:flex flex-1.2 bg-title p-12 lg:p-16 flex-col justify-between relative overflow-hidden z-10"
-                style={{ clipPath: 'polygon(0 0, 100% 0, 90% 100%, 0 100%)' }}
+                className="hidden lg:flex flex-1 bg-title flex-col justify-start relative overflow-hidden z-10"
+                style={{ clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0 100%)' }}
             >
                 {/* Side Content Background Decoration */}
                 <div className="absolute inset-0 bg-gradient-to-br from-title via-title to-primary/20 opacity-100" />
@@ -48,22 +48,28 @@ const AuthLayout = ({ children }) => {
                 {/* Angled Cut Decoration */}
                 <div className="absolute top-0 right-0 bottom-0 w-24 bg-gradient-to-l from-black/20 to-transparent pointer-events-none" />
 
-                {/* Top: Logo */}
+                {/* Top: Logo - Perfectly aligned with LandingNavbar grid */}
                 <motion.div 
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
-                    className="relative z-10"
+                    whileHover={{ scale: 1.02 }}
+                    className="relative z-10 h-24 flex items-center"
+                    style={{ paddingLeft: 'clamp(2rem, calc((100vw - 1280px) / 2), 20rem)' }}
                 >
                     <Logo size="lg" inverse />
                 </motion.div>
 
-                {/* Bottom: Text Content */}
+                {/* Main: Unified Content Flow */}
                 <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 1, 0.36, 1] }}
-                    className="relative z-10 max-w-xl pr-8"
+                    className="relative z-10 mt-20 lg:mt-32"
+                    style={{ 
+                        paddingLeft: 'clamp(2rem, calc((100vw - 1280px) / 2), 20rem)',
+                        paddingRight: '4rem' 
+                    }}
                 >
                     {/* Badge */}
                     <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-[10px] font-black tracking-[0.2em] text-blue-200 uppercase mb-8 shadow-xl">
@@ -78,7 +84,7 @@ const AuthLayout = ({ children }) => {
                         </span>
                     </h1>
 
-                    <p className="text-lg text-gray/80 leading-relaxed max-w-md font-medium">
+                    <p className="text-lg text-gray/80 leading-relaxed max-w-xl font-medium">
                         Seamlessly manage environmental compliance and asset audits with our next-gen predictive engine.
                     </p>
 
