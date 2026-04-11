@@ -20,13 +20,13 @@ const AssignedCoordinators = () => {
   const { organizations: orgs, coordinators: coordinatorsListRaw, isLoading } = useHierarchy();
 
   const passedOrgName = location.state?.org?.name || new URLSearchParams(location.search).get('org');
-  const orgInfo = selectedOrg ? orgs.find(o => o.id === selectedOrg) : null;
+  const orgInfo = selectedOrg.length === 1 ? orgs.find(o => String(o.id) === String(selectedOrg[0])) : null;
   
   // Robust Name Protection: If the passed current org looks like a personnel name, set to 'Organisation'
-  const finalOrgName = orgInfo?.name || (passedOrgName && !passedOrgName.includes(" ") ? passedOrgName : "Organisation");
+  const finalOrgName = selectedOrg.length > 1 ? `Multiple Organizations` : (orgInfo?.name || (passedOrgName && !passedOrgName.includes(" ") ? passedOrgName : "Organisation"));
   const orgName = finalOrgName === "Organisation" && passedOrgName ? passedOrgName : finalOrgName;
 
-  const isOrgSelected = !!(selectedOrg || passedOrgName);
+  const isOrgSelected = !!(selectedOrg.length > 0 || passedOrgName);
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
@@ -36,11 +36,11 @@ const AssignedCoordinators = () => {
 
   // URL → Store sync (mount-only)
   useEffect(() => {
-    if (!selectedOrg && passedOrgName && orgs.length > 0) {
+    if (selectedOrg.length === 0 && passedOrgName && orgs.length > 0) {
       const match = orgs.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
       if (match) setOrg(match.id);
     }
-  }, [orgs.length, selectedOrg, passedOrgName, setOrg, orgs]); 
+  }, [orgs.length, selectedOrg.length, passedOrgName, setOrg]); 
 
   // fetchUsers effect removed - handled by useCoordinators query hook
 

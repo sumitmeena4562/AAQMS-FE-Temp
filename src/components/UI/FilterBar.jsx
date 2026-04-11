@@ -63,14 +63,14 @@ const FilterBar = ({
     const siteOptions = allSites.map(s => ({ value: s.id, label: s.site_name || s.name }));
     const floorOptions = allFloors.map(f => ({ value: f.id, label: f.name }));
 
-    const isFilterActive = selectedOrg !== '' || selectedCoord !== '' || selectedSite !== '' || selectedFloor !== '' || selectedStatus !== 'all' || searchTerm !== '';
+    const isFilterActive = [selectedOrg, selectedCoord, selectedSite, selectedFloor, selectedStatus].some(arr => Array.isArray(arr) && arr.length > 0) || searchTerm !== '';
 
     return (
-        <div className={`bg-card border border-border-main/60 rounded-2xl p-3.5 shadow-sm mb-6 ${className}`}>
-            <div className="flex flex-wrap items-center justify-between gap-4 w-full">
+        <div className={`bg-card border border-border-main/60 rounded-2xl p-2.5 sm:p-3.5 shadow-sm mb-6 ${className}`}>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
                 
-                {/* 🔹 LEFT SIDE: Cascading Dropdowns */}
-                <div className="flex flex-wrap items-center gap-3 flex-1">
+                {/* 🔹 LEFT SIDE: Cascading Dropdowns (Mobile Scrollable) */}
+                <div className="flex flex-nowrap sm:flex-wrap items-center gap-2 sm:gap-3 flex-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 scrollbar-hide">
                     
                     {renderOrg && (
                         <FilterDropdown 
@@ -79,6 +79,7 @@ const FilterBar = ({
                             value={selectedOrg}
                             onChange={(val) => setOrg(val)}
                             allLabel="Select Organization"
+                            multiple={true}
                         />
                     )}
 
@@ -89,29 +90,32 @@ const FilterBar = ({
                             value={selectedCoord}
                             onChange={(val) => setCoord(val)}
                             allLabel="All Coordinators"
+                            multiple={true}
                         />
                     )}
 
                     {renderSite && (
-                        <div className={!selectedCoord ? 'opacity-50 pointer-events-none' : ''}>
+                        <div className={selectedCoord.length === 0 ? 'opacity-50 pointer-events-none' : ''}>
                             <FilterDropdown 
                                 label="Site"
                                 options={siteOptions}
                                 value={selectedSite}
                                 onChange={(val) => setSite(val)}
                                 allLabel="Select Site"
+                                multiple={true}
                             />
                         </div>
                     )}
 
                     {renderFloor && (
-                        <div className={!selectedSite ? 'opacity-50 pointer-events-none' : ''}>
+                        <div className={selectedSite.length === 0 ? 'opacity-50 pointer-events-none' : ''}>
                             <FilterDropdown 
                                 label="Floor"
                                 options={floorOptions}
                                 value={selectedFloor}
                                 onChange={(val) => setFloor(val)}
                                 allLabel="Select Floor"
+                                multiple={true}
                             />
                         </div>
                     )}
@@ -124,8 +128,9 @@ const FilterBar = ({
                                 { value: 'INACTIVE', label: 'Inactive Only' }
                             ]}
                             value={selectedStatus}
-                            onChange={(val) => setStatus(val || 'all')}
+                            onChange={(val) => setStatus(val)}
                             allLabel="All Statuses"
+                            multiple={true}
                         />
                     )}
 
@@ -141,12 +146,12 @@ const FilterBar = ({
                     {children}
                 </div>
 
-                {/* 🔹 RIGHT SIDE: Clear Button */}
-                <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
+                {/* 🔹 RIGHT SIDE: Clear Button & Toggles */}
+                <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 sm:border-l border-border-main/40 pt-3 sm:pt-0 sm:pl-3 ml-0 sm:ml-auto w-full sm:w-auto justify-end">
                     {isFilterActive && (
                         <button 
                             onClick={handleResetAll}
-                            className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 shadow-sm border border-transparent hover:border-rose-100 group animate-in zoom-in duration-300"
+                            className="h-9 flex items-center gap-1.5 px-3 text-danger hover:text-danger/80 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-danger/5 hover:bg-danger/10 shadow-sm border border-transparent hover:border-danger/20 group animate-in zoom-in duration-300"
                         >
                             <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
                             Clear Filters

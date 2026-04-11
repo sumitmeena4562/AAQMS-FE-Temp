@@ -37,12 +37,12 @@ export default function AllHistory() {
     // ── 1. Local Filter + Pagination State ──
     const [currentPage, setCurrentPage] = useState(1);
     const [filters, setFilters] = useState({
-        organisation: '',
-        site: '',
-        floor: '',
-        role: '',
-        operation: '',
-        category: ''
+        organisation: [],
+        site: [],
+        floor: [],
+        role: [],
+        operation: [],
+        category: []
     });
 
     // ── 2. QUERY HOOKS (Declarative Cascades) ──
@@ -54,15 +54,22 @@ export default function AllHistory() {
 
     // ── 4. State Management Actions ──
     const updateFilter = (key, val) => {
-        const newFilters = { ...filters, [key]: val };
-        if (key === 'organisation') { newFilters.site = ''; newFilters.floor = ''; }
-        else if (key === 'site') { newFilters.floor = ''; }
+        const newFilters = { ...filters, [key]: Array.isArray(val) ? val : [val].filter(Boolean) };
+        if (key === 'organisation') { newFilters.site = []; newFilters.floor = []; }
+        else if (key === 'site') { newFilters.floor = []; }
         setFilters(newFilters);
-        setCurrentPage(1); // Reset to page 1 on filter change
+        setCurrentPage(1); 
     };
 
     const resetFilters = () => {
-        setFilters({ organisation: '', site: '', floor: '', role: '', operation: '', category: '' });
+        setFilters({ 
+            organisation: [], 
+            site: [], 
+            floor: [], 
+            role: [], 
+            operation: [], 
+            category: [] 
+        });
         setCurrentPage(1);
     };
 
@@ -79,7 +86,7 @@ export default function AllHistory() {
     const totalCount = historyResponse?.count || 0;
     const totalPages = Math.ceil(totalCount / 50);
 
-    const activeFilterCount = Object.values(filters).filter(v => v !== '').length;
+    const activeFilterCount = Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v !== '').length;
 
     // ── 6. Industrial Column Renderers ──
     const columns = useMemo(() => [
@@ -159,6 +166,7 @@ export default function AllHistory() {
                         value={filters.organisation}
                         onChange={v => updateFilter('organisation', v)}
                         allLabel="All Organizations"
+                        multiple={true}
                     />
 
                     <FilterDropdown
@@ -167,6 +175,7 @@ export default function AllHistory() {
                         value={filters.operation}
                         onChange={v => updateFilter('operation', v)}
                         allLabel="All Actions"
+                        multiple={true}
                     />
 
                     <FilterDropdown
@@ -175,6 +184,7 @@ export default function AllHistory() {
                         value={filters.category}
                         onChange={v => updateFilter('category', v)}
                         allLabel="All Categories"
+                        multiple={true}
                     />
 
                     <FilterDropdown
@@ -183,27 +193,28 @@ export default function AllHistory() {
                         value={filters.role}
                         onChange={v => updateFilter('role', v)}
                         allLabel="All Roles"
+                        multiple={true}
                     />
 
-                    <div className={`transition-all duration-300 ${!filters.organisation ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
-                        <FilterDropdown
-                            label="Target Site"
-                            options={allSites.map(s => ({ value: s.id, label: s.site_name || s.name }))}
-                            value={filters.site}
-                            onChange={v => updateFilter('site', v)}
-                            allLabel="Select Org First"
-                        />
-                    </div>
+                    <FilterDropdown
+                        label="Target Site"
+                        options={allSites.map(s => ({ value: s.id, label: s.site_name || s.name }))}
+                        value={filters.site}
+                        onChange={v => updateFilter('site', v)}
+                        allLabel="Select Org First"
+                        multiple={true}
+                        disabled={filters.organisation.length === 0}
+                    />
 
-                    <div className={`transition-all duration-300 ${!filters.site ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
-                        <FilterDropdown
-                            label="Target Floor"
-                            options={allFloors.map(f => ({ value: f.id, label: f.name }))}
-                            value={filters.floor}
-                            onChange={v => updateFilter('floor', v)}
-                            allLabel="Select Site First"
-                        />
-                    </div>
+                    <FilterDropdown
+                        label="Target Floor"
+                        options={allFloors.map(f => ({ value: f.id, label: f.name }))}
+                        value={filters.floor}
+                        onChange={v => updateFilter('floor', v)}
+                        allLabel="Select Site First"
+                        multiple={true}
+                        disabled={filters.site.length === 0}
+                    />
                     
                     {activeFilterCount > 0 && (
                         <button

@@ -16,13 +16,12 @@ export const useHierarchy = () => {
     const orgsQuery = useOrganizations();
 
     // 2. Coordinators (Cascading: only if org is selected)
-    // We use a stable key structure to ensure FilterBar and Pages share the same cache.
-    const coordsQuery = useCoordinators(selectedOrg);
+    // Support for array of org IDs
+    const coordsQuery = useCoordinators(selectedOrg.length > 0 ? selectedOrg : undefined);
 
     // 3. Sites (Cascading: only if org is selected)
-    // IMPORTANT: We standardize the filters object to ensure key stability.
     const sitesQuery = useSites({ 
-        organisation: selectedOrg || undefined 
+        organisation: selectedOrg.length > 0 ? selectedOrg : undefined 
     });
 
     return {

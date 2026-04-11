@@ -23,10 +23,9 @@ export const hierarchyService = {
 
     // --- FLOORS ---
     getFloors: async (siteId = null) => {
-        /**
-         * @ENDPOINT: GET /api/organisations/floors/<site_id>/ OR /api/organisations/all-floors/
-         */
-        const url = siteId ? `organisations/floors/${siteId}/` : `organisations/all-floors/`;
+        // If siteId is an array, take the first one or use all-floors if supported
+        const id = Array.isArray(siteId) ? siteId[0] : siteId;
+        const url = id ? `organisations/floors/${id}/` : `organisations/all-floors/`;
         const response = await api.get(url);
         return response.data;
     },
@@ -41,10 +40,9 @@ export const hierarchyService = {
 
     // --- ZONES ---
     getZones: async (floorId = null, filters = {}) => {
-        /**
-         * @ENDPOINT: GET /api/organisations/floors/<floor_id>/zones/ OR /api/organisations/all-zones/
-         */
-        const url = (floorId && floorId !== 'all') ? `organisations/floors/${floorId}/zones/` : `organisations/all-zones/`;
+        // Handle array floorId or 'all'
+        const id = Array.isArray(floorId) ? floorId[0] : floorId;
+        const url = (id && id !== 'all') ? `organisations/floors/${id}/zones/` : `organisations/all-zones/`;
         const response = await api.get(url, { params: filters });
         return response.data;
     },

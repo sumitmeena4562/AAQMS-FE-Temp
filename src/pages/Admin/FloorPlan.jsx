@@ -28,9 +28,9 @@ const FloorPlan = () => {
   const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
   const { clearHierarchy } = useHierarchyStore();
 
-  const activeSiteId = selectedSite || searchParams.get('site_id');
-  const activeOrgId = selectedOrg || searchParams.get('org_id');
-  const activeCoordId = selectedCoord || searchParams.get('coord_id');
+  const activeSiteId = selectedSite.length > 0 ? selectedSite : (searchParams.get('site_id') ? [searchParams.get('site_id')] : []);
+  const activeOrgId = selectedOrg.length > 0 ? selectedOrg : (searchParams.get('org_id') ? [searchParams.get('org_id')] : []);
+  const activeCoordId = selectedCoord.length > 0 ? selectedCoord : (searchParams.get('coord_id') ? [searchParams.get('coord_id')] : []);
 
   // --- QUERY HOOKS (UNIFIED) ---
   const { organizations: orgs } = useHierarchy();
@@ -46,41 +46,43 @@ const FloorPlan = () => {
   useEffect(() => {
     if (hasSynced.current) return;
     hasSynced.current = true;
-    if (passedOrgId) setOrg(passedOrgId);
-    if (passedCoordId) setCoord(passedCoordId);
-    if (passedSiteId) setSite(passedSiteId);
-  }, [passedOrgId, passedCoordId, passedSiteId, setOrg, setCoord, setSite]); 
-
+    if (passedOrgId && selectedOrg.length === 0) setOrg(passedOrgId);
+    if (passedCoordId && selectedCoord.length === 0) setCoord(passedCoordId);
+    if (passedSiteId && selectedSite.length === 0) setSite(passedSiteId);
+  }, [passedOrgId, passedCoordId, passedSiteId, selectedOrg.length, selectedCoord.length, selectedSite.length, setOrg, setCoord, setSite]); 
   // fetchFloors effect removed - handled by useFloors query dependency
 
 
 
-  const orgInfo = orgs.find(o => o.id === activeOrgId) || (passedOrgName ? { name: passedOrgName } : null);
+  const currentOrg = activeOrgId.length === 1 ? orgs.find(o => String(o.id) === String(activeOrgId[0])) : null;
+  const orgLabel = activeOrgId.length > 1 ? `Organizations (${activeOrgId.length})` : currentOrg?.name || passedOrgName;
+  const orgInfo = { name: orgLabel || "Organization" };
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
   ];
 
-  if (activeOrgId) {
+  if (activeOrgId.length > 0) {
     breadcrumbs.push({ 
         label: orgInfo?.name || "Organization", 
-        path: `/admin/coordinators?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}` 
+        path: `/admin/coordinators?org_id=${activeOrgId.join(',')}&org_name=${encodeURIComponent(orgInfo?.name || '')}` 
     });
   }
 
-  if (passedSiteId || selectedSite) {
+  if (activeSiteId.length > 0) {
+    const siteLabel = activeSiteId.length > 1 ? `Sites (${activeSiteId.length})` : passedSiteName || "Site Plan";
     breadcrumbs.push({ 
-        label: passedSiteName || "Site Plan", 
-        path: `/admin/site-plan?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}&coord_id=${passedCoordId}&coord=${encodeURIComponent(passedCoordName || '')}` 
+        label: siteLabel, 
+        path: `/admin/site-plan?org_id=${activeOrgId.join(',')}&org_name=${encodeURIComponent(orgInfo?.name || '')}&coord_id=${activeCoordId.join(',')}&coord=${encodeURIComponent(passedCoordName || '')}` 
     });
   }
 
   breadcrumbs.push({ label: "Floor Plan", path: "#", isActive: true });
 
   const floorList = floors;
-  const siteInfo = { name: passedSiteName || "Site" };
-  const coordInfo = activeCoordId ? { name: passedCoordName || "Coordinator" } : null;
+  const siteInfo = { name: (activeSiteId.length === 1 ? passedSiteName : `Multiple Sites`) || "Site" };
+  const coordInfo = activeCoordId.length > 0 ? { name: passedCoordName || "Coordinator" } : null;
 
   const activePlansCount = floorList.length;
 
@@ -148,9 +150,9 @@ const FloorPlan = () => {
             <div className="w-full py-24 flex flex-col items-center justify-center text-gray/40 bg-base/20 rounded-[var(--radius-card)] border border-border-main/40 mt-4">
                <FiAlertCircle className="w-10 h-10 mb-4 opacity-20" />
                <p className="text-sm font-bold text-title">No Floor Plans Found</p>
-               <p className="text-[10px] uppercase tracking-widest mt-1">
-                 {activeSiteId ? "This site doesn't have any registered floor levels yet" : "No floor plans have been registered in the system yet"}
-               </p>
+                <p className="text-[10px] uppercase tracking-widest mt-1">
+                  {activeSiteId.length > 0 ? "This site doesn't have any registered floor levels yet" : "No floor plans have been registered in the system yet"}
+                </p>
             </div>
           )}
         </div>

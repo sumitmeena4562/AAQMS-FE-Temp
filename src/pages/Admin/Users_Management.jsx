@@ -84,7 +84,7 @@ export default function Users() {
         return list;
     }, [users, sortKey, sortDir]);
 
-    const activeFilterCount = Object.values(filters).filter(v => v && v !== '' && v !== 'all').length;
+    const activeFilterCount = Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v && v !== '' && v !== 'all').length;
 
     // ── Handlers ──
 
@@ -319,10 +319,10 @@ export default function Users() {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-2 flex-1">
-                    <FilterDropdown label="Role" options={filterOptions.roles} value={filters.role} onChange={v => setFilters({ ...filters, role: v })} allLabel="All Roles" />
-                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v, region: '' })} allLabel="All Orgs" />
-                    <FilterDropdown label="Zone" options={filterOptions.regions} value={filters.region} onChange={v => setFilters({ ...filters, region: v })} allLabel="All Zones" />
-                    <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" />
+                    <FilterDropdown label="Role" options={filterOptions.roles} value={filters.role} onChange={v => setFilters({ ...filters, role: v })} allLabel="All Roles" multiple={true} />
+                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v, region: [] })} allLabel="All Orgs" multiple={true} />
+                    <FilterDropdown label="Zone" options={filterOptions.regions} value={filters.region} onChange={v => setFilters({ ...filters, region: v })} allLabel="All Zones" multiple={true} />
+                    <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" multiple={true} />
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">

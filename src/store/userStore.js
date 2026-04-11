@@ -17,10 +17,10 @@ const useUserStore = create((set, get) => ({
     // --- UI, FILTER & PAGINATION STATE ---
     search: '',
     filters: {
-        role: '',
-        organization: '',
-        region: '',
-        status: ''
+        role: [],
+        organization: [],
+        region: [],
+        status: []
     },
     sortKey: 'created_at',
     sortDir: 'desc',
@@ -205,7 +205,7 @@ const useUserStore = create((set, get) => ({
     resetFilters: () => set({
         search: '',
         page: 1,
-        filters: { organization: '', role: '', status: '', region: '' },
+        filters: { organization: [], role: [], status: [], region: [] },
     }),
 }));
 

@@ -6,71 +6,77 @@ import { create } from 'zustand';
  */
 export const useFilterStore = create((set, get) => ({
   // --- STATE ---
-  selectedOrg: '',
-  selectedCoord: '',
-  selectedSite: '',
-  selectedFloor: '',
-  selectedZone: '',
-  selectedStatus: 'all',
+  selectedOrg: [],
+  selectedCoord: [],
+  selectedSite: [],
+  selectedFloor: [],
+  selectedStatus: [],
+  selectedZone: [],
   selectedCoordinator: 'all', // Legacy state preserved
   searchTerm: '',
   page: 1,
 
   // --- ACTIONS (with same-value guards to prevent re-render loops) ---
-  setOrg: (id) => {
-    if (get().selectedOrg === id) return;
+  setOrg: (ids) => {
+    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    if (JSON.stringify(get().selectedOrg) === JSON.stringify(newIds)) return;
     set({ 
-      selectedOrg: id, 
-      selectedCoord: '', 
-      selectedSite: '', 
-      selectedFloor: '', 
+      selectedOrg: newIds, 
+      selectedCoord: [], 
+      selectedSite: [], 
+      selectedFloor: [], 
+      selectedZone: [],
+      page: 1
+    });
+  },
+  
+  setCoord: (ids) => {
+    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    if (JSON.stringify(get().selectedCoord) === JSON.stringify(newIds)) return;
+    set({ 
+      selectedCoord: newIds, 
+      selectedSite: [], 
+      selectedFloor: [], 
+      selectedZone: [],
+      page: 1
+    });
+  },
+  
+  setSite: (ids) => {
+    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    if (JSON.stringify(get().selectedSite) === JSON.stringify(newIds)) return;
+    set({ 
+      selectedSite: newIds, 
+      selectedFloor: [], 
+      selectedZone: [],
+      page: 1
+    });
+  },
+  
+  setFloor: (ids) => {
+    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    if (JSON.stringify(get().selectedFloor) === JSON.stringify(newIds)) return;
+    set({ 
+      selectedFloor: newIds, 
       selectedZone: '',
       page: 1
     });
   },
   
-  setCoord: (id) => {
-    if (get().selectedCoord === id) return;
+  setZone: (ids) => {
+    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    if (JSON.stringify(get().selectedZone) === JSON.stringify(newIds)) return;
     set({ 
-      selectedCoord: id, 
-      selectedSite: '', 
-      selectedFloor: '', 
-      selectedZone: '',
+      selectedZone: newIds,
       page: 1
     });
   },
   
-  setSite: (id) => {
-    if (get().selectedSite === id) return;
+  setStatus: (ids) => {
+    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    if (JSON.stringify(get().selectedStatus) === JSON.stringify(newIds)) return;
     set({ 
-      selectedSite: id, 
-      selectedFloor: '', 
-      selectedZone: '',
-      page: 1
-    });
-  },
-  
-  setFloor: (id) => {
-    if (get().selectedFloor === id) return;
-    set({ 
-      selectedFloor: id, 
-      selectedZone: '',
-      page: 1
-    });
-  },
-  
-  setZone: (id) => {
-    if (get().selectedZone === id) return;
-    set({ 
-      selectedZone: id,
-      page: 1
-    });
-  },
-  
-  setStatus: (status) => {
-    if (get().selectedStatus === status) return;
-    set({ 
-      selectedStatus: status,
+      selectedStatus: newIds,
       page: 1
     });
   },
@@ -89,12 +95,12 @@ export const useFilterStore = create((set, get) => ({
   },
   
   resetFilters: () => set({
-    selectedOrg: '',
-    selectedCoord: '',
-    selectedSite: '',
-    selectedFloor: '',
-    selectedZone: '',
-    selectedStatus: 'all',
+    selectedOrg: [],
+    selectedCoord: [],
+    selectedSite: [],
+    selectedFloor: [],
+    selectedZone: [],
+    selectedStatus: [],
     searchTerm: '',
     page: 1
   })

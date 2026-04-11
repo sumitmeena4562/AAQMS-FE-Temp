@@ -80,8 +80,8 @@ const Organizations = () => {
 
     const filteredOrgs = useMemo(() => {
         return enrichedOrgs.filter(org => {
-            const matchesIndustry = filters.industry === 'all' || (org.industry || '') === filters.industry;
-            const matchesStatus = filters.status === 'all' || (org.status || '') === filters.status;
+            const matchesIndustry = filters.industry.length === 0 || filters.industry.includes(org.industry);
+            const matchesStatus = filters.status.length === 0 || filters.status.includes(org.status || (org.isBlocked ? 'INACTIVE' : 'ACTIVE'));
             
             const searchLower = searchQuery.toLowerCase().trim();
             const matchesSearch = !searchLower || 
@@ -101,7 +101,7 @@ const Organizations = () => {
     }, [orgs]);
 
     const activeFiltersCount = useMemo(() => {
-        return Object.values(filters).filter(v => v !== 'all' && v !== '').length;
+        return Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v !== 'all' && v !== '').length;
     }, [filters]);
 
     // --- Handlers ---
@@ -289,8 +289,9 @@ const Organizations = () => {
                             label="Industry"
                             options={industryOptions}
                             value={filters.industry}
-                            onChange={(v) => setFilters({ industry: v })}
+                            onChange={(v) => setFilters({ ...filters, industry: v })}
                             allLabel="All Industries"
+                            multiple={true}
                         />
 
                         <FilterDropdown
@@ -300,8 +301,9 @@ const Organizations = () => {
                                 { value: 'INACTIVE', label: 'Inactive Only' }
                             ]}
                             value={filters.status}
-                            onChange={(v) => setFilters({ status: v || 'all' })}
+                            onChange={(v) => setFilters({ status: v })}
                             allLabel="All Statuses"
+                            multiple={true}
                         />
                     </div>
 

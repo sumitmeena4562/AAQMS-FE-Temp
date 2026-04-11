@@ -50,9 +50,9 @@ const Coordinator = () => {
     // URL Sync for Org Context
     useEffect(() => {
         if (orgIdFromUrl) {
-            setFilters({ organization: orgIdFromUrl, role: 'coordinator' });
+            setFilters({ organization: [orgIdFromUrl], role: ['coordinator'] });
         } else {
-            setFilters({ role: 'coordinator' });
+            setFilters({ role: ['coordinator'] });
         }
     }, [orgIdFromUrl]);
 
@@ -294,17 +294,17 @@ const Coordinator = () => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-3">
-                    {filters.organization && (
+                    {filters.organization.length > 0 && (
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/5 text-primary border border-primary/20 rounded-xl animate-in zoom-in duration-300">
-                             <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Organization |</span>
-                             <span className="text-[11px] font-bold">{orgNameFromUrl || filters.organization}</span>
+                             <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Organizations |</span>
+                             <span className="text-[11px] font-bold">{orgNameFromUrl && filters.organization.length === 1 ? orgNameFromUrl : `${filters.organization.length} Selected`}</span>
                              <button onClick={handleResetAll} className="p-0.5 hover:bg-primary/10 rounded-full transition-colors ml-1">
                                 <FiX size={10} />
                              </button>
                         </div>
                     )}
-                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All Organizations" />
-                    <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" />
+                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All Organizations" multiple={true} />
+                    <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" multiple={true} />
                 </div>
             </FilterBar>
 

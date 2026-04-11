@@ -25,8 +25,8 @@ const SitePlan = () => {
   const passedCoordId = searchParams.get('coord_id');
   const passedCoordNameFromUrl = searchParams.get('coord');
 
-  const activeOrgId = selectedOrg || passedOrgId || '';
-  const activeCoordId = selectedCoord || passedCoordId || '';
+  const activeOrgId = selectedOrg.length > 0 ? selectedOrg : (passedOrgId ? [passedOrgId] : []);
+  const activeCoordId = selectedCoord.length > 0 ? selectedCoord : (passedCoordId ? [passedCoordId] : []);
 
   // --- QUERY HOOKS ---
   const { organizations: orgs } = useHierarchy();
@@ -45,22 +45,24 @@ const SitePlan = () => {
   useEffect(() => {
     if (hasSynced.current) return;
     hasSynced.current = true;
-    if (passedOrgId) setOrg(passedOrgId);
-    if (passedCoordId) setCoord(passedCoordId);
-  }, [passedOrgId, passedCoordId, setOrg, setCoord]); 
+    if (passedOrgId && selectedOrg.length === 0) setOrg(passedOrgId);
+    if (passedCoordId && selectedCoord.length === 0) setCoord(passedCoordId);
+  }, [passedOrgId, passedCoordId, selectedOrg.length, selectedCoord.length, setOrg, setCoord]); 
 
-  const orgInfo = orgs.find(o => o.id === activeOrgId) || (passedOrgNameFromUrl ? { name: passedOrgNameFromUrl } : null);
-  const coordInfo = activeCoordId ? { name: passedCoordNameFromUrl || "Coordinator" } : null;
+  const currentOrg = activeOrgId.length === 1 ? orgs.find(o => String(o.id) === String(activeOrgId[0])) : null;
+  const orgLabel = activeOrgId.length > 1 ? `Organizations (${activeOrgId.length})` : currentOrg?.name || passedOrgNameFromUrl;
+  const orgInfo = { name: orgLabel || "Organization" };
+  const coordInfo = activeCoordId.length > 0 ? { name: passedCoordNameFromUrl || "Coordinator" } : null;
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
   ];
 
-  if (activeOrgId) {
+  if (activeOrgId.length > 0) {
     breadcrumbs.push({ 
         label: orgInfo?.name || "Organization", 
-        path: `/admin/coordinators?org_id=${activeOrgId}&org_name=${encodeURIComponent(orgInfo?.name || '')}`
+        path: `/admin/coordinators?org_id=${activeOrgId.join(',')}&org_name=${encodeURIComponent(orgInfo?.name || '')}`
     });
   }
 
@@ -126,7 +128,7 @@ const SitePlan = () => {
               No Operational Sites Found
             </p>
             <p className="text-gray text-xs">
-              {activeOrgId ? `${orgInfo?.name || 'Selected organization'} does not have any sites registered yet.` : "No sites have been registered in the system yet."}
+              {activeOrgId.length > 0 ? `${orgInfo?.name || 'Selected organization'} does not have any sites registered yet.` : "No sites have been registered in the system yet."}
             </p>
           </div>
         ) : (

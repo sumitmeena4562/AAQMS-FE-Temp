@@ -78,9 +78,9 @@ const Zones = () => {
     // --- QUERY HOOKS (UNIFIED) ---
     const { organizations: orgs, sites: allSites } = useHierarchy();
     const { data: allFloors = [] } = useFloors(selectedSite);
-    const { data: zones = [], isLoading: loading, error: hierarchyError } = useZones(selectedFloor, {
-        site_id: selectedSite || undefined,
-        organisation_id: selectedOrg || undefined
+    const { data: zones = [], isLoading: loading, error: hierarchyError } = useZones(selectedFloor.length > 0 ? selectedFloor : undefined, {
+        site_id: selectedSite.length > 0 ? selectedSite : undefined,
+        organisation_id: selectedOrg.length > 0 ? selectedOrg : undefined
     });
 
     const passedOrgId = searchParams.get('org_id') || searchParams.get('org');
@@ -89,18 +89,18 @@ const Zones = () => {
     const passedCoordId = searchParams.get('coord_id') || searchParams.get('coord');
 
     useEffect(() => {
-        if (passedOrgId && !selectedOrg) setOrg(passedOrgId);
-        if (passedSiteId && !selectedSite) setSite(passedSiteId);
-        if (passedFloorId && !selectedFloor) setFloor(passedFloorId);
-        if (passedCoordId && !selectedCoord) setCoord(passedCoordId);
-    }, [passedOrgId, passedSiteId, passedFloorId, passedCoordId, selectedOrg, selectedSite, selectedFloor, selectedCoord, setOrg, setSite, setFloor, setCoord]);
+        if (passedOrgId && selectedOrg.length === 0) setOrg(passedOrgId);
+        if (passedSiteId && selectedSite.length === 0) setSite(passedSiteId);
+        if (passedFloorId && selectedFloor.length === 0) setFloor(passedFloorId);
+        if (passedCoordId && selectedCoord.length === 0) setCoord(passedCoordId);
+    }, [passedOrgId, passedSiteId, passedFloorId, passedCoordId, selectedOrg.length, selectedSite.length, selectedFloor.length, selectedCoord.length, setOrg, setSite, setFloor, setCoord]);
 
     useEffect(() => {
         const newParams = new URLSearchParams();
-        if (selectedOrg) newParams.set('org_id', selectedOrg);
-        if (selectedSite) newParams.set('site_id', selectedSite);
-        if (selectedFloor) newParams.set('floor_id', selectedFloor);
-        if (selectedCoord) newParams.set('coord_id', selectedCoord);
+        if (selectedOrg.length > 0) newParams.set('org_id', selectedOrg.join(','));
+        if (selectedSite.length > 0) newParams.set('site_id', selectedSite.join(','));
+        if (selectedFloor.length > 0) newParams.set('floor_id', selectedFloor.join(','));
+        if (selectedCoord.length > 0) newParams.set('coord_id', selectedCoord.join(','));
         
         const pOrgName = searchParams.get('org_name');
         const pSiteName = searchParams.get('site');
@@ -110,22 +110,26 @@ const Zones = () => {
         if (pFloorName) newParams.set('floor', pFloorName);
 
         setSearchParams(newParams, { replace: true });
-    }, [selectedOrg, selectedSite, selectedFloor, selectedCoord, setSearchParams]); 
+    }, [selectedOrg, selectedSite, selectedFloor, selectedCoord]); 
 
     // fetchZones effect removed - handled by useZones query hook
 
-    const currentOrg = orgs.find(o => o.id === selectedOrg);
-    const currentSite = (allSites || []).find(s => s.id === selectedSite);
-    const currentFloor = (allFloors || []).find(f => f.id === selectedFloor);
+    const currentOrg = selectedOrg.length === 1 ? orgs.find(o => String(o.id) === String(selectedOrg[0])) : null;
+    const currentSite = selectedSite.length === 1 ? (allSites || []).find(s => String(s.id) === String(selectedSite[0])) : null;
+    const currentFloor = selectedFloor.length === 1 ? (allFloors || []).find(f => String(f.id) === String(selectedFloor[0])) : null;
+
+    const orgLabel = selectedOrg.length > 1 ? `Organizations (${selectedOrg.length})` : currentOrg?.name;
+    const siteLabel = selectedSite.length > 1 ? `Sites (${selectedSite.length})` : currentSite?.site_name;
+    const floorLabel = selectedFloor.length > 1 ? `Floors (${selectedFloor.length})` : currentFloor?.floor_name;
 
     const breadcrumbs = [
         { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
         { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
     ];
 
-    if (selectedOrg) breadcrumbs.push({ label: currentOrg?.name || "Organization", path: `/admin/coordinators?org_id=${selectedOrg}&org_name=${encodeURIComponent(currentOrg?.name || '')}` });
-    if (selectedSite) breadcrumbs.push({ label: currentSite?.site_name || "Site Plan", path: `/admin/site-plan?org_id=${selectedOrg}&site_id=${selectedSite}` });
-    if (selectedFloor) breadcrumbs.push({ label: currentFloor?.floor_name || "Floor Plan", path: `/admin/floor-plan?site_id=${selectedSite}&floor_id=${selectedFloor}` });
+    if (orgLabel) breadcrumbs.push({ label: orgLabel || "Organization", path: `/admin/coordinators?org_id=${selectedOrg.join(',')}&org_name=${encodeURIComponent(currentOrg?.name || '')}` });
+    if (siteLabel) breadcrumbs.push({ label: siteLabel || "Site Plan", path: `/admin/site-plan?org_id=${selectedOrg.join(',')}&site_id=${selectedSite.join(',')}` });
+    if (floorLabel) breadcrumbs.push({ label: floorLabel || "Floor Plan", path: `/admin/floor-plan?site_id=${selectedSite.join(',')}&floor_id=${selectedFloor.join(',')}` });
     breadcrumbs.push({ label: "Zones", path: "#", isActive: true });
 
     const processedZones = zones

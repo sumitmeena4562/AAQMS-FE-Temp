@@ -4,63 +4,52 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiCheck, FiX } from 'react-icons/fi';
 import useClickOutside from '../../hooks/useClickOutside';
 
-const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All', multiple = false }) => {
+const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All', multiple = false, disabled = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
     const containerRef = useRef(null);
 
-    useClickOutside(containerRef, () => setIsOpen(false));
-
+    // Custom click outside handler that understands Portals
     useEffect(() => {
         const updatePosition = () => {
-            if (isOpen && containerRef.current) {
+            if (containerRef.current) {
                 const rect = containerRef.current.getBoundingClientRect();
                 setCoords({
-                    top: rect.bottom + window.scrollY,
+                    top: rect.bottom + window.scrollY + 6,
                     left: rect.left + window.scrollX,
                     width: rect.width
                 });
             }
         };
 
-        updatePosition();
+        const handleClickOutside = (event) => {
+            // Check if click is on the trigger button
+            if (containerRef.current?.contains(event.target)) return;
+            
+            // Check if click is inside any portal-rendered dropdown
+            const portalMenu = event.target.closest('[role="listbox"]');
+            if (portalMenu) return;
+
+            setIsOpen(false);
+        };
 
         if (isOpen) {
+            updatePosition(); // Immediate call on open
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchstart', handleClickOutside);
             window.addEventListener('resize', updatePosition);
-            const handleScroll = (e) => {
-                if (e.target.nodeType === 1 && !e.target.closest('[role="listbox"]')) {
-                    setIsOpen(false);
-                }
-            };
-            window.addEventListener('scroll', handleScroll, true);
-
+            
             return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+                document.removeEventListener('touchstart', handleClickOutside);
                 window.removeEventListener('resize', updatePosition);
-                window.removeEventListener('scroll', handleScroll, true);
             };
         }
     }, [isOpen]);
 
     const isFilterActive = multiple
-        ? (Array.isArray(value) && value.length > 0 && !value.includes('all'))
+        ? (Array.isArray(value) && value.length > 0)
         : (value !== undefined && value !== null && value !== '' && value !== 'All' && value !== 'all' && value !== allLabel);
-
-    const getDisplayLabel = () => {
-        if (!isFilterActive) return allLabel;
-
-        if (multiple && Array.isArray(value)) {
-            if (value.length === 1) {
-                const option = options.find(opt => (typeof opt === 'string' ? opt === value[0] : opt.value === value[0]));
-                return typeof option === 'string' ? option : (option?.label || value[0]);
-            }
-            return `${label} (${value.length})`;
-        }
-
-        const option = options.find(opt =>
-            typeof opt === 'string' ? opt === value : opt.value === value
-        );
-        return typeof option === 'string' ? option : (option?.label || value);
-    };
 
     const handleSelect = (val) => {
         if (!multiple) {
@@ -71,13 +60,32 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
 
         if (val === '' || val === 'all') {
             onChange([]);
-            setIsOpen(false);
             return;
         }
 
-        const currentValues = Array.isArray(value) ? value : [];
-        if (currentValues.includes(val)) {
-            onChange(currentValues.filter(v => v !== val));
+        if (val === 'select_all') {
+            const allOptionValues = options.map(opt => typeof opt === 'string' ? opt : opt.value);
+            const currentValues = Array.isArray(value) ? value : [];
+            
+            // Type-agnostic check for select all
+            const isAllSelected = allOptionValues.every(ov => 
+                currentValues.some(cv => String(cv) === String(ov))
+            );
+
+            if (isAllSelected) {
+                onChange([]); // Deselect all
+            } else {
+                onChange(allOptionValues); // Select all
+            }
+            return;
+        }
+
+        const currentValues = Array.isArray(value) ? [...value] : [];
+        const index = currentValues.findIndex(v => String(v) === String(val));
+        
+        if (index !== -1) {
+            currentValues.splice(index, 1);
+            onChange(currentValues);
         } else {
             onChange([...currentValues, val]);
         }
@@ -92,10 +100,10 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                     exit={{ opacity: 0, y: 8, scale: 0.98 }}
                     style={{
                         position: 'absolute',
-                        top: coords.top + 8,
+                        top: coords.top,
                         left: coords.left,
                         width: 'max-content',
-                        minWidth: Math.max(coords.width, 140),
+                        minWidth: Math.max(coords.width, 160),
                         maxWidth: 240,
                         zIndex: 9999
                     }}
@@ -104,35 +112,45 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                 >
                     <button
                         onClick={() => handleSelect('')}
-                        className={`w-full px-2.5 py-1.5 text-left rounded-lg transition-all duration-200 text-[12px] font-bold group flex items-center justify-between
-                            ${!isFilterActive ? 'bg-primary text-white cursor-default' : 'hover:bg-base text-body'}`}
+                        className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[11.5px] font-black uppercase tracking-widest group flex items-center justify-between
+                            ${!isFilterActive ? 'bg-primary text-white cursor-default' : 'hover:bg-base text-gray/60'}`}
                     >
                         <span className="truncate">{allLabel}</span>
                         {!isFilterActive && <FiCheck size={13} />}
                     </button>
+
+                    {multiple && options.length > 0 && (
+                        <button
+                            onClick={() => handleSelect('select_all')}
+                            className="w-full px-3 py-1.5 text-left rounded-lg transition-all duration-200 text-[10.5px] font-bold text-primary hover:bg-primary/5 flex items-center justify-between border-b border-border-main/40 mb-1"
+                        >
+                            <span>{Array.isArray(value) && value.length === options.length ? 'Deselect All' : 'Select All'}</span>
+                        </button>
+                    )}
+
                     <div className="max-h-[240px] overflow-y-auto no-scrollbar pt-1">
                         {options.map((opt, i) => {
                             const val = typeof opt === 'string' ? opt : opt.value;
                             const lbl = typeof opt === 'string' ? opt : opt.label;
                             const isSelected = multiple
-                                ? (Array.isArray(value) && value.includes(val))
-                                : (value === val);
+                                ? (Array.isArray(value) && value.some(v => String(v) === String(val)))
+                                : (String(value) === String(val));
 
                             return (
                                 <button
                                     key={val !== undefined && val !== null ? val : i}
                                     id={`option-${val}`}
                                     onClick={() => handleSelect(val)}
-                                    className={`w-full px-2.5 py-1.5 text-left rounded-lg transition-all duration-200 text-[12px] font-bold mt-0.5 group flex items-center justify-between gap-3
-                                        ${isSelected ? 'bg-primary text-white cursor-default' : 'hover:bg-base text-body'}`}
+                                    className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[12px] font-bold mt-0.5 group flex items-center justify-between gap-3
+                                        ${isSelected ? 'bg-primary/5 text-primary' : 'hover:bg-base text-body'}`}
                                     role="option"
                                     aria-selected={isSelected}
                                 >
-                                    <div className="flex items-center gap-2 truncate">
+                                    <div className="flex items-center gap-2.5 truncate">
                                         {multiple && (
-                                            <div className={`w-3.5 h-3.5 rounded border transition-colors flex items-center justify-center
-                                                ${isSelected ? 'bg-white border-white' : 'border-border-main group-hover:border-primary'}`}>
-                                                {isSelected && <FiCheck className="text-primary" size={10} strokeWidth={4} />}
+                                            <div className={`w-4 h-4 rounded border transition-colors flex items-center justify-center
+                                                ${isSelected ? 'bg-primary border-primary' : 'border-border-main/60 bg-white group-hover:border-primary'}`}>
+                                                {isSelected && <FiCheck className="text-white" size={10} strokeWidth={4} />}
                                             </div>
                                         )}
                                         <span className="truncate">{lbl}</span>
@@ -150,34 +168,45 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
     return (
         <div ref={containerRef} className="relative inline-block">
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                className={`flex items-center gap-1.5 px-2 py-0.5 bg-card border rounded-md cursor-pointer transition-all duration-300 group whitespace-nowrap
+                disabled={disabled}
+                onClick={() => !disabled && setIsOpen(!isOpen)}
+                className={`flex items-center gap-2 px-3 py-1.5 bg-card border rounded-md transition-all duration-300 group whitespace-nowrap
+                    ${disabled 
+                        ? 'opacity-60 cursor-not-allowed border-border-main/80 bg-base/30' 
+                        : 'cursor-pointer'}
                     ${isOpen
                         ? 'border-primary ring-4 ring-primary/5 shadow-md scale-[1.01]'
                         : isFilterActive
-                            ? 'border-blue-300 bg-blue-50/80 hover:border-blue-400 hover:bg-blue-100/50 shadow-sm'
-                            : 'border-border-main hover:border-border-hover shadow-sm'}`}
+                            ? 'border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10 shadow-sm'
+                            : !disabled ? 'border-border-main hover:border-border-hover shadow-sm' : ''}`}
             >
                 {isFilterActive ? (
                     <>
-                        <span className="text-[9px] font-bold text-blue-500 uppercase tracking-wider">{label}</span>
-                        <span className="h-2 w-[1px] bg-blue-200 mx-0.5" />
-                        <span className="text-[11px] font-bold text-blue-900">{getDisplayLabel()}</span>
+                        <div className="flex flex-col items-start leading-tight">
+                            <span className="text-[8px] font-black text-primary/60 uppercase tracking-[0.12em]">{label}</span>
+                            <span className="text-[10px] font-bold text-primary truncate max-w-[80px]">
+                                {multiple && Array.isArray(value) && value.length > 1 
+                                    ? `${value.length} Selected` 
+                                    : multiple && Array.isArray(value) && value.length === 1
+                                        ? options.find(o => String(typeof o === 'string' ? o : o.value) === String(value[0]))?.label || value[0]
+                                        : !multiple ? options.find(o => String(typeof o === 'string' ? o : o.value) === String(value))?.label || value : ''}
+                            </span>
+                        </div>
                         <div
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleSelect('');
                             }}
-                            className="ml-0.5 p-0.5 text-blue-400 hover:text-rose-500 hover:bg-rose-50 rounded-sm transition-colors flex items-center justify-center"
+                            className="ml-1 p-0.5 text-primary/40 hover:text-danger hover:bg-danger/10 rounded-sm transition-colors flex items-center justify-center"
                             title="Clear filter"
                         >
-                            <FiX size={11} strokeWidth={3} />
+                            <FiX size={10} strokeWidth={3} />
                         </div>
                     </>
                 ) : (
                     <>
                         <span className="text-[11px] font-bold text-body">{label}</span>
-                        <FiChevronDown className={`text-gray transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'group-hover:text-body'}`} size={11} />
+                        <FiChevronDown className={`text-gray/50 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'group-hover:text-body'}`} size={11} />
                     </>
                 )}
             </button>

@@ -88,10 +88,10 @@ const Inventory = () => {
     const debouncedSearch = useDebounce(searchQuery, 400);
 
     const activeFilters = useMemo(() => ({
-        org: selectedOrg || 'all',
-        site: selectedSite || 'all',
-        floor: selectedFloor || 'all',
-        zone: selectedZone || 'all',
+        org: selectedOrg.length > 0 ? selectedOrg : 'all',
+        site: selectedSite.length > 0 ? selectedSite : 'all',
+        floor: selectedFloor.length > 0 ? selectedFloor : 'all',
+        zone: selectedZone.length > 0 ? selectedZone : 'all',
         search: debouncedSearch
     }), [selectedOrg, selectedSite, selectedFloor, selectedZone, debouncedSearch]);
 
@@ -113,20 +113,25 @@ const Inventory = () => {
     };
 
     // ── BREADCRUMBS ──
-    const currentOrg = orgs.find(o => o.id === selectedOrg);
-    const currentSite = allSites.find(s => s.id === selectedSite);
-    const currentFloor = allFloors.find(f => f.id === selectedFloor);
-    const currentZone = allZones.find(z => z.id === selectedZone);
+    const currentOrg = selectedOrg.length === 1 ? orgs.find(o => String(o.id) === String(selectedOrg[0])) : null;
+    const currentSite = selectedSite.length === 1 ? allSites.find(s => String(s.id) === String(selectedSite[0])) : null;
+    const currentFloor = selectedFloor.length === 1 ? allFloors.find(f => String(f.id) === String(selectedFloor[0])) : null;
+    const currentZone = selectedZone.length === 1 ? allZones.find(z => String(z.id) === String(selectedZone[0])) : null;
+
+    const orgLabel = selectedOrg.length > 1 ? `Organizations (${selectedOrg.length})` : currentOrg?.name;
+    const siteLabel = selectedSite.length > 1 ? `Sites (${selectedSite.length})` : currentSite?.name;
+    const floorLabel = selectedFloor.length > 1 ? `Floors (${selectedFloor.length})` : currentFloor?.name;
+    const zoneLabel = selectedZone.length > 1 ? `Zones (${selectedZone.length})` : currentZone?.name;
 
     const breadcrumbs = useMemo(() => {
         const base = [
             { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
             { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
         ];
-        if (currentOrg) base.push({ label: currentOrg.name, path: `/admin/coordinators?org_id=${selectedOrg}&org_name=${encodeURIComponent(currentOrg.name)}` });
-        if (currentSite) base.push({ label: currentSite.name, path: `/admin/site-plan?org_id=${selectedOrg}&site_id=${selectedSite}` });
-        if (currentFloor) base.push({ label: currentFloor.name, path: `/admin/floor-plan?site_id=${selectedSite}&floor_id=${selectedFloor}` });
-        if (currentZone) base.push({ label: currentZone.name, path: `/admin/zones?floor_id=${selectedFloor}&zone_id=${selectedZone}` });
+        if (orgLabel) base.push({ label: orgLabel, path: `/admin/coordinators?org_id=${selectedOrg.join(',')}` });
+        if (siteLabel) base.push({ label: siteLabel, path: `/admin/site-plan?site_id=${selectedSite.join(',')}` });
+        if (floorLabel) base.push({ label: floorLabel, path: `/admin/floor-plan?floor_id=${selectedFloor.join(',')}` });
+        if (zoneLabel) base.push({ label: zoneLabel, path: `/admin/zones?zone_id=${selectedZone.join(',')}` });
         
         base.push({ label: "Inventory", path: "#", isActive: true });
         return base;
@@ -252,10 +257,10 @@ const Inventory = () => {
             <div className="flex flex-col w-full gap-4 mt-2">
                 <FilterBar className="!p-2.5">
                     <div className="flex flex-wrap items-center gap-2 flex-1">
-                        <FilterDropdown label="Organization" options={orgs.map(o => ({ value: o.id, label: o.name }))} value={selectedOrg || 'all'} onChange={setOrg} allLabel="All Orgs" />
-                        <FilterDropdown label="Site" options={allSites.map(s => ({ value: s.id, label: s.name }))} value={selectedSite || 'all'} onChange={setSite} allLabel="All Sites" />
-                        <FilterDropdown label="Floor" options={allFloors.map(f => ({ value: f.id, label: f.name }))} value={selectedFloor || 'all'} onChange={setFloor} allLabel="All Floors" />
-                        <FilterDropdown label="Zone" options={allZones.map(z => ({ value: z.id, label: z.name }))} value={selectedZone || 'all'} onChange={setZone} allLabel="All Zones" />
+                        <FilterDropdown label="Organization" options={orgs.map(o => ({ value: o.id, label: o.name }))} value={selectedOrg} onChange={setOrg} allLabel="All Orgs" multiple={true} />
+                        <FilterDropdown label="Site" options={allSites.map(s => ({ value: s.id, label: s.name }))} value={selectedSite} onChange={setSite} allLabel="All Sites" multiple={true} />
+                        <FilterDropdown label="Floor" options={allFloors.map(f => ({ value: f.id, label: f.name }))} value={selectedFloor} onChange={setFloor} allLabel="All Floors" multiple={true} />
+                        <FilterDropdown label="Zone" options={allZones.map(z => ({ value: z.id, label: z.name }))} value={selectedZone} onChange={setZone} allLabel="All Zones" multiple={true} />
                         
                         <div className="w-[1.5px] h-6 bg-border-main/40 mx-2" />
                         
