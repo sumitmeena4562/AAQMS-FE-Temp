@@ -1,150 +1,163 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import Section from '../../components/UI/Section';
+import SectionHeader from '../../components/UI/SectionHeader';
 import Card from '../../components/UI/Card';
 import {
     MdOutlineLayers,
     MdOutlineLibraryAddCheck,
     MdOutlineFilterCenterFocus
 } from 'react-icons/md';
-import { motion } from 'framer-motion';
 
 const SitePlanning = () => {
     return (
-        <section id="planning" className="py-16 px-6 bg-white border-t border-slate-100 relative overflow-hidden">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-12 lg:gap-16 items-center">
+        <Section id="planning" background="white" withGlow={true}>
+            {/* Unified Section Header */}
+            <SectionHeader
+                badge="Digital Twin"
+                title={<>Mapping & Precision <br className="hidden sm:block" /> at Scale</>}
+                description="Digitize your entire site layout with interactive geofenced zones and geographical asset context."
+            />
 
+            <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1.1fr] gap-12 lg:gap-20 items-center">
                 {/* Left Side: Floor Plan Visual */}
                 <motion.div 
-                    initial={{ opacity: 0, x: -40 }}
+                    initial={{ opacity: 0, x: -30 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1, ease: [0.21, 1, 0.36, 1] }}
+                    transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
                     className="relative"
                 >
-                    <div className="absolute -top-16 -left-16 w-[300px] h-[300px] bg-primary/5 rounded-full blur-3xl pointer-events-none z-0" />
+                    <div className="absolute -top-16 -left-16 w-[300px] h-[300px] bg-primary/[0.03] rounded-full blur-3xl pointer-events-none z-0" />
 
                     <Card 
-                        padding="12px" 
+                        padding="8px" 
                         borderRadius="24px"
-                        className="bg-white/90 backdrop-blur-2xl border-white/50 shadow-2xl relative z-10 overflow-hidden ring-1 ring-slate-100"
+                        className="bg-white border-slate-200/50 shadow-2xl relative z-10 overflow-hidden ring-1 ring-slate-100/50"
                     >
-                        {/* Floor Plan Mockup */}
-                        <div className="w-full h-[360px] bg-slate-50 rounded-[18px] relative border border-slate-200/50 overflow-hidden shadow-inner group">
+                        {/* Floor Plan Mockup - Compact Height */}
+                        <div className="w-full h-[320px] sm:h-[360px] bg-slate-50 rounded-[18px] relative border border-slate-200/50 overflow-hidden shadow-inner group">
                             {/* Grid Pattern */}
                             <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-                                 style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #0f172a 1px, transparent 0)', backgroundSize: '24px 24px' }} 
+                                 style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #0f172a 1px, transparent 0)', backgroundSize: '18px 18px' }} 
                             />
 
                             {/* Zones with micro-interactions */}
                             <motion.div 
-                                whileHover={{ scale: 1.02, backgroundColor: "rgba(var(--color-primary-rgb), 0.1)" }}
-                                className="absolute top-[15%] left-[15%] w-[30%] h-[35%] bg-primary/5 border-2 border-primary/20 rounded-xl flex items-center justify-center cursor-help transition-colors group/z1"
+                                whileHover={{ scale: 1.005, backgroundColor: "rgba(7, 34, 103, 0.05)" }}
+                                className="absolute top-[12%] left-[10%] w-[35%] h-[35%] bg-primary/[0.03] border border-primary/20 rounded-[20px] flex flex-col items-center justify-center cursor-help transition-all group/z1 shadow-sm"
                             >
-                                <span className="text-[10px] font-black text-primary tracking-widest uppercase group-hover/z1:scale-110 transition-transform">Zone 101</span>
+                                <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-primary/10 px-1.5 py-0.5 rounded-full border border-primary/10">
+                                    <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
+                                    <span className="text-[6.5px] font-black text-primary uppercase tracking-tighter">Live</span>
+                                </div>
+                                <span className="text-[9px] font-black text-primary/80 tracking-[0.2em] uppercase group-hover/z1:text-primary transition-colors">Zone 101</span>
                             </motion.div>
                             
                             <motion.div 
-                                whileHover={{ scale: 1.02, backgroundColor: "rgba(16, 185, 129, 0.1)" }}
-                                className="absolute top-[60%] left-[10%] w-[40%] h-[25%] bg-emerald-500/5 border-2 border-emerald-500/20 rounded-xl flex items-center justify-center cursor-help transition-colors group/z2"
+                                whileHover={{ scale: 1.005, backgroundColor: "rgba(16, 185, 129, 0.05)" }}
+                                className="absolute top-[55%] left-[8%] w-[45%] h-[30%] bg-emerald-500/[0.03] border border-emerald-500/20 rounded-[20px] flex items-center justify-center cursor-help transition-all group/z2 shadow-sm"
                             >
-                                <span className="text-[10px] font-black text-emerald-600 tracking-widest uppercase group-hover/z2:scale-110 transition-transform">Zone 102</span>
-                            </motion.div>
-
-                            <motion.div 
-                                animate={{ opacity: [0.6, 1, 0.6] }}
-                                transition={{ duration: 3, repeat: Infinity }}
-                                className="absolute top-[20%] left-[55%] w-[35%] h-[60%] bg-rose-500/[0.02] border-2 border-dashed border-rose-500/20 rounded-xl flex items-center justify-center"
-                            >
-                                <span className="text-[10px] font-black text-rose-500/50 tracking-[0.2em] uppercase">Restricted</span>
+                                <span className="text-[9px] font-black text-emerald-600/80 tracking-[0.2em] uppercase group-hover/z2:text-emerald-600 transition-colors">Zone 102</span>
                             </motion.div>
 
-                            {/* Map Markers with pulsing animation */}
                             <motion.div 
-                                animate={{ scale: [1, 1.2, 1] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                                className="absolute top-[25%] left-[25%] w-3 h-3 bg-primary rounded-full border-2 border-white shadow-lg shadow-primary/40"
-                            />
-                            
-                            <motion.div 
-                                animate={{ scale: [1, 1.2, 1] }}
-                                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                                className="absolute top-[70%] left-[30%] w-3 h-3 bg-emerald-500 rounded-full border-2 border-white shadow-lg shadow-emerald-500/40"
-                            />
-                            
-                            <motion.div 
-                                animate={{ scale: [1, 1.4, 1], rotate: [0, 10, -10, 0] }}
+                                animate={{ opacity: [0.6, 0.8, 0.6] }}
                                 transition={{ duration: 4, repeat: Infinity }}
-                                className="absolute top-[45%] left-[75%] w-4 h-4 bg-rose-500 rounded-full border-2 border-white shadow-xl shadow-rose-500/50"
-                            />
+                                className="absolute top-[15%] left-[58%] w-[35%] h-[70%] bg-rose-500/[0.01] border border-dashed border-rose-500/20 rounded-[20px] flex items-center justify-center overflow-hidden"
+                            >
+                                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+                                     style={{ backgroundImage: 'repeating-linear-gradient(45deg, #f43f5e, #f43f5e 1px, transparent 1px, transparent 15px)' }}
+                                />
+                                <span className="text-[8px] font-black text-rose-500/50 tracking-[0.25em] uppercase text-center px-6 leading-relaxed relative z-10">Restricted Area</span>
+                            </motion.div>
+
+                            {/* Sensor Nodes (Upgraded from simple dots) */}
+                            <motion.div 
+                                animate={{ opacity: [1, 0.7, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                className="absolute top-[32%] left-[28%] flex items-center justify-center z-30"
+                            >
+                                <div className="w-4 h-4 rounded-full bg-primary/10 absolute animate-ping" />
+                                <div className="w-1.5 h-1.5 bg-primary rounded-full border-2 border-white shadow-lg relative z-10" />
+                            </motion.div>
+                            
+                            <motion.div 
+                                animate={{ opacity: [1, 0.7, 1] }}
+                                transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+                                className="absolute top-[72%] left-[42%] flex items-center justify-center z-30"
+                            >
+                                <div className="w-4 h-4 rounded-full bg-emerald-500/10 absolute animate-ping" />
+                                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full border-2 border-white shadow-lg relative z-10" />
+                            </motion.div>
 
                             {/* Scanning pulse effect */}
                             <motion.div 
-                                animate={{ opacity: [0, 0.3, 0] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                                className="absolute inset-x-0 h-2 bg-gradient-to-b from-primary/20 to-transparent pointer-events-none"
-                                style={{ top: '30%' }}
+                                animate={{ opacity: [0, 0.15, 0], y: [0, 360] }}
+                                transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                                className="absolute inset-x-0 h-10 bg-gradient-to-b from-primary/10 via-primary/5 to-transparent pointer-events-none z-20"
+                                style={{ top: '-10%' }}
                             />
                         </div>
 
-                        {/* Control Overlay */}
-                        <div className="absolute bottom-6 right-6 flex gap-2.5">
-                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="bg-white p-2 rounded-xl shadow-lg border border-slate-100 text-primary cursor-pointer hover:bg-slate-50 transition-colors">
-                                <MdOutlineLayers className="text-lg" />
-                            </motion.div>
-                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="bg-white p-2 rounded-xl shadow-lg border border-slate-100 text-primary cursor-pointer hover:bg-slate-50 transition-colors">
-                                <MdOutlineFilterCenterFocus className="text-lg" />
-                            </motion.div>
+                        {/* Premium Glass Toolbar - Compact */}
+                        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 p-1 bg-white/80 backdrop-blur-md rounded-xl border border-slate-100 shadow-2xl z-40 ring-1 ring-slate-900/5">
+                            {[
+                                { icon: MdOutlineLayers, label: "Layers" },
+                                { icon: MdOutlineFilterCenterFocus, label: "Focus" }
+                            ].map((tool, i) => (
+                                <motion.div 
+                                    key={i}
+                                    whileHover={{ backgroundColor: "rgba(7, 34, 103, 0.05)", scale: 1.02 }} 
+                                    whileTap={{ scale: 0.98 }} 
+                                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-primary cursor-pointer transition-colors"
+                                >
+                                    <tool.icon className="text-base" />
+                                    <span className="text-[8px] font-black uppercase tracking-widest">{tool.label}</span>
+                                </motion.div>
+                            ))}
                         </div>
                     </Card>
                 </motion.div>
 
-                {/* Right Side: Text */}
-                <motion.div 
-                    initial={{ opacity: 0, x: 40 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, ease: [0.21, 1, 0.36, 1] }}
-                >
-                    <div className="flex items-center gap-4 text-[10px] font-black text-primary tracking-widest uppercase mb-4">
-                        <div className="w-10 h-px bg-primary/30"></div>
-                        Site Digital Twin
-                    </div>
-                    <h2 className="text-[clamp(1.75rem,4vw,2.4rem)] font-black text-slate-900 mb-6 tracking-tighter leading-[1.05]">
-                        Visual Foundation for <span className="text-primary">Precision Audits.</span>
-                    </h2>
-                    <p className="text-base text-slate-500 leading-relaxed mb-10 max-w-xl font-medium">
-                        Upload architectural floor plans and layer them with interactive audit zones. Geofence high-risk assets and manage inventory with geographical context.
-                    </p>
-
-                    <div className="grid grid-cols-1 gap-8">
-                        {[
-                            { icon: MdOutlineLayers, title: "Multi-Layer Mapping", desc: "Toggle between structural plans, zone heatmaps, and live asset locations." },
-                            { icon: MdOutlineLibraryAddCheck, title: "Zone-Specific Compliance", desc: "Assign unique safety regulations and scan intervals to specific site areas." }
-                        ].map((item, idx) => (
-                            <motion.div 
-                                key={idx}
-                                initial={{ opacity: 0, y: 15 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.5 + (idx * 0.2) }}
-                                className="flex gap-5 group"
-                            >
-                                <div className="min-w-[48px] h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shadow-inner border border-primary/10 group-hover:scale-110 transition-transform duration-500">
-                                    <item.icon className="text-2xl" />
-                                </div>
-                                <div>
-                                    <h5 className="text-lg font-black text-slate-900 mb-1.5 tracking-tight group-hover:text-primary transition-colors">
-                                        {item.title}
-                                    </h5>
-                                    <p className="text-[15px] text-slate-500 leading-relaxed font-medium">
-                                        {item.desc}
-                                    </p>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </motion.div>
+                {/* Right Side: Features List */}
+                <div className="flex flex-col gap-8">
+                    {[
+                        { 
+                            icon: MdOutlineLayers, 
+                            title: "Spatial Layering", 
+                            desc: "Toggle between structure plans, hazard heatmaps, and live asset coordinate layers." 
+                        },
+                        { 
+                            icon: MdOutlineLibraryAddCheck, 
+                            title: "Smart Geofencing", 
+                            desc: "Set safety protocols and audit rules for specific zones with instant breach alerts." 
+                        }
+                    ].map((item, idx) => (
+                        <motion.div 
+                            key={idx}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 + (idx * 0.1), duration: 0.8 }}
+                            className="flex gap-5 group"
+                        >
+                            <div className="min-w-[48px] h-12 rounded-xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10 group-hover:bg-primary group-hover:text-white transition-all duration-500 flex-shrink-0 shadow-sm">
+                                <item.icon className="text-[22px]" />
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <h5 className="text-[17px] sm:text-[18px] font-black text-slate-900 tracking-tight group-hover:text-primary transition-colors leading-tight">
+                                    {item.title}
+                                </h5>
+                                <p className="text-[13.5px] sm:text-[14px] text-slate-500 leading-relaxed font-medium opacity-80">
+                                    {item.desc}
+                                </p>
+                            </div>
+                        </motion.div>
+                    ))}
+                </div>
             </div>
-        </section>
+        </Section>
     );
 };
 

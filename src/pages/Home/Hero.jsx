@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heading, Text } from '../../components/ui/Typography';
-import Button from '../../components/ui/Button';
+import { Heading, Text } from '../../components/UI/Typography';
+import Button from '../../components/UI/Button';
 import { Link } from 'react-router-dom';
 import { MapPin, ClipboardCheck, BrainCircuit, ShieldAlert } from 'lucide-react';
 
@@ -36,29 +36,29 @@ const Hero = () => {
             <div className="absolute inset-0 pointer-events-none select-none">
                 {/* Minimal Base Glow */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-radial-gradient from-primary/[0.02] via-transparent to-transparent opacity-40" />
-                
+
                 {/* Glowing Structural Arcs (The "Lines") */}
-                <motion.div 
+                <motion.div
                     animate={{ opacity: [0.2, 0.4, 0.2] }}
                     transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[160%] max-w-[1400px] aspect-square rounded-full border-[1px] border-primary/10 shadow-[0_0_8px_rgba(7,34,103,0.1)] animate-[spin_180s_linear_infinite]" 
+                    className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[160%] max-w-[1400px] aspect-square rounded-full border-[1px] border-primary/10 shadow-[0_0_8px_rgba(7,34,103,0.1)] animate-[spin_180s_linear_infinite]"
                 />
-                
-                <motion.div 
+
+                <motion.div
                     animate={{ opacity: [0.1, 0.3, 0.1] }}
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[140%] max-w-[1200px] aspect-square rounded-full border-[1px] border-primary/[0.05] border-dashed shadow-[0_0_5px_rgba(7,34,103,0.05)] animate-[spin_120s_linear_infinite_reverse]" 
+                    className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[140%] max-w-[1200px] aspect-square rounded-full border-[1px] border-primary/[0.05] border-dashed shadow-[0_0_5px_rgba(7,34,103,0.05)] animate-[spin_120s_linear_infinite_reverse]"
                 />
-                
+
                 <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[120%] max-w-[1000px] aspect-square rounded-full border-[1px] border-primary/10 shadow-[0_0_10px_rgba(7,34,103,0.08)]" />
-                
+
                 <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-[100%] max-w-[800px] aspect-square rounded-full border-[1px] border-primary/10 border-dashed" />
-                
+
                 {/* Subtle Nodes with Glow */}
-                <motion.div 
-                    animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.2, 1] }} 
+                <motion.div
+                    animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.2, 1] }}
                     transition={{ duration: 4, repeat: Infinity }}
-                    className="absolute top-[35%] left-[30%] w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(7,34,103,0.8)]" 
+                    className="absolute top-[35%] left-[30%] w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_rgba(7,34,103,0.8)]"
                 />
 
                 {/* Content Focus Halo */}
@@ -73,8 +73,8 @@ const Hero = () => {
                 animate="visible"
             >
                 {/* Mini Badge */}
-                <motion.div 
-                    variants={itemVariants} 
+                <motion.div
+                    variants={itemVariants}
                     className="inline-flex items-center gap-2 px-3 py-1 mb-6 sm:mb-10 text-[9px] sm:text-[10px] font-black tracking-[0.2em] sm:tracking-[0.25em] text-primary/80 bg-white shadow-soft border border-border/50 rounded-full uppercase"
                 >
                     <span className="relative flex h-2 w-2">
@@ -84,51 +84,51 @@ const Hero = () => {
                     Asset Intelligence System
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="w-full max-w-4xl">
-                    <Heading className="mb-8 drop-shadow-sm text-5xl sm:text-6xl lg:text-7xl tracking-tighter leading-[1.05]">
-                        Next-Gen Asset Intelligence. <br />
-                        <span className="text-gradient italic font-black">Refined.</span>
+                <motion.div variants={itemVariants} className="w-full max-w-3xl">
+                    <Heading className="mb-8 drop-shadow-sm">
+                        Intelligent Asset Audits. <br />
+                        <span className="text-gradient italic font-extrabold tracking-tight">Simplified.</span>
                     </Heading>
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="w-full max-w-2xl px-4 sm:px-0">
-                    <Text className="mb-12 text-muted/90 text-base md:text-xl font-medium !leading-relaxed">
-                        Enterprise-grade safety audits and real-time AI tracking <br className="hidden md:block" />
-                        seamlessly integrated with your digital twin ecosystem.
+                    <Text className="mb-12 text-muted/90 md:text-lg">
+                        Deploy professional-grade safety audits across multiple sites <br className="hidden md:block" />
+                        with real-time AI tracking and digital twin integration.
                     </Text>
                 </motion.div>
 
-                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6 sm:gap-12 w-full sm:w-auto px-4 sm:px-0">
+                <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10 w-full sm:w-auto px-4 sm:px-0">
                     <Link to="/login" className="w-full sm:w-auto">
-                        <Button 
-                            variant="primary" 
-                            size="lg" 
-                            className="w-full sm:w-auto px-14 py-7 text-lg group rounded-full shadow-xl shadow-primary/20"
+                        <Button
+                            variant="primary"
+                            size="lg"
+                            className="w-full sm:w-auto h-[52px] px-8 group rounded-full text-sm sm:text-base border border-white/10"
                         >
-                            Get Started
-                            <svg className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            Start Auditing
+                            <svg className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M5 12h14m-7-7 7 7-7 7" />
                             </svg>
                         </Button>
                     </Link>
-                    
-                    <div className="flex items-center gap-5 sm:border-l sm:border-border sm:pl-10 group cursor-default">
-                        <motion.span 
+
+                    <div className="flex items-center gap-5 sm:border-l sm:border-slate-200 sm:pl-8 group cursor-default">
+                        <motion.span
                             initial={{ scale: 1 }}
                             whileHover={{ scale: 1.05 }}
-                            className="text-5xl sm:text-6xl font-black text-primary tracking-tighter"
+                            className="text-4xl sm:text-[42px] font-black text-primary tracking-tighter transition-colors"
                         >
                             10
                         </motion.span>
-                        <div className="text-[10px] sm:text-[12px] font-bold text-muted/60 leading-tight text-left uppercase tracking-tighter">
-                            years of <br /> <span className="text-primary/70">unmatched</span> field reliability
+                        <div className="text-[10px] sm:text-[11px] font-bold text-muted/60 leading-tight text-left uppercase tracking-[0.05em]">
+                            years of <br /> <span className="text-primary/70">exceptional</span> reliability
                         </div>
                     </div>
                 </motion.div>
             </motion.div>
 
             {/* --- Sleek Capability Bar --- */}
-            <motion.div 
+            <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1, duration: 1 }}

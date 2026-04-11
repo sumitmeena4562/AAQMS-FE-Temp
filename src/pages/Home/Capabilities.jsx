@@ -1,5 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import Section from '../../components/UI/Section';
+import SectionHeader from '../../components/UI/SectionHeader';
 import Card from '../../components/UI/Card';
 import {
     MdOutlineBusiness,
@@ -16,43 +18,30 @@ const CapabilityCard = ({ title, description, icon: Icon, index }) => {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay: index * 0.1, ease: [0.21, 1, 0.36, 1] }}
-            className="h-full"
+            transition={{ duration: 0.8, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="group relative"
         >
-            <Card
-                className="h-full flex flex-col gap-6 group hover:border-primary/30 transition-all duration-500"
-                hoverEffect={true}
-            >
-                {/* Decorative Background Glow */}
-                <div className="absolute -top-5 -right-5 w-20 h-20 bg-primary/5 rounded-full blur-3xl pointer-events-none group-hover:bg-primary/10 transition-colors" />
-
+            <div className="h-full relative z-10 p-5 sm:p-6 rounded-[24px] bg-white border border-slate-200/60 shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(7,34,103,0.08)] hover:border-primary/20 hover:-translate-y-1.5 flex flex-col gap-4 overflow-hidden">
                 {/* Icon Box */}
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary flex items-center justify-center shadow-inner border border-primary/10 relative z-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                    <Icon className="text-[28px]" />
+                <div className="w-11 h-11 rounded-xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-sm grow-0">
+                    <Icon className="text-[20px]" />
                 </div>
 
-                {/* Text Content */}
-                <div className="flex flex-col gap-3 relative z-10">
-                    <h3 className="text-xl font-black text-slate-900 tracking-tight leading-tight group-hover:text-primary transition-colors">
+                {/* Content */}
+                <div className="flex flex-col gap-1.5">
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight leading-tight group-hover:text-primary transition-colors">
                         {title}
                     </h3>
-                    <p className="text-[15px] leading-relaxed text-slate-500 font-medium">
+                    <p className="text-[13.5px] leading-relaxed text-slate-500 font-medium opacity-80">
                         {description}
                     </p>
                 </div>
-
-                {/* Hover indicator */}
-                <motion.div 
-                    className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                    initial={{ x: -10 }}
-                    whileHover={{ x: 0 }}
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-primary/40">
-                        <line x1="7" y1="17" x2="17" y2="7"></line>
-                        <polyline points="7 7 17 7 17 17"></polyline>
-                    </svg>
-                </motion.div>
-            </Card>
+                
+                {/* Standard Hover Indicator */}
+                <div className="mt-auto pt-2">
+                    <div className="w-8 h-0.5 bg-slate-100 rounded-full group-hover:w-16 group-hover:bg-primary transition-all duration-700" />
+                </div>
+            </div>
         </motion.div>
     );
 };
@@ -60,68 +49,53 @@ const CapabilityCard = ({ title, description, icon: Icon, index }) => {
 const Capabilities = () => {
     const list = [
         {
-            title: "Multi-Site Management",
-            description: "Unified dashboard for managing safety protocols across distributed facilities and subsidiaries.",
+            title: "Multi-Site Governance",
+            description: "Centralize safety operations across global facilities with a unified administrative dashboard.",
             icon: MdOutlineBusiness
         },
         {
-            title: "Digital Mapping (Drone/2D)",
-            description: "Integrate drone imagery and 2D floor plans to create accurate digital twins of your zones.",
+            title: "Digital Twin Mapping",
+            description: "Convert blueprints and spatial captures into interactive twins for immersive site monitoring.",
             icon: MdOutlineAirplanemodeActive
         },
         {
-            title: "Smart Zone Marking",
-            description: "Geofence high-risk assets and assign specific inventory checklists to precise locations.",
+            title: "Precision Geofencing",
+            description: "Deploy high-precision audit zones to automate compliance checks for regional assets.",
             icon: MdOutlinePushPin
         },
         {
-            title: "QR Inventory Tracking",
-            description: "Generate and scan secure QR codes to instantly verify asset presence and condition.",
+            title: "Secure Asset Tracking",
+            description: "Verify the physical status of assets instantly with secure, end-to-end QR encryption.",
             icon: MdOutlineQrCodeScanner
         },
         {
-            title: "AI Mismatch Detection",
-            description: "Algorithms automatically flag discrepancies between recorded inventory and live audit data.",
+            title: "AI Risk Intelligence",
+            description: "Automated detection engine that flags audit anomalies and safety breaches in real-time.",
             icon: MdOutlineAssignmentLate
         },
         {
-            title: "Verified Reporting",
-            description: "Generate tamper-proof audit trails and compliance reports for stakeholders.",
+            title: "Enterprise Reporting",
+            description: "Generate immutable, data-rich audit trails for seamless regulatory and board submission.",
             icon: MdOutlineVerified
         }
     ];
 
     return (
-        <section id="capabilities" className="py-16 px-6 bg-slate-50/50 border-t border-slate-100 overflow-hidden">
-            <div className="max-w-7xl mx-auto">
-                {/* Section Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
-                    className="mb-12"
-                >
-                    <div className="flex items-center gap-4 text-[11px] font-black text-primary tracking-widest uppercase mb-4">
-                        <div className="w-10 h-px bg-primary/30"></div>
-                        Key Expertise
-                    </div>
-                    <h2 className="text-[clamp(1.75rem,4vw,2.5rem)] font-black text-slate-900 mb-5 tracking-tight leading-none">
-                        Core <span className="text-primary">Capabilities.</span>
-                    </h2>
-                    <p className="text-base text-slate-500 max-w-xl leading-relaxed font-medium">
-                        Enterprise-grade tools built for rigorous inventory and safety standards, delivering precision at every touchpoint.
-                    </p>
-                </motion.div>
+        <Section id="capabilities" background="white" withGlow={true}>
+            {/* Unified Section Header */}
+            <SectionHeader
+                badge="Platform Capabilities"
+                title={<>The Backend of <br className="hidden sm:block" /> Modern Compliance</>}
+                description="Enterprise-grade tools built for rigorous inventory and safety standards, delivering precision at every touchpoint."
+            />
 
-                {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                    {list.map((item, index) => (
-                        <CapabilityCard key={index} {...item} index={index} />
-                    ))}
-                </div>
+            {/* Grid - Standard 3-column responsive layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+                {list.map((item, index) => (
+                    <CapabilityCard key={index} {...item} index={index} />
+                ))}
             </div>
-        </section>
+        </Section>
     );
 };
 

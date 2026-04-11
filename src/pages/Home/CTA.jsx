@@ -1,62 +1,65 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import Section from '../../components/UI/Section';
 import Card from '../../components/UI/Card';
+import Button from '../../components/UI/Button';
+import Badge from '../../components/UI/Badge';
 
 const CTA = () => {
     return (
-        <section id="contact" className="py-16 px-6 bg-[#071121] relative overflow-hidden">
-            {/* Complex Multi-layered Background */}
-            <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_10%_10%,_rgba(var(--color-primary-light-rgb),0.15)_0%,_transparent_40%),_radial-gradient(circle_at_90%_90%,_rgba(var(--color-primary-light-rgb),0.15)_0%,_transparent_40%)]" />
-
-            <motion.div
-                animate={{ 
-                    scale: [1, 1.1, 1],
-                    opacity: [0.3, 0.5, 0.3]
-                }}
-                transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-1/5 right-[10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[80px] z-0"
-            />
-
-            <div className="max-w-5xl mx-auto relative z-10">
+        <Section id="contact" className="bg-[#f8faff] py-12 sm:py-20" background="transparent" withGlow={false}>
+            <div className="max-w-4xl mx-auto relative z-10 px-6">
                 <Card 
-                    className="bg-white/5 backdrop-blur-3xl border-white/10 py-12 md:py-16 px-6 md:px-12 rounded-[32px] text-center shadow-2xl ring-1 ring-white/10"
+                    className="bg-white border-slate-200/60 py-10 px-6 sm:py-14 sm:px-16 rounded-[24px] text-center shadow-xl overflow-hidden relative"
                     hoverEffect={false}
                 >
+                    {/* Decorative Arcs — Optimized for Production */}
+                    <div className="absolute top-1/2 -left-20 -translate-y-1/2 w-56 h-56 border-[10px] border-primary/5 rounded-full pointer-events-none opacity-40 hidden md:block" />
+                    <div className="absolute top-1/2 -right-28 -translate-y-1/2 w-72 h-72 border-[16px] border-primary/5 rounded-full pointer-events-none opacity-25 hidden lg:block" />
+                    
                     <motion.div
-                        initial={{ opacity: 0, y: 30 }}
+                        initial={{ opacity: 0, y: 15 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
+                        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                        className="relative z-10 flex flex-col items-center"
                     >
-                        <h2 className="text-[clamp(1.75rem,5vw,2.5rem)] font-black text-white mb-6 tracking-tighter leading-[1.05]">
-                            Ready to Modernize Your <br />
-                            <span className="bg-gradient-to-r from-primary-light to-blue-400 bg-clip-text text-transparent">Safety Operations?</span>
-                        </h2>
-                        
-                        <p className="text-base md:text-lg text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed font-semibold">
-                            Join industry leaders who trust our AI-enabled platform for precision auditing and global inventory accountability.
-                        </p>
+                        {/* Status Badge */}
+                        <Badge color="primary" variant="light" size="pill" className="mb-5 sm:mb-6 border-primary/10">
+                            <span className="flex items-center gap-2">
+                                <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
+                                Quickly test — SaaS Analytics
+                            </span>
+                        </Badge>
 
-                        <div className="flex flex-col sm:flex-row gap-5 justify-center">
-                            <motion.button 
-                                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px -10px rgba(var(--color-primary-light-rgb), 0.4)" }}
-                                whileTap={{ scale: 0.95 }}
-                                className="px-10 py-5 bg-white text-slate-900 rounded-2xl text-base font-black tracking-tight hover:bg-slate-50 transition-all cursor-pointer"
-                            >
-                                Get Started Now
-                            </motion.button>
-                            <motion.button 
-                                whileHover={{ scale: 1.05, background: "rgba(255,255,255,0.08)" }}
-                                whileTap={{ scale: 0.95 }}
-                                className="px-10 py-5 bg-transparent text-white border border-white/20 rounded-2xl text-base font-black tracking-tight transition-all cursor-pointer"
-                            >
-                                Talk to an Expert
-                            </motion.button>
+                        <div className="space-y-4 sm:space-y-5 max-w-2xl w-full">
+                            <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-[1.15]">
+                                Start your <br className="sm:hidden" />
+                                <span className="text-primary italic"> free trial today</span>
+                            </h2>
+                            
+                            <p className="text-slate-600 text-sm sm:text-base md:text-lg font-medium leading-relaxed max-w-[500px] mx-auto opacity-90">
+                                Unlock the full potential of your site data with our comprehensive SaaS analytics platform.
+                            </p>
+                        </div>
+
+                        <div className="pt-8 sm:pt-10">
+                            <Link to="/login" className="inline-block transform transition-active active:scale-95">
+                                <Button 
+                                    variant="primary" 
+                                    size="md" 
+                                    aria-label="Start your free trial now"
+                                    className="min-w-[200px] sm:min-w-[240px] rounded-xl shadow-xl shadow-primary/20 h-12 sm:h-14 text-sm font-black hover:bg-primary/95 transition-all"
+                                >
+                                    Get Started Now
+                                </Button>
+                            </Link>
                         </div>
                     </motion.div>
                 </Card>
             </div>
-        </section>
+        </Section>
     );
 };
 

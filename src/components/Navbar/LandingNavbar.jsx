@@ -4,7 +4,7 @@ import { MdOutlineLanguage } from 'react-icons/md';
 import { FaGithub } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import Logo from '../Branding/Logo';
-import Button from '../ui/Button';
+import Button from '../UI/Button';
 
 // Stable motion-wrapped Link
 const MotionLink = motion.create(Link);
@@ -130,8 +130,8 @@ const LandingNavbar = ({
                                                 initial={{ opacity: 0, scale: 0.95 }}
                                                 animate={{ opacity: 1, scale: 1 }}
                                                 exit={{ opacity: 0, scale: 0.95 }}
-                                                className="absolute inset-x-0 h-10 my-auto bg-primary/10 rounded-full -z-10"
-                                                transition={{ type: "spring", stiffness: 450, damping: 35 }}
+                                                className="absolute inset-x-0 h-9 my-auto bg-primary/5 rounded-full -z-10 border border-primary/5 shadow-sm shadow-primary/5"
+                                                transition={{ type: "spring", stiffness: 480, damping: 38 }}
                                             />
                                         )}
                                     </AnimatePresence>
@@ -146,8 +146,8 @@ const LandingNavbar = ({
                                             }
                                         }}
                                         className={`
-                                            relative z-10 flex items-center justify-center px-4 h-10 text-[13px] xl:text-[14px] font-bold tracking-tight transition-colors duration-300 whitespace-nowrap cursor-pointer
-                                            ${isActive ? 'text-primary' : (isHovered ? 'text-primary/70' : 'text-muted hover:text-text')}
+                                            relative z-10 flex items-center justify-center px-5 h-9 text-[13px] xl:text-[14px] font-black tracking-tight transition-all duration-300 whitespace-nowrap cursor-pointer
+                                            ${isActive ? 'text-primary' : (isHovered ? 'text-primary/80' : 'text-slate-500 hover:text-primary')}
                                         `}
                                     >
                                         <div className="flex items-center gap-1.5 h-full">

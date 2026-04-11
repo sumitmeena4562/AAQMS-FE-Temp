@@ -1,5 +1,8 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import Section from '../../components/UI/Section';
+import SectionHeader from '../../components/UI/SectionHeader';
+import Card from '../../components/UI/Card';
 import {
     MdOutlineFileUpload,
     MdOutlineQrCode2,
@@ -8,62 +11,69 @@ import {
     MdOutlineFactCheck
 } from 'react-icons/md';
 
-const MasterpieceCard = ({ number, title, description, icon: Icon, index }) => {
-    const cardRef = useRef(null);
+const MilestoneNode = ({ scrollYProgress, index, stepsTotal }) => {
+    const threshold = index / (stepsTotal - 1);
+    
+    const opacity = useTransform(scrollYProgress, [threshold - 0.05, threshold], [0, 1]);
+    const dotColor = useTransform(scrollYProgress, [threshold - 0.1, threshold], ["#E2E8F0", "#072267"]);
+
+    return (
+        <div className="absolute left-[30px] lg:left-1/2 ml-[-9px] lg:ml-[-9px] top-6 z-20">
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                className="relative flex items-center justify-center"
+            >
+                <div className="w-4.5 h-4.5 rounded-full bg-white border-2 border-slate-200 group-hover:border-primary transition-colors flex items-center justify-center shadow-lg relative z-10" />
+                <motion.div 
+                    style={{ opacity }}
+                    className="absolute inset-[-3px] rounded-full bg-primary/10 blur-[2px] z-0"
+                />
+                <motion.div 
+                    style={{ backgroundColor: dotColor }}
+                    className="absolute w-1.5 h-1.5 rounded-full z-20"
+                />
+            </motion.div>
+        </div>
+    );
+};
+
+const WorkflowCard = ({ number, title, description, icon: Icon, index }) => {
     const isEven = index % 2 === 0;
 
     return (
         <motion.div
-            initial={{ opacity: 0, x: isEven ? -40 : 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1], delay: index * 0.1 }}
-            className={`w-full flex justify-center lg:${isEven ? 'justify-start' : 'justify-end'} mb-12 sm:mb-20 relative z-10`}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: index * 0.05 }}
+            className={`w-full flex ${isEven ? 'justify-start lg:pr-8' : 'justify-end lg:pl-8'} mb-6 relative z-10`}
         >
-            <motion.div
-                ref={cardRef}
-                className="w-full max-w-[420px] p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] bg-white border border-white/40 shadow-xl sm:shadow-2xl transition-all hover:shadow-primary/5 relative cursor-pointer overflow-hidden group ring-1 ring-slate-100/50"
-            >
-                {/* Grain Texture Overlay - Static */}
-                <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay bg-[url('/noise.svg')]" />
+            <div className={`w-full max-w-[380px] relative group`}>
+                <Card
+                    className="p-4 md:p-5 flex flex-col gap-3 border border-slate-100 bg-white shadow-[0_4px_25px_-5px_rgba(0,0,0,0.03)] hover:shadow-xl hover:border-primary/20 transition-all duration-700 overflow-hidden"
+                >
+                    <div className="flex items-start gap-4">
+                        <div className="shrink-0 relative">
+                            <div className="w-10 h-10 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center border border-slate-100 group-hover:bg-primary/5 group-hover:text-primary group-hover:border-primary/10 transition-all duration-500">
+                                <Icon className="text-xl" />
+                            </div>
+                            <div className={`absolute top-1/2 -translate-y-1/2 w-6 h-[2.5px] bg-slate-100 group-hover:bg-primary/10 transition-colors hidden lg:block ${isEven ? 'left-full ml-2' : 'right-full mr-2'}`} />
+                        </div>
 
-
-                <div className="relative z-10">
-                    <motion.div 
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        whileInView={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 200, damping: 12, delay: (index * 0.1) + 0.3 }}
-                        className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-light to-primary flex items-center justify-center text-white mb-6 shadow-lg shadow-primary/25"
-                    >
-                        <Icon className="text-3xl" />
-                    </motion.div>
-                    
-                    <div className="absolute -top-3 -right-3 text-8xl font-black text-primary/[0.03] select-none z-[-1] leading-none transition-transform group-hover:scale-110 duration-700">
-                        0{number}
+                        <div>
+                            <div className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Step 0{number}</div>
+                            <h4 className="text-base font-bold text-slate-900 mb-1.5 tracking-tight group-hover:text-primary transition-colors line-clamp-1">
+                                {title}
+                            </h4>
+                            <p className="text-[12.5px] leading-relaxed text-slate-500 font-medium opacity-90 line-clamp-2">
+                                {description}
+                            </p>
+                        </div>
                     </div>
-
-                    <h4 className="text-2xl font-black text-slate-900 mb-3 tracking-tight leading-tight group-hover:text-primary transition-colors">
-                        {title}
-                    </h4>
-                    <p className="text-[15px] leading-relaxed text-slate-500 font-medium">
-                        {description}
-                    </p>
-                </div>
-
-            </motion.div>
-        </motion.div>
-    );
-};
-
-const ProgressIndicatorStep = ({ scrollYProgress, index, total }) => {
-    const scaleY = useTransform(scrollYProgress, [index/total, (index+1)/total], [0, 1]);
-    
-    return (
-        <motion.div className="w-1 h-10 bg-slate-100 rounded-full overflow-hidden relative">
-            <motion.div
-                style={{ scaleY, originY: 0 }}
-                className="absolute inset-0 bg-primary"
-            />
+                </Card>
+            </div>
         </motion.div>
     );
 };
@@ -75,102 +85,66 @@ const Workflow = () => {
         offset: ["start center", "end center"]
     });
 
-    const pathLength = useSpring(scrollYProgress, { stiffness: 400, damping: 100 });
+    const scaleY = useSpring(scrollYProgress, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
     const steps = [
-        { number: 1, title: "Setup & Planning", description: "Coordinator uploads site floor plans and defines critical safety zones.", icon: MdOutlineFileUpload },
-        { number: 2, title: "Inventory Marking", description: "Assign unique QR codes to assets and geofence them within mapped zones.", icon: MdOutlineQrCode2 },
-        { number: 3, title: "On-Site Audit", description: "Officers scan items and upload photo/video evidence via mobile app.", icon: MdOutlineMobileFriendly },
-        { number: 4, title: "AI Detection", description: "System identifies mismatches, missing items, or maintenance delays instantly.", icon: MdOutlinePsychology },
-        { number: 5, title: "Review & Report", description: "Admin reviews AI flags and approves final audit reports for compliance.", icon: MdOutlineFactCheck }
+        { number: 1, title: "Site Mapping", description: "Upload your site maps and mark all safety zones.", icon: MdOutlineFileUpload },
+        { number: 2, title: "Smart Tagging", description: "Put secure QR codes on your items for easy tracking.", icon: MdOutlineQrCode2 },
+        { number: 3, title: "Digital Audit", description: "Scan items on-site and sync data to the cloud instantly.", icon: MdOutlineMobileFriendly },
+        { number: 4, title: "Instant Alerts", description: "Get notified immediately about missing items or safety issues.", icon: MdOutlinePsychology },
+        { number: 5, title: "Smart Reports", description: "Generate clear audit reports and history in just one click.", icon: MdOutlineFactCheck }
     ];
 
     return (
-        <section id="workflow" ref={containerRef} className="py-16 px-6 bg-white relative overflow-hidden border-t border-slate-100">
-            {/* Ambient Lighting Leaks */}
-            <div className="absolute -top-[20%] -left-[10%] w-[600px] h-[600px] bg-primary-light/10 rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute -bottom-[20%] -right-[10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-
-            {/* Tech Grid Pattern */}
-            <div className="absolute inset-0 opacity-[0.4] z-0" 
-                 style={{ backgroundImage: 'radial-gradient(rgba(var(--color-primary-light-rgb), 0.15) 1px, transparent 1px)', backgroundSize: '32px 32px' }} 
+        <section 
+            id="workflow" 
+            className="relative py-16 sm:py-20 px-6 overflow-hidden bg-[#f8faff]"
+            ref={containerRef}
+        >
+            {/* Elite Blueprint Grid Pattern */}
+            <div className="absolute inset-0 z-0 opacity-[0.4]" 
+                style={{ 
+                    backgroundImage: `radial-gradient(#072267 0.5px, transparent 0.5px)`, 
+                    backgroundSize: '24px 24px' 
+                }} 
             />
+            
+            {/* Soft Ambient Glows */}
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-400/5 rounded-full blur-[100px] pointer-events-none" />
 
-            {/* Progress Hub (Sticky Side Nav) */}
-            <div className="fixed right-10 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-[100] pointer-events-none hidden xl:flex">
-                {steps.map((_, i) => (
-                    <ProgressIndicatorStep 
-                        key={i} 
-                        scrollYProgress={scrollYProgress} 
-                        index={i} 
-                        total={steps.length} 
-                    />
-                ))}
-            </div>
+            <div className="container mx-auto px-6 relative z-10">
+                <SectionHeader
+                    badge="Operations"
+                    title={<>The Continuity <br className="hidden sm:block" /> Pipeline</>}
+                    description="Standardized protocol ensures data integrity across your entire site operations."
+                />
 
-            <div className="max-w-5xl mx-auto relative z-10">
-                {/* Header */}
-                <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-12"
-                >
-                    <motion.span 
-                        animate={{ opacity: [0.6, 1, 0.6] }}
-                        transition={{ duration: 4, repeat: Infinity }}
-                        className="text-[10px] font-black text-primary-light tracking-[0.3em] uppercase block mb-4"
-                    >
-                        The Process
-                    </motion.span>
-                    <h2 className="text-[clamp(1.75rem,4vw,2.5rem)] font-black text-slate-900 tracking-tighter leading-none mb-6">
-                        Efficiency Unleashed
-                    </h2>
-                </motion.div>
-
-                {/* SVG Snake Path */}
-                <div className="absolute top-48 left-1/2 -translate-x-1/2 w-full h-[calc(100%-300px)] z-0 pointer-events-none hidden lg:block">
-                    <svg width="100%" height="100%" viewBox="0 0 1000 1200" fill="none" preserveAspectRatio="none">
-                        <path
-                            d="M 250 0 C 250 150 750 150 750 300 C 750 450 250 450 250 600 C 250 750 750 750 750 900 C 750 1050 500 1050 500 1200"
-                            stroke="rgba(var(--color-primary-rgb), 0.03)"
-                            strokeWidth="3"
-                            strokeDasharray="8 8"
+                <div className="max-w-4xl mx-auto relative mt-16">
+                    {/* The Precision Axis */}
+                    <div className="absolute left-[30px] lg:left-1/2 top-4 bottom-4 w-[2.5px] lg:-translate-x-1/2 z-0">
+                        <div className="absolute inset-0 bg-slate-200/40 rounded-full" />
+                        <motion.div 
+                            style={{ scaleY, originY: 0 }}
+                            className="absolute inset-0 bg-gradient-to-b from-primary via-blue-500 to-sky-400 rounded-full shadow-[0_0_15px_rgba(7,34,103,0.3)]"
                         />
-                        <motion.path
-                            d="M 250 0 C 250 150 750 150 750 300 C 750 450 250 450 250 600 C 250 750 750 750 750 900 C 750 1050 500 1050 500 1200"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            style={{ pathLength }}
-                            className="text-primary-light"
-                        />
-                        
-                        {/* Pulsing Nodes on Path */}
-                        {[300, 600, 900].map((yPos, i) => (
-                            <motion.circle
-                                key={i}
-                                cx={i % 2 === 0 ? 750 : 250}
-                                cy={yPos}
-                                r="6"
-                                className="fill-primary-light shadow-[0_0_10px_rgba(var(--color-primary-light-rgb),1)]"
-                                initial={{ scale: 0 }}
-                                whileInView={{ scale: [0, 1.5, 1] }}
-                                animate={{ opacity: [0.4, 1, 0.4] }}
-                                transition={{ duration: 2, repeat: Infinity, delay: i * 0.5 }}
-                            />
+                    </div>
+
+                    <div className="relative z-10 space-y-2 lg:space-y-0">
+                        {steps.map((step, index) => (
+                            <div key={index} className="relative">
+                                <MilestoneNode 
+                                    scrollYProgress={scrollYProgress}
+                                    index={index}
+                                    stepsTotal={steps.length}
+                                />
+                                <WorkflowCard 
+                                    {...step}
+                                    index={index}
+                                />
+                            </div>
                         ))}
-                    </svg>
-                </div>
-
-                {/* Staggered Cards */}
-                <div className="relative z-10">
-                    {steps.map((step, index) => (
-                        <MasterpieceCard
-                            key={index}
-                            {...step}
-                            index={index}
-                        />
-                    ))}
+                    </div>
                 </div>
             </div>
         </section>

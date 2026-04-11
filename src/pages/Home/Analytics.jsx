@@ -1,5 +1,7 @@
 import React from 'react';
 import Card from '../../components/UI/Card';
+import Section from '../../components/UI/Section';
+import SectionHeader from '../../components/UI/SectionHeader';
 import { motion } from 'framer-motion';
 import {
     MdOutlineTrendingUp,
@@ -9,38 +11,33 @@ import {
 
 const StatCard = ({ label, value, trend, icon: Icon, color, index }) => (
     <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.3 + (index * 0.1) }}
-        className="flex-1 min-w-[140px]"
+        transition={{ duration: 0.5, delay: 0.2 + (index * 0.1) }}
+        className="flex-1"
     >
         <Card
-            className="flex flex-col gap-4 h-full bg-white border border-white group transition-shadow hover:shadow-lg"
-            hoverEffect={true}
+            className="flex flex-col gap-1.5 h-full bg-white border border-slate-100 shadow-sm p-3 sm:p-4 hover:border-primary/20 transition-all"
         >
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-1">
                 <div 
-                    className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-3"
-                    style={{ 
-                        background: `linear-gradient(135deg, ${color}20, ${color}10)`,
-                        color: color,
-                        boxShadow: `inset 0 0 0 1px ${color}10`
-                    }}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center"
+                    style={{ background: `${color}10`, color: color }}
                 >
-                    <Icon className="text-[22px]" />
+                    <Icon className="text-[14px]" />
                 </div>
                 {trend && (
-                    <div className="text-[11px] font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100 uppercase tracking-tighter">
+                    <div className="text-[7px] font-black text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-100 uppercase tracking-tighter">
                         {trend}
                     </div>
                 )}
             </div>
             <div>
-                <div className="text-[11px] font-black text-slate-400 mb-1 uppercase tracking-widest leading-none">
+                <div className="text-[7px] font-black text-slate-400 mb-0.5 uppercase tracking-widest leading-none">
                     {label}
                 </div>
-                <div className="text-2xl font-black text-slate-900 tracking-tighter leading-none">
+                <div className="text-sm font-black text-slate-900 leading-none">
                     {value}
                 </div>
             </div>
@@ -50,148 +47,122 @@ const StatCard = ({ label, value, trend, icon: Icon, color, index }) => (
 
 const Analytics = () => {
     return (
-        <section id="analytics" className="py-16 px-6 bg-gradient-to-b from-white to-slate-50 border-t border-slate-100 relative overflow-hidden">
-            {/* Background Decorative Blob */}
-            <div className="absolute top-[10%] -right-[5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+        <section 
+            id="analytics" 
+            className="relative py-16 sm:py-24 px-6 overflow-hidden bg-[#f8faff]"
+        >
+            {/* Blueprint Grid Pattern */}
+            <div className="absolute inset-0 z-0 opacity-[0.3]" 
+                style={{ 
+                    backgroundImage: `radial-gradient(#072267 0.5px, transparent 0.5px)`, 
+                    backgroundSize: '24px 24px' 
+                }} 
+            />
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-16 items-center relative z-10">
-                
-                {/* Left Side: Content */}
-                <motion.div 
-                    initial={{ opacity: 0, x: -30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
-                >
-                    <div className="flex items-center gap-4 text-[10px] font-black text-primary tracking-widest uppercase mb-4">
-                        <div className="w-10 h-px bg-primary/30"></div>
-                        Reporting & Compliance
-                    </div>
+            <div className="container mx-auto px-6 relative z-10">
+                <SectionHeader
+                    badge="Reporting"
+                    title={<>Real-Time Insights <br className="hidden sm:block" /> & Simple Control</>}
+                    description="Turn your site data into clear reports and audit history with one click."
+                />
 
-                    <h2 className="text-[clamp(1.75rem,4vw,2.4rem)] font-black text-slate-900 mb-6 tracking-tighter leading-[1.05]">
-                        Real-Time Insights for Absolute <span className="text-primary">Accountability.</span>
-                    </h2>
-
-                    <p className="text-base text-slate-500 leading-relaxed mb-8 max-w-xl font-medium">
-                        Transform raw field data into actionable audit trails. Automatically generate daily, weekly, or monthly compliance reports with AI-verified precision.
-                    </p>
-
-                    <div className="flex flex-col gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center max-w-5xl mx-auto mt-12">
+                    {/* Left Side: Features */}
+                    <div className="flex flex-col gap-8 w-full order-2 md:order-1">
                         {[
-                            "Automated AI-Risk identification & flagship alerts.",
-                            "Tamper-proof audit trails for regulatory submission.",
-                            "Historical data comparison for maintenance trends."
+                            { title: "Spot Risks", desc: "Instantly find and fix missing items or safety issues." },
+                            { title: "Secure History", desc: "Get a clear, unchangeable record of every audit performed." },
+                            { title: "Audit Trends", desc: "Easily track how your site's safety improves over time." }
                         ].map((item, idx) => (
-                            <motion.div 
-                                key={idx}
-                                initial={{ opacity: 0, x: -10 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.4 + (idx * 0.1) }}
-                                className="flex items-start gap-4 text-base text-slate-700 font-bold"
-                            >
-                                <div className="min-w-[22px] h-5.5 rounded-full bg-primary/10 flex items-center justify-center text-primary mt-0.5">
+                            <div key={idx} className="flex items-start gap-5 w-full group">
+                                <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center text-primary mt-1 border border-primary/10 group-hover:bg-primary group-hover:text-white transition-all shrink-0">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 </div>
-                                {item}
-                            </motion.div>
+                                <div className="flex flex-col gap-1.5 flex-1 pt-0.5">
+                                    <h4 className="text-[18px] sm:text-[20px] font-black text-slate-800 leading-tight group-hover:text-primary transition-colors">{item.title}</h4>
+                                    <p className="text-[14px] sm:text-[15px] text-slate-500 font-medium opacity-90 leading-relaxed w-full">{item.desc}</p>
+                                </div>
+                            </div>
                         ))}
                     </div>
-                </motion.div>
 
-                {/* Right Side: Visual Dashboard Card */}
-                <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, ease: [0.21, 1, 0.36, 1] }}
-                    className="relative"
-                >
-                    <Card
-                        padding="32px"
-                        borderRadius="28px"
-                        className="bg-white/95 border-white shadow-2xl flex flex-col gap-8 ring-1 ring-slate-100"
-                    >
-                        {/* Header */}
-                        <div className="flex justify-between items-center">
-                            <h4 className="text-lg font-black text-slate-900 tracking-tight">Compliance Overview</h4>
-                            <div className="flex gap-2">
-                                <div className="w-2.5 h-2.5 rounded-full bg-success opacity-40" />
-                                <div className="w-2.5 h-2.5 rounded-full bg-warning opacity-40" />
-                                <div className="w-2.5 h-2.5 rounded-full bg-slate-200 opacity-40" />
-                            </div>
-                        </div>
-
-                        {/* Stats Row */}
-                        <div className="flex flex-col sm:flex-row gap-5">
-                            <StatCard
-                                label="Audit Score"
-                                value="98.2%"
-                                trend="+2.4%"
-                                icon={MdOutlineTrendingUp}
-                                color="#10b981"
-                                index={0}
-                            />
-                            <StatCard
-                                label="Risk Flags"
-                                value="03"
-                                icon={MdOutlineAssignmentLate}
-                                color="#ef4444"
-                                index={1}
-                            />
-                        </div>
-
-                        {/* Fancy Chart Area */}
-                        <div className="h-44 bg-slate-50 rounded-2xl border border-slate-100 flex items-end p-4 sm:p-5 gap-1.5 sm:gap-3 relative overflow-hidden group shadow-inner">
-                            {/* Static grid pattern for aesthetic */}
-                            <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:16px_16px]" />
-                            
-                            {[40, 70, 45, 90, 65, 80, 55, 95].map((h, i) => (
-                                <motion.div 
-                                    key={i} 
-                                    initial={{ height: 0 }}
-                                    whileInView={{ height: `${h}%` }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 1, delay: 0.6 + (i * 0.05), ease: "easeOut" }}
-                                    className={`
-                                        flex-1 rounded-t-sm sm:rounded-t-lg transition-all duration-300
-                                        ${i === 7 ? 'bg-primary' : 'bg-primary/20 group-hover:bg-primary/30'}
-                                    `}
-                                />
-                            ))}
-                        </div>
-
-                        {/* Action buttons */}
-                        <div className="flex justify-end gap-3 flex-wrap">
-                            <motion.button 
-                                whileHover={{ scale: 1.05 }} 
-                                whileTap={{ scale: 0.95 }} 
-                                className="px-5 py-2.5 text-[12px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 border border-slate-200 rounded-xl transition-colors hover:bg-slate-100"
+                    {/* Right Side: Virtualized Dashboard - 2x More Compact */}
+                    <div className="order-1 md:order-2 flex justify-center md:justify-end">
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.98 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            className="relative w-full max-w-[340px]"
+                        >
+                            <Card
+                                className="bg-white border-slate-200/60 shadow-2xl flex flex-col overflow-hidden p-0"
                             >
-                                History
-                            </motion.button>
-                            <motion.button 
-                                whileHover={{ scale: 1.05, boxShadow: "0 10px 20px -5px rgba(var(--color-primary-rgb), 0.3)" }} 
-                                whileTap={{ scale: 0.95 }} 
-                                className="px-5 py-2.5 text-[12px] font-black uppercase tracking-widest text-white bg-primary rounded-xl flex items-center gap-2 shadow-lg shadow-primary/20 group transition-all"
-                            >
-                                <MdOutlineAutoGraph className="text-base group-hover:rotate-12 transition-transform" /> 
-                                Generate Report
-                            </motion.button>
-                        </div>
-                    </Card>
+                                {/* Header bar */}
+                                <div className="h-8 px-4 flex justify-between items-center border-b border-slate-100 bg-slate-50">
+                                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Analytics Dashboard</span>
+                                    <div className="flex gap-1.5">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/30" />
+                                    </div>
+                                </div>
 
-                    {/* Decorative Floating Label - Adjusted for Mobile safety */}
-                    <motion.div 
-                        initial={{ x: 20, opacity: 0 }}
-                        whileInView={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 1 }}
-                        className="absolute -bottom-5 sm:-left-5 left-0 sm:left-auto bg-white p-3 sm:p-3.5 px-4 sm:px-6 rounded-2xl shadow-xl z-20 flex items-center gap-3 border border-slate-100 ring-2 ring-white"
-                    >
-                        <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_12px_var(--color-success)]" />
-                        <span className="text-[12px] sm:text-sm font-black text-slate-900 tracking-tight">Live Sync Active</span>
-                    </motion.div>
-                </motion.div>
+                                <div className="p-5 flex flex-col gap-5">
+                                    {/* Stats Grid */}
+                                    <div className="flex gap-3">
+                                        <StatCard
+                                            label="Audit Score"
+                                            value="98.4%"
+                                            trend="+1.2%"
+                                            icon={MdOutlineTrendingUp}
+                                            color="#072267"
+                                            index={0}
+                                        />
+                                        <StatCard
+                                            label="Open Risks"
+                                            value="02"
+                                            icon={MdOutlineAssignmentLate}
+                                            color="#ef4444"
+                                            index={1}
+                                        />
+                                    </div>
+
+                                    {/* Mini Graph Area */}
+                                    <div className="h-28 bg-slate-50/50 rounded-xl border border-slate-100 flex items-end p-3 gap-1.5 relative overflow-hidden group">
+                                        <div className="absolute inset-0 opacity-[0.03] bg-[linear-gradient(rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.1)_1px,transparent_1px)] bg-[size:15px_15px]" />
+                                        
+                                        {[40, 70, 50, 80, 60, 90, 65, 85].map((h, i) => (
+                                            <motion.div 
+                                                key={i} 
+                                                initial={{ height: 0 }}
+                                                whileInView={{ height: `${h}%` }}
+                                                viewport={{ once: true }}
+                                                transition={{ duration: 0.8, delay: 0.4 + (i * 0.05) }}
+                                                className={`flex-1 rounded-t-sm ${i === 5 ? 'bg-primary' : 'bg-primary/10'}`}
+                                            />
+                                        ))}
+                                    </div>
+
+                                    <div className="flex justify-between items-center px-1">
+                                        <span className="text-[8px] font-bold text-slate-400">Live Updates Enabled</span>
+                                        <button className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest text-white bg-primary rounded-lg flex items-center gap-1.5 shadow-lg shadow-primary/20">
+                                            <MdOutlineAutoGraph className="text-xs" /> Report
+                                        </button>
+                                    </div>
+                                </div>
+                            </Card>
+
+                            {/* Status Badge */}
+                            <motion.div 
+                                animate={{ y: [0, -5, 0] }}
+                                transition={{ duration: 4, repeat: Infinity }}
+                                className="absolute -bottom-4 -right-4 bg-white p-2 px-4 rounded-full shadow-xl z-20 flex items-center gap-2 border border-slate-100"
+                            >
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                <span className="text-[9px] font-black text-slate-900 tracking-tight whitespace-nowrap uppercase">Audit Live</span>
+                            </motion.div>
+                        </motion.div>
+                    </div>
+                </div>
             </div>
         </section>
     );
