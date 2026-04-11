@@ -6,6 +6,7 @@ import {
 } from 'react-icons/md';
 import { BRAND_NAME, CONTACT_INFO, COPYRIGHT_TEXT } from '../Branding/BrandConfig';
 import { FOOTER_LINKS, SOCIAL_LINKS } from '../../data/footerData';
+import { Link } from 'react-router-dom';
 import Logo from '../Branding/Logo';
 
 const FooterLink = ({ href, children, label }) => (
@@ -48,7 +49,9 @@ const Footer = () => {
 
                     {/* Brand Info */}
                     <div className="col-span-2 lg:col-span-1 flex flex-col items-start">
-                        <Logo size="lg" className="mb-6 -ml-5" />
+                        <Link to="/" className="mb-6 -ml-5">
+                            <Logo size="lg" />
+                        </Link>
                         <p className="text-sm text-slate-500 leading-relaxed mb-8 max-w-[300px] font-medium opacity-90">
                             The advanced engineering blueprint for asset quality monitoring and field safety compliance.
                         </p>

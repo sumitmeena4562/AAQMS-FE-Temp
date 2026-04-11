@@ -248,7 +248,7 @@ function OtpStep({ email, onSubmit, onResend, isLoading, cooldown = 0 }) {
                         type="text"
                         placeholder="000000"
                         maxLength={6}
-                        className="text-center tracking-[1em] font-black text-xl"
+                        className="text-center tracking-[0.5em] font-black text-xl"
                         {...register('otp')}
                         error={errors.otp?.message}
                     />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, Link } from 'react-router-dom';
 import Logo from "../../components/Branding/Logo";
 import Sidebar from "../../components/sidebar/Sidebar";
 import ProfileDropdown from "../../components/Navbar/ProfileDropdown";
@@ -66,7 +66,7 @@ const AdminLayoutInner = () => {
         <div className="flex h-screen overflow-hidden bg-page font-sans">
             <Sidebar
                 navItems={navItems}
-                logo={<Logo />}
+                logo={<Link to="/"><Logo /></Link>}
                 collapsed={isCollapsed}
                 onToggle={() => setIsCollapsed(c => !c)}
                 mobileOpen={isMobileOpen}

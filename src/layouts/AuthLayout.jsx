@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import Logo from '../components/Branding/Logo';
 
 const AuthLayout = ({ children }) => {
@@ -57,7 +58,9 @@ const AuthLayout = ({ children }) => {
                     className="relative z-10 h-24 flex items-center"
                     style={{ paddingLeft: 'clamp(2rem, calc((100vw - 1280px) / 2), 20rem)' }}
                 >
-                    <Logo size="lg" inverse />
+                    <Link to="/">
+                        <Logo size="lg" inverse />
+                    </Link>
                 </motion.div>
 
                 {/* Main: Unified Content Flow */}
@@ -111,7 +114,9 @@ const AuthLayout = ({ children }) => {
             <div className="flex-1 flex items-center justify-center p-4 sm:p-8 md:p-12 relative z-20 overflow-y-auto">
                 {/* Mobile Logo Only */}
                 <div className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:hidden">
-                    <Logo size="md" />
+                    <Link to="/">
+                        <Logo size="md" />
+                    </Link>
                 </div>
 
                 <div className="w-full max-w-[440px] mt-12 lg:mt-0 relative">
