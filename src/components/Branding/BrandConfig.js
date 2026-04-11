@@ -10,7 +10,7 @@ export const BRAND_FULL_NAME = "Advanced Asset Quality Management System";
 export const CONTACT_INFO = {
     EMAIL: "support@aaqms.com",
     PHONE: "+91 (800) 123-4567",
-    ADDRESS: ["Cyber Park, Zone 4,", "Tech Hub, Mumbai"],
+    ADDRESS: ["Singaji IT Park, Zone 4,", "SSS, Sandalpur"],
 };
 
 export const COPYRIGHT_TEXT = `© ${new Date().getFullYear()} AAQMS Safety Management. All rights reserved.`;

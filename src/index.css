@@ -6,15 +6,37 @@
 
     /* ── BASE SYSTEM TOKENS ── */
     --color-primary: #072267;
-    --color-secondary: #0070F3;
+    --color-primary-rgb: 7, 34, 103;
+    --color-primary-dark: #051a4f;
+    --color-secondary: #3B82F6;
+    --color-secondary-rgb: 59, 130, 246;
+    --color-accent: #0070F3;
+    --color-accent-soft: #F8FAFF;
+    
     --color-background: #FAFAFA;
-    --color-text: #000000;
-    --color-muted: #666666;
+    --color-surface: #FFFFFF;
     --color-border: #EAEAEA;
+    --color-border-subtle: rgba(0, 0, 0, 0.05);
 
     /* ── TYPOGRAPHY ── */
+    --color-text: #000000;
+    --color-text-title: #0F172A;
+    --color-text-body: #475569;
+    --color-text-muted: #64748B;
+    --color-text-primary: #072267;
+
     --font-heading: 'Inter', sans-serif;
     --font-body: 'Inter', sans-serif;
+
+    /* ── STATUS COLORS ── */
+    --color-success: #10B981;
+    --color-success-bg: #ECFDF5;
+    --color-danger: #EF4444;
+    --color-danger-bg: #FEF2F2;
+    --color-warning: #F59E0B;
+    --color-warning-bg: #FFFBEB;
+    --color-info: #3B82F6;
+    --color-info-bg: #EFF6FF;
 
     /* ── SPACING SCALE ── */
     --spacing-xs: 4px;
@@ -35,28 +57,11 @@
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.12);
     --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+    --shadow-premium: 0 10px 40px -10px rgba(7, 34, 103, 0.12);
 
-    /* --- Existing/Legacy AAQMS Tokens (Kept for compatibility) --- */
-    --color-accent: #0070F3;
-    --color-accent-soft: #F0F7FF;
-    --color-success: #10B981;
-    --color-success-bg: #ECFDF5;
-    --color-danger: #EF4444;
-    --color-danger-bg: #FEF2F2;
-    --color-warning: #F59E0B;
-    --color-warning-bg: #FFFBEB;
-    --color-info: #3B82F6;
-    --color-info-bg: #EFF6FF;
-    --color-page: #FAFAFA;
-    --color-card: #FFFFFF;
-    --color-title: #000000;
-    --color-body: #666666;
-    --color-gray: #A1A1AA;
-    --radius-card: 14px;
-    --radius-button: 10px;
-    --radius-input: 8px;
-    --sidebar-width: 260px;
+    /* ── CONSTANTS ── */
     --navbar-height: 80px;
+    --sidebar-width: 260px;
 }
 
 /* ============================================

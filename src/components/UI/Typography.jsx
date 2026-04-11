@@ -14,7 +14,7 @@ export const Heading = ({
   return (
     <Component 
       className={cn(
-        "font-heading font-black tracking-tight text-text text-3xl md:text-4xl lg:text-5xl leading-[1.1]",
+        "font-heading font-black tracking-tight text-text-title text-3xl md:text-4xl lg:text-5xl leading-[1.1]",
         className
       )}
     >
@@ -31,7 +31,7 @@ export const SubHeading = ({
   return (
     <Component 
       className={cn(
-        "font-heading font-bold tracking-tight text-text text-xl md:text-2xl leading-tight",
+        "font-heading font-bold tracking-tight text-text-title text-xl md:text-2xl leading-tight",
         className
       )}
     >
@@ -55,7 +55,7 @@ export const Text = ({
   return (
     <Component 
       className={cn(
-        "font-body text-muted leading-relaxed",
+        "font-body text-text-muted leading-relaxed",
         sizes[size],
         className
       )}

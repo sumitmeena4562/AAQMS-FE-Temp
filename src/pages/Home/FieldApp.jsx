@@ -1,9 +1,5 @@
 import React from 'react';
 import {
-    MdOutlineAssignmentInd,
-    MdOutlineQrCodeScanner,
-    MdOutlinePhotoCamera,
-    MdOutlineWifiOff,
     MdMenu,
     MdNotificationsNone,
     MdAdd,
@@ -15,8 +11,8 @@ import {
     MdOutlineVerified
 } from 'react-icons/md';
 import { motion } from 'framer-motion';
-import Section from '../../components/UI/Section';
 import SectionHeader from '../../components/UI/SectionHeader';
+import { FIELD_APP_DATA } from '../../data/landingData';
 
 const FieldFeature = ({ icon: Icon, title, description, index }) => (
     <motion.div 
@@ -27,13 +23,13 @@ const FieldFeature = ({ icon: Icon, title, description, index }) => (
         className="flex gap-6 group items-start w-full"
     >
         <div className="w-12 h-12 rounded-xl bg-primary/5 text-primary flex items-center justify-center border border-primary/10 shadow-sm group-hover:bg-primary group-hover:text-white transition-all duration-500 shrink-0 mt-1">
-            <Icon className="text-[22px]" />
+            <Icon className="text-[22px]" aria-hidden="true" />
         </div>
         <div className="flex flex-col gap-1.5 flex-1">
-            <h4 className="text-[18px] sm:text-[20px] font-black text-slate-900 tracking-tight group-hover:text-primary transition-colors leading-tight">
+            <h4 className="text-[18px] sm:text-[20px] font-black text-text-title tracking-tight group-hover:text-primary transition-colors leading-tight">
                 {title}
             </h4>
-            <p className="text-[14px] sm:text-[15px] leading-relaxed text-slate-500 font-medium opacity-90 w-full">
+            <p className="text-[14px] sm:text-[15px] leading-relaxed text-text-muted font-medium opacity-90 w-full">
                 {description}
             </p>
         </div>
@@ -41,7 +37,7 @@ const FieldFeature = ({ icon: Icon, title, description, index }) => (
 );
 
 const MobileMockup = () => (
-    <div className="relative flex justify-center lg:justify-end perspective-lg lg:pr-10">
+    <div className="relative flex justify-center lg:justify-end perspective-lg lg:pr-10" aria-hidden="true">
         {/* Glow Decoration */}
         <div className="absolute inset-0 w-[90%] h-[90%] bg-primary/10 filter blur-[80px] top-[5%] left-[5%] z-0" />
 
@@ -81,7 +77,7 @@ const MobileMockup = () => (
                     {/* App Task Cards */}
                     <div className="bg-white p-2.5 rounded-xl flex items-center gap-2 shadow-sm border border-slate-100">
                         <div className="w-6 h-6 bg-primary/10 rounded-lg flex items-center justify-center text-primary shrink-0">
-                            <MdOutlineQrCodeScanner className="text-sm" />
+                            <MdNotificationsNone className="text-sm" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="text-[9px] font-black text-slate-800 truncate leading-none mb-0.5">Shelf 4A</div>
@@ -101,11 +97,11 @@ const MobileMockup = () => (
 
                     <div className="grid grid-cols-2 gap-2 mt-1">
                         <div className="bg-white h-10 rounded-xl flex flex-col items-center justify-center gap-1 text-primary shadow-sm border border-slate-100">
-                            <MdOutlineQrCodeScanner className="text-sm" />
+                            <MdNotificationsNone className="text-sm" />
                             <span className="text-[6px] font-black uppercase">Scan</span>
                         </div>
                         <div className="bg-white h-10 rounded-xl flex flex-col items-center justify-center gap-1 text-primary shadow-sm border border-slate-100">
-                            <MdOutlinePhotoCamera className="text-sm" />
+                            <MdNotificationsNone className="text-sm" />
                             <span className="text-[6px] font-black uppercase">Snap</span>
                         </div>
                     </div>
@@ -146,35 +142,33 @@ const MobileMockup = () => (
 );
 
 const FieldApp = () => {
+    const { badge, title, description, features } = FIELD_APP_DATA;
+
     return (
         <section 
             id="mobile" 
-            className="relative py-16 sm:py-24 px-6 overflow-hidden bg-[#f4f7ff]"
+            className="relative py-16 sm:py-24 px-6 overflow-hidden bg-accent-soft"
         >
             {/* Blueprint Grid Pattern */}
             <div className="absolute inset-0 z-0 opacity-[0.3]" 
                 style={{ 
-                    backgroundImage: `radial-gradient(#072267 0.5px, transparent 0.5px)`, 
+                    backgroundImage: `radial-gradient(var(--color-primary) 0.5px, transparent 0.5px)`, 
                     backgroundSize: '24px 24px' 
                 }} 
+                aria-hidden="true"
             />
 
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader
-                    badge="Field Operations"
-                    title={<>Simple Mobile Audits <br className="hidden sm:block" /> for Field Teams</>}
-                    description="Our easy-to-use mobile tool helps your field team sync audit data instantly from any location."
+                    badge={badge}
+                    title={title}
+                    description={description}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center max-w-6xl mx-auto mt-12 sm:mt-16">
                     {/* Left Side: Features List */}
                     <div className="flex flex-col gap-8 order-2 md:order-1 w-full">
-                        {[
-                            { icon: MdOutlineAssignmentInd, title: "Officer Login", description: "Secure login for every staff member for clear audit trails." },
-                            { icon: MdOutlineQrCodeScanner, title: "Quick QR Scan", description: "Easily scan any asset to verify its location and details instantly." },
-                            { icon: MdOutlinePhotoCamera, title: "Photo Evidence", description: "Attach mandatory photos to your audits for 100% proof." },
-                            { icon: MdOutlineWifiOff, title: "Works Offline", description: "Audit items even without internet; data syncs when you're back online." }
-                        ].map((feat, i) => (
+                        {features.map((feat, i) => (
                             <FieldFeature key={i} {...feat} index={i} />
                         ))}
                     </div>

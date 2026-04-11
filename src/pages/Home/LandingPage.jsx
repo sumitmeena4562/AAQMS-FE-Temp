@@ -20,10 +20,37 @@ const SectionLoader = () => (
     </div>
 );
 
+import { useScrollSpy } from '../../hooks/useScrollSpy';
+
 const LandingPage = () => {
     const navigate = useNavigate();
-    const [activeLabel, setActiveLabel] = useState('Home');
     const isScrollingRef = useRef(false);
+
+    // Optimized Scroll Spy for Navigation Highlighting
+    const activeSectionId = useScrollSpy([
+        'home', 'roles', 'capabilities', 'planning', 'workflow', 'mobile', 'analytics'
+    ], { rootMargin: '-10% 0px -80% 0px', threshold: 0 });
+
+    const [activeLabel, setActiveLabel] = useState('Home');
+
+    // Sync active label with active section ID
+    useEffect(() => {
+        if (isScrollingRef.current) return;
+        
+        const idToLabel = {
+            'home': 'Home',
+            'roles': 'Roles',
+            'capabilities': 'Capabilities',
+            'planning': 'Planning',
+            'workflow': 'Workflow',
+            'mobile': 'Mobile App',
+            'analytics': 'Analytics'
+        };
+
+        if (activeSectionId && idToLabel[activeSectionId]) {
+            setActiveLabel(idToLabel[activeSectionId]);
+        }
+    }, [activeSectionId]);
 
     // Enhanced scroll function with better easing and timing
     const scrollToSection = (id, label) => {
@@ -46,7 +73,7 @@ const LandingPage = () => {
             // Re-enable observer after scroll animation finishes
             setTimeout(() => {
                 isScrollingRef.current = false;
-            }, 1200);
+            }, 1000);
         }
     };
 
@@ -64,44 +91,6 @@ const LandingPage = () => {
         { label: 'Mobile App', onClick: () => scrollToSection('mobile', 'Mobile App') },
         { label: 'Analytics', onClick: () => scrollToSection('analytics', 'Analytics') },
     ];
-
-    // Pixel-Perfect Scroll Tracking for Navigation Sync
-    useEffect(() => {
-        const handleScrollTracking = () => {
-            if (isScrollingRef.current) return;
-
-            const scrollY = window.scrollY;
-            const triggerOffset = 200; // Snappier detection
-
-            if (scrollY < 50) {
-                setActiveLabel('Home');
-                return;
-            }
-
-            const sections = [
-                { id: 'home', label: 'Home' },
-                { id: 'roles', label: 'Roles' },
-                { id: 'capabilities', label: 'Capabilities' },
-                { id: 'planning', label: 'Planning' },
-                { id: 'workflow', label: 'Workflow' },
-                { id: 'mobile', label: 'Mobile App' },
-                { id: 'analytics', label: 'Analytics' }
-            ];
-
-            let newActive = 'Home';
-            for (const section of sections) {
-                const element = document.getElementById(section.id);
-                if (element && element.offsetTop <= scrollY + triggerOffset) {
-                    newActive = section.label;
-                }
-            }
-
-            setActiveLabel(prev => prev !== newActive ? newActive : prev);
-        };
-
-        window.addEventListener('scroll', handleScrollTracking, { passive: true });
-        return () => window.removeEventListener('scroll', handleScrollTracking);
-    }, []);
 
     return (
         <div className="min-h-screen bg-white overflow-x-hidden selection:bg-primary/20 selection:text-primary-dark">

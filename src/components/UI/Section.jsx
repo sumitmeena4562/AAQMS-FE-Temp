@@ -16,8 +16,8 @@ const Section = ({
     withGlow = true
 }) => {
     const bgStyles = {
-        white: 'bg-white',
-        slate: 'bg-slate-50/50',
+        white: 'bg-surface',
+        slate: 'bg-accent-soft',
         transparent: 'bg-transparent'
     };
 
@@ -33,8 +33,8 @@ const Section = ({
             {/* Thematic Global Glow Effect */}
             {withGlow && (
                 <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_rgba(7,34,103,0.02)_0%,_transparent_70%)]" />
-                    <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200/50 to-transparent" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--color-primary)_0%,_transparent_70%)] opacity-[0.02]" />
+                    <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-border to-transparent" />
                 </div>
             )}
 
