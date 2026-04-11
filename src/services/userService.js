@@ -9,12 +9,19 @@ export const userService = {
      */
     getUsers: async (filters = {}, search = '', page = 1, pageSize = 20) => {
         try {
-            // Map FE 'organization' filter to BE 'organisation_id' if needed
-            const finalFilters = { ...filters };
-            if (finalFilters.organization) {
-                finalFilters.organisation_id = finalFilters.organization;
-                delete finalFilters.organization;
-            }
+            const finalFilters = {};
+            Object.keys(filters).forEach(key => {
+                const value = filters[key];
+                if (Array.isArray(value)) {
+                    if (value.length > 0) {
+                        // Map FE 'organization' to BE 'organisation_id'
+                        const targetKey = key === 'organization' ? 'organisation_id' : key;
+                        finalFilters[targetKey] = value.join(',');
+                    }
+                } else if (value !== undefined && value !== null && value !== '') {
+                    finalFilters[key] = value;
+                }
+            });
 
             const response = await api.get('users/admin/', {
                 params: {

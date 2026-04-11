@@ -189,9 +189,10 @@ const useUserStore = create((set, get) => ({
     setFilters: (newFilters) => {
         const current = get().filters;
         const merged = typeof newFilters === 'object' ? { ...current, ...newFilters } : newFilters;
-        // Only update if values actually changed
-        const changed = Object.keys(merged).some(k => merged[k] !== current[k]);
-        if (!changed) return;
+        
+        // Use JSON check for deep equality since filters are small objects
+        if (JSON.stringify(current) === JSON.stringify(merged)) return;
+        
         set({ filters: merged, page: 1 });
     },
     setSortKey: (sortKey) => set({ sortKey }),

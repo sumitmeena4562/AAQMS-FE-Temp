@@ -112,18 +112,21 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                 >
                     <button
                         onClick={() => handleSelect('')}
-                        className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[11.5px] font-black uppercase tracking-widest group flex items-center justify-between
+                        className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[11.5px] font-black uppercase tracking-widest group flex items-center gap-3
                             ${!isFilterActive ? 'bg-primary text-white cursor-default' : 'hover:bg-base text-gray/60'}`}
                     >
+                        <div className="flex items-center justify-center w-4 h-4">
+                            {!isFilterActive && <FiCheck size={13} />}
+                        </div>
                         <span className="truncate">{allLabel}</span>
-                        {!isFilterActive && <FiCheck size={13} />}
                     </button>
 
                     {multiple && options.length > 0 && (
                         <button
                             onClick={() => handleSelect('select_all')}
-                            className="w-full px-3 py-1.5 text-left rounded-lg transition-all duration-200 text-[10.5px] font-bold text-primary hover:bg-primary/5 flex items-center justify-between border-b border-border-main/40 mb-1"
+                            className="w-full px-3 py-1.5 text-left rounded-lg transition-all duration-200 text-[10.5px] font-bold text-primary hover:bg-primary/5 flex items-center gap-3 border-b border-border-main/40 mb-1"
                         >
+                            <div className="w-4" /> {/* Spacer to align with others */}
                             <span>{Array.isArray(value) && value.length === options.length ? 'Deselect All' : 'Select All'}</span>
                         </button>
                     )}
@@ -141,21 +144,22 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                                     key={val !== undefined && val !== null ? val : i}
                                     id={`option-${val}`}
                                     onClick={() => handleSelect(val)}
-                                    className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[12px] font-bold mt-0.5 group flex items-center justify-between gap-3
+                                    className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[12px] font-bold mt-0.5 group flex items-center gap-3
                                         ${isSelected ? 'bg-primary/5 text-primary' : 'hover:bg-base text-body'}`}
                                     role="option"
                                     aria-selected={isSelected}
                                 >
-                                    <div className="flex items-center gap-2.5 truncate">
-                                        {multiple && (
-                                            <div className={`w-4 h-4 rounded border transition-colors flex items-center justify-center
-                                                ${isSelected ? 'bg-primary border-primary' : 'border-border-main/60 bg-white group-hover:border-primary'}`}>
-                                                {isSelected && <FiCheck className="text-white" size={10} strokeWidth={4} />}
-                                            </div>
-                                        )}
-                                        <span className="truncate">{lbl}</span>
-                                    </div>
-                                    {!multiple && isSelected && <FiCheck size={13} />}
+                                    {multiple ? (
+                                        <div className={`w-4 h-4 rounded border transition-colors flex items-center justify-center shrink-0
+                                            ${isSelected ? 'bg-primary border-primary' : 'border-border-main/60 bg-white group-hover:border-primary'}`}>
+                                            {isSelected && <FiCheck className="text-white" size={10} strokeWidth={4} />}
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center justify-center w-4 h-4 shrink-0">
+                                            {isSelected && <FiCheck size={13} />}
+                                        </div>
+                                    )}
+                                    <span className="truncate">{lbl}</span>
                                 </button>
                             );
                         })}

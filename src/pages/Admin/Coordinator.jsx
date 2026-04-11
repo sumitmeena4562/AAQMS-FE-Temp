@@ -9,7 +9,7 @@ import { StatsRow } from '../../components/Dashboard/StatsCard';
 import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import {
-    FiUsers, FiRefreshCw, FiRefreshCcw, FiCheckCircle, FiAlertCircle, FiClock,
+    FiUsers, FiUser, FiRefreshCw, FiRefreshCcw, FiCheckCircle, FiAlertCircle, FiClock,
     FiExternalLink, FiHome, FiShield,  FiActivity, FiLayers, FiMail, FiPhone, FiX
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
@@ -141,6 +141,8 @@ const Coordinator = () => {
     const handleResetAll = () => {
         setSearchParams({});
         resetFilters();
+        // Explicitly set coordinator role as a fallback to bypass any race conditions
+        setFilters({ role: ['coordinator'], organization: [], status: [], region: [] });
     };
 
     const navigate = useNavigate();
@@ -222,7 +224,7 @@ const Coordinator = () => {
                     >
                         <FiLayers size={12} />
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }} className="w-8 h-8 flex items-center justify-center text-gray border border-border-main hover:bg-title hover:text-white rounded-xl transition-all shadow-sm"><FiExternalLink size={12} /></button>
+                    <button onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }} className="w-8 h-8 flex items-center justify-center text-gray border border-border-main hover:bg-primary/5 hover:text-primary hover:border-primary/30 rounded-xl transition-all shadow-sm" title="View Profile"><FiUser size={13} /></button>
                     <button onClick={(e) => { e.stopPropagation(); handleEditUser(row); }} className="px-3 h-8 flex items-center justify-center text-gray border border-border-main hover:bg-primary hover:text-white rounded-xl transition-all text-[9px] font-black uppercase">Edit</button>
                 </div>
             )
@@ -252,7 +254,7 @@ const Coordinator = () => {
             <PageHeader
                 title={orgNameFromUrl ? (
                     <div className="flex items-center gap-3">
-                        <span className="text-primary/40">Personnel:</span>
+                        <span className="text-primary/70 font-black">Personnel:</span>
                         <span>{orgNameFromUrl}</span>
                         <div className="px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[9px] font-black uppercase tracking-widest border border-primary/20 animate-pulse">
                             Context Active
@@ -294,15 +296,6 @@ const Coordinator = () => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-3">
-                    {filters.organization.length > 0 && (
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/5 text-primary border border-primary/20 rounded-xl animate-in zoom-in duration-300">
-                             <span className="text-[9px] font-black uppercase tracking-widest opacity-60">Organizations |</span>
-                             <span className="text-[11px] font-bold">{orgNameFromUrl && filters.organization.length === 1 ? orgNameFromUrl : `${filters.organization.length} Selected`}</span>
-                             <button onClick={handleResetAll} className="p-0.5 hover:bg-primary/10 rounded-full transition-colors ml-1">
-                                <FiX size={10} />
-                             </button>
-                        </div>
-                    )}
                     <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All Organizations" multiple={true} />
                     <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" multiple={true} />
                 </div>

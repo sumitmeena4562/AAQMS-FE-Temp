@@ -16,7 +16,13 @@ export const useCoordinators = (orgId = null) => {
 export const useUsers = (filters = {}, search = '', page = 1) => {
   // Normalize filters for stable keys
   const cleanFilters = Object.fromEntries(
-    Object.entries(filters).filter(([_, v]) => v !== undefined && v !== null && v !== 'all' && v !== '')
+    Object.entries(filters).filter(([_, v]) => 
+      v !== undefined && 
+      v !== null && 
+      v !== 'all' && 
+      v !== '' && 
+      !(Array.isArray(v) && v.length === 0)
+    )
   );
 
   return useQuery({
