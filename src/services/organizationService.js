@@ -64,10 +64,19 @@ export const organizationService = {
     // Get all organisations (with search/filtering)
     getOrganizations: async (filters = {}) => {
         try {
-            const params = {
-                ...filters,
-                status: filters.status?.toUpperCase()
-            };
+            const params = { ...filters };
+            
+            // Handle multi-select arrays for backend compatibility
+            if (Array.isArray(params.status)) {
+                params.status = params.status.join(',').toUpperCase();
+            } else if (typeof params.status === 'string') {
+                params.status = params.status.toUpperCase();
+            }
+
+            if (Array.isArray(params.industry)) {
+                params.industry = params.industry.join(',');
+            }
+
             const response = await api.get('organisations/', { params });
             return response.data;
         } catch (err) {

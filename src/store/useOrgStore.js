@@ -1,15 +1,14 @@
 import { create } from 'zustand';
 import { organizationService } from '../services/organizationService';
-import { inventoryService } from '../services/inventoryService';
 import toast from 'react-hot-toast';
+import { queryClient } from '../lib/queryClient.js';
 
 // Helper to clean mangled Cloudinary URLs (400 Bad Request Fix)
 const cleanImageUrl = (url) => {
     if (typeof url !== 'string') return url;
-    // Pattern: https://res.cloudinary.com/.../media/https://...
     if (url.includes('http') && url.split('http').length > 2) {
         const parts = url.split('http');
-        return 'http' + parts[parts.length - 1]; // Take the last absolute URL part
+        return 'http' + parts[parts.length - 1]; 
     }
     return url;
 };
@@ -17,27 +16,16 @@ const cleanImageUrl = (url) => {
 // Helper to map Backend data to Frontend format globally
 const mapOrgToFrontend = (data) => {
   if (!data) return null;
-  
-  // Map imagery array back to form object
-  const imagery = {
-    north: '', south: '', east: '', west: '', profile: '', extra: []
-  };
-  
+  const imagery = { north: '', south: '', east: '', west: '', profile: '', extra: [] };
   if (Array.isArray(data.images)) {
     data.images.forEach(img => {
       const type = (img.image_type || '').toLowerCase();
       const cleanedUrl = cleanImageUrl(img.image_url);
-
-      if (['north', 'south', 'east', 'west', 'profile'].includes(type)) {
-        imagery[type] = cleanedUrl;
-      } else if (type === 'extra') {
-        imagery.extra.push(cleanedUrl);
-      }
+      if (['north', 'south', 'east', 'west', 'profile'].includes(type)) imagery[type] = cleanedUrl;
+      else if (type === 'extra') imagery.extra.push(cleanedUrl);
     });
   }
-
   const profileImg = imagery.profile || cleanImageUrl(data.image) || '';
-
   return {
     ...data,
     name: data.organisation_name || data.name || '',
@@ -63,27 +51,21 @@ const mapOrgToFrontend = (data) => {
     }
   };
 };
-/**
- * ORGANIZATION STORE
- * Connects to the real backend via organizationService, with robust error handling and loading states.
- */
+
 export const useOrgStore = create((set, get) => ({
-  // --- UI STATE ---
-  filters: { industry: 'all', status: 'all' },
+  filters: { industry: [], status: [] },
   viewMode: 'grid',
   isSubmitting: false,
   error: null,
-
-  // --- UI ACTIONS ---
   setFilters: (newFilters) => set((state) => ({ filters: { ...state.filters, ...newFilters } })),
   setViewMode: (mode) => set({ viewMode: mode }),
-  resetFilters: () => set({ filters: { industry: 'all', status: 'all' } }),
+  resetFilters: () => set({ filters: { industry: [], status: [] } }),
 
-  // --- CRUD ACTIONS (MUTATIONS) ---
   addOrg: async (newOrg) => {
     set({ isSubmitting: true, error: null });
     try {
       await organizationService.createOrganization(newOrg);
+      await queryClient.invalidateQueries(['organisations']);
       set({ isSubmitting: false });
       toast.success("Success! The organization has been added.");
       return true; 
@@ -94,10 +76,26 @@ export const useOrgStore = create((set, get) => ({
     }
   },
 
+  blockOrg: async (id) => {
+    set({ isSubmitting: true, error: null });
+    try {
+      await organizationService.blockOrganization(id);
+      await queryClient.invalidateQueries(['organisations']);
+      set({ isSubmitting: false });
+      toast.success("Organization state updated.");
+      return true;
+    } catch (err) {
+      set({ error: err.message, isSubmitting: false });
+      toast.error("Failed to update organization state.");
+      return false;
+    }
+  },
+
   updateOrg: async (id, updatedOrg) => {
     set({ isSubmitting: true, error: null });
     try {
       await organizationService.updateOrganization(id, updatedOrg);
+      await queryClient.invalidateQueries(['organisations']);
       set({ isSubmitting: false });
       toast.success("Changes saved successfully!");
       return true;
@@ -122,4 +120,3 @@ export const useOrgStore = create((set, get) => ({
     }
   },
 }));
-

@@ -17,6 +17,16 @@ import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiShieldOff, FiEye
 import useSearchStore from '../../store/useSearchStore';
 
 /**
+ * Helper for consistent status calculation
+ * Used by both Table and Cards for identical behavior.
+ */
+export const getOrgStatus = (org) => {
+    if (org.isBlocked) return 'BLOCKED';
+    if ((org.stats?.coordinators || 0) === 0) return 'PENDING';
+    return (org.status || 'ACTIVE').toUpperCase();
+};
+
+/**
  * OrgLogo Component
  * Renders an organization logo with a resilient fallback mechanism.
  */
@@ -73,17 +83,22 @@ const Organizations = () => {
             ...org,
             stats: {
                 ...org.stats,
-                coordinators: org.stats?.coordinators || org.stats?.coordinators_count || 0,
-                coordinatorNames: org.stats?.coordinatorNames || org.stats?.coordinator_names || []
+                coordinators: org.stats?.coordinators || org.stats?.coordinators_count || 0
             }
         }));
     }, [orgs]);
 
     const filteredOrgs = useMemo(() => {
-        return enrichedOrgs.filter(org => {
-            const matchesIndustry = filters.industry.length === 0 || filters.industry.includes(org.industry);
-            const matchesStatus = filters.status.length === 0 || filters.status.includes(org.status || (org.isBlocked ? 'INACTIVE' : 'ACTIVE'));
+        const result = enrichedOrgs.filter(org => {
+            // 1. Industry Matching (Case-Insensitive)
+            const matchesIndustry = filters.industry.length === 0 || 
+                filters.industry.some(f => f.toLowerCase() === org.industry?.toLowerCase());
             
+            // 2. Status Matching (Normalization using helper)
+            const orgStatus = getOrgStatus(org);
+            const matchesStatus = filters.status.length === 0 || filters.status.includes(orgStatus);
+            
+            // 3. Search Matching
             const searchLower = searchQuery.toLowerCase().trim();
             const matchesSearch = !searchLower || 
                 org.name?.toLowerCase().includes(searchLower) || 
@@ -91,6 +106,8 @@ const Organizations = () => {
 
             return matchesIndustry && matchesStatus && matchesSearch;
         });
+
+        return result;
     }, [enrichedOrgs, filters, searchQuery]);
 
     useEffect(() => {
@@ -211,26 +228,23 @@ const Organizations = () => {
             width: '15%',
             className: 'hidden sm:table-cell',
             render: (status, org) => {
-                let computedStatus = org.isBlocked ? 'INACTIVE' : (status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE');
-                if ((org.stats?.coordinators || 0) === 0) {
-                    computedStatus = 'PENDING';
-                }
-                if (org.isBlocked) {
-                    computedStatus = 'INACTIVE';
-                }
+                const computedStatus = getOrgStatus(org);
 
                 const isActive = computedStatus === 'ACTIVE';
                 const isPending = computedStatus === 'PENDING';
+                const isBlocked = computedStatus === 'BLOCKED';
 
                 const bgClass = isActive
-                    ? 'bg-success-bg/50 border-success/10 text-success'
+                    ? 'bg-[#e6f4ea] border-[#137333]/20 text-[#137333]'
                     : isPending
                         ? 'bg-amber-50 border-amber-200/50 text-amber-600'
-                        : 'bg-danger-bg/50 border-danger/10 text-danger';
+                        : isBlocked
+                            ? 'bg-rose-100 border-rose-600/20 text-rose-600'
+                            : 'bg-[#fce8e6] border-[#c5221f]/20 text-[#c5221f]';
 
                 return (
                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border ${bgClass}`}>
-                        <DotStatus status={isActive ? 'active' : isPending ? 'pending' : 'inactive'} />
+                        <DotStatus status={isActive ? 'active' : isPending ? 'pending' : (isBlocked ? 'inactive' : 'inactive')} />
                         <span className="text-[9px] font-black uppercase tracking-widest leading-none">
                             {computedStatus}
                         </span>
@@ -305,8 +319,10 @@ const Organizations = () => {
                         <FilterDropdown
                             label="Status"
                             options={[
-                                { value: 'ACTIVE', label: 'Active Only' },
-                                { value: 'INACTIVE', label: 'Inactive Only' }
+                                { value: 'ACTIVE', label: 'Active' },
+                                { value: 'PENDING', label: 'Pending' },
+                                { value: 'BLOCKED', label: 'Blocked' },
+                                { value: 'INACTIVE', label: 'Inactive' }
                             ]}
                             value={filters.status}
                             onChange={(v) => setFilters({ status: v })}

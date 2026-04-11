@@ -217,20 +217,20 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
     <div className="px-6 mb-4">
       <div className="flex items-center justify-between relative">
         {/* Progress Line */}
-        <div className="absolute top-1/2 left-0 w-full h-[2px] bg-border-main -translate-y-1/2 z-0" />
+        <div className="absolute top-4 left-10 right-10 h-[2px] bg-border-main -translate-y-1/2 z-0" />
         <div
-          className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-500 ease-out"
-          style={{ width: `${((step - 1) / 2) * 100}%` }}
+          className="absolute top-4 left-10 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-500 ease-out"
+          style={{ width: `calc(((100% - 80px) / 2) * ${step - 1})` }}
         />
 
         {/* Steps */}
         {[1, 2, 3].map((s) => (
-          <div key={s} className="relative z-10 flex flex-col items-center">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 border-2 ${step >= s ? 'bg-primary border-primary text-white scale-110 shadow-md' : 'bg-base border-border-main text-gray'
+          <div key={s} className="relative z-10 flex flex-col items-center w-20">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold transition-all duration-300 border-2 ${step >= s ? 'bg-primary border-primary text-white scale-110 shadow-md' : 'bg-base border-border-main text-gray'
               }`}>
               {step > s ? '✓' : s}
             </div>
-            <span className={`text-[9px] font-bold uppercase tracking-wider mt-1.5 ${step >= s ? 'text-primary' : 'text-gray'}`}>
+            <span className={`text-[10px] font-black uppercase tracking-[0.15em] mt-2.5 whitespace-nowrap text-center ${step >= s ? 'text-primary' : 'text-gray/60'}`}>
               {s === 1 ? 'Primary' : s === 2 ? 'Contact' : 'Imagery'}
             </span>
           </div>
@@ -493,7 +493,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
                               className="flex items-center gap-2 px-4 py-2 bg-primary/5 hover:bg-primary/10 text-primary border border-primary/20 rounded-xl transition-all duration-300 font-bold text-[11px] uppercase tracking-wider group"
                               onClick={() => {
                                 const currentExtra = getValues('imagery.extra') || [];
-                                setValue('imagery.extra', [...currentExtra, '']);
+                                setValue('imagery.extra', [...currentExtra, ''], { shouldValidate: true, shouldDirty: true });
                               }}
                             >
                               <Plus size={14} /> Add View
@@ -511,6 +511,8 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, onEd
 
                       {extraImages.length > 0 && (
                         <Motion.div
+                          initial="hidden"
+                          animate="visible"
                           variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}
                           className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-border-main"
                         >

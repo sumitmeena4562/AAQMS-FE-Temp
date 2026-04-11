@@ -1,6 +1,8 @@
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiEdit2, FiEye, FiShieldOff } from 'react-icons/fi';
 import { useFilterStore } from '../../store/useFilterStore';
+import { getOrgStatus } from '../../pages/Admin/Organizations';
 
 const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onView, onBlock }) => {
   const navigate = useNavigate();
@@ -14,23 +16,8 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
   let siteComputedZones = org.zones_count || 0;
   let siteComputedAssets = org.inventory_count || 0;
 
-  let currentStatus = org.status === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE';
-
-  if (!isSiteCard) {
-    if (totalComputedCoordinators === 0) {
-      currentStatus = 'PENDING';
-    } else if (org.isBlocked) {
-      currentStatus = 'BLOCKED';
-    } else if (org.lastInventoryAudit) {
-      const auditDate = new Date(org.lastInventoryAudit);
-      const oneMonthAgo = new Date();
-      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-      if (auditDate < oneMonthAgo) {
-        currentStatus = 'DEACTIVE'; // Has not been audited recently
-      }
-    }
-  }
+  // Standardized Status Calculation
+  const currentStatus = isSiteCard ? (org.status || 'ACTIVE') : getOrgStatus(org);
 
   const { setOrg, setSite } = useFilterStore();
 
@@ -142,20 +129,6 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
             </p>
           )}
 
-          {coordinatorNames.length > 0 && !isSiteCard && (
-            <div className="flex flex-wrap gap-1 mt-3">
-              {coordinatorNames.slice(0, 2).map((name, idx) => (
-                <span key={idx} className="px-2 py-0.5 bg-primary/5 text-primary text-[8px] font-black rounded uppercase border border-primary/10">
-                  {name}
-                </span>
-              ))}
-              {coordinatorNames.length > 2 && (
-                <span className="text-[8px] font-bold text-gray/60 flex items-center pl-1">
-                  +{coordinatorNames.length - 2} more
-                </span>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Stats Section */}
