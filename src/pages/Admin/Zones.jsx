@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
@@ -9,7 +9,7 @@ import { useHierarchyStore } from '../../store/useHierarchyStore';
 import { useOrgStore } from '../../store/useOrgStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors, useZones } from '../../hooks/api/useHierarchyQueries';
-import { FiHome, FiBriefcase, FiLoader, FiAlertCircle, FiX, FiMaximize, FiDownload } from 'react-icons/fi';
+import { FiHome, FiBriefcase, FiLoader, FiAlertCircle, FiX, FiMaximize, FiDownload, FiInbox } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import { Layout, Truck, Fuel, Monitor } from 'lucide-react';
 import useSearchStore from '../../store/useSearchStore';
@@ -70,26 +70,34 @@ const Zones = () => {
     const [currentPage, setCurrentPage] = useState(1);
 
     const { 
+        selectedOrg, selectedCoord, selectedSite, selectedFloor,
         setOrg, setCoord, setSite, setFloor, resetFilters 
     } = useFilterStore();
     const { query: searchQuery, clearSearch } = useSearchStore();
     
     const { clearHierarchy } = useHierarchyStore();
-    
-    // --- QUERY HOOKS (UNIFIED) ---
+      // --- QUERY HOOKS (UNIFIED) ---
     const { organizations: orgs, sites: allSites } = useHierarchy();
-    const { data: allFloors = [] } = useFloors(selectedSite);
-    const { data: zones = [], isLoading: loading, error: hierarchyError } = useZones(selectedFloor.length > 0 ? selectedFloor : undefined, {
+    const { data: floorData } = useFloors(selectedSite);
+    const allFloors = floorData?.results || [];
+    const { data: zoneData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useZones(selectedFloor.length > 0 ? selectedFloor : undefined, {
         site_id: selectedSite.length > 0 ? selectedSite : undefined,
-        organisation_id: selectedOrg.length > 0 ? selectedOrg : undefined
+        org_id: selectedOrg.length > 0 ? selectedOrg : undefined
     });
+
+    const zones = zoneData.results || [];
+    const totalZonesCount = zoneData.total || zones.length;
 
     const passedOrgId = searchParams.get('org_id') || searchParams.get('org');
     const passedSiteId = searchParams.get('site_id') || searchParams.get('site');
     const passedFloorId = searchParams.get('floor_id') || searchParams.get('floor');
     const passedCoordId = searchParams.get('coord_id') || searchParams.get('coord');
 
+    // URL → Store sync (mount-only, guarded)
+    const hasSynced = useRef(false);
     useEffect(() => {
+        if (hasSynced.current) return;
+        hasSynced.current = true;
         if (passedOrgId && selectedOrg.length === 0) setOrg(passedOrgId);
         if (passedSiteId && selectedSite.length === 0) setSite(passedSiteId);
         if (passedFloorId && selectedFloor.length === 0) setFloor(passedFloorId);
@@ -130,7 +138,7 @@ const Zones = () => {
 
     if (orgLabel) breadcrumbs.push({ label: orgLabel || "Organization", path: `/admin/coordinators?org_id=${selectedOrg.join(',')}&org_name=${encodeURIComponent(currentOrg?.name || '')}` });
     if (siteLabel) breadcrumbs.push({ label: siteLabel || "Site Plan", path: `/admin/site-plan?org_id=${selectedOrg.join(',')}&site_id=${selectedSite.join(',')}` });
-    if (floorLabel) breadcrumbs.push({ label: floorLabel || "Floor Plan", path: `/admin/floor-plan?site_id=${selectedSite.join(',')}&floor_id=${selectedFloor.join(',')}` });
+    if (floorLabel) breadcrumbs.push({ label: floorLabel || "Floor Plan", path: `/admin/site-plan?site_id=${selectedSite.join(',')}&floor_id=${selectedFloor.join(',')}` });
     breadcrumbs.push({ label: "Zones", path: "#", isActive: true });
 
     const processedZones = zones
@@ -142,15 +150,15 @@ const Zones = () => {
             if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
             if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
             if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
-            return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.count ?? 0}` };
+            return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.inventory_count ?? 0}` };
         });
 
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery, selectedOrg, selectedSite, selectedFloor]);
 
-    const totalPages = Math.ceil(processedZones.length / 10);
-    const paginatedZones = processedZones.slice((currentPage - 1) * 10, currentPage * 10);
+    const totalPages = Math.ceil(totalZonesCount / 10);
+    const paginatedZones = processedZones;
 
     const handleResetAll = () => { resetFilters(); setSearchParams({}); clearSearch(); };
     const handleViewMedia = (zone) => { setSelectedMediaZone(zone); setIsMediaModalOpen(true); };
@@ -168,7 +176,7 @@ const Zones = () => {
                             <FiLoader size={14} className={loading ? 'animate-spin' : ''} />
                             <span className="font-black text-[10px] uppercase tracking-widest ">Clear Context</span>
                         </Button>
-                        {zones.length > 0 && <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">{zones.length} Active Zones</span>}
+                        {totalZonesCount > 0 && <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">{totalZonesCount} Active Zones</span>}
                     </div>
                 }
             />
@@ -185,21 +193,21 @@ const Zones = () => {
                         <div className="w-full py-24 flex flex-col items-center justify-center text-rose-500 bg-rose-50/50 rounded-3xl border border-rose-100 mx-4">
                             <FiAlertCircle className="w-10 h-10 mb-4" />
                             <h4 className="text-lg font-bold">Fetch Error</h4>
-                            <p className="text-sm opacity-80">{hierarchyError}</p>
+                            <p className="text-sm opacity-80">{hierarchyError.message || hierarchyError}</p>
                             <Button onClick={() => fetchZones(selectedFloor || null)} variant="outline" className="mt-6">Try Again</Button>
                         </div>
                     ) : zones.length > 0 ? (
                         <div className="flex flex-col gap-6">
                             <ZonesTable data={paginatedZones} selectionMode={false} onViewMedia={handleViewMedia} />
                             
-                            {totalPages > 1 && (
+                            {totalZonesCount > 10 && (
                                 <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm">
                                     <span className="text-[10px] font-black text-gray uppercase tracking-[0.2em]">
-                                        Page {currentPage} of {totalPages} &nbsp;·&nbsp; {processedZones.length} Zones Total
+                                        Page {currentPage} of {Math.ceil(totalZonesCount / 10)} &nbsp;·&nbsp; {totalZonesCount} Zones Total
                                     </span>
                                     <div className="flex items-center gap-2">
                                         <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
-                                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
+                                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage * 10 >= totalZonesCount} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
                                     </div>
                                 </div>
                             )}
@@ -210,7 +218,7 @@ const Zones = () => {
                                 <FiInbox className="w-8 h-8 text-primary/40" />
                             </div>
                             <h3 className="text-2xl font-black text-title tracking-tight mb-2">No Zones Found</h3>
-                            <p className="text-gray text-xs max-w-sm mb-8 font-medium leading-relaxed px-10">
+                            <p className="text-gray text-xs w-full max-w-[400px] mb-8 font-medium leading-relaxed px-4">
                                 We couldn't find any zones matching your selection. Try adjusting your filters.
                             </p>
                         </div>

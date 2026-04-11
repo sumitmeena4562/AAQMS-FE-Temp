@@ -63,8 +63,8 @@ const Organizations = () => {
     const { query: searchQuery, clearSearch } = useSearchStore();
 
     // --- QUERY HOOK (NEW) ---
-    // Note: We use the global filters directly in the query key for automatic refetching
-    const { data: orgs = [], isLoading } = useOrganizations(filters);
+    // Note: We use the global filters and search directly in the query key for automatic refetching
+    const { data: orgs = [], isLoading } = useOrganizations(filters, searchQuery);
 
     // --- Local State ---
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -72,12 +72,7 @@ const Organizations = () => {
     const [isViewOnly, setIsViewOnly] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
 
-    // --- Lifecycle / Effects ---
-    // fetchOrgs is now handled by useOrganizations hook automatically
-
     // --- Memoized Computations ---
-    // Coordinator counts come from org.stats (provided by backend API)
-    // No need to cross-join with user list client-side
     const enrichedOrgs = useMemo(() => {
         return orgs.map(org => ({
             ...org,
@@ -88,27 +83,9 @@ const Organizations = () => {
         }));
     }, [orgs]);
 
-    const filteredOrgs = useMemo(() => {
-        const result = enrichedOrgs.filter(org => {
-            // 1. Industry Matching (Case-Insensitive)
-            const matchesIndustry = filters.industry.length === 0 || 
-                filters.industry.some(f => f.toLowerCase() === org.industry?.toLowerCase());
-            
-            // 2. Status Matching (Normalization using helper)
-            const orgStatus = getOrgStatus(org);
-            const matchesStatus = filters.status.length === 0 || filters.status.includes(orgStatus);
-            
-            // 3. Search Matching
-            const searchLower = searchQuery.toLowerCase().trim();
-            const matchesSearch = !searchLower || 
-                org.name?.toLowerCase().includes(searchLower) || 
-                org.industry?.toLowerCase().includes(searchLower);
-
-            return matchesIndustry && matchesStatus && matchesSearch;
-        });
-
-        return result;
-    }, [enrichedOrgs, filters, searchQuery]);
+    // SERVER-SIDE FILTERING: We rely on the hook above. 
+    // We only keep the paginated slice here.
+    const filteredOrgs = enrichedOrgs; 
 
     useEffect(() => {
         setCurrentPage(1);

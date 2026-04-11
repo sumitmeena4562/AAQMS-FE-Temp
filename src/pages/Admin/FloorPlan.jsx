@@ -35,26 +35,36 @@ const FloorPlan = () => {
 
   // --- QUERY HOOKS (UNIFIED) ---
   const { organizations: orgs } = useHierarchy();
-  const { data: floors = [], isLoading, error: hierarchyError } = useFloors(activeSiteId);
+  const { data: floorData = { results: [], total: 0 }, isLoading, error: hierarchyError } = useFloors(activeSiteId);
+
+  const floorList = floorData.results || [];
+  const totalLevels = floorData.total || floorList.length;
 
   const handleResetAll = () => {
     setSearchParams({});
     resetFilters();
   };
 
-  // URL → Store sync (mount-only, guarded)
+  // URL → Store sync (mount-only guard)
   const hasSynced = useRef(false);
   useEffect(() => {
     if (hasSynced.current) return;
+    
+    const pOrg = searchParams.get('org_id') || searchParams.get('org');
+    const pSite = searchParams.get('site_id') || searchParams.get('site');
+    const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
+
+    // Logic Review: "Admin direct aaye to sari dikh"
+    if (!pOrg && !pSite && !pCoord) {
+        resetFilters();
+    } else {
+        if (pOrg) setOrg(pOrg.split(','));
+        if (pSite) setSite(pSite.split(','));
+        if (pCoord) setCoord(pCoord.split(','));
+    }
+
     hasSynced.current = true;
-    if (passedOrgId && selectedOrg.length === 0) setOrg(passedOrgId);
-    if (passedCoordId && selectedCoord.length === 0) setCoord(passedCoordId);
-    if (passedSiteId && selectedSite.length === 0) setSite(passedSiteId);
-  }, [passedOrgId, passedCoordId, passedSiteId, selectedOrg.length, selectedCoord.length, selectedSite.length, setOrg, setCoord, setSite]); 
-  // fetchFloors effect removed - handled by useFloors query dependency
-
-
-
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const currentOrg = activeOrgId.length === 1 ? orgs.find(o => String(o.id) === String(activeOrgId[0])) : null;
   const orgLabel = activeOrgId.length > 1 ? `Organizations (${activeOrgId.length})` : currentOrg?.name || passedOrgName;
   const orgInfo = { name: orgLabel || "Organization" };
@@ -81,7 +91,6 @@ const FloorPlan = () => {
 
   breadcrumbs.push({ label: "Floor Plan", path: "#", isActive: true });
 
-  const floorList = floors;
   const siteInfo = { name: (activeSiteId.length === 1 ? passedSiteName : `Multiple Sites`) || "Site" };
   const coordInfo = activeCoordId.length > 0 ? { name: passedCoordName || "Coordinator" } : null;
 
@@ -114,9 +123,9 @@ const FloorPlan = () => {
                   <FiLoader size={14} className={isLoading ? 'animate-spin' : ''} />
                   <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
               </Button>
-              {floorList.length > 0 && (
+              {totalLevels > 0 && (
                  <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
-                    {floorList.length} Total Levels
+                    {totalLevels} Total Levels
                 </span>
               )}
           </div>
@@ -136,11 +145,11 @@ const FloorPlan = () => {
           ) : hierarchyError ? (
             <div className="w-full py-20 flex flex-col items-center justify-center text-red-500/70 bg-rose-50/50 rounded-3xl border border-dashed border-rose-200">
                <FiAlertCircle className="w-8 h-8 mb-3" />
-               <p className="text-sm font-medium">{hierarchyError}</p>
+               <p className="text-sm font-medium">{hierarchyError.message || hierarchyError}</p>
             </div>
           ): floorList.length > 0 ? (
             <>
-              {floorList.slice((currentPage - 1) * 10, currentPage * 10).map((floor, index) => (
+              {floorList.map((floor, index) => (
                 <FloorCard 
                   key={floor.id || index} 
                   floor={floor} 
@@ -149,14 +158,14 @@ const FloorPlan = () => {
                 />
               ))}
 
-              {floorList.length > 10 && (
+              {totalLevels > 10 && (
                   <div className="flex items-center justify-between px-4 py-4 bg-card border border-border-main rounded-2xl shadow-sm mt-6 col-span-full">
                       <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                          Page {currentPage} of {Math.ceil(floorList.length / 10)}
+                          Page {currentPage} of {Math.ceil(totalLevels / 10)}
                       </span>
                       <div className="flex items-center gap-2">
                           <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
-                          <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(floorList.length / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
+                          <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(totalLevels / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
                       </div>
                   </div>
               )}

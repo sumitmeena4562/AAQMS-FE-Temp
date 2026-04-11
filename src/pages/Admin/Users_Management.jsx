@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'react-hot-toast';
 import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
@@ -9,7 +9,7 @@ import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import {
     FiDownload, FiUsers, FiRefreshCw, FiRefreshCcw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock,
-    FiExternalLink, FiSquare, FiCheckSquare, FiHome, FiBriefcase, FiShield, FiUserCheck, FiUserX,
+    FiUser, FiSquare, FiCheckSquare, FiHome, FiBriefcase, FiShield, FiUserCheck, FiUserX,
     FiMail, FiPhone, FiLayers, FiActivity
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
@@ -26,14 +26,48 @@ import { useUsers, useUserStats } from '../../hooks/api/useUserQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import useSearchStore from '../../store/useSearchStore';
 
+import { useSearchParams } from 'react-router-dom';
+
 export default function Users() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const { resetFilters } = useUserStore();
+
     // ── STORES (UI state only) ──
     const { 
         filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
-        setPage, setFilters, toggleSelectRow, clearSelection, resetFilters,
+        setPage, setFilters, toggleSelectRow, clearSelection, 
         setSelectedIds, setLoading, setError // Keeping for mutations
     } = useUserStore();
     const { query: search } = useSearchStore();
+
+    // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
+    const hasSynced = useRef(false);
+    useEffect(() => {
+        if (hasSynced.current) return;
+        
+        const pOrg = searchParams.get('org_id') || searchParams.get('org');
+        const pSite = searchParams.get('site_id') || searchParams.get('site');
+        const pRole = searchParams.get('role');
+        const pStatus = searchParams.get('status');
+
+        if (!pOrg && !pSite && !pRole && !pStatus) {
+            resetFilters();
+        } else {
+            const orgs = pOrg ? pOrg.split(',') : [];
+            const sites = pSite ? pSite.split(',') : [];
+            const roles = pRole ? pRole.split(',') : [];
+            const statuses = pStatus ? pStatus.split(',') : [];
+
+            setFilters({ 
+                organization: orgs, 
+                region: sites, 
+                role: roles, 
+                status: statuses 
+            });
+        }
+
+        hasSynced.current = true;
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 
@@ -174,7 +208,7 @@ export default function Users() {
         },
         {
             header: 'ORGANIZATION',
-            accessor: 'organization',
+            accessor: 'org_name',
             width: '15%',
             render: (value, row) => (
                 <div className="flex flex-col min-w-0">
@@ -238,7 +272,7 @@ export default function Users() {
             align: 'right',
             render: (_, row) => (
                 <div className="flex items-center justify-end gap-1.5 pr-2">
-                    <button onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }} className="w-8 h-8 flex items-center justify-center text-gray border border-border-main hover:text-white hover:bg-title transition-all rounded-xl active:scale-95 bg-card shadow-sm"><FiExternalLink size={12} /></button>
+                    <button onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }} className="w-8 h-8 flex items-center justify-center text-gray border border-border-main hover:text-white hover:bg-title transition-all rounded-xl active:scale-95 bg-card shadow-sm"><FiUser size={13} /></button>
                     <button onClick={(e) => { e.stopPropagation(); handleEditUser(row); }} className="px-4 h-8 flex items-center justify-center text-gray border border-border-main hover:text-white hover:bg-primary transition-all rounded-xl active:scale-95 bg-card font-black uppercase tracking-widest text-[9px] hidden md:flex">Edit</button>
                 </div>
             )
@@ -246,10 +280,42 @@ export default function Users() {
     ], [handleEditUser]);
 
     const statsData = [
-        { title: 'Total Users', value: stats.total || 0, icon: FiUsers, iconColorClass: 'text-primary', iconBgClass: 'bg-primary/10', change: `${stats.active || 0} Active`, changeType: 'neutral', description: 'platform users' },
-        { title: 'Active Users', value: stats.active || 0, icon: FiCheckCircle, iconColorClass: 'text-success', iconBgClass: 'bg-emerald-50', description: 'Currently Active' },
-        { title: 'Deactive', value: stats.inactive || 0, icon: FiAlertCircle, iconColorClass: 'text-danger', iconBgClass: 'bg-rose-50', description: 'Account Disabled' },
-        { title: 'Unassigned', value: stats.unassigned || 0, icon: FiClock, iconColorClass: 'text-warning', iconBgClass: 'bg-amber-50', description: 'pending assignment' },
+        { 
+            title: 'Total Users', 
+            value: stats.total || 0, 
+            icon: FiUsers, 
+            iconColorClass: 'text-primary', 
+            iconBgClass: 'bg-primary/10', 
+            secondaryLabel: `${stats.active || 0} active in system`,
+            description: 'platform-wide' 
+        },
+        { 
+            title: 'Active Accounts', 
+            value: stats.active || 0, 
+            icon: FiCheckCircle, 
+            iconColorClass: 'text-emerald-600', 
+            iconBgClass: 'bg-emerald-50', 
+            secondaryLabel: 'Verified & operating',
+            description: 'Ready for tasks' 
+        },
+        { 
+            title: 'Deactive/Blocked', 
+            value: stats.inactive || 0, 
+            icon: FiAlertCircle, 
+            iconColorClass: 'text-rose-600', 
+            iconBgClass: 'bg-rose-50', 
+            secondaryLabel: `${stats.inactive || 0} restricted profiles`,
+            description: 'Access denied' 
+        },
+        { 
+            title: 'Unassigned', 
+            value: stats.unassigned || 0, 
+            icon: FiClock, 
+            iconColorClass: 'text-amber-600', 
+            iconBgClass: 'bg-amber-50', 
+            secondaryLabel: 'Pending org linkage',
+            description: 'Requires attention' 
+        },
     ];
 
     const paginationFooter = (
@@ -283,23 +349,48 @@ export default function Users() {
     );
 
 
+    const currentOrg = filters.organization?.length === 1 ? organizations.find(o => String(o.id) === String(filters.organization[0])) : null;
+    const orgLabel = (filters.organization?.length > 1) ? `Multiple Orgs (${filters.organization.length})` : currentOrg?.name;
+
+    const breadcrumbs = useMemo(() => {
+        const base = [{ label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> }];
+        if (orgLabel) {
+            base.push({ 
+                label: orgLabel, 
+                path: `/admin/users?org_id=${filters.organization?.join(',') || ''}` 
+            });
+        }
+        base.push({ label: "User Management", path: "#", isActive: true });
+        return base;
+    }, [filters.organization, orgLabel]);
+
+    const handleHardReset = () => {
+        resetFilters();
+        setSearchParams({});
+    };
+
     return (
         <div className="flex flex-col gap-6 w-full pb-10 animate-in fade-in duration-500 relative">
             <PageHeader
                 title="User Management"
-                subtitle={`Managing ${stats.total || 0} registered identities`}
+                subtitle={`Orchestrating ${stats.total || 0} registered personnel`}
                 onAdd={handleAddUser}
                 addButtonText="Add User"
                 hideAddButton={false}
-                breadcrumbs={[
-                    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-                    { label: "User Management", path: "/admin/users", isActive: true }
-                ]}
+                breadcrumbs={breadcrumbs}
                 rightContent={
-                    <Button onClick={exportPDF} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 shadow-sm border-dashed border-primary/30">
-                        <FiDownload size={14} className="text-primary/70" />
-                        <span className="font-black text-[10px] uppercase tracking-widest text-title">PDF Report</span>
-                    </Button>
+                    <div className="flex items-center gap-3">
+                         <div className="flex flex-col items-end px-4 border-r border-border-main/50 translate-y-[2px]">
+                            <span className="text-[10px] font-black text-gray/40 uppercase tracking-widest leading-none">Management Context</span>
+                            <button onClick={handleHardReset} className="text-[9px] font-black text-primary hover:text-primary-hover uppercase tracking-tighter mt-1 flex items-center gap-1">
+                               <FiRefreshCcw size={10} /> Clear Context
+                            </button>
+                        </div>
+                        <Button onClick={exportPDF} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 shadow-sm border-dashed border-primary/30">
+                            <FiDownload size={14} className="text-primary/70" />
+                            <span className="font-black text-[10px] uppercase tracking-widest text-title">PDF Export</span>
+                        </Button>
+                    </div>
                 }
             />
 

@@ -66,6 +66,11 @@ export const organizationService = {
         try {
             const params = { ...filters };
             
+            // Handle search mapping specifically if exists
+            if (params.search) {
+                params.search = params.search.trim() || undefined;
+            }
+
             // Handle multi-select arrays for backend compatibility
             if (Array.isArray(params.status)) {
                 params.status = params.status.join(',').toUpperCase();

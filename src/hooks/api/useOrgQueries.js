@@ -12,7 +12,7 @@ const cleanImageUrl = (url) => {
 };
 
 // Map Backend data to Frontend format (consistent with useOrgStore)
-const mapOrgToFrontend = (data) => {
+export const mapOrgToFrontend = (data) => {
   if (!data) return null;
   
   const imagery = {
@@ -36,7 +36,7 @@ const mapOrgToFrontend = (data) => {
 
   return {
     ...data,
-    name: data.organisation_name || data.name || '',
+    name: data.organisation_name || data.site_name || data.name || '',
     industry: data.industry_type || data.industry || 'General',
     occupancyType: data.occupancy_type || data.occupancyType || '',
     classification: data.classification || '',
@@ -54,6 +54,8 @@ const mapOrgToFrontend = (data) => {
     stats: {
       sites: data.sites_count || 0,
       floors: data.floors_count || 0,
+      zones: data.zones_count || 0,
+      assets: data.inventory_count || 0,
       coordinators: data.coordinators_count || 0,
       coordinatorNames: data.coordinator_names || []
     }
@@ -64,20 +66,26 @@ const mapOrgToFrontend = (data) => {
  * ── ORGANIZATION QUERIES ──
  */
 
-export const useOrganizations = (filters = {}) => {
+export const useOrganizations = (filters = {}, search = '') => {
   // Normalize filters to ensure stable Query Keys
   const cleanFilters = Object.fromEntries(
-    Object.entries(filters).filter(([_, v]) => v !== undefined && v !== null && v !== 'all' && v !== '')
+    Object.entries(filters).filter(([_, v]) => 
+        v !== undefined && 
+        v !== null && 
+        v !== 'all' && 
+        v !== '' && 
+        !(Array.isArray(v) && v.length === 0)
+    )
   );
 
   return useQuery({
-    queryKey: ['organizations', cleanFilters],
+    queryKey: ['organizations', { filters: cleanFilters, search }],
     queryFn: async () => {
-      const response = await organizationService.getOrganizations(cleanFilters);
+      const response = await organizationService.getOrganizations({ ...cleanFilters, search });
       const data = response.data || response.results || response;
       return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes fresh data
+    staleTime: 5 * 60 * 1000, 
   });
 };
 

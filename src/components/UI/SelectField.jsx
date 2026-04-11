@@ -13,6 +13,7 @@ const SelectField = forwardRef(({
     required = false,
     className = '',
     containerStyle = {},
+    loading = false,
     ...props
 }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
@@ -107,7 +108,7 @@ const SelectField = forwardRef(({
                     })}
                 </select>
 
-                {/* Custom Dropdown Arrow */}
+                {/* Custom Dropdown Arrow or Loading Spinner */}
                 <div style={{ 
                     position: 'absolute', 
                     right: '12px', 
@@ -116,9 +117,17 @@ const SelectField = forwardRef(({
                     display: 'flex', 
                     alignItems: 'center' 
                 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="m6 9 6 6 6-6" />
-                    </svg>
+                    {loading ? (
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                            style={{ width: '16px', height: '16px', border: '2px solid rgba(7, 34, 103, 0.1)', borderTopColor: t.color.primary, borderRadius: '50%' }}
+                        />
+                    ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    )}
                 </div>
             </div>
 

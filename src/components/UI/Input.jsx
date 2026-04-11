@@ -29,7 +29,7 @@ const Input = React.forwardRef(({
         ref={ref}
         disabled={disabled}
         className={cn(
-          "w-full h-11 px-4 rounded-md border-2 border-border bg-white font-body text-sm transition-all duration-200 outline-none",
+          "w-full h-10 px-4 rounded-md border-2 border-border bg-white font-body text-sm transition-all duration-200 outline-none",
           "placeholder:text-muted/50",
           "focus:border-primary focus:ring-4 focus:ring-primary/5",
           "disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed",

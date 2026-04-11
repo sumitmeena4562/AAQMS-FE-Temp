@@ -20,7 +20,13 @@ export const useDashboardSummary = () => {
 export const useAllHistory = (filters = {}) => {
   // Normalize filters for query key stability
   const cleanFilters = Object.fromEntries(
-    Object.entries(filters).filter(([_, v]) => v !== undefined && v !== null && v !== 'all' && v !== '')
+    Object.entries(filters).filter(([_, v]) => 
+      v !== undefined && 
+      v !== null && 
+      v !== 'all' && 
+      v !== '' && 
+      !(Array.isArray(v) && v.length === 0)
+    )
   );
 
   return useQuery({

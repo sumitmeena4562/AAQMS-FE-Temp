@@ -28,7 +28,7 @@ export const useHierarchy = () => {
         // Data
         organizations: orgsQuery.data || [],
         coordinators: coordsQuery.data || [],
-        sites: sitesQuery.data || [],
+        sites: sitesQuery.data?.results || [],
         
         // Loading States
         isLoading: orgsQuery.isLoading || coordsQuery.isLoading || sitesQuery.isLoading,

@@ -41,7 +41,7 @@ const FeatureCard = ({
                         {description}
                     </p>
                 </div>
-            </Card>
+            </div>
         </motion.div>
     );
 };

@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors } from '../../hooks/api/useHierarchyQueries';
+import useSearchStore from '../../store/useSearchStore';
 
 const FilterBar = ({ 
     activeLevel, // 'coordinators', 'sites', 'floors', 'zones'
@@ -29,11 +30,13 @@ const FilterBar = ({
         resetFilters
     } = useFilterStore();
 
+    const { query: searchQuery, clearSearch } = useSearchStore();
     const [_, setSearchParams] = useSearchParams();
 
     const handleResetAll = () => {
         resetFilters();
         setSearchParams({});
+        clearSearch();
     };
 
     const { orgs: cachedOrgs, setFilters: setOrgFilters } = useOrgStore();
@@ -44,7 +47,8 @@ const FilterBar = ({
 
     // ─── QUERY HOOKS (UNIFIED) ───
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading: isHierarchyLoading } = useHierarchy();
-    const { data: allFloors = [] } = useFloors(selectedSite);
+    const { data: floorData } = useFloors(selectedSite);
+    const allFloors = floorData?.results || [];
 
     // Initial Load / Cascading Sync: Handled by React Query dependencies above
 
@@ -63,7 +67,7 @@ const FilterBar = ({
     const siteOptions = allSites.map(s => ({ value: s.id, label: s.site_name || s.name }));
     const floorOptions = allFloors.map(f => ({ value: f.id, label: f.name }));
 
-    const isFilterActive = [selectedOrg, selectedCoord, selectedSite, selectedFloor, selectedStatus].some(arr => Array.isArray(arr) && arr.length > 0) || searchTerm !== '';
+    const isFilterActive = [selectedOrg, selectedCoord, selectedSite, selectedFloor, selectedStatus].some(arr => Array.isArray(arr) && arr.length > 0) || searchTerm !== '' || searchQuery !== '';
 
     return (
         <div className={`bg-card border border-border-main/60 rounded-2xl p-2.5 sm:p-3.5 shadow-sm mb-6 ${className}`}>

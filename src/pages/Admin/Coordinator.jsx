@@ -10,7 +10,7 @@ import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import {
     FiUsers, FiUser, FiRefreshCw, FiRefreshCcw, FiCheckCircle, FiAlertCircle, FiClock,
-    FiExternalLink, FiHome, FiShield,  FiActivity, FiLayers, FiMail, FiPhone, FiX
+    FiExternalLink, FiHome, FiShield,  FiActivity, FiLayers, FiMail, FiPhone, FiX, FiBriefcase
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
@@ -47,14 +47,25 @@ const Coordinator = () => {
     // ── QUERY HOOKS (NEW) ──
     const debouncedSearch = useDebounce(search, 400);
     
-    // URL Sync for Org Context
+    // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
+    const hasSynced = useRef(false);
     useEffect(() => {
-        if (orgIdFromUrl) {
-            setFilters({ organization: [orgIdFromUrl], role: ['coordinator'] });
-        } else {
+        if (hasSynced.current) return;
+        
+        const pOrg = searchParams.get('org_id') || searchParams.get('org');
+        const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
+
+        // Logic Review: "Admin direct aaye to sari dikh"
+        if (!pOrg && !pCoord) {
+            resetFilters();
             setFilters({ role: ['coordinator'] });
+        } else {
+            const orgs = pOrg ? pOrg.split(',') : [];
+            setFilters({ organization: orgs, role: ['coordinator'] });
         }
-    }, [orgIdFromUrl]);
+
+        hasSynced.current = true;
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Role-locked Users Query
     const queryFilters = { ...filters, role: 'coordinator' };
@@ -249,6 +260,24 @@ const Coordinator = () => {
         </div>
     );
 
+    const currentOrg = filters.organization?.length === 1 ? organizations.find(o => String(o.id) === String(filters.organization[0])) : null;
+    const orgLabel = (filters.organization?.length > 1) ? `Organizations (${filters.organization.length})` : currentOrg?.name || orgNameFromUrl;
+
+    const breadcrumbs = useMemo(() => {
+        const base = [
+            { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+            { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
+        ];
+        if (orgLabel) {
+            base.push({ 
+                label: orgLabel, 
+                path: `/admin/coordinators?org_id=${filters.organization?.join(',') || ''}` 
+            });
+        }
+        base.push({ label: "Management", path: "#", isActive: true });
+        return base;
+    }, [filters.organization, orgLabel]);
+
     return (
         <div className="flex flex-col gap-6 w-full pb-10 animate-in fade-in duration-500">
             <PageHeader
@@ -264,24 +293,15 @@ const Coordinator = () => {
                 subtitle={orgNameFromUrl ? `Authorized staff assigned to ${orgNameFromUrl}` : "System-wide administrative resource control"}
                 onAdd={handleAddUser}
                 addButtonText="Add Coordinator"
-                breadcrumbs={[
-                    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-                    { label: "Organizations", path: "/admin/organizations" },
-                    { label: orgNameFromUrl ? `Personnel Records` : "Coordinators", path: "/admin/coordinators", isActive: true }
-                ]}
+                breadcrumbs={breadcrumbs}
                 rightContent={
                     <div className="flex items-center gap-3">
                          <div className="flex flex-col items-end px-4 border-r border-border-main/50 translate-y-[2px]">
-                            <span className="text-[9px] font-black text-gray uppercase tracking-widest opacity-60 leading-none mb-1">Status</span>
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                                <span className="text-[11px] font-bold text-title uppercase">Live Ops</span>
-                            </div>
-                        </div>
-                        <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
-                            <FiRefreshCcw size={14} className={isUsersLoading ? 'animate-spin' : ''} />
-                            <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
-                        </Button>
+                             <span className="text-[10px] font-black text-gray/40 uppercase tracking-widest leading-none">Context Management</span>
+                             <button onClick={handleResetAll} className="text-[9px] font-black text-primary hover:text-primary-hover uppercase tracking-tighter mt-1 flex items-center gap-1">
+                                <FiRefreshCcw size={10} /> Reset All Contexts
+                             </button>
+                         </div>
                     </div>
                 }
             />

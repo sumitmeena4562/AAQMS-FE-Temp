@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { FiHome, FiClock, FiBox, FiRefreshCcw } from 'react-icons/fi';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterDropdown from '../../components/UI/FilterDropdown';
+import FilterBar from '../../components/UI/FilterBar';
 import DataTable from '../../components/UI/DataTable';
 import Button from '../../components/UI/Button';
 import { useAllHistory } from '../../hooks/api/useDashboardQueries';
@@ -47,10 +48,10 @@ export default function AllHistory() {
 
     // ── 2. QUERY HOOKS (Declarative Cascades) ──
     const { organizations: orgs } = useHierarchy();
-    const { data: allSites = [] } = useSites({ organisation: filters.organisation });
-    const { data: allFloors = [] } = useFloors(filters.site);
-
-    // Cascading fetches are now handled declaratively by query hooks above.
+    const { data: siteData } = useSites({ organisation: filters.organisation });
+    const allSites = siteData?.results || [];
+    const { data: floorData } = useFloors(filters.site);
+    const allFloors = floorData?.results || [];
 
     // ── 4. State Management Actions ──
     const updateFilter = (key, val) => {
@@ -74,7 +75,6 @@ export default function AllHistory() {
     };
 
     // ── 5. Fetching Activity Logs (Server-side paginated) ──
-    // 🛡️ MEMOIZED: Prevents infinite fetch loops caused by new object refs on every render
     const queryFilters = useMemo(() => ({
         ...filters,
         page: currentPage,
@@ -85,8 +85,6 @@ export default function AllHistory() {
     const activityList = historyResponse?.results || [];
     const totalCount = historyResponse?.count || 0;
     const totalPages = Math.ceil(totalCount / 10);
-
-    const activeFilterCount = Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v !== '').length;
 
     // ── 6. Industrial Column Renderers ──
     const columns = useMemo(() => [
@@ -143,25 +141,35 @@ export default function AllHistory() {
     ], []);
 
     return (
-        <div className="flex flex-col gap-8 w-full animate-in fade-in duration-700 bg-base/10 min-h-screen pb-12">
-            
-            <div className="px-1 pt-2">
-                <PageHeader
-                    title="Audit History"
-                    subtitle="Centralized ledger of all system security and operational events"
-                    breadcrumbs={[
-                        { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
-                        { label: "History", path: "/admin/history", icon: <FiClock size={14} />, isActive: true }
-                    ]}
-                />
-            </div>
+        <div className="flex flex-col gap-6 w-full pb-10 animate-in fade-in duration-500">
+            <PageHeader
+                title="Audit History"
+                subtitle="Centralized ledger of all system security and operational events"
+                breadcrumbs={[
+                    { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
+                    { label: "History", path: "/admin/history", isActive: true }
+                ]}
+                rightContent={
+                    <div className="flex items-center gap-3">
+                         <div className="flex flex-col items-end px-4 border-r border-border-main/50 translate-y-[2px]">
+                            <span className="text-[9px] font-black text-gray uppercase tracking-widest opacity-60 leading-none mb-1">Status</span>
+                            <div className="flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                <span className="text-[11px] font-bold text-title uppercase">Live Sync</span>
+                            </div>
+                        </div>
+                        <Button onClick={resetFilters} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
+                            <FiRefreshCcw size={14} className={isLoading ? 'animate-spin' : ''} />
+                            <span className="font-black text-[10px] uppercase tracking-widest text-primary">Reset Filter</span>
+                        </Button>
+                    </div>
+                }
+            />
 
-            {/* ── ADVANCED CASCADING FILTERS ── */}
-            <div className="bg-card border border-border-main/60 rounded-2xl p-5 shadow-sm transition-all duration-300">
-                <div className="flex flex-wrap items-center gap-4">
-                    
+            <FilterBar className="!p-2.5">
+                <div className="flex flex-wrap items-center gap-2 flex-1 pl-1">
                     <FilterDropdown
-                        label="Performer Org"
+                        label="Organization"
                         options={orgs.map(o => ({ value: o.id, label: o.name }))}
                         value={filters.organisation}
                         onChange={v => updateFilter('organisation', v)}
@@ -170,7 +178,7 @@ export default function AllHistory() {
                     />
 
                     <FilterDropdown
-                        label="Action / Op"
+                        label="Action Type"
                         options={OPERATION_TYPES}
                         value={filters.operation}
                         onChange={v => updateFilter('operation', v)}
@@ -179,7 +187,7 @@ export default function AllHistory() {
                     />
 
                     <FilterDropdown
-                        label="Entity Category"
+                        label="Category"
                         options={EVENT_CATEGORIES}
                         value={filters.category}
                         onChange={v => updateFilter('category', v)}
@@ -197,7 +205,7 @@ export default function AllHistory() {
                     />
 
                     <FilterDropdown
-                        label="Target Site"
+                        label="Site"
                         options={allSites.map(s => ({ value: s.id, label: s.site_name || s.name }))}
                         value={filters.site}
                         onChange={v => updateFilter('site', v)}
@@ -207,7 +215,7 @@ export default function AllHistory() {
                     />
 
                     <FilterDropdown
-                        label="Target Floor"
+                        label="Floor"
                         options={allFloors.map(f => ({ value: f.id, label: f.name }))}
                         value={filters.floor}
                         onChange={v => updateFilter('floor', v)}
@@ -215,78 +223,35 @@ export default function AllHistory() {
                         multiple={true}
                         disabled={filters.site.length === 0}
                     />
-                    
-                    {activeFilterCount > 0 && (
-                        <button
-                            onClick={resetFilters}
-                            className="h-10 flex items-center gap-2 px-5 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-rose-50 border border-rose-100 shadow-sm active:scale-95 ml-auto"
-                        >
-                            <FiRefreshCcw size={12} />
-                            Reset Filters
-                        </button>
-                    )}
                 </div>
-            </div>
+            </FilterBar>
 
-            {/* ── THE LEDGER CARD ── */}
-            <div className="bg-card w-full border border-border-main rounded-[32px] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.12)] p-8 flex flex-col gap-6 transition-all duration-500 overflow-hidden relative">
-                
-                <div className="flex items-center justify-between border-b border-border-main/50 pb-6">
-                    <div className="flex flex-col">
-                        <h2 className="text-2xl font-black text-title tracking-tighter leading-none mb-2">History Records</h2>
-                        <span className="text-xs font-bold text-gray/60 uppercase tracking-widest">Permanent System Audit Trail</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 bg-base/40 px-3 py-1.5 rounded-full border border-border-main/40">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                            {totalCount.toLocaleString()} Total Logs
-                        </span>
-                    </div>
-                </div>
-                
-                <div className="w-full relative min-h-[400px]">
-                    {isLoading ? (
-                        <TableSkeleton rows={10} />
-                    ) : !isError && activityList ? (
-                        <DataTable
-                            columns={columns}
-                            data={activityList}
-                            loading={isLoading}
-                            emptyMessage="No historical records matched your current filters."
-                            className="!border-none !shadow-none !p-0 !rounded-none"
-                            footer={
-                                totalPages > 1 && (
-                                    <div className="flex items-center justify-between w-full pt-2">
-                                        <span className="text-[10px] font-bold text-gray">
-                                            Page {currentPage} of {totalPages} &nbsp;·&nbsp; {totalCount.toLocaleString()} records total
-                                        </span>
-                                        <div className="flex items-center gap-1.5">
-                                            <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1 || isLoading} className="!h-8 !px-3 !text-[10px] !font-black !uppercase">Previous</Button>
-                                            <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages || isLoading} className="!h-8 !px-4 !text-[10px] !font-black !uppercase">Next</Button>
-                                        </div>
-                                    </div>
-                                )
-                            }
-                            pageSize={10}
-                        />
-                    ) : (
-                        <div className="flex items-center justify-center py-20 text-rose-500 font-bold">
-                            Failed to retrieve history. Please check your connection.
+            <div className="w-full relative">
+                <DataTable
+                    title={
+                        <div className="flex flex-col">
+                            <span className="text-[14px] font-black text-title leading-tight">System Ledger</span>
+                            <span className="text-[10px] font-bold text-gray uppercase tracking-widest mt-1">SHA-256 Integrity Verified</span>
                         </div>
-                    )}
-                </div>
-
-                <div className="flex items-center justify-between pt-6 border-t border-border-main/30">
-                    <div className="flex items-center gap-4">
-                        <span className="text-[10px] font-black text-gray/40 uppercase tracking-[0.2em]">Data Integrity: SHA-256 Verified</span>
-                        <div className="h-4 w-[1px] bg-border-main/40" />
-                        <span className="text-[10px] font-black text-gray/40 uppercase tracking-[0.2em]">Live Sync Status: Active</span>
-                    </div>
-                    <span className="text-[10px] font-black text-primary/60 uppercase tracking-widest cursor-help hover:text-primary transition-colors">
-                        Enterprise Audit Mode
-                    </span>
-                </div>
+                    }
+                    subtitle="Audit Trail"
+                    columns={columns}
+                    data={activityList}
+                    loading={isLoading || !activityList}
+                    emptyMessage="No historical records matched your current filters."
+                    footer={
+                        <div className="flex justify-between items-center w-full py-2 px-1">
+                            <div className="text-[12px] text-gray font-medium uppercase tracking-tight">Records Found: <span className="font-black text-title">{totalCount.toLocaleString()}</span></div>
+                            {totalPages > 1 && (
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[11px] font-bold text-gray/60">Page {currentPage} of {totalPages}</span>
+                                    <Button variant="outline" size="sm" onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1 || isLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Previous</Button>
+                                    <Button variant="outline" size="sm" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage >= totalPages || isLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Next</Button>
+                                </div>
+                            )}
+                        </div>
+                    }
+                />
             </div>
         </div>
     );

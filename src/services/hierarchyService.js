@@ -12,7 +12,17 @@ export const hierarchyService = {
          * @ENDPOINT: GET /api/organisations/sites/
          * @QUERY_PARAMS: ?organisation=uuid&org_id=uuid&coord_id=uuid
          */
-        const response = await api.get('organisations/sites/', { params: filters });
+        const params = { ...filters };
+        
+        // Handle multi-select arrays for backend compatibility
+        if (Array.isArray(params.organisation)) {
+            params.organisation = params.organisation.join(',');
+        }
+        if (Array.isArray(params.coord_id)) {
+            params.coord_id = params.coord_id.join(',');
+        }
+
+        const response = await api.get('organisations/sites/', { params });
         return response.data;
     },
 
@@ -23,9 +33,17 @@ export const hierarchyService = {
 
     // --- FLOORS ---
     getFloors: async (siteId = null) => {
-        // If siteId is an array, take the first one or use all-floors if supported
-        const id = Array.isArray(siteId) ? siteId[0] : siteId;
-        const url = id ? `organisations/floors/${id}/` : `organisations/all-floors/`;
+        // If siteId is an array with multiple values, use the 'all-floors' endpoint with query params
+        const isMulti = Array.isArray(siteId) && siteId.length > 1;
+        const singleId = Array.isArray(siteId) ? siteId[0] : siteId;
+
+        if (isMulti) {
+            return (await api.get('organisations/all-floors/', { 
+                params: { site_id: siteId.join(',') } 
+            })).data;
+        }
+
+        const url = singleId ? `organisations/floors/${singleId}/` : `organisations/all-floors/`;
         const response = await api.get(url);
         return response.data;
     },
@@ -40,10 +58,26 @@ export const hierarchyService = {
 
     // --- ZONES ---
     getZones: async (floorId = null, filters = {}) => {
-        // Handle array floorId or 'all'
-        const id = Array.isArray(floorId) ? floorId[0] : floorId;
-        const url = (id && id !== 'all') ? `organisations/floors/${id}/zones/` : `organisations/all-zones/`;
-        const response = await api.get(url, { params: filters });
+        // Handle multi-select for floors: if it's an array with multiple values, use the 'all-zones' endpoint
+        const isMultiFloor = Array.isArray(floorId) && floorId.length > 1;
+        const singleFloorId = (Array.isArray(floorId) && floorId.length > 0) ? floorId[0] : (floorId === 'all' ? null : floorId);
+        
+        const params = { ...filters };
+        
+        // Ensure cascading filters are joined for backend compatibility
+        if (Array.isArray(params.site_id)) params.site_id = params.site_id.join(',');
+        if (Array.isArray(params.org_id)) params.org_id = params.org_id.join(',');
+        if (Array.isArray(params.organisation_id)) params.organisation_id = params.organisation_id.join(',');
+        if (isMultiFloor) params.floor_id = floorId.join(',');
+
+        let url = 'organisations/all-zones/';
+        const isValidId = singleFloorId && (typeof singleFloorId !== 'string' || singleFloorId.trim() !== '');
+        
+        if (!isMultiFloor && isValidId) {
+            url = `organisations/floors/${singleFloorId}/zones/`;
+        }
+
+        const response = await api.get(url, { params });
         return response.data;
     },
 

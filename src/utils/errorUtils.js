@@ -17,21 +17,36 @@ export const extractError = (err, fallback = "Something went wrong. Please try a
       if (data.detail) return data.detail;
       if (data.non_field_errors) return data.non_field_errors[0];
       if (data.error) return data.error;
-      if (data.message) return data.message;
   
-      // 3. Nested Field Errors
+      // 3. Nested Field Errors (Validation Errors)
       if (typeof data === 'object' && data !== null) {
-        const messages = Object.entries(data)
-          .map(([key, val]) => {
-            const msg = Array.isArray(val) ? val[0] : val;
-            if (key === 'non_field_errors' || key === 'error' || key === 'detail') return msg;
-            const readableKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            return `${readableKey}: ${msg}`;
-          });
-        if (messages.length > 0) return messages[0];
+        const errorData = data.errors || data; // Handle 'errors' wrapper or flat object
+        if (typeof errorData === 'object' && errorData !== null && !Array.isArray(errorData)) {
+          const messages = Object.entries(errorData)
+            .map(([key, val]) => {
+              const msg = Array.isArray(val) ? val[0] : val;
+              if (key === 'non_field_errors' || key === 'error' || key === 'detail' || key === 'message' || key === 'status') return null;
+              
+              // Filter out python raw ErrorDetail strings if they slip in
+              const cleanMsg = typeof msg === 'string' ? msg.replace(/ErrorDetail\(string='(.*?)', code='.*?'\)/g, '$1') : msg;
+
+              const readableKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              return `${readableKey}: ${cleanMsg}`;
+            })
+            .filter(Boolean); // Remove nulls
+            
+          if (messages.length > 0) return messages.join(' | ');
+        }
       }
       
-      if (typeof data === 'string') return data;
+      // Fallback to data.message, but ignore raw python dict representations
+      if (data.message && typeof data.message === 'string' && !data.message.includes('ErrorDetail(')) {
+          return data.message;
+      }
+      
+      if (typeof data === 'string') {
+          return data.includes('ErrorDetail(') ? fallback : data;
+      }
     }
   
     // 4. Default Status Codes

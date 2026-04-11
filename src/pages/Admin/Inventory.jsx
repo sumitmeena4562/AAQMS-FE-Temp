@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
@@ -57,7 +57,8 @@ const Inventory = () => {
 
     // ── QUERY HOOKS (UNIFIED) ──
     const { organizations: orgs, sites: allSites } = useHierarchy();
-    const { data: allFloors = [] } = useFloors(selectedSite);
+    const { data: floorData } = useFloors(selectedSite);
+    const allFloors = floorData?.results || [];
     const { data: allZones = [] } = useZones(selectedFloor);
 
     // ── LOCAL STATE ──
@@ -69,19 +70,32 @@ const Inventory = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const PAGE_SIZE = 10;
 
-    // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only) ──
+    // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
+    const hasSynced = useRef(false);
     useEffect(() => {
+        if (hasSynced.current) return;
+        
         const pOrg = searchParams.get('org_id') || searchParams.get('org');
         const pSite = searchParams.get('site_id') || searchParams.get('site');
         const pFloor = searchParams.get('floor_id') || searchParams.get('floor');
         const pZone = searchParams.get('zone_id') || searchParams.get('zone');
         const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
 
-        if (pOrg) setOrg(pOrg);
-        if (pSite) setSite(pSite);
-        if (pFloor) setFloor(pFloor);
-        if (pZone) setZone(pZone);
-        if (pCoord) setCoord(pCoord);
+        // Logic Review: "Admin direct aaye to sari dikh"
+        // If NO hierarchy params are present in URL, we assume direct navigation and reset filters
+        if (!pOrg && !pSite && !pFloor && !pZone && !pCoord) {
+            resetFilters();
+            clearSearch();
+        } else {
+            // Otherwise, prioritize URL params for deep-linking
+            if (pOrg) setOrg(pOrg.split(','));
+            if (pSite) setSite(pSite.split(','));
+            if (pFloor) setFloor(pFloor.split(','));
+            if (pZone) setZone(pZone.split(','));
+            if (pCoord) setCoord(pCoord.split(','));
+        }
+
+        hasSynced.current = true;
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── DEBOUNCED SEARCH ──
@@ -131,7 +145,7 @@ const Inventory = () => {
         if (orgLabel) base.push({ label: orgLabel, path: `/admin/coordinators?org_id=${selectedOrg.join(',')}` });
         if (siteLabel) base.push({ label: siteLabel, path: `/admin/site-plan?site_id=${selectedSite.join(',')}` });
         if (floorLabel) base.push({ label: floorLabel, path: `/admin/floor-plan?floor_id=${selectedFloor.join(',')}` });
-        if (zoneLabel) base.push({ label: zoneLabel, path: `/admin/zones?zone_id=${selectedZone.join(',')}` });
+        if (zoneLabel) base.push({ label: zoneLabel, path: `/admin/inventory?zone_id=${selectedZone.join(',')}` });
         
         base.push({ label: "Inventory", path: "#", isActive: true });
         return base;
@@ -140,8 +154,9 @@ const Inventory = () => {
     // ── HANDLERS ──
     const handleReset = () => {
         resetFilters();
-        setSearchParams({});
+        setSearchParams({}, { replace: true });
         clearSearch();
+        setCurrentPage(1);
     };
 
     const handleAssetClick = (asset) => {

@@ -4,6 +4,7 @@ import { userService } from "../services/userService";
 import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { queryClient } from '../lib/queryClient';
 
 /**
  * USER STORE
@@ -43,7 +44,8 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             await userService.createUser(userData);
-            await get().fetchInitialData(); 
+            await queryClient.invalidateQueries(['users']);
+            await queryClient.invalidateQueries(['user-stats']);
             return { success: true };
         } catch (err) {
             set({ loading: false, error: err.message });
@@ -55,7 +57,8 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             await userService.updateUser(id, updates);
-            await get().fetchInitialData();
+            await queryClient.invalidateQueries(['users']);
+            await queryClient.invalidateQueries(['user-stats']);
             return { success: true };
         } catch (err) {
             set({ loading: false, error: err.message });
@@ -68,7 +71,8 @@ const useUserStore = create((set, get) => ({
         try {
             await userService.deleteUser(id);
             set(s => ({ selectedIds: s.selectedIds.filter(i => i !== id) }));
-            await get().fetchInitialData();
+            await queryClient.invalidateQueries(['users']);
+            await queryClient.invalidateQueries(['user-stats']);
             return { success: true };
         } catch (err) {
             set({ loading: false, error: err.message });
@@ -87,7 +91,8 @@ const useUserStore = create((set, get) => ({
         try {
             await userService.bulkAction(ids, action);
             set({ selectedIds: [] }); 
-            await get().fetchInitialData();
+            await queryClient.invalidateQueries(['users']);
+            await queryClient.invalidateQueries(['user-stats']);
             toast.success("Done! The changes have been applied.");
             return { success: true };
         } catch (err) {
@@ -140,7 +145,7 @@ const useUserStore = create((set, get) => ({
                 u.email,
                 u.mobile_number || 'N/A',
                 u.role?.toUpperCase() || 'N/A',
-                u.organization || 'Unassigned',
+                u.org_name || 'Unassigned',
                 u.status?.toUpperCase() || 'N/A'
             ]);
 

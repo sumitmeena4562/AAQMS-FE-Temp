@@ -31,25 +31,38 @@ const SitePlan = () => {
 
   // --- QUERY HOOKS ---
   const { organizations: orgs } = useHierarchy();
-  const { data: sites = [], isLoading: loading, error: hierarchyError } = useSites({ 
+  const { data: siteData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useSites({ 
       organisation: activeOrgId, 
       coord_id: activeCoordId 
   });
+
+  const sitePlans = siteData.results || [];
+  const totalPlans = siteData.total || sitePlans.length;
+  const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
 
   const handleResetAll = () => {
       setSearchParams({});
       resetFilters();
   };
 
-  // URL → Store sync (mount-only, guarded)
+  // URL → Store sync (mount-only guard)
   const hasSynced = useRef(false);
   useEffect(() => {
     if (hasSynced.current) return;
-    hasSynced.current = true;
-    if (passedOrgId && selectedOrg.length === 0) setOrg(passedOrgId);
-    if (passedCoordId && selectedCoord.length === 0) setCoord(passedCoordId);
-  }, [passedOrgId, passedCoordId, selectedOrg.length, selectedCoord.length, setOrg, setCoord]); 
+    
+    const pOrg = searchParams.get('org_id') || searchParams.get('org');
+    const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
 
+    // Logic Review: "Admin direct aaye to sari dikh"
+    if (!pOrg && !pCoord) {
+        resetFilters();
+    } else {
+        if (pOrg) setOrg(pOrg.split(','));
+        if (pCoord) setCoord(pCoord.split(','));
+    }
+
+    hasSynced.current = true;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const currentOrg = activeOrgId.length === 1 ? orgs.find(o => String(o.id) === String(activeOrgId[0])) : null;
   const orgLabel = activeOrgId.length > 1 ? `Organizations (${activeOrgId.length})` : currentOrg?.name || passedOrgNameFromUrl;
   const orgInfo = { name: orgLabel || "Organization" };
@@ -72,10 +85,6 @@ const SitePlan = () => {
     path: "#", 
     isActive: true 
   });
-
-  const sitePlans = sites;
-  const totalPlans = sitePlans.length;
-  const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
 
   return (
     <div className="flex flex-col font-sans h-full">
@@ -134,7 +143,7 @@ const SitePlan = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {sitePlans.slice((currentPage - 1) * 10, currentPage * 10).map((item, index) => (
+            {sitePlans.map((item, index) => (
               <div key={item.id || index} className="w-full max-w-[340px]">
                 <OrganizationCard
                   org={item}
@@ -144,14 +153,14 @@ const SitePlan = () => {
               </div>
             ))}
 
-            {sitePlans.length > 10 && (
+            {totalPlans > 10 && (
                 <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm mt-6 col-span-full">
                     <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                        Page {currentPage} of {Math.ceil(sitePlans.length / 10)}
+                        Page {currentPage} of {Math.ceil(totalPlans / 10)}
                     </span>
                     <div className="flex items-center gap-2">
                         <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
-                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(sitePlans.length / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
+                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(totalPlans / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
                     </div>
                 </div>
             )}

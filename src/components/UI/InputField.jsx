@@ -77,7 +77,7 @@ const InputField = forwardRef(({
                     required={required}
                     style={{
                         width: '100%',
-                        padding: icon ? '13px 14px 13px 42px' : '13px 16px',
+                        padding: icon ? '10px 14px 10px 42px' : '10px 16px',
                         paddingRight: isPassword || isValid ? '42px' : '16px',
                         fontSize: t.fontSize.md,
                         color: t.color.text,

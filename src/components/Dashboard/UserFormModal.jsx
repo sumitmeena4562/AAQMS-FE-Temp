@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { userSchema } from '../../schema/userSchema';
 import { 
     FiX, FiChevronRight, FiChevronLeft, FiActivity, FiLayers, FiAlertCircle, FiMail,
-    FiPlus, FiMapPin, FiCheckCircle
+    FiPlus, FiMapPin, FiCheckCircle, FiShield, FiBriefcase
 } from 'react-icons/fi';
 import Button from '../UI/Button';
 import InputField from '../UI/InputField';
@@ -19,7 +19,7 @@ const ROLE_DETAILS = [
         id: 'admin', 
         name: 'Admin', 
         desc: 'Full administrative control: Manage users, organizations, and global settings.', 
-        icon: <FiLayers size={18} />,
+        icon: <FiShield size={18} />,
         color: 'text-amber-600',
         bg: 'bg-amber-50',
         border: 'border-amber-100',
@@ -89,15 +89,15 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         try {
             const role_name = watch('role')?.toUpperCase();
             let data = [];
-            if (role_name === 'COORDINATOR') {
-                data = await organizationService.getSites(orgId);
-            } else if (role_name === 'FIELD_OFFICER') {
+            if (role_name === 'FIELD_OFFICER') {
                 data = await organizationService.getZones(orgId);
                 // Also fetch coordinators for this org
                 const coords = await userService.getCoordinators(orgId);
                 setAvailableCoordinators(Array.isArray(coords) ? coords : []);
+                setAssignmentData(Array.isArray(data) ? data : (data.results || []));
+            } else {
+                setAssignmentData([]);
             }
-            setAssignmentData(Array.isArray(data) ? data : (data.results || []));
         } catch (err) {
             console.error("Failed to load assignment data:", err);
         } finally {
@@ -428,7 +428,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                                                             <FiPlus size={16} />
                                                         </div>
-                                                        <span className="text-[13px] font-bold">Assign Work Area</span>
+                                                        <span className="text-[13px] font-bold">
+                                                            {currentRole === 'coordinator' ? 'Link to Organization' : 'Assign Operational Units'}
+                                                        </span>
                                                     </button>
                                                 ) : (
                                                     <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 relative">
@@ -443,11 +445,15 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                         
                                                         <div className="flex items-center gap-2 mb-4">
                                                             <div className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center">
-                                                                <FiMapPin size={16} />
+                                                                {currentRole === 'coordinator' ? <FiBriefcase size={16} /> : <FiMapPin size={16} />}
                                                             </div>
                                                             <div>
-                                                                <div className="text-[12px] font-bold text-title leading-none">Assignment Details</div>
-                                                                <div className="text-[10px] font-medium text-gray leading-none mt-1">Linking user to operational units</div>
+                                                                <div className="text-[12px] font-bold text-title leading-none">
+                                                                    {currentRole === 'coordinator' ? 'Corporate Assignment' : 'Sector Assignment'}
+                                                                </div>
+                                                                <div className="text-[10px] font-medium text-gray leading-none mt-1">
+                                                                    {currentRole === 'coordinator' ? 'Linking to parent organization' : 'Deploying to specific zones'}
+                                                                </div>
                                                             </div>
                                                         </div>
 
@@ -510,21 +516,28 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             )}
 
                                             <div className="col-span-2">
-                                                <label className="block text-[11px] font-bold text-gray mb-1.5 ml-1 uppercase tracking-wider">Operational Status</label>
-                                                <div className="flex gap-2">
-                                                    {STATUS_OPTIONS.map(s => (
-                                                        <button 
-                                                            type="button"
-                                                            key={s} 
-                                                            onClick={() => setValue('status', s)} 
-                                                            className={`flex-1 py-2.5 px-4 rounded-[var(--radius-button)] text-[12px] font-bold uppercase transition-all
-                                                                ${currentStatus === s 
-                                                                    ? 'bg-title text-white shadow-md'
-                                                                    : 'bg-white border border-border-main text-gray hover:border-border-hover'}`}
-                                                        >
-                                                            {s}
-                                                        </button>
-                                                    ))}
+                                                <label className="block text-[10px] font-black text-gray/60 mb-2 ml-1 uppercase tracking-[0.25em]">Operational Status Control</label>
+                                                <div className="flex p-1.5 bg-gray-100/80 border border-gray-200 rounded-2xl max-w-[320px] shadow-inner">
+                                                    {STATUS_OPTIONS.map(s => {
+                                                        const isActive = currentStatus === s;
+                                                        const isGreen = s === 'active';
+                                                        return (
+                                                            <button 
+                                                                type="button"
+                                                                key={s} 
+                                                                onClick={() => setValue('status', s)} 
+                                                                className={`flex-1 flex items-center justify-center gap-2.5 py-2 px-4 rounded-xl text-[10px] font-black uppercase tracking-[0.08em] transition-all duration-300 transform active:scale-95
+                                                                    ${isActive 
+                                                                        ? (isGreen 
+                                                                            ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200 ring-1 ring-emerald-500' 
+                                                                            : 'bg-rose-600 text-white shadow-lg shadow-rose-200 ring-1 ring-rose-500')
+                                                                        : 'text-gray-500 hover:text-gray-700 hover:bg-white/40'}`}
+                                                            >
+                                                                <span className={`w-2 h-2 rounded-full border border-white/20 ${isActive ? 'bg-white animate-pulse' : (isGreen ? 'bg-emerald-400/50' : 'bg-rose-400/50')}`} />
+                                                                {s}
+                                                            </button>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         </form>

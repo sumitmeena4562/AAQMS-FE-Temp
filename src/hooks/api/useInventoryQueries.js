@@ -6,20 +6,31 @@ import { inventoryService } from '../../services/inventoryService';
  */
 
 export const useInventory = (filters = {}, page = 1) => {
-  // Map frontend filters to API params (consistent with useOrgStore logic)
+  // Normalize filters to ensure stable Query Keys
+  const cleanFilters = Object.fromEntries(
+    Object.entries(filters).filter(([_, v]) => 
+        v !== undefined && 
+        v !== null && 
+        v !== 'all' && 
+        v !== '' && 
+        !(Array.isArray(v) && v.length === 0)
+    )
+  );
+
+  // Map frontend filters to API params
   const params = {
-    organisation: filters.org !== 'all' ? filters.org : undefined,
-    site: filters.site !== 'all' ? filters.site : undefined,
-    floor: filters.floor !== 'all' ? filters.floor : undefined,
-    zone: filters.zone !== 'all' ? filters.zone : undefined,
-    category: filters.type?.length ? filters.type[0] : undefined,
-    search: filters.search || undefined,
+    org_id: cleanFilters.org,
+    site_id: cleanFilters.site,
+    floor_id: cleanFilters.floor,
+    zone_id: cleanFilters.zone,
+    category: cleanFilters.type?.length ? cleanFilters.type[0] : undefined,
+    search: cleanFilters.search || undefined,
     page: page,
     page_size: 20,
   };
 
   return useQuery({
-    queryKey: ['inventory', params],
+    queryKey: ['inventory', cleanFilters, page],
     queryFn: async () => {
       const response = await inventoryService.getInventory(params);
       return {
@@ -28,7 +39,6 @@ export const useInventory = (filters = {}, page = 1) => {
         count: response.count || 0,
       };
     },
-    // We can set a shorter staleTime for inventory if it's highly dynamic
     staleTime: 30 * 1000, 
   });
 };

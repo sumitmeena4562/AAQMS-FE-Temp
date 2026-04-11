@@ -51,7 +51,7 @@ const FloorCard = ({ floor, site, onClick }) => {
           </h3>
         </div>
         {status === 'ACTIVE' && (
-          <span className="w-2 h-2 rounded-full bg-[#10B981] flex-shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.4)] absolute top-4 right-4"></span>
+          <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] flex-shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.4)] absolute top-4 left-4 z-20"></span>
         )}
 
         <p className="text-[11px] text-body font-medium mb-4 leading-relaxed line-clamp-1 opacity-80">
