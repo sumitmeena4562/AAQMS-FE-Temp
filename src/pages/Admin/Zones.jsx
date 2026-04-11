@@ -12,6 +12,7 @@ import { useFloors, useZones } from '../../hooks/api/useHierarchyQueries';
 import { FiHome, FiBriefcase, FiLoader, FiAlertCircle, FiX, FiMaximize, FiDownload } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import { Layout, Truck, Fuel, Monitor } from 'lucide-react';
+import useSearchStore from '../../store/useSearchStore';
 
 const MediaModal = ({ isOpen, onClose, zone }) => {
     if (!isOpen) return null;
@@ -68,9 +69,9 @@ const Zones = () => {
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
 
     const { 
-        selectedOrg, selectedCoord, selectedSite, selectedFloor, 
         setOrg, setCoord, setSite, setFloor, resetFilters 
     } = useFilterStore();
+    const { query: searchQuery, clearSearch } = useSearchStore();
     
     const { clearHierarchy } = useHierarchyStore();
     
@@ -127,17 +128,19 @@ const Zones = () => {
     if (selectedFloor) breadcrumbs.push({ label: currentFloor?.floor_name || "Floor Plan", path: `/admin/floor-plan?site_id=${selectedSite}&floor_id=${selectedFloor}` });
     breadcrumbs.push({ label: "Zones", path: "#", isActive: true });
 
-    const processedZones = zones.map(z => {
-        let Icon = Layout;
-        let bgClass = 'bg-blue-50';
-        let txtClass = 'text-blue-600';
-        if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
-        if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
-        if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
-        return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.count ?? 0}` };
-    });
+    const processedZones = zones
+        .filter(z => !searchQuery || z.name?.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+        .map(z => {
+            let Icon = Layout;
+            let bgClass = 'bg-blue-50';
+            let txtClass = 'text-blue-600';
+            if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
+            if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
+            if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
+            return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.count ?? 0}` };
+        });
 
-    const handleResetAll = () => { resetFilters(); setSearchParams({}); };
+    const handleResetAll = () => { resetFilters(); setSearchParams({}); clearSearch(); };
     const handleViewMedia = (zone) => { setSelectedMediaZone(zone); setIsMediaModalOpen(true); };
 
     return (

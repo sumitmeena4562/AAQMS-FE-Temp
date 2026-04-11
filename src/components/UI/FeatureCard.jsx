@@ -26,7 +26,7 @@ const FeatureCard = ({
             }}
             className={cn("h-full", className)}
         >
-            <Card className="h-full p-6 bg-surface border border-border/60 shadow-soft rounded-2xl transition-all hover:shadow-md hover:-translate-y-1 group">
+            <div className="h-full p-6 elite-card elite-card-hover group">
                 {/* Icon Box */}
                 <div className="w-12 h-12 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                     {Icon && <Icon className="text-2xl" aria-hidden="true" />}

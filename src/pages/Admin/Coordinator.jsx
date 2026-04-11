@@ -20,6 +20,7 @@ import UserAvatar from '../../components/UI/UserAvatar';
 import FilterBar from '../../components/UI/FilterBar';
 import { useUsers, useCoordinatorStats } from '../../hooks/api/useUserQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
+import useSearchStore from '../../store/useSearchStore';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 
@@ -35,10 +36,11 @@ const Coordinator = () => {
 
     // ── STORES (UI state only) ──
     const { 
-        search, filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
+        filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
         setPage, setFilters, toggleSelectRow, setSelectedIds, resetFilters,
         setLoading, setError
     } = useUserStore();
+    const { query: search } = useSearchStore();
 
     const { updateUser, createUser, bulkAction } = useUserStore();
 

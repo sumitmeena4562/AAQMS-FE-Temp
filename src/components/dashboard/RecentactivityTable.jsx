@@ -28,7 +28,7 @@ const columns = [
         render: (_, row) => (
             <div className="flex flex-col min-w-[120px]">
                 <span className="text-[13px] text-title font-bold leading-none">{row.user}</span>
-                <span className="text-[11px] text-gray font-medium mt-1 uppercase tracking-wider">{row.entity}</span>
+                <span className="text-[11px] text-slate-500 font-medium mt-1 uppercase tracking-wider">{row.entity}</span>
             </div>
         ),
     },
@@ -36,7 +36,7 @@ const columns = [
         header: 'Audit Details',
         accessor: 'details',
         render: (value) => (
-            <span className="text-[13px] text-body/80 font-medium min-w-[220px] max-w-[400px] break-words line-clamp-2">
+            <span className="text-[13px] text-body/90 font-medium min-w-[220px] max-w-[400px] break-words line-clamp-2">
                 {value}
             </span>
         ),
@@ -51,7 +51,7 @@ const columns = [
                     row.statusVariant === 'warning' ? 'bg-orange-500' :
                     row.statusVariant === 'success' ? 'bg-emerald-500' : 'bg-primary'
                 }`} />
-                <span className="text-[13px] text-gray font-bold tracking-tight">{value}</span>
+                <span className="text-[13px] text-slate-600 font-bold tracking-tight">{value}</span>
             </div>
         ),
     },

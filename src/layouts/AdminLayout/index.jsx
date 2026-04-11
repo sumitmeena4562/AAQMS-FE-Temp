@@ -10,11 +10,12 @@ import { BreadcrumbProvider } from "../../context/BreadcrumbContext";
 import { useBreadcrumb } from "../../hooks/useBreadcrumb";
 import { generateBreadcrumbs } from "../../utils/breadcrumbUtils.jsx";
 
+import SearchField from "../../components/Navbar/SearchField";
+
 import {
     FiBriefcase, FiUsers, FiAlertTriangle,
     FiSettings, FiMap, FiLayers, FiTarget,
-    FiBox, FiUser, FiHome, FiBarChart2,
-    FiSearch, FiX
+    FiBox, FiUser, FiHome, FiBarChart2
 } from 'react-icons/fi';
 import useUserStore from '../../store/userStore';
 
@@ -44,7 +45,6 @@ const AdminLayoutInner = () => {
     const location = useLocation();
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
     const [isCollapsed, setIsCollapsed] = React.useState(false);
-    const { search, setSearch } = useUserStore();
 
     React.useEffect(() => {
         // Let dynamic pages manage their own breadcrumbs
@@ -77,27 +77,7 @@ const AdminLayoutInner = () => {
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}
-                    leftContent={
-                        <div className="relative group hidden sm:block">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray group-focus-within:text-primary transition-colors pointer-events-none">
-                                <FiSearch size={16} />
-                            </span>
-                            <input
-                                className="pl-11 pr-10 py-2 bg-base/50 border border-border-main/50 rounded-[var(--radius-input)] text-sm font-bold text-body outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-card focus:border-transparent focus:shadow-card-hover w-[320px] focus:w-[420px]"
-                                placeholder="Search anything..."
-                                value={search}
-                                onChange={e => setSearch(e.target.value)}
-                            />
-                            {search && (
-                                <button
-                                    onClick={() => setSearch('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray hover:text-rose-500 transition-colors"
-                                >
-                                    <FiX size={14} />
-                                </button>
-                            )}
-                        </div>
-                    }
+                    leftContent={<SearchField />}
                     rightContent={
                         <div className="flex items-center gap-3">
                             <NotificationCenter />

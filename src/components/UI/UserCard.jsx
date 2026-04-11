@@ -14,8 +14,8 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
 
   return (
     <div 
-      className={`h-[360px] bg-card rounded-[var(--radius-card)] shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col border overflow-hidden group/card
-        ${isSelected ? 'border-primary ring-1 ring-primary/20 bg-primary/[0.01]' : 'border-border-main/60 hover:border-border-main'}
+      className={`h-[360px] elite-card elite-card-hover flex flex-col overflow-hidden group/card
+        ${isSelected ? '!border-primary ring-1 ring-primary/20 bg-primary/[0.01]' : ''}
       `}
       onClick={() => selectable ? onSelect?.(user.id) : onView?.(user)}
     >

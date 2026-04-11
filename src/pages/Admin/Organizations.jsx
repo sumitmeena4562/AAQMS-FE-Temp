@@ -14,6 +14,7 @@ import FilterBar from '../../components/UI/FilterBar';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 
 import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiShieldOff, FiEye } from 'react-icons/fi';
+import useSearchStore from '../../store/useSearchStore';
 
 /**
  * OrgLogo Component
@@ -49,6 +50,7 @@ const Organizations = () => {
         setFilters, setViewMode, resetFilters,
         isSubmitting
     } = useOrgStore();
+    const { query: searchQuery, clearSearch } = useSearchStore();
 
     // --- QUERY HOOK (NEW) ---
     // Note: We use the global filters directly in the query key for automatic refetching
@@ -80,9 +82,15 @@ const Organizations = () => {
         return enrichedOrgs.filter(org => {
             const matchesIndustry = filters.industry === 'all' || (org.industry || '') === filters.industry;
             const matchesStatus = filters.status === 'all' || (org.status || '') === filters.status;
-            return matchesIndustry && matchesStatus;
+            
+            const searchLower = searchQuery.toLowerCase().trim();
+            const matchesSearch = !searchLower || 
+                org.name?.toLowerCase().includes(searchLower) || 
+                org.industry?.toLowerCase().includes(searchLower);
+
+            return matchesIndustry && matchesStatus && matchesSearch;
         });
-    }, [enrichedOrgs, filters]);
+    }, [enrichedOrgs, filters, searchQuery]);
 
     const industryOptions = useMemo(() => {
         const uniqueIndustries = [...new Set(orgs.map(o => o.industry).filter(Boolean))];
@@ -310,6 +318,15 @@ const Organizations = () => {
                                 <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px] ml-1">
                                     {activeFiltersCount}
                                 </span>
+                            </button>
+                        )}
+                        {searchQuery && (
+                             <button
+                                onClick={clearSearch}
+                                className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 border border-transparent hover:border-rose-100"
+                            >
+                                <FiRefreshCcw size={12} />
+                                Clear Search
                             </button>
                         )}
                     </div>

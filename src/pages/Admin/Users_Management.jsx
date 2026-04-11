@@ -24,14 +24,16 @@ import CardSkeleton from '../../components/UI/CardSkeleton';
 import UserCard from '../../components/UI/UserCard';
 import { useUsers, useUserStats } from '../../hooks/api/useUserQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
+import useSearchStore from '../../store/useSearchStore';
 
 export default function Users() {
     // ── STORES (UI state only) ──
     const { 
-        search, filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
+        filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
         setPage, setFilters, toggleSelectRow, clearSelection, resetFilters,
         setSelectedIds, setLoading, setError // Keeping for mutations
     } = useUserStore();
+    const { query: search } = useSearchStore();
 
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 

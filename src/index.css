@@ -234,3 +234,22 @@ a {
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
 }
+
+/* ── Global Card Standard ── */
+.elite-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border-main);
+    border-radius: var(--radius-card);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.13);
+}
+
+.elite-card-hover {
+    cursor: pointer;
+}
+
+.elite-card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 50px -12px rgba(7, 34, 103, 0.18);
+    border-color: rgba(7, 34, 103, 0.3) !important;
+}

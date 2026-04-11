@@ -104,27 +104,37 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     )}
                 </button>
                 <CollapsibleSection isOpen={isOpen && !collapsed}>
-                    <div className="ml-8 pl-3 border-l-2 border-slate-300 mt-1 mb-2 flex flex-col gap-0.5 transition-all">
-                        {item.children.map(child => {
+                    <div className="ml-8 mt-1 mb-2 flex flex-col transition-all">
+                        {item.children.map((child, index) => {
                             const cAct = isActive(child.path);
+                            const isLast = index === item.children.length - 1;
+
                             return (
-                                <NavLink
-                                    key={child.path}
-                                    to={child.path}
-                                    className={`
-                                        flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
-                                        ${cAct 
-                                            ? 'bg-slate-200 text-slate-950 font-bold' 
-                                            : 'text-slate-600 hover:text-slate-950 font-medium'}
-                                    `}
-                                >
-                                    {child.icon && (
-                                        <span className={`flex items-center shrink-0 transition-colors ${cAct ? 'text-primary' : 'text-slate-400'}`}>
-                                            {child.icon}
-                                        </span>
-                                    )}
-                                    <span className="truncate tracking-tight">{child.label}</span>
-                                </NavLink>
+                                <div key={child.path} className="relative group/child pl-4 py-0.5">
+                                    {/* ── Tree Branches ── */}
+                                    <div className={`absolute left-0 top-0 w-[1.5px] bg-slate-200 transition-colors group-hover/child:bg-slate-300 ${isLast ? 'h-[50%]' : 'h-full'}`} />
+                                    <div className="absolute left-0 top-[50%] w-3 h-[1.5px] bg-slate-200 transition-colors group-hover/child:bg-slate-300" />
+                                    
+                                    {/* ── Active Indicator ── */}
+                                    {cAct && <div className="absolute left-[-2px] top-[50%] -translate-y-1/2 w-[5px] h-[5px] rounded-full bg-primary shadow-[0_0_8px_rgba(7,34,103,0.3)] z-10" />}
+
+                                    <NavLink
+                                        to={child.path}
+                                        className={`
+                                            flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
+                                            ${cAct 
+                                                ? 'bg-primary/5 text-primary font-bold border border-primary/10' 
+                                                : 'text-slate-600 hover:text-slate-950 font-medium'}
+                                        `}
+                                    >
+                                        {child.icon && (
+                                            <span className={`flex items-center shrink-0 transition-colors ${cAct ? 'text-primary' : 'text-slate-400 group-hover/child:text-slate-600'}`}>
+                                                {child.icon}
+                                            </span>
+                                        )}
+                                        <span className="truncate tracking-tight">{child.label}</span>
+                                    </NavLink>
+                                </div>
                             );
                         })}
                     </div>

@@ -20,9 +20,8 @@ const AssetCard = ({ asset, onClick }) => {
             layout
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -5, transition: { duration: 0.2, ease: "easeOut" } }}
             onClick={() => onClick(asset)}
-            className="group relative bg-card border border-border-main rounded-[var(--radius-card)] p-6 shadow-card hover:shadow-card-hover transition-all cursor-pointer overflow-hidden flex flex-col min-h-[170px]"
+            className="group relative elite-card elite-card-hover p-6 cursor-pointer overflow-hidden flex flex-col min-h-[170px]"
         >
             {/* Subtle Gradient Accent */}
             <div className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 rounded-full opacity-[0.04] group-hover:opacity-[0.08] transition-all group-hover:scale-150 ${

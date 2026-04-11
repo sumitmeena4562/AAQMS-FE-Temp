@@ -66,14 +66,14 @@ const ImageUploadCard = ({ label, value, onUpload, error, onBlur, disabled }) =>
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
-          whileHover={!disabled ? { scale: 1.02 } : {}}
+          whileHover={!disabled ? { scale: 1.01 } : {}}
           whileTap={!disabled ? { scale: 0.98 } : {}}
-          className={`w-full h-full rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all duration-300 relative overflow-hidden shadow-sm hover:shadow-md cursor-pointer ${
+          className={`w-full h-full elite-card elite-card-hover border-2 border-dashed flex flex-col items-center justify-center gap-2 relative overflow-hidden ${
             error 
-              ? 'border-red-500 bg-red-50/10' 
+              ? '!border-red-500 bg-red-50/10' 
               : isDragging 
-                ? 'border-primary bg-primary/10 ring-4 ring-primary/10' 
-                : 'border-gray/40 bg-slate-50/50 hover:bg-white hover:border-primary/40'
+                ? '!border-primary bg-primary/10 ring-4 ring-primary/10' 
+                : '!border-gray/40 bg-slate-50/50 hover:!bg-white hover:!border-primary/20'
           }`}
         >
           <AnimatePresence mode="wait">

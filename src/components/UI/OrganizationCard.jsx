@@ -62,7 +62,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
   return (
     <div
-      className={`h-[360px] bg-card rounded-[var(--radius-card)] shadow-card hover:shadow-card-hover transition-all duration-300 flex flex-col border border-border-main overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
+      className={`h-[360px] elite-card elite-card-hover flex flex-col overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
       onClick={handleCardClick}
     >
 

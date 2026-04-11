@@ -13,7 +13,7 @@ const CoordinatorCard = ({ coordinator, orgName, view = 'list' }) => {
 
   if (view === 'grid') {
     return (
-      <div className="w-full bg-card rounded-[var(--radius-card)] border border-border-main shadow-card hover:border-blue-600 hover:shadow-card-hover transition-all duration-300 flex flex-col group overflow-hidden relative p-6 cursor-pointer" onClick={handleNavigate}>
+      <div className="w-full elite-card elite-card-hover flex flex-col group overflow-hidden relative p-6 cursor-pointer" onClick={handleNavigate}>
 
         {/* Top: Avatar & Status (Center) */}
         <div className="flex flex-col items-center mb-6">
@@ -78,7 +78,7 @@ const CoordinatorCard = ({ coordinator, orgName, view = 'list' }) => {
 
   // --- DEFAULT LIST VIEW (Horizontal Compact Table) ---
   return (
-    <div className="flex flex-col xl:flex-row xl:items-center justify-between py-4 px-8 bg-card border border-border-main rounded-[var(--radius-card)] shadow-[0_2px_10px_rgba(7,34,103,0.02)] hover:shadow-card-hover transition-all duration-300 gap-6">
+    <div className="flex flex-col xl:flex-row xl:items-center justify-between py-4 px-8 elite-card elite-card-hover gap-6">
 
       {/* 1. Avatar + Name Column */}
       <div className="flex items-center gap-4 min-w-[200px] shrink-0">

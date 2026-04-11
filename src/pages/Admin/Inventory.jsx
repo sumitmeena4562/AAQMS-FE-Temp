@@ -26,6 +26,7 @@ import { useInventory } from '../../hooks/api/useInventoryQueries';
 import AssetInventoryModal from '../../components/Admin/Inventory/AssetInventoryModal';
 import EmptyState from '../../components/Admin/Inventory/EmptyState';
 import AssetCard from '../../components/Admin/Inventory/AssetCard';
+import useSearchStore from '../../store/useSearchStore';
 import useDebounce from '../../hooks/useDebounce';
 
 export const AssetIcon = ({ type, className = "" }) => {
@@ -62,7 +63,7 @@ const Inventory = () => {
     // ── LOCAL STATE ──
     const [selectedAsset, setSelectedAsset] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+    const { query: searchQuery, clearSearch } = useSearchStore();
     const [viewMode, setViewMode] = useState('list');
     // Server-side pagination — page number drives the API call
     const [currentPage, setCurrentPage] = useState(1);
@@ -135,7 +136,7 @@ const Inventory = () => {
     const handleReset = () => {
         resetFilters();
         setSearchParams({});
-        setSearchQuery('');
+        clearSearch();
     };
 
     const handleAssetClick = (asset) => {
@@ -266,15 +267,7 @@ const Inventory = () => {
                         </div>
                     </div>
 
-                    <div className="relative group">
-                         <input 
-                            type="text" 
-                            placeholder="SEARCH UNIQUE ID..." 
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="bg-base border border-border-main/60 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest focus:ring-2 focus:ring-primary/10 transition-all w-[240px]"
-                         />
-                    </div>
+                    {/* Global search is now handled in the Navbar */}
                 </FilterBar>
 
                 {viewMode === 'list' ? (

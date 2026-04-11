@@ -14,7 +14,7 @@ const FloorCard = ({ floor, site, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="w-full h-[360px] bg-card rounded-[var(--radius-card)] border border-border-main shadow-card hover:border-blue-600 hover:shadow-card-hover transition-all duration-300 flex flex-col group overflow-hidden cursor-pointer relative"
+      className="w-full h-[360px] elite-card elite-card-hover flex flex-col group overflow-hidden cursor-pointer relative"
     >
 
       {/* Visual Image Area (Blue Line Art Style Placeholder) */}

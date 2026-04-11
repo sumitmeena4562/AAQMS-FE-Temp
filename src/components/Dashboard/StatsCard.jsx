@@ -43,11 +43,11 @@ const StatsCard = ({
     const finalChange = change || autoChange;
 
     return (
-        <div className={`bg-card px-6 py-5 rounded-[var(--radius-card)] w-full border border-border-main/80 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 cursor-default group relative overflow-hidden ${className}`}>
+        <div className={`elite-card elite-card-hover px-6 py-5 group relative overflow-hidden ${className}`}>
             
             <div className="flex items-start justify-between gap-4 relative z-10">
                 <div className="flex flex-col min-w-0 flex-1">
-                    <p className="text-[10px] font-bold tracking-widest text-gray uppercase mb-1 truncate">
+                    <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mb-1 truncate">
                         {displayTitle}
                     </p>
                     <h2 className="text-2xl font-black text-title leading-none mt-1 tracking-tight truncate">
@@ -78,13 +78,13 @@ const StatsCard = ({
                         </span>
                     )}
                     {description && (
-                        <span className="text-[11px] font-medium text-gray truncate flex-1 text-right italic">
+                        <span className="text-[11px] font-medium text-slate-500 truncate flex-1 text-right italic">
                             {description}
                         </span>
                     )}
                 </div>
                 {secondaryLabel && (
-                    <div className="text-[10px] font-medium text-gray/60 mt-1 uppercase tracking-wider">
+                    <div className="text-[10px] font-medium text-slate-600 mt-1 uppercase tracking-wider">
                         {secondaryLabel}
                     </div>
                 )}

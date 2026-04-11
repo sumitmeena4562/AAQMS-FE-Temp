@@ -33,7 +33,7 @@ const PageHeader = ({
               {title}
             </h1>
             {subtitle && (
-              <div className="text-[11px] sm:text-[12px] font-bold text-gray uppercase tracking-widest leading-none opacity-80">
+              <div className="text-[11px] sm:text-[12px] font-bold text-gray/90 uppercase tracking-widest leading-none">
                 {subtitle}
               </div>
             )}
@@ -94,4 +94,4 @@ const PageHeader = ({
   );
 };
 
-export default PageHeader;
+export default PageHeader;

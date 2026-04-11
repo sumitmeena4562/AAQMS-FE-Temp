@@ -28,11 +28,11 @@ const MatricCard = ({
 
     return (
         <div
-            className="bg-card border border-border-main/80 rounded-[var(--radius-card)] !py-[21px] !px-[24px] flex flex-col gap-3 min-h-[148px] h-auto shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 cursor-default group relative overflow-hidden"
+            className={`elite-card elite-card-hover !py-[21px] !px-[24px] flex flex-col gap-3 min-h-[148px] h-auto group relative overflow-hidden`}
         >
             <div className="flex items-start justify-between gap-3 relative z-10">
                 <div className="min-w-0">
-                    <p className="text-[11px] font-bold tracking-wider text-gray uppercase mb-1">
+                    <p className="text-[11px] font-bold tracking-wider text-slate-500 uppercase mb-1">
                         {title}
                     </p>
                     <div className="text-2xl font-black text-title leading-none">
@@ -47,7 +47,7 @@ const MatricCard = ({
             <div className="h-[1.5px] w-full bg-border-main/20 my-1" />
 
             {secondaryLabel && (
-                <div className="text-[10px] font-bold text-gray/40 uppercase tracking-widest -mt-1 mb-1 px-1">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest -mt-1 mb-1 px-1">
                     {secondaryLabel}
                 </div>
             )}
