@@ -12,7 +12,7 @@ const CTA = () => {
         <SectionWrapper 
             id="contact" 
             backgroundProps={{ showScanner: false, gridOpacity: 0.1 }}
-            className="py-12 sm:py-24 border-t border-border/40"
+            className="pt-12 pb-6 sm:pt-24 sm:pb-8 border-t border-border/40"
         >
             <div className="max-w-4xl mx-auto relative z-10">
                 <div 

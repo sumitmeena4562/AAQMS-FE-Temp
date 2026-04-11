@@ -32,7 +32,7 @@ const SocialIcon = ({ icon: Icon, href, label }) => (
 
 const Footer = () => {
     return (
-        <footer className="bg-slate-50/50 py-16 sm:py-20 px-6 border-t border-slate-100 relative z-10 overflow-hidden" aria-labelledby="footer-heading">
+        <footer className="bg-slate-50/50 pt-16 sm:pt-20 pb-2 px-6 border-t border-slate-100 relative z-10 overflow-hidden" aria-labelledby="footer-heading">
             <h2 id="footer-heading" className="sr-only">Footer</h2>
             
             {/* Premium Background Glow */}
@@ -44,7 +44,7 @@ const Footer = () => {
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
 
             <div className="max-w-7xl mx-auto">
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 mb-16">
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 mb-8">
 
                     {/* Brand Info */}
                     <div className="col-span-2 lg:col-span-1 flex flex-col items-start">
@@ -112,7 +112,7 @@ const Footer = () => {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-8 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div className="pt-5 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-6">
                     <div className="text-[12px] text-slate-400 font-semibold tracking-tight">
                         {COPYRIGHT_TEXT}
                     </div>

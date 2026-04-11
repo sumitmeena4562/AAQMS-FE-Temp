@@ -86,8 +86,8 @@ const BlueprintBackground = ({
                             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                             className="absolute inset-0 rounded-full z-10"
                         >
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-secondary shadow-[0_0_20px_#3b82f6,0_0_40px_rgba(59,130,246,0.6)]">
-                                <div className="absolute inset-0 rounded-full animate-ping bg-secondary opacity-50" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_10px_#3b82f6,0_0_20px_rgba(59,130,246,0.4)]">
+                                <div className="absolute inset-0 rounded-full animate-ping bg-secondary opacity-40" />
                             </div>
                         </motion.div>
                     )}

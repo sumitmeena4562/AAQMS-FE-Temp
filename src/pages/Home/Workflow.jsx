@@ -10,11 +10,11 @@ const LineSegment = ({ scrollYProgress, index, stepsTotal }) => {
     const segmentSize = 1 / stepsTotal;
     const start = index * segmentSize;
     const end = (index + 1) * segmentSize;
-    
+
     // Scale the line growth within this row's scroll window
     // Added a small buffer to ensure segments overlap perfectly
     const scaleY = useTransform(scrollYProgress, [start, end], [0, 1.05]);
-    
+
     const isFirst = index === 0;
     const isLast = index === stepsTotal - 1;
 
@@ -22,11 +22,11 @@ const LineSegment = ({ scrollYProgress, index, stepsTotal }) => {
         <div className="absolute inset-x-0 top-0 bottom-0 flex justify-center z-0 pointer-events-none">
             {/* Background Track Segment */}
             <div className={`w-[2px] bg-border/20 ${isFirst ? 'top-1/2' : 'top-0'} ${isLast ? 'bottom-1/2' : 'bottom-0'} absolute`} />
-            
+
             {/* Animated Active Segment */}
-            <motion.div 
-                style={{ 
-                    scaleY, 
+            <motion.div
+                style={{
+                    scaleY,
                     originY: 0,
                     top: isFirst ? '50%' : '0%',
                     bottom: isLast ? '50%' : '0%',
@@ -53,11 +53,11 @@ const MilestoneNode = ({ scrollYProgress, index, stepsTotal }) => {
                 className="relative flex items-center justify-center"
             >
                 <div className="w-[18px] h-[18px] rounded-full bg-surface border-2 border-border flex items-center justify-center shadow-soft relative z-10" />
-                <motion.div 
+                <motion.div
                     style={{ opacity }}
                     className="absolute inset-[-3px] rounded-full bg-primary/10 blur-[2px] z-0"
                 />
-                <motion.div 
+                <motion.div
                     style={{ backgroundColor: dotColor }}
                     className="absolute w-2 h-2 rounded-full z-20"
                 />
@@ -105,9 +105,18 @@ const WorkflowCard = ({ number, title, description, icon: Icon, index }) => {
 const Workflow = () => {
     const { badge, title, description, steps } = WORKFLOW_DATA;
     const containerRef = useRef(null);
+    const stepsRef = useRef(null); // Ref for the actual steps container
+    
+    // Target the steps block for precise scroll tracking
     const { scrollYProgress } = useScroll({
-        target: containerRef,
+        target: stepsRef,
         offset: ["start center", "end center"]
+    });
+
+    const springProgress = useSpring(scrollYProgress, { 
+        stiffness: 100, 
+        damping: 30, 
+        restDelta: 0.001 
     });
 
     return (
@@ -119,7 +128,7 @@ const Workflow = () => {
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader badge={badge} title={title} description={description} />
 
-                <div className="max-w-5xl mx-auto relative mt-20 sm:mt-24">
+                <div ref={stepsRef} className="max-w-5xl mx-auto relative mt-20 sm:mt-24">
                     <div className="relative z-10 flex flex-col">
                         {steps.map((step, index) => {
                             const isEven = index % 2 === 0;
@@ -128,7 +137,7 @@ const Workflow = () => {
                                     {/* Line Segment Logic (Segmented Continuity) */}
                                     <div className="absolute inset-0 flex lg:justify-center left-[24px] lg:left-0 z-0">
                                         <LineSegment 
-                                            scrollYProgress={scrollYProgress} 
+                                            scrollYProgress={springProgress} 
                                             index={index} 
                                             stepsTotal={steps.length} 
                                         />
@@ -142,7 +151,7 @@ const Workflow = () => {
                                     {/* Column 2: Milestone Dot */}
                                     <div className="flex justify-center z-10">
                                         <MilestoneNode 
-                                            scrollYProgress={scrollYProgress}
+                                            scrollYProgress={springProgress}
                                             index={index}
                                             stepsTotal={steps.length}
                                         />
