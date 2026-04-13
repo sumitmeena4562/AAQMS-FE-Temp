@@ -45,13 +45,6 @@ const FilterBar = ({
         // but coordinators list now comes from Query
     } = useUserStore();
 
-    // ─── QUERY HOOKS (UNIFIED) ───
-    const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading: isHierarchyLoading } = useHierarchy();
-    const { data: floorData } = useFloors(selectedSite);
-    const allFloors = floorData?.results || [];
-
-    // Initial Load / Cascading Sync: Handled by React Query dependencies above
-
     // Safely strip singular/plural mapping for consistent tiering
     const normalizedLevel = activeLevel?.replace(/s$/, '') || ''; 
 
@@ -60,6 +53,16 @@ const FilterBar = ({
     const renderCoord = ['site', 'floor', 'zone'].includes(normalizedLevel);
     const renderSite = ['floor', 'zone'].includes(normalizedLevel);
     const renderFloor = ['zone'].includes(normalizedLevel);
+
+    // ─── QUERY HOOKS (UNIFIED) ───
+    const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading: isHierarchyLoading } = useHierarchy({
+        includeOrgs: true, // Always fetch orgs for breadcrumbs/reference
+        includeCoords: renderCoord,
+        includeSites: renderSite || renderFloor
+    });
+
+    const { data: floorData } = useFloors(selectedSite, { enabled: renderFloor });
+    const allFloors = floorData?.results || [];
 
     // Dynamic Relational Options mapping (using Real IDs)
     const orgOptions = orgs.map(o => ({ value: o.id, label: o.name }));

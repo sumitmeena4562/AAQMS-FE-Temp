@@ -47,7 +47,7 @@ export default function AllHistory() {
     });
 
     // ── 2. QUERY HOOKS (Declarative Cascades) ──
-    const { organizations: orgs } = useHierarchy();
+    const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
     const { data: siteData } = useSites({ organisation: filters.organisation });
     const allSites = siteData?.results || [];
     const { data: floorData } = useFloors(filters.site);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
@@ -77,7 +77,7 @@ const Zones = () => {
     
     const { clearHierarchy } = useHierarchyStore();
       // --- QUERY HOOKS (UNIFIED) ---
-    const { organizations: orgs, sites: allSites } = useHierarchy();
+    const { organizations: orgs, sites: allSites } = useHierarchy({ includeCoords: false });
     const { data: floorData } = useFloors(selectedSite);
     const allFloors = floorData?.results || [];
     const { data: zoneData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useZones(selectedFloor.length > 0 ? selectedFloor : undefined, {
@@ -141,17 +141,19 @@ const Zones = () => {
     if (floorLabel) breadcrumbs.push({ label: floorLabel || "Floor Plan", path: `/admin/site-plan?site_id=${selectedSite.join(',')}&floor_id=${selectedFloor.join(',')}` });
     breadcrumbs.push({ label: "Zones", path: "#", isActive: true });
 
-    const processedZones = zones
-        .filter(z => !searchQuery || z.name?.toLowerCase().includes(searchQuery.toLowerCase().trim()))
-        .map(z => {
-            let Icon = Layout;
-            let bgClass = 'bg-blue-50';
-            let txtClass = 'text-blue-600';
-            if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
-            if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
-            if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
-            return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.inventory_count ?? 0}` };
-        });
+    const processedZones = useMemo(() => {
+        return zones
+            .filter(z => !searchQuery || z.name?.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+            .map(z => {
+                let Icon = Layout;
+                let bgClass = 'bg-blue-50';
+                let txtClass = 'text-blue-600';
+                if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
+                if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
+                if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
+                return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.inventory_count ?? 0}` };
+            });
+    }, [zones, searchQuery]);
 
     useEffect(() => {
         setCurrentPage(1);
@@ -159,6 +161,9 @@ const Zones = () => {
 
     const totalPages = Math.ceil(totalZonesCount / 10);
     const paginatedZones = processedZones;
+
+    const handlePreviousPage = () => setCurrentPage(p => p - 1);
+    const handleNextPage = () => setCurrentPage(p => p + 1);
 
     const handleResetAll = () => { resetFilters(); setSearchParams({}); clearSearch(); };
     const handleViewMedia = (zone) => { setSelectedMediaZone(zone); setIsMediaModalOpen(true); };
@@ -206,8 +211,8 @@ const Zones = () => {
                                         Page {currentPage} of {Math.ceil(totalZonesCount / 10)} &nbsp;·&nbsp; {totalZonesCount} Zones Total
                                     </span>
                                     <div className="flex items-center gap-2">
-                                        <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
-                                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage * 10 >= totalZonesCount} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
+                                        <Button variant="outline" onClick={handlePreviousPage} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
+                                        <Button variant="outline" onClick={handleNextPage} disabled={currentPage * 10 >= totalZonesCount} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
                                     </div>
                                 </div>
                             )}

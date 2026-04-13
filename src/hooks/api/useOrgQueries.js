@@ -66,7 +66,7 @@ export const mapOrgToFrontend = (data) => {
  * ── ORGANIZATION QUERIES ──
  */
 
-export const useOrganizations = (filters = {}, search = '') => {
+export const useOrganizations = (filters = {}, search = '', options = {}) => {
   // Normalize filters to ensure stable Query Keys
   const cleanFilters = Object.fromEntries(
     Object.entries(filters).filter(([_, v]) => 
@@ -86,10 +86,11 @@ export const useOrganizations = (filters = {}, search = '') => {
       return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
     },
     staleTime: 5 * 60 * 1000, 
+    ...options
   });
 };
 
-export const useOrganizationDetails = (id) => {
+export const useOrganizationDetails = (id, options = {}) => {
   return useQuery({
     queryKey: ['organization', id],
     queryFn: async () => {
@@ -98,5 +99,6 @@ export const useOrganizationDetails = (id) => {
     },
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
+    ...options
   });
 };

@@ -18,7 +18,7 @@ const AssignedCoordinators = () => {
   const { selectedOrg, setOrg } = useFilterStore();
   
   // --- QUERY HOOKS (UNIFIED) ---
-  const { organizations: orgs, coordinators: coordinatorsListRaw, isLoading } = useHierarchy();
+  const { organizations: orgs, coordinators: coordinatorsListRaw, isLoading } = useHierarchy({ includeSites: false });
 
   const passedOrgName = location.state?.org?.name || new URLSearchParams(location.search).get('org');
   const orgInfo = selectedOrg.length === 1 ? orgs.find(o => String(o.id) === String(selectedOrg[0])) : null;

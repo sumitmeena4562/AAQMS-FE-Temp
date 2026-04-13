@@ -30,7 +30,7 @@ const SitePlan = () => {
   const activeCoordId = selectedCoord.length > 0 ? selectedCoord : (passedCoordId ? [passedCoordId] : []);
 
   // --- QUERY HOOKS ---
-  const { organizations: orgs } = useHierarchy();
+  const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
   const { data: siteData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useSites({ 
       organisation: activeOrgId, 
       coord_id: activeCoordId 

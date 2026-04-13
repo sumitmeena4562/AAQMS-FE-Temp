@@ -73,7 +73,7 @@ const Coordinator = () => {
     const { data: stats = { total: 0, active: 0, inactive: 0, unassigned: 0 } } = useCoordinatorStats(filters.organization);
     
     // ── HIERARCHY DATA (UNIFIED) ──
-    const { organizations } = useHierarchy();
+    const { organizations } = useHierarchy({ includeSites: false, includeCoords: false });
     
     // Roles are static for the product
     const filterOptions = {

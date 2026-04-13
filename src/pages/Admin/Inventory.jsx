@@ -56,7 +56,7 @@ const Inventory = () => {
     } = useFilterStore();
 
     // ── QUERY HOOKS (UNIFIED) ──
-    const { organizations: orgs, sites: allSites } = useHierarchy();
+    const { organizations: orgs, sites: allSites } = useHierarchy({ includeCoords: false });
     const { data: floorData } = useFloors(selectedSite);
     const allFloors = floorData?.results || [];
     const { data: allZones = [] } = useZones(selectedFloor);

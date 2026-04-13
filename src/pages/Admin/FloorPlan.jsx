@@ -34,7 +34,7 @@ const FloorPlan = () => {
   const activeCoordId = selectedCoord.length > 0 ? selectedCoord : (searchParams.get('coord_id') ? [searchParams.get('coord_id')] : []);
 
   // --- QUERY HOOKS (UNIFIED) ---
-  const { organizations: orgs } = useHierarchy();
+  const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
   const { data: floorData = { results: [], total: 0 }, isLoading, error: hierarchyError } = useFloors(activeSiteId);
 
   const floorList = floorData.results || [];

@@ -8,21 +8,32 @@ import { useFilterStore } from '../../store/useFilterStore';
  * This hook acts as a single point of truth for Organizations, Sites, and Coordinators.
  * It ensures that these entities are fetched with consistent query keys across the entire app,
  * preventing redundant API calls seen in the network tab.
+ * 
+ * @param {Object} options - { includeOrgs, includeSites, includeCoords }
  */
-export const useHierarchy = () => {
-    const { selectedOrg, selectedCoord, selectedSite } = useFilterStore();
+export const useHierarchy = (options = {}) => {
+    const { 
+        includeOrgs = true, 
+        includeSites = true, 
+        includeCoords = true 
+    } = options;
 
-    // 1. Organizations (Top level - always fetched once and cached)
-    const orgsQuery = useOrganizations();
+    const { selectedOrg } = useFilterStore();
+
+    // 1. Organizations (Top level)
+    const orgsQuery = useOrganizations({}, '', { enabled: includeOrgs });
 
     // 2. Coordinators (Cascading: only if org is selected)
-    // Support for array of org IDs
-    const coordsQuery = useCoordinators(selectedOrg.length > 0 ? selectedOrg : undefined);
+    const coordsQuery = useCoordinators(
+        selectedOrg.length > 0 ? selectedOrg : undefined, 
+        { enabled: includeCoords }
+    );
 
     // 3. Sites (Cascading: only if org is selected)
-    const sitesQuery = useSites({ 
-        organisation: selectedOrg.length > 0 ? selectedOrg : undefined 
-    });
+    const sitesQuery = useSites(
+        { organisation: selectedOrg.length > 0 ? selectedOrg : undefined },
+        { enabled: includeSites }
+    );
 
     return {
         // Data
@@ -31,8 +42,13 @@ export const useHierarchy = () => {
         sites: sitesQuery.data?.results || [],
         
         // Loading States
-        isLoading: orgsQuery.isLoading || coordsQuery.isLoading || sitesQuery.isLoading,
-        isFetching: orgsQuery.isFetching || coordsQuery.isFetching || sitesQuery.isFetching,
+        isLoading: (includeOrgs && orgsQuery.isLoading) || 
+                   (includeCoords && coordsQuery.isLoading) || 
+                   (includeSites && sitesQuery.isLoading),
+                   
+        isFetching: (includeOrgs && orgsQuery.isFetching) || 
+                    (includeCoords && coordsQuery.isFetching) || 
+                    (includeSites && sitesQuery.isFetching),
         
         // Error States
         error: orgsQuery.error || coordsQuery.error || sitesQuery.error,

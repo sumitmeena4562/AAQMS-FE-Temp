@@ -79,7 +79,7 @@ export default function Users() {
     const { data: stats = { total: 0, active: 0, inactive: 0, unassigned: 0 } } = useUserStats();
     
     // ── HIERARCHY DATA (UNIFIED) ──
-    const { organizations, sites } = useHierarchy();
+    const { organizations, sites } = useHierarchy({ includeCoords: false });
     
     // Roles are static for the product
     const STATIC_ROLES = [

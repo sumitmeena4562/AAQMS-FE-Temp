@@ -5,11 +5,12 @@ import { userService } from '../../services/userService';
  * ── USER & COORDINATOR QUERIES ──
  */
 
-export const useCoordinators = (orgId = null) => {
+export const useCoordinators = (orgId = null, options = {}) => {
   return useQuery({
     queryKey: ['coordinators', orgId],
     queryFn: () => userService.getCoordinators(orgId),
     staleTime: 5 * 60 * 1000,
+    ...options
   });
 };
 
