@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, Link } from 'react-router-dom';
 
 import { 
@@ -22,14 +20,7 @@ const STEPS = {
     SUCCESS: 'SUCCESS'
 };
 
-const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { 
-        opacity: 1, 
-        y: 0,
-        transition: { duration: 0.5, ease: [0.21, 1, 0.36, 1] }
-    }
-};
+
 
 import useAuthStore from '../../store/authStore';
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,7 +10,6 @@ import {
 import Button from '../UI/Button';
 import InputField from '../UI/InputField';
 import SelectField from '../UI/SelectField';
-import { useOrgStore } from '../../store/useOrgStore';
 import { organizationService } from '../../services/organizationService';
 import { userService } from '../../services/userService';
 
@@ -64,7 +63,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const [isLoadingOrgs, setIsLoadingOrgs] = useState(false);
     const [isLoadingSites, setIsLoadingSites] = useState(false);
     const [isLoadingCoordinators, setIsLoadingCoordinators] = useState(false);
-    const [hasNewImage, setHasNewImage] = useState(false);
+
 
     // Fetch initial organizations
     useEffect(() => {
@@ -82,8 +81,25 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         if (isOpen) fetchOrgs();
     }, [isOpen]);
 
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        reset,
+        formState: { errors }
+    } = useForm({
+        resolver: zodResolver(userSchema),
+        defaultValues: {
+            name: '', email: '', organisation_id: '', role: '', 
+            assignment: 'standby', status: 'active',
+            region: '', zone: '', coordinator_id: '',
+            mobile_number: ''
+        }
+    });
+
     // Helper to fetch data (Sites or Zones) based on role
-    const fetchAssignmentDataForOrg = async (orgId) => {
+    const fetchAssignmentDataForOrg = useCallback(async (orgId) => {
         setIsLoadingSites(true);
         setIsLoadingCoordinators(true);
         try {
@@ -104,24 +120,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             setIsLoadingSites(false);
             setIsLoadingCoordinators(false);
         }
-    };
-
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        watch,
-        reset,
-        formState: { errors }
-    } = useForm({
-        resolver: zodResolver(userSchema),
-        defaultValues: {
-            name: '', email: '', organisation_id: '', role: '', 
-            assignment: 'standby', status: 'active',
-            region: '', zone: '', coordinator_id: '',
-            mobile_number: ''
-        }
-    });
+    }, [watch]);
 
     const currentRole = watch('role');
     const currentStatus = watch('status');
@@ -161,7 +160,6 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             });
             
             setImagePreview(avatarVal || null);
-            setHasNewImage(false);
             setShowWorkAssignment(!!orgId);
             if (orgId) fetchAssignmentDataForOrg(orgId);
             setStep(1);
@@ -175,11 +173,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             });
             setShowWorkAssignment(false);
             setImagePreview(null);
-            setHasNewImage(false);
             setStep(0);
         }
         setSubmitError('');
-    }, [user, isOpen, reset]);
+    }, [user, isOpen, reset, fetchAssignmentDataForOrg]);
 
     // Re-fetch assignment data if role changes during edit mode
     useEffect(() => {
@@ -187,7 +184,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         if (isOpen && orgId && currentRole) {
             fetchAssignmentDataForOrg(orgId);
         }
-    }, [currentRole, isOpen]); // OrgId change is already handled by onChange
+    }, [currentRole, isOpen, watch, fetchAssignmentDataForOrg]);
 
     const onFormSubmit = async (data) => {
         setSubmitError('');
@@ -235,7 +232,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             reader.onloadend = () => {
                 setImagePreview(reader.result);
                 setValue('avatar', reader.result); 
-                setHasNewImage(true);
+
             };
             reader.readAsDataURL(file);
         }
@@ -246,12 +243,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         setStep(1);
     };
 
-    const inputClasses = (hasError) => `
-        w-full px-4 py-2.5 text-[13px] font-medium rounded-[var(--radius-input)] border outline-none transition-all duration-200
-        ${hasError 
-            ? 'bg-rose-50/50 border-rose-200 text-rose-900 focus:border-rose-400' 
-            : 'bg-card border-border-main text-body focus:border-primary/50 focus:ring-2 focus:ring-primary/5'}
-    `;
+
 
     return (
         <AnimatePresence>

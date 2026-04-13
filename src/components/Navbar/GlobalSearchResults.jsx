@@ -23,7 +23,7 @@ const SYSTEM_PAGES = [
     { name: 'Settings', path: '/admin/settings', icon: FiSettings, category: 'navigation' },
 ];
 
-const ResultSection = ({ title, icon: Icon, items, onSelect, type, query }) => {
+const ResultSection = ({ title, icon: Icon, items, onSelect, type }) => {
     if (!items || items.length === 0) return null;
 
     return (

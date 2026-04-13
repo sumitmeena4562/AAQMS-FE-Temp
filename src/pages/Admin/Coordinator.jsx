@@ -37,8 +37,7 @@ const Coordinator = () => {
     // ── STORES (UI state only) ──
     const { 
         filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
-        setPage, setFilters, toggleSelectRow, setSelectedIds, resetFilters,
-        setLoading, setError
+        setPage, setFilters, setSelectedIds, resetFilters
     } = useUserStore();
     const { query: search } = useSearchStore();
 
@@ -70,7 +69,7 @@ const Coordinator = () => {
     // Role-locked Users Query
     const queryFilters = { ...filters, role: 'coordinator' };
     const { data: usersData, isLoading: isUsersLoading } = useUsers(queryFilters, debouncedSearch, page);
-    const { data: stats = { total: 0, active: 0, inactive: 0, unassigned: 0 } } = useCoordinatorStats(filters.organization);
+    useCoordinatorStats(filters.organization);
     
     // ── HIERARCHY DATA (UNIFIED) ──
     const { organizations } = useHierarchy({ includeSites: false, includeCoords: false });
@@ -81,7 +80,7 @@ const Coordinator = () => {
         roles: [{ value: 'coordinator', label: 'Coordinator' }]
     };
 
-    const users = usersData?.users || [];
+
     const totalCount = usersData?.totalCount || 0;
 
     // ── Modal & UI state ──
@@ -92,18 +91,19 @@ const Coordinator = () => {
     const [statusTarget, setStatusTarget] = useState(null);
     const [bulkStatusOpen, setBulkStatusOpen] = useState(false);
     const [selectionMode, setSelectionMode] = useState(false);
-    const [viewMode, setViewMode] = useState('list');
+    const [viewMode] = useState('list');
 
 
 
     const sortedUsers = useMemo(() => {
+        const users = usersData?.users || [];
         if (!Array.isArray(users)) return [];
         return [...users].sort((a, b) => {
             const av = (a[sortKey] || '').toString().toLowerCase();
             const bv = (b[sortKey] || '').toString().toLowerCase();
             return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
         });
-    }, [users, sortKey, sortDir]);
+    }, [usersData, sortKey, sortDir]);
 
     // ── Handlers ──
     const handleAddUser = () => {
@@ -242,12 +242,7 @@ const Coordinator = () => {
         }
     ], [handleEditUser, navigate]);
 
-    const statsData = [
-        { title: 'Total Coordinators', value: stats.total || 0, icon: FiUsers, iconColorClass: 'text-primary', iconBgClass: 'bg-primary/10', description: 'Assigned personnel' },
-        { title: 'Active Units', value: stats.active || 0, icon: FiCheckCircle, iconColorClass: 'text-success', iconBgClass: 'bg-emerald-50', description: 'Ready for ops' },
-        { title: 'Inactive', value: stats.inactive || 0, icon: FiAlertCircle, iconColorClass: 'text-danger', iconBgClass: 'bg-rose-50', description: 'Requires review' },
-        { title: 'Unassigned', value: stats.unassigned || 0, icon: FiClock, iconColorClass: 'text-warning', iconBgClass: 'bg-amber-50', description: 'Pending org linkage' },
-    ];
+
 
     const paginationFooter = (
         <div className="flex justify-between items-center w-full bg-card py-6 px-8 rounded-b-2xl border-t border-border-main/50">

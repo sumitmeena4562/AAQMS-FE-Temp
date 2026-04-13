@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import SectionHeader from '../../components/UI/SectionHeader';
 import FeatureCard from '../../components/UI/FeatureCard';
 import { ROLE_FEATURES } from '../../data/landingData';

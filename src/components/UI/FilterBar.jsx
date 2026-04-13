@@ -3,10 +3,6 @@ import { FiGrid, FiList, FiRefreshCcw } from 'react-icons/fi';
 import FilterDropdown from './FilterDropdown';
 import Search from './Search';
 import { useFilterStore } from '../../store/useFilterStore';
-import { useHierarchyStore } from '../../store/useHierarchyStore';
-import { useOrgStore } from '../../store/useOrgStore';
-import useUserStore from '../../store/userStore';
-import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors } from '../../hooks/api/useHierarchyQueries';
@@ -39,11 +35,7 @@ const FilterBar = ({
         clearSearch();
     };
 
-    const { orgs: cachedOrgs, setFilters: setOrgFilters } = useOrgStore();
-    const { 
-        // We still use userStore for selection state if it exists there, 
-        // but coordinators list now comes from Query
-    } = useUserStore();
+
 
     // Safely strip singular/plural mapping for consistent tiering
     const normalizedLevel = activeLevel?.replace(/s$/, '') || ''; 
@@ -55,7 +47,7 @@ const FilterBar = ({
     const renderFloor = ['zone'].includes(normalizedLevel);
 
     // ─── QUERY HOOKS (UNIFIED) ───
-    const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading: isHierarchyLoading } = useHierarchy({
+    const { organizations: orgs, coordinators: allCoordinators, sites: allSites } = useHierarchy({
         includeOrgs: true, // Always fetch orgs for breadcrumbs/reference
         includeCoords: renderCoord,
         includeSites: renderSite || renderFloor

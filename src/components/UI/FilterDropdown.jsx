@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiCheck, FiX } from 'react-icons/fi';
-import useClickOutside from '../../hooks/useClickOutside';
+
 
 const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All', multiple = false, disabled = false }) => {
     const [isOpen, setIsOpen] = useState(false);

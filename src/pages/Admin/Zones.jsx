@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
 import FilterBar from '../../components/UI/FilterBar';
 import Button from '../../components/UI/Button';
 import { useFilterStore } from '../../store/useFilterStore';
-import { useHierarchyStore } from '../../store/useHierarchyStore';
-import { useOrgStore } from '../../store/useOrgStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
+
 import { useFloors, useZones } from '../../hooks/api/useHierarchyQueries';
 import { FiHome, FiBriefcase, FiLoader, FiAlertCircle, FiX, FiMaximize, FiDownload, FiInbox } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
@@ -63,7 +62,7 @@ const MediaModal = ({ isOpen, onClose, zone }) => {
 };
 
 const Zones = () => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate(); // removed unused
     const [searchParams, setSearchParams] = useSearchParams();
     const [selectedMediaZone, setSelectedMediaZone] = useState(null);
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
@@ -75,12 +74,12 @@ const Zones = () => {
     } = useFilterStore();
     const { query: searchQuery, clearSearch } = useSearchStore();
     
-    const { clearHierarchy } = useHierarchyStore();
+    // const { clearHierarchy } = useHierarchyStore(); // removed unused
       // --- QUERY HOOKS (UNIFIED) ---
     const { organizations: orgs, sites: allSites } = useHierarchy({ includeCoords: false });
     const { data: floorData } = useFloors(selectedSite);
     const allFloors = floorData?.results || [];
-    const { data: zoneData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useZones(selectedFloor.length > 0 ? selectedFloor : undefined, {
+    const { data: zoneData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError, refetch: refetchZones } = useZones(selectedFloor.length > 0 ? selectedFloor : undefined, {
         site_id: selectedSite.length > 0 ? selectedSite : undefined,
         org_id: selectedOrg.length > 0 ? selectedOrg : undefined
     });
@@ -119,7 +118,7 @@ const Zones = () => {
         if (pFloorName) newParams.set('floor', pFloorName);
 
         setSearchParams(newParams, { replace: true });
-    }, [selectedOrg, selectedSite, selectedFloor, selectedCoord]); 
+    }, [selectedOrg, selectedSite, selectedFloor, selectedCoord, searchParams, setSearchParams]); 
 
     // fetchZones effect removed - handled by useZones query hook
 
@@ -142,6 +141,8 @@ const Zones = () => {
     breadcrumbs.push({ label: "Zones", path: "#", isActive: true });
 
     const processedZones = useMemo(() => {
+        const zones = zoneData.results || [];
+        if (!Array.isArray(zones)) return [];
         return zones
             .filter(z => !searchQuery || z.name?.toLowerCase().includes(searchQuery.toLowerCase().trim()))
             .map(z => {
@@ -153,13 +154,14 @@ const Zones = () => {
                 if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
                 return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.inventory_count ?? 0}` };
             });
-    }, [zones, searchQuery]);
+    }, [zoneData, searchQuery]);
 
-    useEffect(() => {
+    // 🔹 Auto-reset to page 1 when filters change (Adjusting state during rendering)
+    const [prevFilters, setPrevFilters] = useState({ q: searchQuery, o: selectedOrg, s: selectedSite, f: selectedFloor });
+    if (searchQuery !== prevFilters.q || selectedOrg !== prevFilters.o || selectedSite !== prevFilters.s || selectedFloor !== prevFilters.f) {
+        setPrevFilters({ q: searchQuery, o: selectedOrg, s: selectedSite, f: selectedFloor });
         setCurrentPage(1);
-    }, [searchQuery, selectedOrg, selectedSite, selectedFloor]);
-
-    const totalPages = Math.ceil(totalZonesCount / 10);
+    }
     const paginatedZones = processedZones;
 
     const handlePreviousPage = () => setCurrentPage(p => p - 1);
@@ -199,7 +201,7 @@ const Zones = () => {
                             <FiAlertCircle className="w-10 h-10 mb-4" />
                             <h4 className="text-lg font-bold">Fetch Error</h4>
                             <p className="text-sm opacity-80">{hierarchyError.message || hierarchyError}</p>
-                            <Button onClick={() => fetchZones(selectedFloor || null)} variant="outline" className="mt-6">Try Again</Button>
+                            <Button onClick={() => refetchZones()} variant="outline" className="mt-6">Try Again</Button>
                         </div>
                     ) : zones.length > 0 ? (
                         <div className="flex flex-col gap-6">

@@ -14,7 +14,7 @@ import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal';
 
 function LoginPage() {
     const navigate = useNavigate();
-    const { login, isLoading, error: storeError, setError } = useAuthStore();
+    const { login, isLoading, setError } = useAuthStore();
     const rememberedEmail = localStorage.getItem("rememberedEmail");
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
     const [localError, setLocalError] = useState(null);

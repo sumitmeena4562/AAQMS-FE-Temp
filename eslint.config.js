@@ -33,8 +33,13 @@ export default defineConfig([
         'warn',
         { allowConstantExport: true },
       ],
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
-      'react/prop-types': 'off', // We use Zod/manual validation or it's just a preference for this project
+      'no-unused-vars': ['error', { 
+        varsIgnorePattern: '^[A-Z_]',
+        argsIgnorePattern: '^_',
+        ignoreRestSiblings: true
+      }],
+      'react/no-unescaped-entities': 'off',
+      'react/prop-types': 'off',
     },
   },
 ])

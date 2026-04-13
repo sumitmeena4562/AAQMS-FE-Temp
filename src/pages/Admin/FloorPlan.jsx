@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import FloorCard from '../../components/UI/FloorCard';
 import Button from '../../components/UI/Button';
 import { useFilterStore } from '../../store/useFilterStore';
-import { useHierarchyStore } from '../../store/useHierarchyStore';
-import { useOrgStore } from '../../store/useOrgStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors } from '../../hooks/api/useHierarchyQueries';
 import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
@@ -14,9 +12,8 @@ import CardSkeleton from '../../components/UI/CardSkeleton';
 
 const FloorPlan = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const passedOrgId = searchParams.get('org_id');
   const passedOrgName = searchParams.get('org_name');
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,9 +22,7 @@ const FloorPlan = () => {
   const passedSiteId = searchParams.get('site_id');
   const passedSiteName = searchParams.get('site');
 
-  const { resetFilters } = useFilterStore();
-  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
-  const { clearHierarchy } = useHierarchyStore();
+  const { resetFilters, selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
 
   const activeSiteId = selectedSite.length > 0 ? selectedSite : (searchParams.get('site_id') ? [searchParams.get('site_id')] : []);
   const activeOrgId = selectedOrg.length > 0 ? selectedOrg : (searchParams.get('org_id') ? [searchParams.get('org_id')] : []);

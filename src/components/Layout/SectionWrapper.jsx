@@ -9,8 +9,7 @@ import { cn } from '../../utils/cn';
 const SectionWrapper = ({ 
     children, 
     className, 
-    id,
-    backgroundProps = {} 
+    id
 }) => {
     return (
         <section 

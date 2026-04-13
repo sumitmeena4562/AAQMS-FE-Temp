@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Table from './Table';
-import Button from './Button';
-import GlobalLoader from './GlobalLoader';
 import TableSkeleton from './TableSkeleton';
-import { FiFilter, FiSearch } from 'react-icons/fi';
+import { FiSearch } from 'react-icons/fi';
 import { AnimatePresence, motion } from 'framer-motion';
 
 /**
@@ -44,7 +42,6 @@ const DataTable = ({
     filterContent,
     footer,
     selectionFooter,
-    children,
     className = ""
 }) => {
     const hasSelection = selectable && selectedIds.length > 0;

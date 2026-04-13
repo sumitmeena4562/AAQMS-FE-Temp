@@ -3,13 +3,11 @@ import { useLocation } from 'react-router-dom';
 import CoordinatorCard from '../../components/UI/CoordinatorCard';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
-import useUserStore from '../../store/userStore';
 import { useFilterStore } from '../../store/useFilterStore';
-import { useOrgStore } from '../../store/useOrgStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
-import { useCoordinators } from '../../hooks/api/useUserQueries';
 import CardSkeleton from '../../components/UI/CardSkeleton';
-import { FiHome, FiBriefcase, FiGrid, FiList } from 'react-icons/fi';
+import Button from '../../components/UI/Button';
+import { FiHome, FiBriefcase, FiGrid, FiList, FiInbox } from 'react-icons/fi';
 
 const AssignedCoordinators = () => {
   const location = useLocation();
@@ -41,7 +39,7 @@ const AssignedCoordinators = () => {
       const match = orgs.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
       if (match) setOrg(match.id);
     }
-  }, [orgs.length, selectedOrg.length, passedOrgName, setOrg]); 
+  }, [orgs, selectedOrg.length, passedOrgName, setOrg]); 
 
   // fetchUsers effect removed - handled by useCoordinators query hook
 

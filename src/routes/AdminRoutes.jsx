@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "../layouts/AdminLayout"
 import Dashboard from "../pages/Admin/Dashboard";

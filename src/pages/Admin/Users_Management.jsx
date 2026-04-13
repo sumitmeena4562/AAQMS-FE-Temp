@@ -16,7 +16,6 @@ import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
 import UserAvatar from '../../components/UI/UserAvatar';
 import Badge from '../../components/UI/Badge';
-import { useBreadcrumb } from '../../hooks/useBreadcrumb';
 import FilterBar from '../../components/UI/FilterBar';
 import useDebounce from '../../hooks/useDebounce';
 import TableSkeleton from '../../components/UI/TableSkeleton';
@@ -35,8 +34,8 @@ export default function Users() {
     // ── STORES (UI state only) ──
     const { 
         filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
-        setPage, setFilters, toggleSelectRow, clearSelection, 
-        setSelectedIds, setLoading, setError // Keeping for mutations
+        setPage, setFilters, toggleSelectRow, 
+        setSelectedIds // setError removed
     } = useUserStore();
     const { query: search } = useSearchStore();
 
@@ -108,6 +107,7 @@ export default function Users() {
     const [viewMode, setViewMode] = useState('list');
 
     const sortedUsers = useMemo(() => {
+        const users = usersData?.users || [];
         if (!Array.isArray(users)) return [];
         const list = [...users];
         list.sort((a, b) => {
@@ -116,7 +116,7 @@ export default function Users() {
             return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
         });
         return list;
-    }, [users, sortKey, sortDir]);
+    }, [usersData, sortKey, sortDir]);
 
     const activeFilterCount = Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v && v !== '' && v !== 'all').length;
 

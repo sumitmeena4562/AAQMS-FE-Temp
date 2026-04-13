@@ -106,7 +106,7 @@ export const userService = {
         try {
             const response = await api.get('users/admin/stats/');
             return response.data;
-        } catch (error) {
+        } catch {
             return { total: 0, active: 0, inactive: 0, unassigned: 0 };
         }
     },

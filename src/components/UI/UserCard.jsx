@@ -8,9 +8,7 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
   const isActive = user.status === 'active';
   const isAssigned = !!(user.organization || user.region || user.zone);
 
-  // Calculate Tenure (Days since created_at)
-  const createdDate = new Date(user.created_at || '2024-01-01');
-  const diffDays = Math.ceil(Math.abs(new Date() - createdDate) / (1000 * 60 * 60 * 24));
+
 
   return (
     <div 

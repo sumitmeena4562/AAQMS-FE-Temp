@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { FiHome, FiClock, FiBox, FiRefreshCcw } from 'react-icons/fi';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterDropdown from '../../components/UI/FilterDropdown';
@@ -81,7 +81,7 @@ export default function AllHistory() {
         page_size: 10
     }), [filters, currentPage]);
 
-    const { data: historyResponse, isLoading, isError } = useAllHistory(queryFilters);
+    const { data: historyResponse, isLoading } = useAllHistory(queryFilters);
     const activityList = historyResponse?.results || [];
     const totalCount = historyResponse?.count || 0;
     const totalPages = Math.ceil(totalCount / 10);

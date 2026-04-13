@@ -1,19 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { FiExternalLink, FiLayout } from 'react-icons/fi';
+
 import Badge from '../../UI/Badge';
-import Button from '../../UI/Button';
-import { AssetIcon } from '../../../pages/Admin/Inventory'; 
+import AssetIcon from './AssetIcon'; 
 
 const AssetCard = ({ asset, onClick }) => {
-    const navigate = useNavigate();
+
     const statusColor = asset.status === 'Verified' ? 'success' : asset.status === 'Mismatch' ? 'danger' : 'warning';
     
-    const handleDetailsClick = (e) => {
-        e.stopPropagation();
-        navigate(`/admin/inventory/analysis/${asset.id}`);
-    };
+
     
     return (
         <motion.div

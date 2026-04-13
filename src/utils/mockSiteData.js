@@ -1,14 +1,12 @@
-export const generateSitePlansForCoordinator = (userId, userOrg = "") => {
+export const generateSitePlansForCoordinator = (userId) => {
   const seed = typeof userId === 'string' ? parseInt(userId.replace(/\D/g, '') || '1') : (userId || 1);
   
   // 🔹 FIX: Hardcoded Data Alignment
   // Ensure we output precisely what the Organization Stats say. Unassigned users get 0.
   let numSites = 0;
-  let orgName = userOrg;
-
-  if (seed === 2) { numSites = 5; orgName = "SSISM"; } // David Kim
-  else if (seed === 3) { numSites = 12; orgName = "Globex"; } // Elena 
-  else if (seed === 5) { numSites = 8; orgName = "TechCore"; } // Aisha
+  if (seed === 2) { numSites = 5; } // David Kim
+  else if (seed === 3) { numSites = 12; } // Elena 
+  else if (seed === 5) { numSites = 8; } // Aisha
   // All others (Sarah, Marcus, etc) are unassigned or have 0 sites.
 
   const bases = [

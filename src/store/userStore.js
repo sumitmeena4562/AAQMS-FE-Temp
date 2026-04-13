@@ -1,15 +1,10 @@
 import { create } from 'zustand';
-import api from '../services/api';
 import { userService } from "../services/userService";
 import toast from 'react-hot-toast';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { queryClient } from '../lib/queryClient';
 
-/**
- * USER STORE
- * Manages all user-related data, stats, and filtering for the Admin panel.
- */
 /**
  * USER STORE
  * Manages all user-related data, stats, and filtering for the Admin panel.
@@ -181,7 +176,7 @@ const useUserStore = create((set, get) => ({
             a.click();
             window.URL.revokeObjectURL(url);
             toast.success("Success! Your CSV data is ready.");
-        } catch (err) {
+        } catch {
             toast.error("Oops! Something went wrong while making the CSV.");
         }
     },

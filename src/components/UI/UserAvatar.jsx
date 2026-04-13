@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { t } from '../../theme/theme';
 
 const UserAvatar = ({ name, avatar, size = "40px", fontSize = "14px", className = "" }) => {
     const [imgError, setImgError] = useState(false);
 
-    // Reset error state if avatar prop changes
-    useEffect(() => {
+    const [prevAvatar, setPrevAvatar] = useState(avatar);
+
+    if (avatar !== prevAvatar) {
+        setPrevAvatar(avatar);
         setImgError(false);
-    }, [avatar]);
+    }
 
     const getInitials = (name) => {
         if (!name) return "??";

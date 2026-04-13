@@ -36,6 +36,7 @@ const MagneticButton = ({ children, className, ...props }) => {
             animate={{ x, y }}
             transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
             className={className}
+            {...props}
         >
             {children}
         </motion.div>

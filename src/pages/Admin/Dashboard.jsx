@@ -113,13 +113,20 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (latestTimestamp === 0) return;
-        setSyncText(formatLastSync(latestTimestamp));
+        
+        const timer = setTimeout(() => {
+            setSyncText(formatLastSync(latestTimestamp));
+        }, 0);
 
         // Gently tick the timer label every 10 seconds (so it fades from "Just now" to "1 min ago")
         const interval = setInterval(() => {
             setSyncText(formatLastSync(latestTimestamp));
         }, 10000);
-        return () => clearInterval(interval);
+        
+        return () => {
+            clearTimeout(timer);
+            clearInterval(interval);
+        };
     }, [latestTimestamp]);
 
     return (

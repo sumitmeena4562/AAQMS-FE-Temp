@@ -17,7 +17,7 @@ import {
     FiSettings, FiMap, FiLayers, FiTarget,
     FiBox, FiUser, FiHome, FiBarChart2
 } from 'react-icons/fi';
-import useUserStore from '../../store/userStore';
+
 
 // ── Nav Items Configuration ──
 const navItems = [
@@ -41,7 +41,7 @@ const navItems = [
 ];
 
 const AdminLayoutInner = () => {
-    const { breadcrumbs, setBreadcrumbs } = useBreadcrumb();
+    const { setBreadcrumbs } = useBreadcrumb();
     const location = useLocation();
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
     const [isCollapsed, setIsCollapsed] = React.useState(false);

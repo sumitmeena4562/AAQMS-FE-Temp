@@ -8,7 +8,7 @@ import { inventoryService } from '../../services/inventoryService';
 export const useInventory = (filters = {}, page = 1) => {
   // Normalize filters to ensure stable Query Keys
   const cleanFilters = Object.fromEntries(
-    Object.entries(filters).filter(([_, v]) => 
+    Object.entries(filters).filter(([, v]) => 
         v !== undefined && 
         v !== null && 
         v !== 'all' && 

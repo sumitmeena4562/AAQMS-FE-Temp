@@ -1,25 +1,23 @@
-import React, { useMemo, useState, useEffect, useCallback, useRef } from 'react';
-import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
 import DataTable from '../../components/UI/DataTable';
 import Badge from '../../components/UI/Badge';
 import {
     FiHome, FiBriefcase, FiBox, FiCheckCircle,
-    FiAlertCircle, FiClock, FiExternalLink, FiGrid,
-    FiMonitor, FiLayout, FiRefreshCcw, FiPrinter,
-    FiCpu, FiHardDrive, FiSmartphone, FiTablet,
-    FiZap, FiMousePointer, FiMaximize2, FiLoader
+    FiAlertCircle, FiClock, FiGrid,
+    FiMonitor, FiLayout, FiRefreshCcw,
 } from 'react-icons/fi';
+import AssetIcon from '../../components/Admin/Inventory/AssetIcon';
 import Button from '../../components/UI/Button';
 import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 
-import { useOrgStore } from '../../store/useOrgStore';
+
 import { useFilterStore } from '../../store/useFilterStore';
-import { useHierarchyStore } from '../../store/useHierarchyStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors, useZones } from '../../hooks/api/useHierarchyQueries';
 import { useInventory } from '../../hooks/api/useInventoryQueries';
@@ -29,29 +27,13 @@ import AssetCard from '../../components/Admin/Inventory/AssetCard';
 import useSearchStore from '../../store/useSearchStore';
 import useDebounce from '../../hooks/useDebounce';
 
-export const AssetIcon = ({ type, className = "" }) => {
-    const ASSET_ICONS = {
-        chair: FiGrid, furniture: FiGrid, monitor: FiMonitor, display: FiMonitor,
-        screen: FiMonitor, peripheral: FiCpu, network: FiLayout, router: FiLayout,
-        switch: FiLayout, printer: FiPrinter, scanner: FiPrinter, copier: FiPrinter,
-        safety: FiBox, server: FiHardDrive, storage: FiHardDrive, mobile: FiSmartphone,
-        phone: FiSmartphone, tablet: FiTablet, laptop: FiMonitor, cpu: FiCpu,
-        ups: FiZap, system: FiCpu, keyboard: FiMousePointer, mouse: FiMousePointer, box: FiBox
-    };
-    const Icon = ASSET_ICONS[type?.toLowerCase()] || ASSET_ICONS.box;
-    return <Icon className={className} />;
-};
+
 
 const Inventory = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // ── STORES ──
-    const { setFilters: setOrgFilters } = useOrgStore(); // only for actions if needed
-
     const { 
-        selectedOrg, selectedCoord, selectedSite, selectedFloor, selectedZone,
+        selectedOrg, selectedSite, selectedFloor, selectedZone,
         setOrg, setCoord, setSite, setFloor, setZone, resetFilters 
     } = useFilterStore();
 
@@ -109,13 +91,10 @@ const Inventory = () => {
         search: debouncedSearch
     }), [selectedOrg, selectedSite, selectedFloor, selectedZone, debouncedSearch]);
 
-    // Reset to page 1 when filters or search change
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [activeFilters]);
+
 
     // ── FETCH INVENTORY (server-side pagination) ──
-    const { data: inventoryData, isLoading, isPlaceholderData } = useInventory(activeFilters, currentPage);
+    const { data: inventoryData, isLoading } = useInventory(activeFilters, currentPage);
     
     const inventory = inventoryData?.results || [];
     const inventoryStats = inventoryData?.stats || null;
@@ -132,12 +111,12 @@ const Inventory = () => {
     const currentFloor = selectedFloor.length === 1 ? allFloors.find(f => String(f.id) === String(selectedFloor[0])) : null;
     const currentZone = selectedZone.length === 1 ? allZones.find(z => String(z.id) === String(selectedZone[0])) : null;
 
-    const orgLabel = selectedOrg.length > 1 ? `Organizations (${selectedOrg.length})` : currentOrg?.name;
-    const siteLabel = selectedSite.length > 1 ? `Sites (${selectedSite.length})` : currentSite?.name;
-    const floorLabel = selectedFloor.length > 1 ? `Floors (${selectedFloor.length})` : currentFloor?.name;
-    const zoneLabel = selectedZone.length > 1 ? `Zones (${selectedZone.length})` : currentZone?.name;
-
     const breadcrumbs = useMemo(() => {
+        const orgLabel = selectedOrg.length > 1 ? `Organizations (${selectedOrg.length})` : currentOrg?.name;
+        const siteLabel = selectedSite.length > 1 ? `Sites (${selectedSite.length})` : currentSite?.name;
+        const floorLabel = selectedFloor.length > 1 ? `Floors (${selectedFloor.length})` : currentFloor?.name;
+        const zoneLabel = selectedZone.length > 1 ? `Zones (${selectedZone.length})` : currentZone?.name;
+
         const base = [
             { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
             { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },

@@ -59,7 +59,6 @@ function ForgotPasswordModal({ isOpen, onClose }) {
         verifyOtp, 
         resetPassword,
         isLoading,
-        error,
         setError
     } = useAuthStore();
 

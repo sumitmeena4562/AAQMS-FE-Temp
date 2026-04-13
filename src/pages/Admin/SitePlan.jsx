@@ -1,21 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import OrganizationCard from '../../components/UI/OrganizationCard';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import { useFilterStore } from '../../store/useFilterStore';
-import { useHierarchyStore } from '../../store/useHierarchyStore';
-import { useOrgStore } from '../../store/useOrgStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useSites } from '../../hooks/api/useHierarchyQueries';
 import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 
 const SitePlan = () => {
-  const location = useLocation();
   const { selectedOrg, selectedCoord, setOrg, setCoord } = useFilterStore();
-  const { clearHierarchy } = useHierarchyStore();
+
   
   const [searchParams, setSearchParams] = useSearchParams();
   const { resetFilters } = useFilterStore();

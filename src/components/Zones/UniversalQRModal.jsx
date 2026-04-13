@@ -53,7 +53,7 @@ const UniversalQRModal = ({
                         {/* Decorative background web/node art */}
                         <div className="absolute top-0 right-0 -mr-16 -mt-16 text-gray-50 opacity-40 pointer-events-none">
                             <svg width="250" height="250" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5">
-                                <circle cx="12" cy="12" ro="10" />
+                                <circle cx="12" cy="12" r="10" />
                                 <path d="M2 12h20M12 2v20M7 7l10 10M17 7L7 17" />
                             </svg>
                         </div>

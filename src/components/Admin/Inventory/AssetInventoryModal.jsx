@@ -1,12 +1,9 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { 
     FiX, FiBox, FiMapPin, FiActivity, FiShield, FiCpu, 
-    FiMaximize2, FiAlertTriangle, FiCheckCircle, FiInfo, FiLayout, FiAlertCircle,
-    FiClock, FiUser
+    FiAlertTriangle, FiCheckCircle, FiInfo, FiLayout, FiAlertCircle
 } from "react-icons/fi";
-import Badge from '../../UI/Badge';
-import Button from '../../UI/Button';
+
 
 const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
     const [showInfo, setShowInfo] = React.useState(true);

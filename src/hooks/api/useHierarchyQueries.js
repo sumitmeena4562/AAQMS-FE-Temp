@@ -9,7 +9,7 @@ import { mapOrgToFrontend } from './useOrgQueries';
 export const useSites = (filters = {}, options = {}) => {
   // Normalize filters to ensure stable Query Keys
   const cleanFilters = Object.fromEntries(
-    Object.entries(filters).filter(([_, v]) => 
+    Object.entries(filters).filter(([, v]) => 
         v !== undefined && 
         v !== null && 
         v !== 'all' && 
@@ -61,7 +61,7 @@ export const useFloors = (siteId = null, options = {}) => {
 
 export const useZones = (floorId = null, filters = {}, options = {}) => {
   const cleanFilters = Object.fromEntries(
-    Object.entries(filters).filter(([_, v]) => v !== undefined && v !== null && v !== 'all' && v !== '')
+    Object.entries(filters).filter(([, v]) => v !== undefined && v !== null && v !== 'all' && v !== '')
   );
 
   return useQuery({

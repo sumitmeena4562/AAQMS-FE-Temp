@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useOrgStore } from '../../store/useOrgStore';
+import { getOrgStatus } from '../../utils/orgUtils';
 import { useOrganizations } from '../../hooks/api/useOrgQueries';
+import Button from '../../components/UI/Button';
 
 import OrganizationCard from '../../components/UI/OrganizationCard';
 import CreateOrganization from '../../components/UI/CreateOrganization';
@@ -20,11 +22,7 @@ import useSearchStore from '../../store/useSearchStore';
  * Helper for consistent status calculation
  * Used by both Table and Cards for identical behavior.
  */
-export const getOrgStatus = (org) => {
-    if (org.isBlocked) return 'BLOCKED';
-    if ((org.stats?.coordinators || 0) === 0) return 'PENDING';
-    return (org.status || 'ACTIVE').toUpperCase();
-};
+
 
 /**
  * OrgLogo Component
@@ -87,9 +85,7 @@ const Organizations = () => {
     // We only keep the paginated slice here.
     const filteredOrgs = enrichedOrgs; 
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [filters, searchQuery]);
+
 
     const totalPages = Math.ceil(filteredOrgs.length / 10);
     const paginatedOrgs = filteredOrgs.slice((currentPage - 1) * 10, currentPage * 10);

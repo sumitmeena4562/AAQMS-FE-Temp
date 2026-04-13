@@ -2,15 +2,15 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiEdit2, FiEye, FiShieldOff } from 'react-icons/fi';
 import { useFilterStore } from '../../store/useFilterStore';
-import { getOrgStatus } from '../../pages/Admin/Organizations';
+import { getOrgStatus } from '../../utils/orgUtils';
 
-const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onView, onBlock }) => {
+const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onView }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const totalComputedCoordinators = org.stats?.coordinators || 0;
   const totalComputedSites = org.stats?.sites || 0;
   const totalComputedFloors = org.stats?.floors || 0;
-  const coordinatorNames = org.stats?.coordinatorNames || [];
+
 
   let siteComputedFloors = org.floors_count || 0;
   let siteComputedZones = org.zones_count || 0;

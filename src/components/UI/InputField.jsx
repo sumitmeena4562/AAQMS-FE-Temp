@@ -15,7 +15,7 @@ const InputField = forwardRef(({
     className = '',
     containerStyle = {},
     isValid,
-    helperText,
+
     ...props
 }, ref) => {
     const [isFocused, setIsFocused] = useState(false);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,7 +14,7 @@ import { FiAlertCircle } from 'react-icons/fi';
 import useAuthStore from '../../store/authStore';
 
 function RegistrationPage() {
-    const { register: registerUser, isLoading, error: authError } = useAuthStore();
+    const { register: registerUser, isLoading } = useAuthStore();
     const navigate = useNavigate();
 
     const onSubmit = async (data) => {

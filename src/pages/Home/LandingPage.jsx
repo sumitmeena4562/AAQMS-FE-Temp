@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { BRAND_FULL_NAME, BRAND_TAGLINE } from '../../components/Branding/BrandConfig';
 import LandingNavbar from '../../components/Navbar/LandingNavbar';
@@ -26,7 +26,6 @@ const SectionLoader = () => (
 import { useScrollSpy } from '../../hooks/useScrollSpy';
 
 const LandingPage = () => {
-    const navigate = useNavigate();
     const isScrollingRef = useRef(false);
 
     // Optimized Scroll Spy for Navigation Highlighting
@@ -34,33 +33,37 @@ const LandingPage = () => {
         'home', 'roles', 'capabilities', 'planning', 'workflow', 'mobile', 'analytics'
     ], { rootMargin: '-10% 0px -80% 0px', threshold: 0 });
 
-    const [activeLabel, setActiveLabel] = useState('Home');
+    // Mapping for section IDs to human-readable labels
+    const idToLabel = {
+        'home': 'Home',
+        'roles': 'Roles',
+        'capabilities': 'Capabilities',
+        'planning': 'Planning',
+        'workflow': 'Workflow',
+        'mobile': 'Mobile App',
+        'analytics': 'Analytics'
+    };
 
-    // Sync active label with active section ID
+    const [manualLabel, setManualLabel] = useState(null);
+
+    // Sync current display label: Manual takes priority during scroll, then spy follows.
+    const activeLabel = manualLabel || idToLabel[activeSectionId] || 'Home';
+
+    // Clear manual label after a delay when scrolling finishes
     useEffect(() => {
-        if (isScrollingRef.current) return;
-        
-        const idToLabel = {
-            'home': 'Home',
-            'roles': 'Roles',
-            'capabilities': 'Capabilities',
-            'planning': 'Planning',
-            'workflow': 'Workflow',
-            'mobile': 'Mobile App',
-            'analytics': 'Analytics'
-        };
-
-        if (activeSectionId && idToLabel[activeSectionId]) {
-            setActiveLabel(idToLabel[activeSectionId]);
+        if (manualLabel) {
+            const timer = setTimeout(() => setManualLabel(null), 1200);
+            return () => clearTimeout(timer);
         }
-    }, [activeSectionId]);
+    }, [manualLabel]);
+
 
     // Enhanced scroll function with better easing and timing
     const scrollToSection = (id, label) => {
         const element = document.getElementById(id);
         if (element) {
             isScrollingRef.current = true;
-            setActiveLabel(label);
+            setManualLabel(label);
             
             const offset = 80; // Standard Navbar height
             const bodyRect = document.body.getBoundingClientRect().top;
@@ -84,7 +87,7 @@ const LandingPage = () => {
         { label: 'Home', onClick: () => {
             isScrollingRef.current = true;
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            setActiveLabel('Home');
+            setManualLabel('Home');
             setTimeout(() => isScrollingRef.current = false, 1000);
         }},
         { label: 'Roles', onClick: () => scrollToSection('roles', 'Roles') },
@@ -110,7 +113,7 @@ const LandingPage = () => {
             <LandingNavbar
                 navLinks={navLinks}
                 activeLabel={activeLabel}
-                onLinkClick={(label) => setActiveLabel(label)}
+                onLinkClick={(label) => setManualLabel(label)}
                 buttons={[
                     { label: 'Login', variant: 'filled', href: '/login' }
                 ]}
