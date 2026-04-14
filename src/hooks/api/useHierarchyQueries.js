@@ -53,7 +53,6 @@ export const useFloors = (siteId = null, options = {}) => {
           total: count
       };
     },
-    enabled: !!siteId && (!Array.isArray(siteId) || siteId.length > 0),
     staleTime: 5 * 60 * 1000,
     ...options
   });
@@ -77,7 +76,7 @@ export const useZones = (floorId = null, filters = {}, options = {}) => {
           total: count
       };
     },
-    enabled: !!floorId && (!Array.isArray(floorId) || floorId.length > 0),
+    staleTime: 5 * 60 * 1000, 
     ...options
   });
 };

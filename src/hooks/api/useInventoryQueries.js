@@ -19,10 +19,10 @@ export const useInventory = (filters = {}, page = 1) => {
 
   // Map frontend filters to API params
   const params = {
-    org_id: cleanFilters.org,
-    site_id: cleanFilters.site,
-    floor_id: cleanFilters.floor,
-    zone_id: cleanFilters.zone,
+    org_id: Array.isArray(cleanFilters.org) ? cleanFilters.org.join(',') : cleanFilters.org,
+    site_id: Array.isArray(cleanFilters.site) ? cleanFilters.site.join(',') : cleanFilters.site,
+    floor_id: Array.isArray(cleanFilters.floor) ? cleanFilters.floor.join(',') : cleanFilters.floor,
+    zone_id: Array.isArray(cleanFilters.zone) ? cleanFilters.zone.join(',') : cleanFilters.zone,
     category: cleanFilters.type?.length ? cleanFilters.type[0] : undefined,
     search: cleanFilters.search || undefined,
     page: page,

@@ -106,10 +106,10 @@ const Inventory = () => {
     };
 
     // ── BREADCRUMBS ──
-    const currentOrg = selectedOrg.length === 1 ? orgs.find(o => String(o.id) === String(selectedOrg[0])) : null;
-    const currentSite = selectedSite.length === 1 ? allSites.find(s => String(s.id) === String(selectedSite[0])) : null;
-    const currentFloor = selectedFloor.length === 1 ? allFloors.find(f => String(f.id) === String(selectedFloor[0])) : null;
-    const currentZone = selectedZone.length === 1 ? allZones.find(z => String(z.id) === String(selectedZone[0])) : null;
+    const currentOrg = selectedOrg.length === 1 ? orgs?.find(o => String(o.id) === String(selectedOrg[0])) : null;
+    const currentSite = selectedSite.length === 1 ? allSites?.find(s => String(s.id) === String(selectedSite[0])) : null;
+    const currentFloor = selectedFloor.length === 1 ? allFloors?.find(f => String(f.id) === String(selectedFloor[0])) : null;
+    const currentZone = selectedZone.length === 1 ? allZones?.find(z => String(z.id) === String(selectedZone[0])) : null;
 
     const breadcrumbs = useMemo(() => {
         const orgLabel = selectedOrg.length > 1 ? `Organizations (${selectedOrg.length})` : currentOrg?.name;

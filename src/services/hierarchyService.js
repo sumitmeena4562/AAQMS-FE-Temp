@@ -43,7 +43,8 @@ export const hierarchyService = {
             })).data;
         }
 
-        const url = singleId ? `organisations/floors/${singleId}/` : `organisations/all-floors/`;
+        const isValidId = singleId && typeof singleId === 'string' && singleId.trim() !== '';
+        const url = isValidId ? `organisations/floors/${singleId}/` : `organisations/all-floors/`;
         const response = await api.get(url);
         return response.data;
     },
@@ -71,7 +72,8 @@ export const hierarchyService = {
         if (isMultiFloor) params.floor_id = floorId.join(',');
 
         let url = 'organisations/all-zones/';
-        const isValidId = singleFloorId && (typeof singleFloorId !== 'string' || singleFloorId.trim() !== '');
+        // Strict validation: Must be a non-empty string and NOT an array (to avoid //zones/ crash)
+        const isValidId = singleFloorId && typeof singleFloorId === 'string' && singleFloorId.trim() !== '' && !Array.isArray(singleFloorId);
         
         if (!isMultiFloor && isValidId) {
             url = `organisations/floors/${singleFloorId}/zones/`;

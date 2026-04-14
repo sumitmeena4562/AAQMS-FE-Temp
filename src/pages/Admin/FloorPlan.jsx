@@ -128,14 +128,14 @@ const FloorPlan = () => {
       />
 
       {/* MAIN BODY */}
-      <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
+      <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6 px-4 sm:px-6 lg:px-8">
         <FilterBar activeLevel="floors" />
 
         {/* CARDS LIST/GRID SECTION */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-5 gap-6 gap-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 px-4 sm:px-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 gap-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-6">
           {isLoading ? (
-            <div className="w-full mt-4">
-               <CardSkeleton count={8} columns={4} />
+            <div className="col-span-full w-full py-4">
+               <CardSkeleton count={10} columns={5} />
             </div>
           ) : hierarchyError ? (
             <div className="w-full py-20 flex flex-col items-center justify-center text-red-500/70 bg-rose-50/50 rounded-3xl border border-dashed border-rose-200">
@@ -166,10 +166,12 @@ const FloorPlan = () => {
               )}
             </>
           ) : (
-            <div className="w-full py-24 flex flex-col items-center justify-center text-gray/40 bg-base/20 rounded-[var(--radius-card)] border border-border-main/40 mt-4">
-               <FiAlertCircle className="w-10 h-10 mb-4 opacity-20" />
-               <p className="text-sm font-bold text-title">No Floor Plans Found</p>
-                <p className="text-[10px] uppercase tracking-widest mt-1">
+            <div className="col-span-full w-full py-32 flex flex-col items-center justify-center text-gray/40 bg-card/40 rounded-[2.5rem] border-2 border-dashed border-border-main/50 mt-4">
+               <div className="w-20 h-20 bg-base rounded-3xl flex items-center justify-center mb-6 border border-border-main/30 rotate-6 shadow-inner">
+                  <FiAlertCircle className="w-10 h-10 text-primary/40" />
+               </div>
+               <p className="text-xl font-black text-title tracking-tight">No Floor Plans Found</p>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] mt-2 opacity-60">
                   {activeSiteId.length > 0 ? "This site doesn't have any registered floor levels yet" : "No floor plans have been registered in the system yet"}
                 </p>
             </div>
