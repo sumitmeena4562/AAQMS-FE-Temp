@@ -32,16 +32,17 @@ import useDebounce from '../../hooks/useDebounce';
 const Inventory = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const { 
+    const {
         selectedOrg, selectedSite, selectedFloor, selectedZone,
-        setOrg, setCoord, setSite, setFloor, setZone, resetFilters 
+        setOrg, setCoord, setSite, setFloor, setZone, resetFilters
     } = useFilterStore();
 
     // ── QUERY HOOKS (UNIFIED) ──
     const { organizations: orgs, sites: allSites } = useHierarchy({ includeCoords: false });
     const { data: floorData } = useFloors(selectedSite);
     const allFloors = floorData?.results || [];
-    const { data: allZones = [] } = useZones(selectedFloor);
+    const { data: zoneData } = useZones(selectedFloor);
+    const allZones = zoneData?.results || [];
 
     // ── LOCAL STATE ──
     const [selectedAsset, setSelectedAsset] = useState(null);
@@ -56,7 +57,7 @@ const Inventory = () => {
     const hasSynced = useRef(false);
     useEffect(() => {
         if (hasSynced.current) return;
-        
+
         const pOrg = searchParams.get('org_id') || searchParams.get('org');
         const pSite = searchParams.get('site_id') || searchParams.get('site');
         const pFloor = searchParams.get('floor_id') || searchParams.get('floor');
@@ -95,7 +96,7 @@ const Inventory = () => {
 
     // ── FETCH INVENTORY (server-side pagination) ──
     const { data: inventoryData, isLoading } = useInventory(activeFilters, currentPage);
-    
+
     const inventory = inventoryData?.results || [];
     const inventoryStats = inventoryData?.stats || null;
     const inventoryTotalCount = inventoryData?.count || 0;
@@ -125,7 +126,7 @@ const Inventory = () => {
         if (siteLabel) base.push({ label: siteLabel, path: `/admin/site-plan?site_id=${selectedSite.join(',')}` });
         if (floorLabel) base.push({ label: floorLabel, path: `/admin/floor-plan?floor_id=${selectedFloor.join(',')}` });
         if (zoneLabel) base.push({ label: zoneLabel, path: `/admin/inventory?zone_id=${selectedZone.join(',')}` });
-        
+
         base.push({ label: "Inventory", path: "#", isActive: true });
         return base;
     }, [currentOrg, currentSite, currentFloor, currentZone, selectedOrg, selectedSite, selectedFloor, selectedZone]);
@@ -223,10 +224,10 @@ const Inventory = () => {
                 hideAddButton={true}
                 breadcrumbs={breadcrumbs}
                 rightContent={
-                    <Button 
-                        onClick={handleReset} 
-                        variant="outline" 
-                        size="sm" 
+                    <Button
+                        onClick={handleReset}
+                        variant="outline"
+                        size="sm"
                         className="h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60"
                     >
                         <FiRefreshCcw size={14} className={isLoading ? 'animate-spin' : ''} />
@@ -255,14 +256,14 @@ const Inventory = () => {
                         <FilterDropdown label="Site" options={allSites.map(s => ({ value: s.id, label: s.name }))} value={selectedSite} onChange={setSite} allLabel="All Sites" multiple={true} disabled={selectedOrg.length === 0} />
                         <FilterDropdown label="Floor" options={allFloors.map(f => ({ value: f.id, label: f.name }))} value={selectedFloor} onChange={setFloor} allLabel="All Floors" multiple={true} disabled={selectedSite.length === 0} />
                         <FilterDropdown label="Zone" options={allZones.map(z => ({ value: z.id, label: z.name }))} value={selectedZone} onChange={setZone} allLabel="All Zones" multiple={true} disabled={selectedFloor.length === 0} />
-                        
+
                         <div className="w-[1.5px] h-6 bg-border-main/40 mx-2" />
-                        
+
                         <div className="flex items-center gap-2">
-                             <div className="flex items-center bg-base p-1 rounded-lg border border-border-main">
+                            <div className="flex items-center bg-base p-1 rounded-lg border border-border-main">
                                 <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-card text-primary shadow-sm' : 'text-gray/40'}`} title="List View"><FiLayout size={16} /></button>
                                 <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-card text-primary shadow-sm' : 'text-gray/40'}`} title="Grid View"><FiGrid size={16} /></button>
-                             </div>
+                            </div>
                         </div>
                     </div>
 
@@ -271,26 +272,26 @@ const Inventory = () => {
 
                 {viewMode === 'list' ? (
                     isLoading ? <TableSkeleton rows={10} /> : (
-                    <DataTable
-                        columns={columns}
-                        data={displayedInventory}
-                        loading={isLoading}
-                        onRowClick={handleAssetClick}
-                        emptyMessage={<EmptyState onReset={handleReset} />}
-                        footer={
-                            <div className="flex items-center justify-between w-full px-1">
-                                <span className="text-[11px] font-bold text-gray tracking-tight">
-                                    Showing <span className="text-title font-bold">{inventoryTotalCount > 0 ? startIndex + 1 : 0}–{Math.min(startIndex + PAGE_SIZE, inventoryTotalCount)}</span> of <span className="text-title font-bold">{inventoryTotalCount.toLocaleString()}</span> assets
-                                </span>
-                                <div className="flex items-center gap-1.5">
-                                    <Button variant="outline" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1 || isLoading} className="!h-8 !px-3 !text-[10px] !font-black !uppercase">Previous</Button>
-                                    <span className="text-[10px] font-black text-gray px-2">{currentPage} / {totalPages || 1}</span>
-                                    <Button variant="outline" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage >= totalPages || isLoading} className="!h-8 !px-4 !text-[10px] !font-black !uppercase">Next</Button>
+                        <DataTable
+                            columns={columns}
+                            data={displayedInventory}
+                            loading={isLoading}
+                            onRowClick={handleAssetClick}
+                            emptyMessage={<EmptyState onReset={handleReset} />}
+                            footer={
+                                <div className="flex items-center justify-between w-full px-1">
+                                    <span className="text-[11px] font-bold text-gray tracking-tight">
+                                        Showing <span className="text-title font-bold">{inventoryTotalCount > 0 ? startIndex + 1 : 0}–{Math.min(startIndex + PAGE_SIZE, inventoryTotalCount)}</span> of <span className="text-title font-bold">{inventoryTotalCount.toLocaleString()}</span> assets
+                                    </span>
+                                    <div className="flex items-center gap-1.5">
+                                        <Button variant="outline" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1 || isLoading} className="!h-8 !px-3 !text-[10px] !font-black !uppercase">Previous</Button>
+                                        <span className="text-[10px] font-black text-gray px-2">{currentPage} / {totalPages || 1}</span>
+                                        <Button variant="outline" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage >= totalPages || isLoading} className="!h-8 !px-4 !text-[10px] !font-black !uppercase">Next</Button>
+                                    </div>
                                 </div>
-                            </div>
-                        }
-                    />
-                   )
+                            }
+                        />
+                    )
                 ) : (
                     <div className="flex flex-col gap-6">
                         {isLoading ? (
