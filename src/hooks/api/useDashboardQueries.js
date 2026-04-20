@@ -9,7 +9,10 @@ export const useDashboardSummary = () => {
   return useQuery({
     queryKey: ['dashboard', 'summary'],
     queryFn: dashboardService.getDashboardSummary,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchInterval: false, // Explicitly disable polling
   });
 };
 

@@ -40,14 +40,16 @@ export const BreadcrumbProvider = ({ children }) => {
     }, []);
 
     // Combine base + extra
-    const allBreadcrumbs = [...breadcrumbs, ...extraItems];
+    const allBreadcrumbs = React.useMemo(() => [...breadcrumbs, ...extraItems], [breadcrumbs, extraItems]);
+
+    const contextValue = React.useMemo(() => ({
+        breadcrumbs: allBreadcrumbs,
+        setBreadcrumbs,
+        appendBreadcrumbs
+    }), [allBreadcrumbs, setBreadcrumbs, appendBreadcrumbs]);
 
     return (
-        <BreadcrumbContext.Provider value={{
-            breadcrumbs: allBreadcrumbs,
-            setBreadcrumbs,
-            appendBreadcrumbs
-        }}>
+        <BreadcrumbContext.Provider value={contextValue}>
             {children}
         </BreadcrumbContext.Provider>
     );

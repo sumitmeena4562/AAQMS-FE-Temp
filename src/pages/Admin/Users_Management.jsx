@@ -149,7 +149,17 @@ export default function Users() {
             : await createUser(data);
 
         if (res.success) {
-            toast.success(editingUser ? 'Changes to user profile have been saved' : 'New personnel successfully added to the system');
+            const userName = res.data?.name || data.name || 'User';
+            const isEmailSent = res.data?.email_sent;
+
+            if (isEmailSent === true) {
+                toast.success(`Email sent successfully: ${userName} ${editingUser ? 'updated' : 'created'}`);
+            } else if (isEmailSent === false) {
+                toast.error(`${editingUser ? 'User updated' : 'User created'}, but email could not be sent`);
+            } else {
+                toast.success(editingUser ? 'Changes to user profile have been saved' : 'New personnel successfully added to the system');
+            }
+            
             setIsFormOpen(false);
             setEditingUser(null);
         } else {

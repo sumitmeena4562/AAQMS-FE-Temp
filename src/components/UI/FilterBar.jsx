@@ -48,11 +48,13 @@ const FilterBar = ({
     const renderFloor = ['zone'].includes(normalizedLevel);
 
     // ─── QUERY HOOKS (UNIFIED) ───
-    const { organizations: orgs, coordinators: allCoordinators, sites: allSites } = useHierarchy({
-        includeOrgs: true, // Always fetch orgs for breadcrumbs/reference
+    const hierarchyOptions = React.useMemo(() => ({
+        includeOrgs: true,
         includeCoords: renderCoord,
         includeSites: renderSite || renderFloor
-    });
+    }), [renderCoord, renderSite, renderFloor]);
+
+    const { organizations: orgs, coordinators: allCoordinators, sites: allSites } = useHierarchy(hierarchyOptions);
 
     const { data: floorData } = useFloors(selectedSite, { enabled: renderFloor });
     const allFloors = floorData?.results || [];

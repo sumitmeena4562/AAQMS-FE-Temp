@@ -59,6 +59,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
           src={org.imagery?.profile || org.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop'}
           alt={org.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110"
+          loading="lazy"
         />
         {/* Status Badge */}
         <div className="absolute top-3.5 left-3.5">
@@ -183,4 +184,4 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
   );
 };
 
-export default OrganizationCard;
+export default React.memo(OrganizationCard);

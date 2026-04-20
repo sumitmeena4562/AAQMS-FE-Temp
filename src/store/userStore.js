@@ -39,10 +39,10 @@ const useUserStore = create((set, get) => ({
     createUser: async (userData) => {
         set({ loading: true, error: null });
         try {
-            await userService.createUser(userData);
+            const data = await userService.createUser(userData);
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
-            return { success: true };
+            return { success: true, data };
         } catch (err) {
             set({ loading: false, error: err.message });
             return { success: false, error: err.message };
@@ -52,10 +52,10 @@ const useUserStore = create((set, get) => ({
     updateUser: async (id, updates) => {
         set({ loading: true, error: null });
         try {
-            await userService.updateUser(id, updates);
+            const data = await userService.updateUser(id, updates);
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
-            return { success: true };
+            return { success: true, data };
         } catch (err) {
             set({ loading: false, error: err.message });
             return { success: false, error: err.message };

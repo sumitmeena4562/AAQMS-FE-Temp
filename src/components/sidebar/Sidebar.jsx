@@ -30,17 +30,19 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
     const [prevPath, setPrevPath] = useState(location.pathname);
 
-    // 🔹 Auto-open sidebar menus if their child is active (Adjusting state during rendering)
-    if (location.pathname !== prevPath) {
-        setPrevPath(location.pathname);
-        const activeParents = {};
-        navItems.forEach(item => {
-            if (item.children && isParentActive(item)) {
-                activeParents[item.label] = true;
-            }
-        });
-        setOpenMenus(prev => ({ ...prev, ...activeParents }));
-    }
+    // 🔹 Auto-open sidebar menus if their child is active
+    useEffect(() => {
+        if (location.pathname !== prevPath) {
+            setPrevPath(location.pathname);
+            const activeParents = {};
+            navItems.forEach(item => {
+                if (item.children && isParentActive(item)) {
+                    activeParents[item.label] = true;
+                }
+            });
+            setOpenMenus(prev => ({ ...prev, ...activeParents }));
+        }
+    }, [location.pathname, prevPath, navItems, isParentActive]);
 
     const toggleMenu = (item) => {
         setOpenMenus(p => ({ ...p, [item.label]: !p[item.label] }));

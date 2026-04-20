@@ -30,7 +30,7 @@ import Pagination from '../../components/UI/Pagination';
  * OrgLogo Component
  * Renders an organization logo with a resilient fallback mechanism.
  */
-const OrgLogo = ({ org }) => {
+const OrgLogo = React.memo(({ org }) => {
     const [imgError, setImgError] = useState(false);
     const name = org?.name || 'OR';
 
@@ -42,6 +42,7 @@ const OrgLogo = ({ org }) => {
                     alt={name}
                     className="w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all"
                     onError={() => setImgError(true)}
+                    loading="lazy"
                 />
             ) : (
                 <span className="bg-gradient-to-br from-base to-page w-full h-full flex items-center justify-center">
@@ -50,7 +51,7 @@ const OrgLogo = ({ org }) => {
             )}
         </div>
     );
-};
+});
 
 const Organizations = () => {
     // --- Global State ---

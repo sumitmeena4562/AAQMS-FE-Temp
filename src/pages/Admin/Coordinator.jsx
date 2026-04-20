@@ -135,7 +135,17 @@ const Coordinator = () => {
             : await createUser(finalData);
 
         if (res.success) {
-            toast.success(editingUser?.id ? 'Profile updated' : 'Coordinator added');
+            const userName = res.data?.name || data.name || 'User';
+            const isEmailSent = res.data?.email_sent;
+
+            if (isEmailSent === true) {
+                toast.success(`Email sent successfully: ${userName} ${editingUser?.id ? 'updated' : 'added'}`);
+            } else if (isEmailSent === false) {
+                toast.error(`${editingUser?.id ? 'Profile updated' : 'Coordinator added'}, but email could not be sent`);
+            } else {
+                toast.success(editingUser?.id ? 'Profile updated' : 'Coordinator added');
+            }
+            
             setIsFormOpen(false);
             setEditingUser(null);
         } else {

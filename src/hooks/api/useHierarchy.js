@@ -3,6 +3,8 @@ import { useSites } from './useHierarchyQueries';
 import { useCoordinators } from './useUserQueries';
 import { useFilterStore } from '../../store/useFilterStore';
 
+const EMPTY_ARRAY = [];
+
 /**
  * ── UNIFIED HIERARCHY HOOK ──
  * This hook acts as a single point of truth for Organizations, Sites, and Coordinators.
@@ -37,9 +39,9 @@ export const useHierarchy = (options = {}) => {
 
     return {
         // Data
-        organizations: orgsQuery.data || [],
-        coordinators: coordsQuery.data || [],
-        sites: sitesQuery.data?.results || [],
+        organizations: orgsQuery.data || EMPTY_ARRAY,
+        coordinators: coordsQuery.data || EMPTY_ARRAY,
+        sites: sitesQuery.data?.results || EMPTY_ARRAY,
         
         // Loading States
         isLoading: (includeOrgs && orgsQuery.isLoading) || 

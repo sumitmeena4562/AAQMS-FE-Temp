@@ -7,6 +7,7 @@ import { mapToActivityFeed } from '../utils/dashboardCalculations';
 
 // \u2500\u2500\u2500 UNIFIED DASHBOARD ENDPOINT (1 call replaces 3) \u2500\u2500\u2500
 export const getDashboardSummary = async () => {
+    console.count("SUMMARY API CALLED");
     const response = await api.get('/users/dashboard/summary/');
     return response.data; // { stats, metrics, recent_activity }
 };

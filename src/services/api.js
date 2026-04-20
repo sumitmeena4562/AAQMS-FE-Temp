@@ -24,8 +24,17 @@ const api = axios.create({
  */
 const PUBLIC_ENDPOINTS = ['users/login/', 'users/token/refresh/', 'users/register/', 'users/request-reset/', 'users/verify-otp/', 'users/reset-password/'];
 
+// ─── DIAGNOSTIC REQUEST COUNTER ───
+let requestCount = 0;
+
 api.interceptors.request.use(
     (config) => {
+        requestCount++;
+        if (requestCount % 10 === 0) {
+            console.warn(`[AAQMS-DEBUG] High request volume detected: ${requestCount} requests since load.`);
+        }
+        
+        // ... (rest of the logic)
         // No manual JWT injection needed; browser handles HttpOnly cookies.
         
         // ── CSRF PROTECTION ──
