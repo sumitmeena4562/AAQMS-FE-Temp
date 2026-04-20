@@ -87,8 +87,8 @@ const Organizations = () => {
 
 
 
-    const totalPages = Math.ceil(filteredOrgs.length / 10);
-    const paginatedOrgs = filteredOrgs.slice((currentPage - 1) * 10, currentPage * 10);
+    const totalPages = Math.ceil(filteredOrgs.length / 12);
+    const paginatedOrgs = filteredOrgs.slice((currentPage - 1) * 12, currentPage * 12);
 
     const industryOptions = useMemo(() => {
         const uniqueIndustries = [...new Set(orgs.map(o => o.industry).filter(Boolean))];
