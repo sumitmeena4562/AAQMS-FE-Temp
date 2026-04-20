@@ -216,7 +216,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                             `}
                         >
                             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-[13px] font-black shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
-                                {user.avatar || user.first_name?.charAt(0)?.toUpperCase() || 'U'}
+                                {user.avatar || user.name?.charAt(0)?.toUpperCase() || user.first_name?.charAt(0)?.toUpperCase() || 'U'}
                             </div>
                             {!collapsed && (
                                 <div className="overflow-hidden flex-1">
