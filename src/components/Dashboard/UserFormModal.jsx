@@ -106,7 +106,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             const role_name = watch('role')?.toUpperCase();
             let data = [];
             if (role_name === 'FIELD_OFFICER') {
-                data = await organizationService.getZones(orgId);
+                data = await organizationService.getZonesByOrg(orgId);
                 // Also fetch coordinators for this org
                 const coords = await userService.getCoordinators(orgId);
                 setAvailableCoordinators(Array.isArray(coords) ? coords : []);
@@ -474,7 +474,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                         error={errors.zone?.message}
                                                                         options={(assignmentData || []).map(item => ({ 
                                                                             value: item?.id, 
-                                                                            label: item?.zone_name 
+                                                                            label: item?.zone_name || item?.name || 'Unnamed Zone'
                                                                         })).filter(opt => opt.value)}
                                                                         disabled={!watch('organisation_id')}
                                                                         loading={isLoadingSites}

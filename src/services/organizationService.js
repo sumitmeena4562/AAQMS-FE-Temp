@@ -171,6 +171,17 @@ export const organizationService = {
         }
     },
 
+    // Get zones for an organisation
+    getZonesByOrg: async (orgId) => {
+        if (!orgId) return [];
+        try {
+            const response = await api.get('organisations/all-zones/', { params: { org_id: orgId, dropdown: 'true' } });
+            return response.data;
+        } catch (err) {
+            throw new Error(extractError(err, "Failed to load zones for organisation"));
+        }
+    },
+
     // Generic delete for any unit
     deleteUnit: async (type, id) => {
         try {
