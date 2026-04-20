@@ -46,7 +46,7 @@ const ROLE_DETAILS = [
 const STATUS_OPTIONS = ['active', 'deactive'];
 
 const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false }) => {
-    const isEdit = !!user;
+    const isEdit = !!(user && user.id);
     const [step, setStep] = useState(0);
     const [submitError, setSubmitError] = useState('');
     const [showWorkAssignment, setShowWorkAssignment] = useState(false);
@@ -137,7 +137,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
         if (user) {
             // Flatten nested profile data for the form
-            const role_name = (user.role_name || user.role?.role_name || '').toUpperCase();
+            const roleStr = typeof user.role === 'string' ? user.role : (user.role_name || user.role?.role_name || '');
+            const role_name = roleStr.toUpperCase();
             const profile = user.field_officer_profile || user.coordinator_profile || user.admin_profile || {};
             
             // Extract IDs carefully (handle both object and ID string cases)
