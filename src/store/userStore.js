@@ -102,9 +102,12 @@ const useUserStore = create((set, get) => ({
     /**
      * Export to PDF (Frontend)
      */
-    exportPDF: async () => {
+    exportPDF: async (users = []) => {
         try {
-            const { users } = get();
+            if (!users || users.length === 0) {
+                toast.error("No data available to export.");
+                return;
+            }
             const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
             
             // --- HEADER & BRANDING ---

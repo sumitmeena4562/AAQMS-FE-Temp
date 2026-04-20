@@ -377,7 +377,7 @@ export default function Users() {
                                <FiRefreshCcw size={10} /> Clear Context
                             </button>
                         </div>
-                        <Button onClick={exportPDF} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 shadow-sm border-dashed border-primary/30">
+                        <Button onClick={() => exportPDF(users)} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 shadow-sm border-dashed border-primary/30">
                             <FiDownload size={14} className="text-primary/70" />
                             <span className="font-black text-[10px] uppercase tracking-widest text-title">PDF Export</span>
                         </Button>
