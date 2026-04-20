@@ -76,15 +76,25 @@ const Organizations = () => {
             ...org,
             stats: {
                 ...org.stats,
-                coordinators: org.stats?.coordinators || org.stats?.coordinators_count || 0
+                coordinators: org.coordinators_count || (org.stats && org.stats.coordinators) || 0,
+                sites: org.sites_count || (org.stats && org.stats.sites) || 0,
+                floors: org.floors_count || (org.stats && org.stats.floors) || 0,
+                assets: org.assets_count || (org.stats && org.stats.assets) || 0
             }
         }));
     }, [orgs]);
 
-    // SERVER-SIDE FILTERING: We rely on the hook above. 
-    // We only keep the paginated slice here.
-    const filteredOrgs = enrichedOrgs; 
-
+    // LOCAL FILTERING: Ensure computed statuses like 'PENDING' are exactly matched
+    const filteredOrgs = useMemo(() => {
+        let result = enrichedOrgs;
+        if (filters.status && filters.status.length > 0 && !filters.status.includes('all')) {
+            result = result.filter(org => {
+                const computedStatus = getOrgStatus(org);
+                return filters.status.some(s => s.toUpperCase() === computedStatus);
+            });
+        }
+        return result;
+    }, [enrichedOrgs, filters.status]);
 
 
     const totalPages = Math.ceil(filteredOrgs.length / 12);
@@ -278,7 +288,7 @@ const Organizations = () => {
 
             {/* Filter & View Mode Bar */}
             <div className="flex flex-col gap-6">
-                <FilterBar>
+                <FilterBar hideClearButton={true}>
                     <div className="flex flex-wrap items-center gap-3 flex-1">
                         <FilterDropdown
                             label="Industry"
@@ -307,25 +317,16 @@ const Organizations = () => {
                     <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto mt-3 sm:mt-0">
                         <FilterBar.ViewToggle mode={viewMode} onChange={setViewMode} />
 
-                        {activeFiltersCount > 0 && (
+                        {(activeFiltersCount > 0 || searchQuery) && (
                             <button
-                                onClick={resetFilters}
+                                onClick={() => { resetFilters(); clearSearch(); }}
                                 className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 shadow-sm border border-transparent hover:border-rose-100 group"
                             >
                                 <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
-                                Reset
+                                Reset Filters
                                 <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px] ml-1">
-                                    {activeFiltersCount}
+                                    {activeFiltersCount + (searchQuery ? 1 : 0)}
                                 </span>
-                            </button>
-                        )}
-                        {searchQuery && (
-                             <button
-                                onClick={clearSearch}
-                                className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 border border-transparent hover:border-rose-100"
-                            >
-                                <FiRefreshCcw size={12} />
-                                Clear Search
                             </button>
                         )}
                     </div>

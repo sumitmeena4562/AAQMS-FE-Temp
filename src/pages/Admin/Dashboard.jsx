@@ -86,10 +86,10 @@ const Dashboard = () => {
             title: m.label,
             value: m.unit ? `${m.value}${m.unit}` : String(m.value ?? 0),
             icon: React.createElement(FiActivity, { size: 16 }),
-            statusLabel: m.change,
+            statusLabel: m.change ? String(m.change).replace('-', '') : "0",
             statusVariant: m.trend === 'up' ? 'success' : m.trend === 'down' ? 'danger' : 'info',
             progress: 70,
-            secondaryLabel: m.trend === 'up' ? 'Increasing' : 'Decreasing',
+            secondaryLabel: m.trend === 'up' ? 'Increasing' : m.trend === 'down' ? 'Decreasing' : 'Stable',
         }))
         : null;
 

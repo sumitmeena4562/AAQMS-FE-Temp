@@ -5,5 +5,7 @@
 export const getOrgStatus = (org) => {
     if (org.isBlocked) return 'BLOCKED';
     if ((org.stats?.coordinators || 0) === 0) return 'PENDING';
-    return (org.status || 'ACTIVE').toUpperCase();
+    const status = (org.status || 'ACTIVE').toUpperCase();
+    if (status === 'PENDING') return 'ACTIVE';
+    return status;
 };

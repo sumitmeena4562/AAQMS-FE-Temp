@@ -14,7 +14,8 @@ const FilterBar = ({
     children,
     showStatus = false,
     showSearch = false,
-    searchPlaceholder = "Search..."
+    searchPlaceholder = "Search...",
+    hideClearButton = false
 }) => {
     const { 
         selectedOrg, setOrg,
@@ -147,7 +148,7 @@ const FilterBar = ({
 
                 {/* 🔹 RIGHT SIDE: Clear Button & Toggles */}
                 <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 sm:border-l border-border-main/40 pt-3 sm:pt-0 sm:pl-3 ml-0 sm:ml-auto w-full sm:w-auto justify-end">
-                    {isFilterActive && (
+                    {isFilterActive && !hideClearButton && (
                         <button 
                             onClick={handleResetAll}
                             className="h-9 flex items-center gap-1.5 px-3 text-danger hover:text-danger/80 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-danger/5 hover:bg-danger/10 shadow-sm border border-transparent hover:border-danger/20 group animate-in zoom-in duration-300"
