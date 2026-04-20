@@ -12,6 +12,8 @@ import { FiHome, FiBriefcase, FiLoader, FiAlertCircle, FiX, FiMaximize, FiDownlo
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import { Layout, Truck, Fuel, Monitor } from 'lucide-react';
 import useSearchStore from '../../store/useSearchStore';
+import { useResponsiveLimit } from '../../hooks/useWindowSize';
+import Pagination from '../../components/UI/Pagination';
 
 const MediaModal = ({ isOpen, onClose, zone }) => {
     if (!isOpen) return null;
@@ -156,13 +158,17 @@ const Zones = () => {
             });
     }, [zoneData, searchQuery]);
 
-    // 🔹 Auto-reset to page 1 when filters change (Adjusting state during rendering)
-    const [prevFilters, setPrevFilters] = useState({ q: searchQuery, o: selectedOrg, s: selectedSite, f: selectedFloor });
-    if (searchQuery !== prevFilters.q || selectedOrg !== prevFilters.o || selectedSite !== prevFilters.s || selectedFloor !== prevFilters.f) {
-        setPrevFilters({ q: searchQuery, o: selectedOrg, s: selectedSite, f: selectedFloor });
+    const pageSize = useResponsiveLimit(10);
+    // 🔹 Auto-reset to page 1 when filters or page size change
+    const [prevParams, setPrevParams] = useState({ q: searchQuery, o: selectedOrg, s: selectedSite, f: selectedFloor, ps: pageSize });
+    if (searchQuery !== prevParams.q || selectedOrg !== prevParams.o || selectedSite !== prevParams.s || selectedFloor !== prevParams.f || pageSize !== prevParams.ps) {
+        setPrevParams({ q: searchQuery, o: selectedOrg, s: selectedSite, f: selectedFloor, ps: pageSize });
         setCurrentPage(1);
     }
-    const paginatedZones = processedZones;
+    const totalPages = Math.ceil(processedZones.length / pageSize);
+    const paginatedZones = useMemo(() => {
+        return processedZones.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    }, [processedZones, currentPage, pageSize]);
 
     const handlePreviousPage = () => setCurrentPage(p => p - 1);
     const handleNextPage = () => setCurrentPage(p => p + 1);
@@ -207,17 +213,13 @@ const Zones = () => {
                         <div className="flex flex-col gap-6">
                             <ZonesTable data={paginatedZones} selectionMode={false} onViewMedia={handleViewMedia} />
                             
-                            {totalZonesCount > 10 && (
-                                <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm">
-                                    <span className="text-[10px] font-black text-gray uppercase tracking-[0.2em]">
-                                        Page {currentPage} of {Math.ceil(totalZonesCount / 10)} &nbsp;·&nbsp; {totalZonesCount} Zones Total
-                                    </span>
-                                    <div className="flex items-center gap-2">
-                                        <Button variant="outline" onClick={handlePreviousPage} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
-                                        <Button variant="outline" onClick={handleNextPage} disabled={currentPage * 10 >= totalZonesCount} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
-                                    </div>
-                                </div>
-                            )}
+                            <Pagination 
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                                totalItems={processedZones.length}
+                                itemsPerPage={pageSize}
+                            />
                         </div>
                     ) : (
                         <div className="w-full py-40 flex flex-col items-center justify-center text-center bg-card/40 rounded-[2rem] border-2 border-dashed border-border-main/60">

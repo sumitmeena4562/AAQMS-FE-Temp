@@ -14,7 +14,7 @@ export const useCoordinators = (orgId = null, options = {}) => {
   });
 };
 
-export const useUsers = (filters = {}, search = '', page = 1) => {
+export const useUsers = (filters = {}, search = '', page = 1, limit = 20) => {
   // Normalize filters for stable keys
   const cleanFilters = Object.fromEntries(
     Object.entries(filters).filter(([_, v]) => 
@@ -27,8 +27,8 @@ export const useUsers = (filters = {}, search = '', page = 1) => {
   );
 
   return useQuery({
-    queryKey: ['users', { filters: cleanFilters, search, page }],
-    queryFn: () => userService.getUsers(cleanFilters, search, page),
+    queryKey: ['users', { filters: cleanFilters, search, page, limit }],
+    queryFn: () => userService.getUsers(cleanFilters, search, page, limit),
     staleTime: 2 * 60 * 1000,
   });
 };

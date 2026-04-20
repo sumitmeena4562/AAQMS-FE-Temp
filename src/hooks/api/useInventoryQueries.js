@@ -5,7 +5,7 @@ import { inventoryService } from '../../services/inventoryService';
  * ── INVENTORY QUERIES ──
  */
 
-export const useInventory = (filters = {}, page = 1) => {
+export const useInventory = (filters = {}, page = 1, pageSize = 20) => {
   // Normalize filters to ensure stable Query Keys
   const cleanFilters = Object.fromEntries(
     Object.entries(filters).filter(([, v]) => 
@@ -26,11 +26,11 @@ export const useInventory = (filters = {}, page = 1) => {
     category: cleanFilters.type?.length ? cleanFilters.type[0] : undefined,
     search: cleanFilters.search || undefined,
     page: page,
-    page_size: 20,
+    page_size: pageSize,
   };
 
   return useQuery({
-    queryKey: ['inventory', cleanFilters, page],
+    queryKey: ['inventory', cleanFilters, page, pageSize],
     queryFn: async () => {
       const response = await inventoryService.getInventory(params);
       return {

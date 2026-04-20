@@ -26,6 +26,8 @@ import EmptyState from '../../components/Admin/Inventory/EmptyState';
 import AssetCard from '../../components/Admin/Inventory/AssetCard';
 import useSearchStore from '../../store/useSearchStore';
 import useDebounce from '../../hooks/useDebounce';
+import { useResponsiveLimit } from '../../hooks/useWindowSize';
+import Pagination from '../../components/UI/Pagination';
 
 
 
@@ -51,7 +53,12 @@ const Inventory = () => {
     const [viewMode, setViewMode] = useState('list');
     // Server-side pagination — page number drives the API call
     const [currentPage, setCurrentPage] = useState(1);
-    const PAGE_SIZE = 10;
+    const PAGE_SIZE = useResponsiveLimit(12);
+
+    // Reset to page 1 if page size changes to avoid 'Invalid page' errors
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [PAGE_SIZE]);
 
     // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
     const hasSynced = useRef(false);
@@ -95,7 +102,7 @@ const Inventory = () => {
 
 
     // ── FETCH INVENTORY (server-side pagination) ──
-    const { data: inventoryData, isLoading } = useInventory(activeFilters, currentPage);
+    const { data: inventoryData, isLoading } = useInventory(activeFilters, currentPage, PAGE_SIZE);
 
     const inventory = inventoryData?.results || [];
     const inventoryStats = inventoryData?.stats || null;
@@ -279,16 +286,14 @@ const Inventory = () => {
                             onRowClick={handleAssetClick}
                             emptyMessage={<EmptyState onReset={handleReset} />}
                             footer={
-                                <div className="flex items-center justify-between w-full px-1">
-                                    <span className="text-[11px] font-bold text-gray tracking-tight">
-                                        Showing <span className="text-title font-bold">{inventoryTotalCount > 0 ? startIndex + 1 : 0}–{Math.min(startIndex + PAGE_SIZE, inventoryTotalCount)}</span> of <span className="text-title font-bold">{inventoryTotalCount.toLocaleString()}</span> assets
-                                    </span>
-                                    <div className="flex items-center gap-1.5">
-                                        <Button variant="outline" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1 || isLoading} className="!h-8 !px-3 !text-[10px] !font-black !uppercase">Previous</Button>
-                                        <span className="text-[10px] font-black text-gray px-2">{currentPage} / {totalPages || 1}</span>
-                                        <Button variant="outline" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage >= totalPages || isLoading} className="!h-8 !px-4 !text-[10px] !font-black !uppercase">Next</Button>
-                                    </div>
-                                </div>
+                                <Pagination 
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    totalItems={inventoryTotalCount}
+                                    itemsPerPage={PAGE_SIZE}
+                                    className="!bg-transparent !border-none !shadow-none !px-0 !py-2"
+                                />
                             }
                         />
                     )
@@ -297,8 +302,17 @@ const Inventory = () => {
                         {isLoading ? (
                             <CardSkeleton count={8} columns={4} />
                         ) : displayedInventory.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xxl:grid-cols-5 gap-5">
-                                {displayedInventory.map(asset => <AssetCard key={asset.id} asset={asset} onClick={handleAssetClick} />)}
+                            <div className="flex flex-col gap-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
+                                    {displayedInventory.map(asset => <AssetCard key={asset.id} asset={asset} onClick={handleAssetClick} />)}
+                                </div>
+                                <Pagination 
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={handlePageChange}
+                                    totalItems={inventoryTotalCount}
+                                    itemsPerPage={PAGE_SIZE}
+                                />
                             </div>
                         ) : (
                             <EmptyState onReset={handleReset} />

@@ -23,6 +23,8 @@ import { useHierarchy } from '../../hooks/api/useHierarchy';
 import useSearchStore from '../../store/useSearchStore';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
+import { useResponsiveLimit } from '../../hooks/useWindowSize';
+import Pagination from '../../components/UI/Pagination';
 
 /**
  * COORDINATOR MANAGEMENT PAGE
@@ -37,7 +39,7 @@ const Coordinator = () => {
     // ── STORES (UI state only) ──
     const { 
         filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
-        setPage, setFilters, setSelectedIds, resetFilters
+        setPage, setFilters, setSelectedIds, resetFilters, setLimit
     } = useUserStore();
     const { query: search } = useSearchStore();
 
@@ -65,10 +67,18 @@ const Coordinator = () => {
 
         hasSynced.current = true;
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    
+    // --- Responsive Pagination Sync ---
+    const responsiveLimit = useResponsiveLimit(12);
+    useEffect(() => {
+        if (responsiveLimit !== limit) {
+            setLimit(responsiveLimit);
+        }
+    }, [responsiveLimit, limit, setLimit]);
 
     // Role-locked Users Query
     const queryFilters = { ...filters, role: 'coordinator' };
-    const { data: usersData, isLoading: isUsersLoading } = useUsers(queryFilters, debouncedSearch, page);
+    const { data: usersData, isLoading: isUsersLoading } = useUsers(queryFilters, debouncedSearch, page, limit);
     useCoordinatorStats(filters.organization);
     
     // ── HIERARCHY DATA (UNIFIED) ──
@@ -245,14 +255,14 @@ const Coordinator = () => {
 
 
     const paginationFooter = (
-        <div className="flex justify-between items-center w-full bg-card py-6 px-8 rounded-b-2xl border-t border-border-main/50">
-            <div className="text-[12px] text-gray font-medium uppercase tracking-tight">Personnel Records Found: <span className="font-black text-title">{totalCount}</span></div>
-            <div className="flex items-center gap-3">
-                <span className="text-[11px] font-bold text-gray/60">Page {page} of {Math.ceil(totalCount / limit) || 1}</span>
-                <Button variant="outline" size="sm" onClick={() => setPage(page - 1)} disabled={page <= 1 || isUsersLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Previous</Button>
-                <Button variant="outline" size="sm" onClick={() => setPage(page + 1)} disabled={page * limit >= totalCount || isUsersLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Next</Button>
-            </div>
-        </div>
+        <Pagination 
+            currentPage={page}
+            totalPages={Math.ceil(totalCount / limit) || 1}
+            onPageChange={setPage}
+            totalItems={totalCount}
+            itemsPerPage={limit}
+            className="!rounded-t-none !border-t-0"
+        />
     );
 
     const currentOrg = filters.organization?.length === 1 ? organizations.find(o => String(o.id) === String(filters.organization[0])) : null;

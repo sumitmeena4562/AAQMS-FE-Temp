@@ -31,6 +31,7 @@ const useUserStore = create((set, get) => ({
     setError: (error) => set({ error }),
 
     setPage: (pageNumber) => set({ page: pageNumber }),
+    setLimit: (newLimit) => set({ limit: newLimit, page: 1 }),
 
     /**
      * CRUD Operations

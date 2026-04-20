@@ -24,6 +24,8 @@ import UserCard from '../../components/UI/UserCard';
 import { useUsers, useUserStats } from '../../hooks/api/useUserQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import useSearchStore from '../../store/useSearchStore';
+import { useResponsiveLimit } from '../../hooks/useWindowSize';
+import Pagination from '../../components/UI/Pagination';
 
 import { useSearchParams } from 'react-router-dom';
 
@@ -35,7 +37,7 @@ export default function Users() {
     const { 
         filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
         setPage, setFilters, toggleSelectRow, 
-        setSelectedIds // setError removed
+        setSelectedIds, setLimit // setError removed
     } = useUserStore();
     const { query: search } = useSearchStore();
 
@@ -67,6 +69,14 @@ export default function Users() {
 
         hasSynced.current = true;
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    
+    // --- Responsive Pagination Sync ---
+    const responsiveLimit = useResponsiveLimit(12);
+    useEffect(() => {
+        if (responsiveLimit !== limit) {
+            setLimit(responsiveLimit);
+        }
+    }, [responsiveLimit, limit, setLimit]);
 
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 
@@ -74,7 +84,7 @@ export default function Users() {
     const debouncedSearch = useDebounce(search, 400);
     
     // Sync React Query with local state
-    const { data: usersData, isLoading: isUsersLoading } = useUsers(filters, debouncedSearch, page);
+    const { data: usersData, isLoading: isUsersLoading } = useUsers(filters, debouncedSearch, page, limit);
     const { data: stats = { total: 0, active: 0, inactive: 0, unassigned: 0 } } = useUserStats();
     
     // ── HIERARCHY DATA (UNIFIED) ──
@@ -319,33 +329,14 @@ export default function Users() {
     ];
 
     const paginationFooter = (
-        <div className="flex justify-between items-center w-full bg-card py-6 px-8 rounded-b-2xl border-t border-border-main/50">
-            <div className="text-sm text-gray font-medium">
-                Showing <span className="font-bold text-title">{totalCount > 0 ? (page - 1) * limit + 1 : 0} to {Math.min(page * limit, totalCount)}</span> of <span className="font-bold text-title">{totalCount.toLocaleString()}</span> results
-            </div>
-
-            <div className="flex items-center gap-3">
-                <span className="text-[11px] font-bold text-gray/60">Page {page} of {Math.ceil(totalCount / limit) || 1}</span>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(page - 1)}
-                    disabled={page <= 1 || isUsersLoading}
-                    className="px-6 font-bold tracking-wider uppercase text-[11px] h-10 border-border-main hover:bg-base"
-                >
-                    Previous
-                </Button>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(page + 1)}
-                    disabled={page * limit >= totalCount || isUsersLoading}
-                    className="px-6 font-bold tracking-wider uppercase text-[11px] h-10 border-border-main hover:bg-base"
-                >
-                    Next
-                </Button>
-            </div>
-        </div>
+        <Pagination 
+            currentPage={page}
+            totalPages={Math.ceil(totalCount / limit) || 1}
+            onPageChange={setPage}
+            totalItems={totalCount}
+            itemsPerPage={limit}
+            className="!rounded-t-none !border-t-0"
+        />
     );
 
 

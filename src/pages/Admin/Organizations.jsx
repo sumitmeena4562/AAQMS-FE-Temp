@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useOrgStore } from '../../store/useOrgStore';
 import { getOrgStatus } from '../../utils/orgUtils';
 import { useOrganizations } from '../../hooks/api/useOrgQueries';
@@ -17,6 +17,8 @@ import TableSkeleton from '../../components/UI/TableSkeleton';
 
 import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiShieldOff, FiEye } from 'react-icons/fi';
 import useSearchStore from '../../store/useSearchStore';
+import { useResponsiveLimit } from '../../hooks/useWindowSize';
+import Pagination from '../../components/UI/Pagination';
 
 /**
  * Helper for consistent status calculation
@@ -97,8 +99,15 @@ const Organizations = () => {
     }, [enrichedOrgs, filters.status]);
 
 
-    const totalPages = Math.ceil(filteredOrgs.length / 12);
-    const paginatedOrgs = filteredOrgs.slice((currentPage - 1) * 12, currentPage * 12);
+    const itemsPerPage = useResponsiveLimit(12);
+    
+    // Auto-reset to page 1 when criteria or page size changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [filters, searchQuery, itemsPerPage]);
+
+    const totalPages = Math.ceil(filteredOrgs.length / itemsPerPage);
+    const paginatedOrgs = filteredOrgs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
     const industryOptions = useMemo(() => {
         const uniqueIndustries = [...new Set(orgs.map(o => o.industry).filter(Boolean))];
@@ -352,17 +361,13 @@ const Organizations = () => {
                                     </div>
                                 ))}
                             </div>
-                            {totalPages > 1 && (
-                                <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm">
-                                    <span className="text-[10px] font-bold text-gray uppercase tracking-widest">
-                                        Page {currentPage} of {totalPages}
-                                    </span>
-                                    <div className="flex items-center gap-2">
-                                        <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
-                                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
-                                    </div>
-                                </div>
-                            )}
+                            <Pagination 
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={setCurrentPage}
+                                totalItems={filteredOrgs.length}
+                                itemsPerPage={itemsPerPage}
+                            />
                         </div>
                     ) : (
                         <DataTable
@@ -370,17 +375,14 @@ const Organizations = () => {
                             data={paginatedOrgs}
                             onRowClick={handleView}
                             footer={
-                                totalPages > 1 && (
-                                    <div className="flex items-center justify-between w-full pt-2">
-                                        <span className="text-[10px] font-bold text-gray uppercase tracking-widest">
-                                            Page {currentPage} of {totalPages}
-                                        </span>
-                                        <div className="flex items-center gap-1.5 focus-within:z-10">
-                                            <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-8 !px-3 !text-[10px] !font-black !uppercase">Previous</Button>
-                                            <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= totalPages} className="!h-8 !px-4 !text-[10px] !font-black !uppercase">Next</Button>
-                                        </div>
-                                    </div>
-                                )
+                                <Pagination 
+                                    currentPage={currentPage}
+                                    totalPages={totalPages}
+                                    onPageChange={setCurrentPage}
+                                    totalItems={filteredOrgs.length}
+                                    itemsPerPage={itemsPerPage}
+                                    className="!bg-transparent !border-none !shadow-none !px-0 !py-2"
+                                />
                             }
                         />
                     )

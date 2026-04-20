@@ -8,12 +8,20 @@ import { useHierarchy } from '../../hooks/api/useHierarchy';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import Button from '../../components/UI/Button';
 import { FiHome, FiBriefcase, FiGrid, FiList, FiInbox } from 'react-icons/fi';
+import { useResponsiveLimit } from '../../hooks/useWindowSize';
+import Pagination from '../../components/UI/Pagination';
 
 const AssignedCoordinators = () => {
   const location = useLocation();
   const [view, setView] = React.useState('list');
   const [currentPage, setCurrentPage] = React.useState(1);
   const { selectedOrg, setOrg } = useFilterStore();
+  const pageSize = useResponsiveLimit(10);
+
+  // Reset to page 1 if criteria or page size changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [pageSize, selectedOrg]);
   
   // --- QUERY HOOKS (UNIFIED) ---
   const { organizations: orgs, coordinators: coordinatorsListRaw, isLoading } = useHierarchy({ includeSites: false });
@@ -108,27 +116,25 @@ const AssignedCoordinators = () => {
                 </button>
               </div>
             </div>
-
-            <div className={view === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'flex flex-col gap-4'}>
+            
+            <div className={view === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6' : 'flex flex-col gap-4'}>
               {isLoading ? (
                 <CardSkeleton count={6} columns={3} />
               ) : coordinatorsList.length > 0 ? (
                 <>
-                  {coordinatorsList.slice((currentPage - 1) * 10, currentPage * 10).map((coord, index) => (
+                  {coordinatorsList.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((coord, index) => (
                     <CoordinatorCard key={index} coordinator={coord} orgName={orgName} view={view} />
                   ))}
                   
-                  {coordinatorsList.length > 10 && (
-                    <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm mt-6 col-span-full">
-                      <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                        Page {currentPage} of {Math.ceil(coordinatorsList.length / 10)}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
-                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(coordinatorsList.length / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
-                      </div>
-                    </div>
-                  )}
+                  <div className="col-span-full mt-6">
+                    <Pagination 
+                      currentPage={currentPage}
+                      totalPages={Math.ceil(coordinatorsList.length / pageSize)}
+                      onPageChange={setCurrentPage}
+                      totalItems={coordinatorsList.length}
+                      itemsPerPage={pageSize}
+                    />
+                  </div>
                 </>
               ) : (
                 <div className="w-full flex flex-col items-center justify-center py-24 bg-card/40 rounded-3xl border-2 border-dashed border-border-main col-span-full animate-in zoom-in duration-300">
