@@ -42,9 +42,9 @@ const Users = React.memo(() => {
     const { query: search } = useSearchStore();
 
     // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
-    const hasSynced = useRef(false);
+    const [isInitialized, setIsInitialized] = useState(false);
     useEffect(() => {
-        if (hasSynced.current) return;
+        if (isInitialized) return;
         
         const pOrg = searchParams.get('org_id') || searchParams.get('org');
         const pSite = searchParams.get('site_id') || searchParams.get('site');
@@ -67,8 +67,8 @@ const Users = React.memo(() => {
             });
         }
 
-        hasSynced.current = true;
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+        setIsInitialized(true);
+    }, [searchParams, resetFilters, setFilters, isInitialized]);
     
     // --- Responsive Pagination Sync ---
     const responsiveLimit = useResponsiveLimit(12);
@@ -80,28 +80,28 @@ const Users = React.memo(() => {
 
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 
-    // ── QUERY HOOKS (NEW) ──
     // ── QUERY HOOKS (OPTIMIZED) ──
     const debouncedSearch = useDebounce(search, 400);
+    const isReady = isInitialized && responsiveLimit === limit;
     
     const { 
         users, totalCount, stats, isLoading: isUsersLoading 
-    } = useUserManagementData(filters, debouncedSearch, page, limit);
+    } = useUserManagementData(filters, debouncedSearch, page, limit, { enabled: isReady });
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
     
     // ── HIERARCHY DATA (OPTIMIZED) ──
-    // Conditional Fetching: Only fetch sites if organizations are selected
     const hasOrgSelected = filters.organization?.length > 0;
     const { organizations, sites } = useHierarchy({ 
         includeOrgs: true, 
         includeSites: hasOrgSelected, // <--- OPTIMIZATION: Conditional fetch
-        includeCoords: false 
+        includeCoords: false,
+        enabled: isReady
     });
 
     const filterOptions = useMemo(() => ({
-        organizations: organizations.map(o => ({ value: o.id, label: o.name })),
-        regions: hasOrgSelected ? sites.map(s => ({ value: s.id, label: s.site_name || s.name })) : [],
+        organizations: organizations?.map(o => ({ value: o?.id, label: o?.name })) || [],
+        regions: hasOrgSelected ? sites?.map(s => ({ value: s?.id, label: s?.site_name || s?.name })) || [] : [],
         roles: STATIC_ROLES
     }), [organizations, sites, STATIC_ROLES, hasOrgSelected]);
 
@@ -300,16 +300,16 @@ const Users = React.memo(() => {
     const statsData = [
         { 
             title: 'Total Users', 
-            value: stats.total || 0, 
+            value: stats?.total || 0, 
             icon: FiUsers, 
             iconColorClass: 'text-primary', 
             iconBgClass: 'bg-primary/10', 
-            secondaryLabel: `${stats.active || 0} active in system`,
+            secondaryLabel: `${stats?.active || 0} active in system`,
             description: 'platform-wide' 
         },
         { 
             title: 'Active Accounts', 
-            value: stats.active || 0, 
+            value: stats?.active || 0, 
             icon: FiCheckCircle, 
             iconColorClass: 'text-emerald-600', 
             iconBgClass: 'bg-emerald-50', 
@@ -318,16 +318,16 @@ const Users = React.memo(() => {
         },
         { 
             title: 'Deactive/Blocked', 
-            value: stats.inactive || 0, 
+            value: stats?.inactive || 0, 
             icon: FiAlertCircle, 
             iconColorClass: 'text-rose-600', 
             iconBgClass: 'bg-rose-50', 
-            secondaryLabel: `${stats.inactive || 0} restricted profiles`,
+            secondaryLabel: `${stats?.inactive || 0} restricted profiles`,
             description: 'Access denied' 
         },
         { 
             title: 'Unassigned', 
-            value: stats.unassigned || 0, 
+            value: stats?.unassigned || 0, 
             icon: FiClock, 
             iconColorClass: 'text-amber-600', 
             iconBgClass: 'bg-amber-50', 

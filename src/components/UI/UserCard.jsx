@@ -88,7 +88,7 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
                 color={user.role === 'coordinator' ? 'coordinator' : user.role === 'admin' ? 'admin' : 'fieldOfficer'}
                 className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
             >
-              {user.role === 'field_officer' ? 'Field Officer' : user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+              {user.role === 'field_officer' ? 'Field Officer' : (user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Unknown Role')}
             </Badge>
             <Badge 
                 variant="light" 

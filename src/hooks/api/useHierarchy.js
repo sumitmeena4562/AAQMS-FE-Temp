@@ -18,24 +18,25 @@ export const useHierarchy = (options = {}) => {
     const { 
         includeOrgs = true, 
         includeSites = true, 
-        includeCoords = true 
+        includeCoords = true,
+        enabled = true
     } = options;
 
     const { selectedOrg } = useFilterStore();
 
     // 1. Organizations (Top level)
-    const orgsQuery = useOrganizations({}, '', { enabled: includeOrgs });
+    const orgsQuery = useOrganizations({}, '', { enabled: includeOrgs && enabled });
 
     // 2. Coordinators (Cascading: only if org is selected)
     const coordsQuery = useCoordinators(
         selectedOrg.length > 0 ? selectedOrg : undefined, 
-        { enabled: includeCoords }
+        { enabled: includeCoords && enabled }
     );
 
     // 3. Sites (Cascading: only if org is selected)
     const sitesQuery = useSites(
         { organisation: selectedOrg.length > 0 ? selectedOrg : undefined },
-        { enabled: includeSites }
+        { enabled: includeSites && enabled }
     );
 
     return React.useMemo(() => ({

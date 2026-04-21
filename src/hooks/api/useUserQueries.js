@@ -70,21 +70,18 @@ export const useCoordinatorStats = (orgId = null, options = {}) => {
  * ── OPTIMIZED ORCHESTRATOR HOOK ──
  * Combines Users, Stats, and Filter Hierarchy into a single optimized lifecycle.
  */
-export const useUserManagementData = (filters, search, page, limit) => {
+export const useUserManagementData = (filters, search, page, limit, options = {}) => {
     // 1. Core Users Query
-    const usersQuery = useUsers(filters, search, page, limit);
+    const usersQuery = useUsers(filters, search, page, limit, options);
 
     // 2. Global Stats Query
-    const statsQuery = useUserStats();
+    const statsQuery = useUserStats(options);
 
     // 3. Conditional Hierarchy Querying
     // Only fetch sites if organizations are selected (Cascading logic)
     const orgIds = filters?.organization || [];
     const hasOrgSelected = Array.isArray(orgIds) && orgIds.length > 0;
 
-    // We can use a derived state or a separate query for filter options
-    // To prevent duplicate calls, we rely on React Query's automatic deduplication
-    
     return {
         users: usersQuery.data?.users || [],
         totalCount: usersQuery.data?.totalCount || 0,
