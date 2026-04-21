@@ -89,7 +89,13 @@ const useAuthStore = create((set, get) => ({
     if (isBootstrapping) return { success: true, message: "Verification already in flight" };
     
     // ── Cache Guard: don't re-fetch if already have a user in memory ──
-    if (isAuthenticated && user) return { success: true, user };
+    // Added a small timestamp check to allow re-verification after 1 hour
+    const lastVerified = localStorage.getItem("last_verified");
+    const isRecentlyVerified = lastVerified && (Date.now() - parseInt(lastVerified)) < 3600000;
+
+    if (isAuthenticated && user && isRecentlyVerified) {
+        return { success: true, user };
+    }
 
     // ── UI Lock: don't bootstrap if manually logging out ──
     if (isLoggingOut) return { success: false, error: "Logging out" };
@@ -111,6 +117,7 @@ const useAuthStore = create((set, get) => ({
       const userData = { ...data, role: (data.role || '').toLowerCase() };
 
       storage.saveUser(userData);
+      localStorage.setItem("last_verified", Date.now().toString());
 
       set({
         user: userData,
