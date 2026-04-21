@@ -35,8 +35,8 @@ export const useSites = (filters = {}, options = {}) => {
     },
     // Only fetch if org_id is present in filters, OR if no filters (get all)
     // Actually, in this app, we usually fetch by Org-id for lookups.
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     placeholderData: (prev) => prev,
     ...options
   });
@@ -56,8 +56,8 @@ export const useFloors = (siteId = null, options = {}) => {
           total: count
       };
     },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
     placeholderData: (prev) => prev,
     ...options
   });
@@ -81,8 +81,9 @@ export const useZones = (floorId = null, filters = {}, options = {}) => {
           total: count
       };
     },
-    staleTime: 5 * 60 * 1000, 
-    gcTime: 10 * 60 * 1000,    placeholderData: (prev) => prev,
+    staleTime: 5 * 60 * 1000, // Zones are slightly more dynamic
+    gcTime: 30 * 60 * 1000,
+    placeholderData: (prev) => prev,
     ...options
   });
 };

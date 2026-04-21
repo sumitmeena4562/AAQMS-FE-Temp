@@ -9,8 +9,8 @@ import { userService } from '../../services/userService';
 /**
  * ── CONSTANTS & CONFIG ──
  */
-const STALE_TIME = 60 * 1000; // 1 minute
-const CACHE_TIME = 5 * 60 * 1000; // 5 minutes (gcTime)
+const STALE_TIME = 5 * 60 * 1000; // 5 minutes (Increased from 1 min)
+const CACHE_TIME = 30 * 60 * 1000; // 30 minutes (Increased from 5 min)
 
 /**
  * ── INDIVIDUAL QUERIES ──

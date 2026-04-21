@@ -42,6 +42,7 @@ const useUserStore = create((set, get) => ({
             const data = await userService.createUser(userData);
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
+            await queryClient.invalidateQueries(['dashboard', 'summary']);
             set({ loading: false }); // Reset loading on success
             return { success: true, data };
         } catch (err) {
@@ -56,6 +57,7 @@ const useUserStore = create((set, get) => ({
             const data = await userService.updateUser(id, updates);
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
+            await queryClient.invalidateQueries(['dashboard', 'summary']);
             set({ loading: false }); // Reset loading on success
             return { success: true, data };
         } catch (err) {
@@ -71,6 +73,7 @@ const useUserStore = create((set, get) => ({
             set(s => ({ selectedIds: s.selectedIds.filter(i => i !== id), loading: false })); // Reset loading
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
+            await queryClient.invalidateQueries(['dashboard', 'summary']);
             return { success: true };
         } catch (err) {
             set({ loading: false, error: err.message });
@@ -91,6 +94,7 @@ const useUserStore = create((set, get) => ({
             set({ selectedIds: [], loading: false }); // Reset loading
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
+            await queryClient.invalidateQueries(['dashboard', 'summary']);
             toast.success("Done! The changes have been applied.");
             return { success: true };
         } catch (err) {

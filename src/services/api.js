@@ -27,6 +27,9 @@ const PUBLIC_ENDPOINTS = ['users/login/', 'users/token/refresh/', 'users/registe
 // ─── DIAGNOSTIC REQUEST COUNTER ───
 let requestCount = 0;
 
+// ─── REQUEST DEDUPLICATION CACHE ───
+const pendingRequests = new Map();
+
 api.interceptors.request.use(
     (config) => {
         requestCount++;
@@ -34,9 +37,17 @@ api.interceptors.request.use(
             console.warn(`[AAQMS-DEBUG] High request volume detected: ${requestCount} requests since load.`);
         }
         
-        // ... (rest of the logic)
-        // No manual JWT injection needed; browser handles HttpOnly cookies.
-        
+        // ── REQUEST DEDUPLICATION ──
+        // Only deduplicate GET requests to prevent race conditions on writes.
+        if (config.method?.toLowerCase() === 'get') {
+            const requestKey = `${config.url}${JSON.stringify(config.params || {})}`;
+            if (pendingRequests.has(requestKey)) {
+                return Promise.reject({ isDeduplicated: true, key: requestKey });
+            }
+            pendingRequests.set(requestKey, true);
+            config._requestKey = requestKey;
+        }
+
         // ── CSRF PROTECTION ──
         // For state-changing requests, attach the X-CSRFToken header.
         if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
@@ -88,9 +99,26 @@ const processQueue = (error, token = null) => {
 };
 
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        // Clear pending request tracker on success
+        if (response.config?._requestKey) {
+            pendingRequests.delete(response.config._requestKey);
+        }
+        return response;
+    },
     async (error) => {
+        // If the request was deduplicated, we don't treat it as a real error
+        if (error.isDeduplicated) {
+            // We return a never-resolving promise or similar, but React Query will handle the actual data
+            // from the first request that was sent.
+            return new Promise(() => {}); 
+        }
+
         const originalRequest = error.config;
+        if (originalRequest?._requestKey) {
+            pendingRequests.delete(originalRequest._requestKey);
+        }
+
         const isSilent = originalRequest?._silent === true;
 
         if (error.response) {
@@ -151,5 +179,6 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+
 
 export default api;

@@ -9,10 +9,11 @@ export const useDashboardSummary = () => {
   return useQuery({
     queryKey: ['dashboard', 'summary'],
     queryFn: ({ signal }) => dashboardService.getDashboardSummary(signal),
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000,   // 30 minutes
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    refetchInterval: false, // Explicitly disable polling
+    refetchInterval: false,
   });
 };
 
@@ -35,6 +36,9 @@ export const useAllHistory = (filters = {}) => {
   return useQuery({
     queryKey: ['dashboard', 'history', cleanFilters],
     queryFn: ({ signal }) => dashboardService.getAllHistory(cleanFilters, signal),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000, // History is more dynamic, 2 mins is safer
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 };
+
