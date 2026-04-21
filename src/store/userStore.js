@@ -139,14 +139,27 @@ const useUserStore = create((set, get) => ({
                 "Full Name", "Email", "Phone", "Role", "Organization", "Status"
             ];
             
-            const tableRows = users.map(u => [
-                u.name,
-                u.email,
-                u.mobile_number || 'N/A',
-                u.role?.toUpperCase() || 'N/A',
-                u.org_name || 'Unassigned',
-                u.status?.toUpperCase() || 'N/A'
-            ]);
+            const tableRows = users.map(u => {
+                // Format Role: e.g., 'FIELD_OFFICER' -> 'Field Officer'
+                const formattedRole = (u.role || 'N/A')
+                    .replace(/_/g, ' ')
+                    .toLowerCase()
+                    .replace(/\b\w/g, l => l.toUpperCase());
+
+                // Format Status: e.g., 'ACTIVE' -> 'Active'
+                const formattedStatus = (u.status || 'N/A')
+                    .toLowerCase()
+                    .replace(/\b\w/g, l => l.toUpperCase());
+
+                return [
+                    u.name || 'N/A',
+                    u.email || 'N/A',
+                    u.mobile_number || 'N/A',
+                    formattedRole,
+                    u.org_name || 'Unassigned',
+                    formattedStatus
+                ];
+            });
 
             autoTable(doc, {
                 head: [tableColumn],
