@@ -70,13 +70,14 @@ const Users = React.memo(() => {
         setIsInitialized(true);
     }, [searchParams, resetFilters, setFilters, isInitialized]);
     
-    // --- Responsive Pagination Sync ---
     const responsiveLimit = useResponsiveLimit(12);
+    const appliedLimit = useRef(limit);
     useEffect(() => {
-        if (responsiveLimit !== limit) {
+        if (responsiveLimit !== appliedLimit.current) {
+            appliedLimit.current = responsiveLimit;
             setLimit(responsiveLimit);
         }
-    }, [responsiveLimit, limit, setLimit]);
+    }, [responsiveLimit, setLimit]);
 
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 
@@ -96,7 +97,8 @@ const Users = React.memo(() => {
         includeOrgs: true, 
         includeSites: hasOrgSelected, // <--- OPTIMIZATION: Conditional fetch
         includeCoords: false,
-        enabled: isReady
+        enabled: isReady,
+        orgId: filters.organization
     });
 
     const filterOptions = useMemo(() => ({

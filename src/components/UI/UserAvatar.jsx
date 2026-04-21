@@ -42,6 +42,8 @@ const UserAvatar = ({ name, avatar, size = "40px", fontSize = "14px", className 
                     src={avatar} 
                     alt={name} 
                     className="w-full h-full object-cover" 
+                    loading="lazy"
+                    decoding="async"
                     onError={() => setImgError(true)} 
                 />
             ) : (

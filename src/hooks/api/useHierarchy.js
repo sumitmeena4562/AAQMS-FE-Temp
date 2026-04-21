@@ -19,23 +19,25 @@ export const useHierarchy = (options = {}) => {
         includeOrgs = true, 
         includeSites = true, 
         includeCoords = true,
-        enabled = true
+        enabled = true,
+        orgId = null
     } = options;
 
     const { selectedOrg } = useFilterStore();
+    const activeOrgs = orgId !== null ? (Array.isArray(orgId) ? orgId : [orgId]) : selectedOrg;
 
     // 1. Organizations (Top level)
     const orgsQuery = useOrganizations({}, '', { enabled: includeOrgs && enabled });
 
     // 2. Coordinators (Cascading: only if org is selected)
     const coordsQuery = useCoordinators(
-        selectedOrg.length > 0 ? selectedOrg : undefined, 
+        activeOrgs.length > 0 ? activeOrgs : undefined, 
         { enabled: includeCoords && enabled }
     );
 
     // 3. Sites (Cascading: only if org is selected)
     const sitesQuery = useSites(
-        { organisation: selectedOrg.length > 0 ? selectedOrg : undefined },
+        { organisation: activeOrgs.length > 0 ? activeOrgs : undefined },
         { enabled: includeSites && enabled }
     );
 

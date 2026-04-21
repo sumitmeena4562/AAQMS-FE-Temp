@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { userService } from '../../services/userService';
 
@@ -16,11 +17,11 @@ const CACHE_TIME = 5 * 60 * 1000; // 5 minutes (gcTime)
  */
 
 export const useUsers = (filters = {}, search = '', page = 1, limit = 20, options = {}) => {
-  const cleanFilters = Object.fromEntries(
+  const cleanFilters = useMemo(() => Object.fromEntries(
     Object.entries(filters).filter(([_, v]) => 
       v !== undefined && v !== null && v !== 'all' && v !== '' && !(Array.isArray(v) && v.length === 0)
     )
-  );
+  ), [filters]);
 
   return useQuery({
     queryKey: ['users', 'list', { filters: cleanFilters, search, page, limit }],
