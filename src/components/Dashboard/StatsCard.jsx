@@ -13,7 +13,7 @@ const CHANGE_STYLES = {
     negative: { text: 'text-red-700',     bg: 'bg-red-50' },
 };
 
-const StatsCard = ({
+const StatsCard = React.memo(({
     title,
     label,
     value,
@@ -91,9 +91,9 @@ const StatsCard = ({
             </div>
         </div>
     );
-};
+});
 
-export const StatsRow = ({ items = [], columns = 4, className = "" }) => {
+export const StatsRow = React.memo(({ items = [], columns = 4, className = "" }) => {
     const gridCols = {
         1: 'grid-cols-1',
         2: 'grid-cols-1 sm:grid-cols-2',
@@ -108,6 +108,6 @@ export const StatsRow = ({ items = [], columns = 4, className = "" }) => {
             ))}
         </div>
     );
-};
+});
 
 export default StatsCard;

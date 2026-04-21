@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { hierarchyService } from '../../services/hierarchyService';
 import { mapOrgToFrontend } from './useOrgQueries';
@@ -8,7 +9,7 @@ import { mapOrgToFrontend } from './useOrgQueries';
 
 export const useSites = (filters = {}, options = {}) => {
   // Normalize filters to ensure stable Query Keys
-  const cleanFilters = Object.fromEntries(
+  const cleanFilters = useMemo(() => Object.fromEntries(
     Object.entries(filters).filter(([, v]) => 
         v !== undefined && 
         v !== null && 
@@ -16,7 +17,7 @@ export const useSites = (filters = {}, options = {}) => {
         v !== '' && 
         !(Array.isArray(v) && v.length === 0)
     )
-  );
+  ), [filters]);
 
   return useQuery({
     queryKey: ['sites', cleanFilters],
@@ -34,7 +35,8 @@ export const useSites = (filters = {}, options = {}) => {
     },
     // Only fetch if org_id is present in filters, OR if no filters (get all)
     // Actually, in this app, we usually fetch by Org-id for lookups.
-    staleTime: 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     placeholderData: (prev) => prev,
     ...options
   });
@@ -54,16 +56,17 @@ export const useFloors = (siteId = null, options = {}) => {
           total: count
       };
     },
-    staleTime: 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     placeholderData: (prev) => prev,
     ...options
   });
 };
 
 export const useZones = (floorId = null, filters = {}, options = {}) => {
-  const cleanFilters = Object.fromEntries(
+  const cleanFilters = useMemo(() => Object.fromEntries(
     Object.entries(filters).filter(([, v]) => v !== undefined && v !== null && v !== 'all' && v !== '')
-  );
+  ), [filters]);
 
   return useQuery({
     queryKey: ['zones', floorId, cleanFilters],
@@ -78,8 +81,8 @@ export const useZones = (floorId = null, filters = {}, options = {}) => {
           total: count
       };
     },
-    staleTime: 60 * 1000, 
-    placeholderData: (prev) => prev,
+    staleTime: 5 * 60 * 1000, 
+    gcTime: 10 * 60 * 1000,    placeholderData: (prev) => prev,
     ...options
   });
 };

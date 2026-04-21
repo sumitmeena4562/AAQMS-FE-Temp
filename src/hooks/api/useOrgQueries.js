@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { organizationService } from '../../services/organizationService';
 
@@ -68,7 +69,7 @@ export const mapOrgToFrontend = (data) => {
 
 export const useOrganizations = (filters = {}, search = '', options = {}) => {
   // Normalize filters to ensure stable Query Keys
-  const cleanFilters = Object.fromEntries(
+  const cleanFilters = useMemo(() => Object.fromEntries(
     Object.entries(filters).filter(([, v]) => 
         v !== undefined && 
         v !== null && 
@@ -76,7 +77,7 @@ export const useOrganizations = (filters = {}, search = '', options = {}) => {
         v !== '' && 
         !(Array.isArray(v) && v.length === 0)
     )
-  );
+  ), [filters]);
 
   return useQuery({
     queryKey: ['organizations', { filters: cleanFilters, search }],
@@ -85,8 +86,8 @@ export const useOrganizations = (filters = {}, search = '', options = {}) => {
       const data = response.data || response.results || response;
       return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
     },
-    staleTime: 60 * 1000, 
-    placeholderData: (previousData) => previousData,
+    staleTime: 5 * 60 * 1000, 
+    gcTime: 10 * 60 * 1000,    placeholderData: (previousData) => previousData,
     ...options
   });
 };
@@ -99,8 +100,8 @@ export const useOrganizationDetails = (id, options = {}) => {
       return mapOrgToFrontend(data);
     },
     enabled: !!id,
-    staleTime: 60 * 1000,
-    placeholderData: (previousData) => previousData,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,    placeholderData: (previousData) => previousData,
     ...options
   });
 };

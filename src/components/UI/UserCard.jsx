@@ -4,11 +4,9 @@ import UserAvatar from './UserAvatar';
 import Badge from './Badge';
 import DotStatus from './DotStatus';
 
-const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) => {
+const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selectable }) => {
   const isActive = user.status === 'active';
   const isAssigned = !!(user.organization || user.region || user.zone);
-
-
 
   return (
     <div 
@@ -131,6 +129,6 @@ const UserCard = ({ user, isSelected, onSelect, onEdit, onView, selectable }) =>
       </div>
     </div>
   );
-};
+});
 
 export default UserCard;
