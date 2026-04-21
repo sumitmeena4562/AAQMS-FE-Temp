@@ -35,8 +35,10 @@ const AppRoutes = () => {
         fetchProfile();
     }, [fetchProfile]);
 
-    // 🛡️ Prevent routing jumps while verifying session on refresh
-    if (isBootstrapping) return <PageLoader />;
+    // 🛡️ We no longer block the entire app. 
+    // Public routes (Landing Page) render immediately. 
+    // Protected/Guest routes handle bootstrapping internally.
+    // if (isBootstrapping) return <PageLoader />;
 
     return (
         <BrowserRouter>

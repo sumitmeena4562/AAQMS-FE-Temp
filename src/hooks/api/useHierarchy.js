@@ -27,7 +27,7 @@ export const useHierarchy = (options = {}) => {
     const activeOrgs = orgId !== null ? (Array.isArray(orgId) ? orgId : [orgId]) : selectedOrg;
 
     // 1. Organizations (Top level)
-    const orgsQuery = useOrganizations({}, '', { enabled: includeOrgs && enabled });
+    const orgsQuery = useOrganizations({ dropdown: 'true' }, '', 1, 1000, { enabled: includeOrgs && enabled });
 
     // 2. Coordinators (Cascading: only if org is selected)
     const coordsQuery = useCoordinators(
@@ -43,7 +43,7 @@ export const useHierarchy = (options = {}) => {
 
     return React.useMemo(() => ({
         // Data
-        organizations: orgsQuery.data || EMPTY_ARRAY,
+        organizations: orgsQuery.data?.results || (Array.isArray(orgsQuery.data) ? orgsQuery.data : EMPTY_ARRAY),
         coordinators: coordsQuery.data || EMPTY_ARRAY,
         sites: sitesQuery.data?.results || EMPTY_ARRAY,
         

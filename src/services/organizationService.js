@@ -71,6 +71,13 @@ export const organizationService = {
                 params.search = params.search.trim() || undefined;
             }
 
+            // Handle pagination params
+            if (params.page) params.page = Number(params.page);
+            if (params.pageSize) {
+                params.page_size = params.pageSize;
+                delete params.pageSize;
+            }
+
             // Handle multi-select arrays for backend compatibility
             if (Array.isArray(params.status)) {
                 params.status = params.status.join(',').toUpperCase();

@@ -31,6 +31,12 @@ export default defineConfig({
             if (id.includes('@tanstack/react-query')) {
               return 'vendor-query';
             }
+            if (id.includes('jspdf')) {
+              return 'vendor-pdf';
+            }
+            if (id.includes('gsap')) {
+              return 'vendor-gsap';
+            }
             if (id.includes('framer-motion')) {
               return 'vendor-motion';
             }

@@ -65,7 +65,14 @@ const Organizations = React.memo(() => {
 
     // --- QUERY HOOK (NEW) ---
     // Note: We use the global filters and search directly in the query key for automatic refetching
-    const { data: orgs = [], isLoading } = useOrganizations(filters, searchQuery);
+    const itemsPerPage = useResponsiveLimit(12);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    // --- QUERY HOOK (UPDATED) ---
+    // Note: We use server-side pagination and filtering
+    const { data, isLoading } = useOrganizations(filters, searchQuery, currentPage, itemsPerPage);
+    const orgs = data?.results || [];
+    const totalCount = data?.count || 0;
 
     // --- Local State ---
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -75,40 +82,19 @@ const Organizations = React.memo(() => {
 
     // --- Memoized Computations ---
     const enrichedOrgs = useMemo(() => {
-        return orgs.map(org => ({
-            ...org,
-            stats: {
-                ...org.stats,
-                coordinators: org.coordinators_count || (org.stats && org.stats.coordinators) || 0,
-                sites: org.sites_count || (org.stats && org.stats.sites) || 0,
-                floors: org.floors_count || (org.stats && org.stats.floors) || 0,
-                assets: org.assets_count || (org.stats && org.stats.assets) || 0
-            }
-        }));
+        return orgs; // They are already enriched by the hook's mapOrgToFrontend
     }, [orgs]);
 
-    // LOCAL FILTERING: Ensure computed statuses like 'PENDING' are exactly matched
-    const filteredOrgs = useMemo(() => {
-        let result = enrichedOrgs;
-        if (filters.status && filters.status.length > 0 && !filters.status.includes('all')) {
-            result = result.filter(org => {
-                const computedStatus = getOrgStatus(org);
-                return filters.status.some(s => s.toUpperCase() === computedStatus);
-            });
-        }
-        return result;
-    }, [enrichedOrgs, filters.status]);
+    // SERVER-SIDE FILTERING: Remove local filter logic
+    const filteredOrgs = enrichedOrgs;
 
-
-    const itemsPerPage = useResponsiveLimit(12);
-
-    // Auto-reset to page 1 when criteria or page size changes
+    // Auto-reset to page 1 when criteria changes
     useEffect(() => {
         setCurrentPage(1);
-    }, [filters, searchQuery, itemsPerPage]);
+    }, [filters, searchQuery]);
 
-    const totalPages = Math.ceil(filteredOrgs.length / itemsPerPage);
-    const paginatedOrgs = filteredOrgs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+    const paginatedOrgs = filteredOrgs; // Already paginated by server
 
     const industryOptions = useMemo(() => {
         const uniqueIndustries = [...new Set(orgs.map(o => o.industry).filter(Boolean))];
@@ -286,7 +272,7 @@ const Organizations = React.memo(() => {
             {/* Header Section */}
             <PageHeader
                 title="Organizations"
-                subtitle={`Managing ${filteredOrgs.length} strategic client entities and operational density`}
+                subtitle={`Managing ${totalCount} strategic client entities and operational density`}
                 onAdd={handleAddClick}
                 addButtonText="Add Organization"
                 hideAddButton={false}
@@ -366,7 +352,7 @@ const Organizations = React.memo(() => {
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={setCurrentPage}
-                                totalItems={filteredOrgs.length}
+                                totalItems={totalCount}
                                 itemsPerPage={itemsPerPage}
                             />
                         </div>
@@ -380,7 +366,7 @@ const Organizations = React.memo(() => {
                                     currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={setCurrentPage}
-                                    totalItems={filteredOrgs.length}
+                                    totalItems={totalCount}
                                     itemsPerPage={itemsPerPage}
                                     className="!bg-transparent !border-none !shadow-none !px-0 !py-2"
                                 />

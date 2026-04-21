@@ -67,7 +67,7 @@ export const mapOrgToFrontend = (data) => {
  * ── ORGANIZATION QUERIES ──
  */
 
-export const useOrganizations = (filters = {}, search = '', options = {}) => {
+export const useOrganizations = (filters = {}, search = '', page = 1, pageSize = 10, options = {}) => {
   // Normalize filters to ensure stable Query Keys
   const cleanFilters = useMemo(() => Object.fromEntries(
     Object.entries(filters).filter(([, v]) => 
@@ -80,11 +80,22 @@ export const useOrganizations = (filters = {}, search = '', options = {}) => {
   ), [filters]);
 
   return useQuery({
-    queryKey: ['organizations', { filters: cleanFilters, search }],
+    queryKey: ['organizations', { filters: cleanFilters, search, page, pageSize }],
     queryFn: async ({ signal }) => {
-      const response = await organizationService.getOrganizations({ ...cleanFilters, search }, signal);
-      const data = response.data || response.results || response;
-      return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
+      const response = await organizationService.getOrganizations({ ...cleanFilters, search, page, pageSize }, signal);
+      
+      // Handle DRF Paginated Response
+      if (response && response.results) {
+        return {
+          results: response.results.map(mapOrgToFrontend),
+          count: response.count,
+          next: response.next,
+          previous: response.previous
+        };
+      }
+      
+      const data = response.data || response;
+      return Array.isArray(data) ? data.map(mapOrgToFrontend) : { results: [], count: 0 };
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 60 * 60 * 1000,    // 1 hour

@@ -7,7 +7,7 @@ import Footer from '../../components/Navbar/Footer';
 import BlueprintBackground from '../../components/Effects/BlueprintBackground';
 
 // Lazy load sections for optimized performance
-const Hero = lazy(() => import('./Hero'));
+import Hero from './Hero';
 const RoleFeatures = lazy(() => import('./RoleFeatures'));
 const Capabilities = lazy(() => import('./Capabilities'));
 const FieldApp = lazy(() => import('./FieldApp'));
@@ -17,9 +17,12 @@ const SitePlanning = lazy(() => import('./SitePlanning'));
 const CTA = lazy(() => import('./CTA'));
 
 // Skeleton Loader for smooth transitions
-const SectionLoader = () => (
-    <div className="py-20 px-6 text-center text-slate-400 opacity-50">
-        <div className="animate-pulse font-black uppercase tracking-[0.2em] text-xs">Loading segment...</div>
+const SectionLoader = ({ height = "400px" }) => (
+    <div className="w-full px-6 flex flex-col items-center justify-center bg-slate-50/5" style={{ minHeight: height }}>
+        <div className="w-24 h-1 bg-slate-200 rounded-full overflow-hidden mb-4">
+            <div className="w-full h-full bg-primary/20 animate-loading-bar" />
+        </div>
+        <div className="animate-pulse font-black uppercase tracking-[0.2em] text-[10px] text-slate-400">Initializing Experience...</div>
     </div>
 );
 
@@ -122,36 +125,48 @@ const LandingPage = () => {
             {/* Global Fixed Blueprint Background Layer */}
             <BlueprintBackground />
 
-            {/* Main Content Sections with Lazy Loading */}
-            <Suspense fallback={<SectionLoader />}>
-                <section id="home">
-                    <Hero />
-                </section>
+            {/* Main Content Sections */}
+            <section id="home">
+                <Hero />
+            </section>
 
+            <Suspense fallback={<SectionLoader height="600px" />}>
                 <div id="roles" className="scroll-mt-20">
                     <RoleFeatures />
                 </div>
+            </Suspense>
 
+            <Suspense fallback={<SectionLoader height="700px" />}>
                 <div id="capabilities" className="scroll-mt-20">
                     <Capabilities />
                 </div>
+            </Suspense>
 
+            <Suspense fallback={<SectionLoader height="800px" />}>
                 <div id="planning" className="scroll-mt-20">
                     <SitePlanning />
                 </div>
+            </Suspense>
 
+            <Suspense fallback={<SectionLoader height="600px" />}>
                 <div id="workflow" className="scroll-mt-20">
                     <Workflow />
                 </div>
+            </Suspense>
 
+            <Suspense fallback={<SectionLoader height="700px" />}>
                 <div id="mobile" className="scroll-mt-20">
                     <FieldApp />
                 </div>
+            </Suspense>
 
+            <Suspense fallback={<SectionLoader height="800px" />}>
                 <div id="analytics" className="scroll-mt-20">
                     <Analytics />
                 </div>
+            </Suspense>
 
+            <Suspense fallback={<SectionLoader height="400px" />}>
                 <section id="cta">
                     <CTA />
                 </section>

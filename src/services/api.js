@@ -36,7 +36,7 @@ api.interceptors.request.use(
         if (requestCount % 10 === 0) {
             console.warn(`[AAQMS-DEBUG] High request volume detected: ${requestCount} requests since load.`);
         }
-        
+
         // ── REQUEST DEDUPLICATION ──
         // Only deduplicate GET requests to prevent race conditions on writes.
         if (config.method?.toLowerCase() === 'get') {
@@ -55,12 +55,12 @@ api.interceptors.request.use(
                 .split('; ')
                 .find(row => row.startsWith('csrftoken='))
                 ?.split('=')[1];
-            
+
             if (csrfToken) {
                 config.headers['X-CSRFToken'] = csrfToken;
             }
         }
-        
+
         // ── PARAMETER SANITIZATION ──
         // Remove 'undefined', 'null' or literal "undefined" strings from query params
         if (config.params) {
@@ -94,7 +94,7 @@ const processQueue = (error, token = null) => {
             prom.resolve(token);
         }
     });
-    
+
     failedQueue = [];
 };
 
@@ -111,7 +111,7 @@ api.interceptors.response.use(
         if (error.isDeduplicated) {
             // We return a never-resolving promise or similar, but React Query will handle the actual data
             // from the first request that was sent.
-            return new Promise(() => {}); 
+            return new Promise(() => { });
         }
 
         const originalRequest = error.config;
@@ -126,17 +126,18 @@ api.interceptors.response.use(
 
             // 1. Handling Unauthorized (401) with Token Refresh (and Queuing)
             const isUnauthorized = status === 401 || (error.response.data?.status === false && error.response.data?.errors?.code === 'token_not_valid');
-            
+
             // SECURITY: Never attempt refresh for PUBLIC_ENDPOINTS (avoid login loops)
             const isPublicEndpoint = PUBLIC_ENDPOINTS.some(endpoint => originalRequest.url?.includes(endpoint));
-            
-            if (isUnauthorized && !originalRequest._retry && !isPublicEndpoint) {
+            const shouldRefresh = !originalRequest._retry && !isPublicEndpoint && !originalRequest._noRefresh;
+
+            if (isUnauthorized && shouldRefresh) {
                 if (isRefreshing) {
-                    return new Promise(function(resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         failedQueue.push({ resolve, reject });
                     })
-                    .then(() => api(originalRequest))
-                    .catch(err => Promise.reject(err));
+                        .then(() => api(originalRequest))
+                        .catch(err => Promise.reject(err));
                 }
 
                 originalRequest._retry = true;
@@ -144,21 +145,21 @@ api.interceptors.response.use(
 
                 try {
                     // Critical: Await the response from the refresh endpoint
-                    await axios.post(`${API_BASE_URL}users/token/refresh/`, {}, { 
+                    await axios.post(`${API_BASE_URL}users/token/refresh/`, {}, {
                         withCredentials: true,
                         // Prevent this request from ever being intercepted/retried recursively
-                        _silent: true 
+                        _silent: true
                     });
-                    
+
                     isRefreshing = false;
-                    processQueue(null); 
-                    
+                    processQueue(null);
+
                     // Final Retry logic
                     return api(originalRequest);
                 } catch (refreshError) {
                     processQueue(refreshError);
                     isRefreshing = false;
-                    
+
                     // 🛡️ Cleanup localStorage ONLY if it's a terminal AUTHENTICATION failure.
                     // This prevents losing the session during transient 500/Database errors.
                     if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
@@ -175,7 +176,7 @@ api.interceptors.response.use(
         } else if (error.message === 'Network Error' && !isSilent) {
             toast.error("Network Error: Please check your internet connection.", { id: 'network-error' });
         }
-        
+
         return Promise.reject(error);
     }
 );
