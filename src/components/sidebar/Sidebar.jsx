@@ -4,6 +4,7 @@ import useAuthStore from '../../store/authStore';
 import { queryClient } from '../../lib/queryClient';
 import { organizationService } from '../../services/organizationService';
 import { userService } from '../../services/userService';
+import { mapOrgToFrontend } from '../../hooks/api/useOrgQueries';
 
 /* ── Animated Collapsible ── */
 const CollapsibleSection = ({ isOpen, children }) => {
@@ -55,11 +56,15 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         }
     };
 
-    const handlePrefetch = (path) => {
+    const handlePrefetch = async (path) => {
         if (path === '/admin/organizations') {
             queryClient.prefetchQuery({
                 queryKey: ['organizations', { filters: {}, search: '' }],
-                queryFn: () => organizationService.getOrganizations({ filters: {}, search: '' })
+                queryFn: async () => {
+                    const response = await organizationService.getOrganizations({});
+                    const data = response.data || response.results || response;
+                    return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
+                }
             });
         } else if (path === '/admin/users') {
             queryClient.prefetchQuery({
