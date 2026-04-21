@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useOrgStore } from '../../store/useOrgStore';
 import { getOrgStatus } from '../../utils/orgUtils';
 import { useOrganizations } from '../../hooks/api/useOrgQueries';
