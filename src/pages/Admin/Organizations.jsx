@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+
 import { useOrgStore } from '../../store/useOrgStore';
 import { getOrgStatus } from '../../utils/orgUtils';
 import { useOrganizations } from '../../hooks/api/useOrgQueries';
@@ -102,7 +102,7 @@ const Organizations = React.memo(() => {
 
 
     const itemsPerPage = useResponsiveLimit(12);
-    
+
     // Auto-reset to page 1 when criteria or page size changes
     useEffect(() => {
         setCurrentPage(1);
@@ -363,7 +363,7 @@ const Organizations = React.memo(() => {
                                     </div>
                                 ))}
                             </div>
-                            <Pagination 
+                            <Pagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}
                                 onPageChange={setCurrentPage}
@@ -377,7 +377,7 @@ const Organizations = React.memo(() => {
                             data={paginatedOrgs}
                             onRowClick={handleView}
                             footer={
-                                <Pagination 
+                                <Pagination
                                     currentPage={currentPage}
                                     totalPages={totalPages}
                                     onPageChange={setCurrentPage}

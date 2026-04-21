@@ -26,10 +26,10 @@ const orgSchema = z.object({
   country: z.string().trim().min(1, "Country is required"),
   otherInfo: z.string().optional(),
   imagery: z.object({
-    north: z.string().min(1, "North view image is required"),
-    south: z.string().min(1, "South view image is required"),
-    east: z.string().min(1, "East view image is required"),
-    west: z.string().min(1, "West view image is required"),
+    north: z.string().optional(),
+    south: z.string().optional(),
+    east: z.string().optional(),
+    west: z.string().optional(),
     profile: z.string().min(1, "Profile logo is required"),
     extra: z.array(z.string().min(1, "Upload an image")).optional()
   })
@@ -66,40 +66,44 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
     }
   });
 
-  // Helper to map Backend data back to Frontend form format
   const mapOrgBackendToFrontend = (data) => {
     if (!data) return null;
 
-    // Map imagery array back to form object
+    // Map imagery array back to form object, being resilient to already-mapped data
     const imagery = {
-      north: '', south: '', east: '', west: '', profile: '', extra: []
+      north: data.imagery?.north || '',
+      south: data.imagery?.south || '',
+      east: data.imagery?.east || '',
+      west: data.imagery?.west || '',
+      profile: data.imagery?.profile || '',
+      extra: Array.isArray(data.imagery?.extra) ? [...data.imagery.extra] : []
     };
 
     if (Array.isArray(data.images)) {
       data.images.forEach(img => {
         const type = (img.image_type || '').toLowerCase();
         if (['north', 'south', 'east', 'west', 'profile'].includes(type)) {
-          imagery[type] = img.image_url;
+          if (!imagery[type]) imagery[type] = img.image_url;
         } else if (type === 'extra') {
-          imagery.extra.push(img.image_url);
+          if (!imagery.extra.includes(img.image_url)) imagery.extra.push(img.image_url);
         }
       });
     }
 
     return {
-      name: data.organisation_name || '',
-      industry: data.industry_type || 'Manufacturing & Heavy Industry',
-      occupancyType: data.occupancy_type || 'Industrial Factory',
+      name: data.organisation_name || data.name || '',
+      industry: data.industry_type || data.industry || 'Manufacturing & Heavy Industry',
+      occupancyType: data.occupancy_type || data.occupancyType || 'Industrial Factory',
       classification: data.classification || 'Group H - High Hazard',
-      plannedSites: data.plannedSites || 0,
-      contactPerson: data.contact_person_name || '',
-      contactEmail: data.contact_email || '',
-      contactPhone: data.contact_phone || '',
+      plannedSites: data.planned_sites !== undefined ? data.planned_sites : (data.plannedSites || 0),
+      contactPerson: data.contact_person_name || data.contactPerson || '',
+      contactEmail: data.contact_email || data.contactEmail || '',
+      contactPhone: data.contact_phone || data.contactPhone || '',
       address: data.address || '',
       city: data.city || '',
       state: data.state || '',
       country: data.country || 'India',
-      otherInfo: data.description || '',
+      otherInfo: data.description || data.otherInfo || '',
       imagery
     };
   };
@@ -180,6 +184,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
       onSubmit({
         id: org?.id,
         ...data,
+        is_active: org?.is_active,
         imageFiles: imageFiles, // Pass actual files for backend processing
         status: org?.status || "PENDING",
         lastInventoryAudit: org?.lastInventoryAudit || new Date().toISOString(),
@@ -192,7 +197,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
 
   const nextStep = async () => {
     let fieldsToValidate = [];
-    if (step === 1) fieldsToValidate = ['name', 'industry', 'occupancyType', 'classification', 'plannedSites'];
+    if (step === 1) fieldsToValidate = ['name', 'industry', 'occupancyType', 'classification', 'plannedSites', 'imagery.profile'];
     if (step === 2) fieldsToValidate = ['contactPerson', 'contactEmail', 'contactPhone', 'address', 'city', 'state', 'country'];
 
     const result = await trigger(fieldsToValidate);
@@ -357,6 +362,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                           <ImageUploadCard
                             label="Identity Logo"
                             value={imageryValues?.profile}
+                            error={errors.imagery?.profile?.message}
                             onUpload={(url, file) => handleImage('profile', url, file)}
                           />
                         </div>
@@ -489,10 +495,10 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                           </div>
 
                           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                            <ImageUploadCard label="North View ↑" value={imageryValues?.north} onUpload={(url, file) => handleImage('north', url, file)} />
-                            <ImageUploadCard label="South View ↓" value={imageryValues?.south} onUpload={(url, file) => handleImage('south', url, file)} />
-                            <ImageUploadCard label="East View →" value={imageryValues?.east} onUpload={(url, file) => handleImage('east', url, file)} />
-                            <ImageUploadCard label="West View ←" value={imageryValues?.west} onUpload={(url, file) => handleImage('west', url, file)} />
+                            <ImageUploadCard label="North View ↑" value={imageryValues?.north} error={errors.imagery?.north?.message} onUpload={(url, file) => handleImage('north', url, file)} />
+                            <ImageUploadCard label="South View ↓" value={imageryValues?.south} error={errors.imagery?.south?.message} onUpload={(url, file) => handleImage('south', url, file)} />
+                            <ImageUploadCard label="East View →" value={imageryValues?.east} error={errors.imagery?.east?.message} onUpload={(url, file) => handleImage('east', url, file)} />
+                            <ImageUploadCard label="West View ←" value={imageryValues?.west} error={errors.imagery?.west?.message} onUpload={(url, file) => handleImage('west', url, file)} />
                           </div>
                         </Motion.div>
                       </div>

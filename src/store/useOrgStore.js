@@ -19,7 +19,7 @@ export const useOrgStore = create((set) => ({
     set({ isSubmitting: true, error: null });
     try {
       await organizationService.createOrganization(newOrg);
-      await queryClient.invalidateQueries(['organisations']);
+      await queryClient.invalidateQueries(['organizations']);
       set({ isSubmitting: false });
       toast.success("Success! The organization has been added.");
       return true; 
@@ -34,7 +34,7 @@ export const useOrgStore = create((set) => ({
     set({ isSubmitting: true, error: null });
     try {
       await organizationService.blockOrganization(id);
-      await queryClient.invalidateQueries(['organisations']);
+      await queryClient.invalidateQueries(['organizations']);
       set({ isSubmitting: false });
       toast.success("Organization state updated.");
       return true;
@@ -49,7 +49,7 @@ export const useOrgStore = create((set) => ({
     set({ isSubmitting: true, error: null });
     try {
       await organizationService.updateOrganization(id, updatedOrg);
-      await queryClient.invalidateQueries(['organisations']);
+      await queryClient.invalidateQueries(['organizations']);
       set({ isSubmitting: false });
       toast.success("Changes saved successfully!");
       return true;
