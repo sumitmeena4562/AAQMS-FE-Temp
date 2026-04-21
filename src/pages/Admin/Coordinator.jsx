@@ -3,8 +3,8 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
-import UserFormModal from '../../components/Dashboard/UserFormModal';
-import ConfirmModal from '../../components/UI/ConfirmModal';
+const UserFormModal = React.lazy(() => import('../../components/Dashboard/UserFormModal'));
+const ConfirmModal = React.lazy(() => import('../../components/UI/ConfirmModal'));
 import { StatsRow } from '../../components/Dashboard/StatsCard';
 import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
@@ -31,7 +31,7 @@ import Pagination from '../../components/UI/Pagination';
  * Optimized for 100% Production Readiness.
  * Features: URL-based filtering (org_id), Role-locked view, and standard Personnel UI.
  */
-const Coordinator = () => {
+const Coordinator = React.memo(() => {
     const [searchParams, setSearchParams] = useSearchParams();
     const orgIdFromUrl = searchParams.get('org_id');
     const orgNameFromUrl = searchParams.get('org_name');
@@ -370,11 +370,13 @@ const Coordinator = () => {
             )}
 
             <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={peekUser} onEdit={handleEditUser} onViewSites={handleViewSites} />
-            <UserFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} />
-            <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Status Lock" message={`Are you sure you want to change status?`} confirmText="Confirm" danger={true} />
-            <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Change" message={`Update ${selectedIds.length} profiles?`} confirmText="Confirm All" danger={true} />
+            <React.Suspense fallback={null}>
+                <UserFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} />
+                <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Status Lock" message={`Are you sure you want to change status?`} confirmText="Confirm" danger={true} />
+                <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Change" message={`Update ${selectedIds.length} profiles?`} confirmText="Confirm All" danger={true} />
+            </React.Suspense>
         </div>
     );
-};
+});
 
 export default Coordinator;

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useOrganizations } from './useOrgQueries';
 import { useSites } from './useHierarchyQueries';
 import { useCoordinators } from './useUserQueries';
@@ -37,7 +38,7 @@ export const useHierarchy = (options = {}) => {
         { enabled: includeSites }
     );
 
-    return {
+    return React.useMemo(() => ({
         // Data
         organizations: orgsQuery.data || EMPTY_ARRAY,
         coordinators: coordsQuery.data || EMPTY_ARRAY,
@@ -61,5 +62,10 @@ export const useHierarchy = (options = {}) => {
             coords: coordsQuery,
             sites: sitesQuery
         }
-    };
+    }), [
+        orgsQuery.data, orgsQuery.isLoading, orgsQuery.isFetching, orgsQuery.error,
+        coordsQuery.data, coordsQuery.isLoading, coordsQuery.isFetching, coordsQuery.error,
+        sitesQuery.data, sitesQuery.isLoading, sitesQuery.isFetching, sitesQuery.error,
+        includeOrgs, includeCoords, includeSites
+    ]);
 };

@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useOrgStore } from '../../store/useOrgStore';
 import { getOrgStatus } from '../../utils/orgUtils';
 import { useOrganizations } from '../../hooks/api/useOrgQueries';
 import Button from '../../components/UI/Button';
 
 import OrganizationCard from '../../components/UI/OrganizationCard';
-import CreateOrganization from '../../components/UI/CreateOrganization';
-import OrganizationDetailsModal from '../../components/UI/OrganizationDetailsModal';
+const CreateOrganization = React.lazy(() => import('../../components/UI/CreateOrganization'));
+const OrganizationDetailsModal = React.lazy(() => import('../../components/UI/OrganizationDetailsModal'));
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
@@ -53,7 +54,7 @@ const OrgLogo = React.memo(({ org }) => {
     );
 });
 
-const Organizations = () => {
+const Organizations = React.memo(() => {
     // --- Global State ---
     const {
         filters, viewMode,
@@ -408,26 +409,28 @@ const Organizations = () => {
             </div>
 
             {/* Modal Sub-components */}
-            {isViewOnly ? (
-                <OrganizationDetailsModal
-                    isOpen={isCreateModalOpen}
-                    org={editingOrg}
-                    onEdit={handleEdit}
-                    onClose={() => { setIsCreateModalOpen(false); setEditingOrg(null); }}
-                />
-            ) : (
-                <CreateOrganization
-                    isOpen={isCreateModalOpen}
-                    org={editingOrg}
-                    isViewOnly={isViewOnly}
-                    isSubmitting={isSubmitting}
-                    onSubmit={handleCreateOrUpdate}
-                    onEdit={handleEdit}
-                    onClose={() => { setIsCreateModalOpen(false); setEditingOrg(null); }}
-                />
-            )}
+            <React.Suspense fallback={null}>
+                {isViewOnly ? (
+                    <OrganizationDetailsModal
+                        isOpen={isCreateModalOpen}
+                        org={editingOrg}
+                        onEdit={handleEdit}
+                        onClose={() => { setIsCreateModalOpen(false); setEditingOrg(null); }}
+                    />
+                ) : (
+                    <CreateOrganization
+                        isOpen={isCreateModalOpen}
+                        org={editingOrg}
+                        isViewOnly={isViewOnly}
+                        isSubmitting={isSubmitting}
+                        onSubmit={handleCreateOrUpdate}
+                        onEdit={handleEdit}
+                        onClose={() => { setIsCreateModalOpen(false); setEditingOrg(null); }}
+                    />
+                )}
+            </React.Suspense>
         </div>
     );
-};
+});
 
 export default Organizations;

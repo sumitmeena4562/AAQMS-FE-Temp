@@ -20,8 +20,8 @@ export const useSites = (filters = {}, options = {}) => {
 
   return useQuery({
     queryKey: ['sites', cleanFilters],
-    queryFn: async () => {
-      const response = await hierarchyService.getSites(cleanFilters);
+    queryFn: async ({ signal }) => {
+      const response = await hierarchyService.getSites(cleanFilters, signal);
       
       // Standardize response handling for pagination
       const results = response.results || (Array.isArray(response) ? response : (response.data || []));
@@ -42,8 +42,8 @@ export const useSites = (filters = {}, options = {}) => {
 export const useFloors = (siteId = null, options = {}) => {
   return useQuery({
     queryKey: ['floors', siteId],
-    queryFn: async () => {
-      const response = await hierarchyService.getFloors(siteId);
+    queryFn: async ({ signal }) => {
+      const response = await hierarchyService.getFloors(siteId, signal);
       
       const results = response.results || (Array.isArray(response) ? response : (response.data || []));
       const count = response.count || (Array.isArray(response) ? response.length : 0);
@@ -65,8 +65,8 @@ export const useZones = (floorId = null, filters = {}, options = {}) => {
 
   return useQuery({
     queryKey: ['zones', floorId, cleanFilters],
-    queryFn: async () => {
-      const response = await hierarchyService.getZones(floorId, cleanFilters);
+    queryFn: async ({ signal }) => {
+      const response = await hierarchyService.getZones(floorId, cleanFilters, signal);
       
       const results = response.results || (Array.isArray(response) ? response : (response.data || []));
       const count = response.count || (Array.isArray(response) ? response.length : 0);

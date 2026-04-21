@@ -8,7 +8,7 @@ import * as dashboardService from '../../services/dashboardService';
 export const useDashboardSummary = () => {
   return useQuery({
     queryKey: ['dashboard', 'summary'],
-    queryFn: dashboardService.getDashboardSummary,
+    queryFn: ({ signal }) => dashboardService.getDashboardSummary(signal),
     staleTime: 5 * 60 * 1000, // 5 minutes cache
     refetchOnWindowFocus: false,
     refetchOnMount: false,
@@ -34,7 +34,7 @@ export const useAllHistory = (filters = {}) => {
 
   return useQuery({
     queryKey: ['dashboard', 'history', cleanFilters],
-    queryFn: () => dashboardService.getAllHistory(cleanFilters),
+    queryFn: ({ signal }) => dashboardService.getAllHistory(cleanFilters, signal),
     staleTime: 5 * 60 * 1000,
   });
 };

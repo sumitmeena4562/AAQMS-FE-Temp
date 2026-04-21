@@ -8,7 +8,7 @@ import { userService } from '../../services/userService';
 export const useCoordinators = (orgId = null, options = {}) => {
   return useQuery({
     queryKey: ['coordinators', orgId],
-    queryFn: () => userService.getCoordinators(orgId),
+    queryFn: ({ signal }) => userService.getCoordinators(orgId, signal),
     staleTime: 5 * 60 * 1000,
     ...options
   });
@@ -28,7 +28,7 @@ export const useUsers = (filters = {}, search = '', page = 1, limit = 20) => {
 
   return useQuery({
     queryKey: ['users', { filters: cleanFilters, search, page, limit }],
-    queryFn: () => userService.getUsers(cleanFilters, search, page, limit),
+    queryFn: ({ signal }) => userService.getUsers(cleanFilters, search, page, limit, signal),
     staleTime: 5 * 60 * 1000,
     placeholderData: (previousData) => previousData,
   });
@@ -37,7 +37,7 @@ export const useUsers = (filters = {}, search = '', page = 1, limit = 20) => {
 export const useUserStats = () => {
   return useQuery({
     queryKey: ['users', 'stats'],
-    queryFn: userService.getUserStats,
+    queryFn: ({ signal }) => userService.getUserStats(signal),
     staleTime: 5 * 60 * 1000,
   });
 };
@@ -45,7 +45,7 @@ export const useUserStats = () => {
 export const useCoordinatorStats = (orgId = null) => {
   return useQuery({
     queryKey: ['coordinators', 'stats', orgId],
-    queryFn: () => userService.getCoordinatorStats(orgId),
+    queryFn: ({ signal }) => userService.getCoordinatorStats(orgId, signal),
     staleTime: 5 * 60 * 1000,
   });
 };
@@ -53,7 +53,7 @@ export const useCoordinatorStats = (orgId = null) => {
 export const useUserFilterOptions = () => {
     return useQuery({
         queryKey: ['users', 'filter-options'],
-        queryFn: userService.getFilterOptions,
+        queryFn: ({ signal }) => userService.getFilterOptions(signal),
         staleTime: 10 * 60 * 1000,
     });
 };

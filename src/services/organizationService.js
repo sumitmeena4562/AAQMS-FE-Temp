@@ -90,9 +90,9 @@ export const organizationService = {
     },
 
     // Get single organisation details
-    getOrganizationById: async (id) => {
+    getOrganizationById: async (id, signal = null) => {
         try {
-            const response = await api.get(`organisations/${id}/`);
+            const response = await api.get(`organisations/${id}/`, { signal });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Organisation details not found"));
@@ -137,12 +137,10 @@ export const organizationService = {
     // --- SUB-UNITS (SITES, FLOORS, ZONES) ---
 
     // Get all sites
-    getSites: async (organizationId = null, coordinatorId = null) => {
-        const params = {};
-        if (organizationId) params.organisation = organizationId;
-        if (coordinatorId) params.coord_id = coordinatorId;
+    getSites: async (filters = {}, signal = null) => {
+        const params = { ...filters };
         try {
-            const response = await api.get('organisations/sites/', { params });
+            const response = await api.get('organisations/sites/', { params, signal });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load sites"));
@@ -150,10 +148,10 @@ export const organizationService = {
     },
 
     // Get floors for a site
-    getFloors: async (siteId) => {
+    getFloors: async (siteId, signal = null) => {
         if (!siteId) return [];
         try {
-            const response = await api.get(`organisations/floors/${siteId}/`);
+            const response = await api.get(`organisations/floors/${siteId}/`, { signal });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load floors"));
@@ -161,10 +159,10 @@ export const organizationService = {
     },
 
     // Get zones for a floor
-    getZones: async (floorId) => {
+    getZones: async (floorId, signal = null) => {
         if (!floorId) return [];
         try {
-            const response = await api.get(`organisations/floors/${floorId}/zones/`);
+            const response = await api.get(`organisations/floors/${floorId}/zones/`, { signal });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load zones"));
@@ -172,10 +170,13 @@ export const organizationService = {
     },
 
     // Get zones for an organisation
-    getZonesByOrg: async (orgId) => {
+    getZonesByOrg: async (orgId, signal = null) => {
         if (!orgId) return [];
         try {
-            const response = await api.get('organisations/all-zones/', { params: { org_id: orgId, dropdown: 'true' } });
+            const response = await api.get('organisations/all-zones/', { 
+                params: { org_id: orgId, dropdown: 'true' },
+                signal
+            });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load zones for organisation"));

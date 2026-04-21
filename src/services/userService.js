@@ -102,19 +102,20 @@ export const userService = {
     /**
      * ANALYTICS & OPTIONS
      */
-    getUserStats: async () => {
+    getUserStats: async (signal = null) => {
         try {
-            const response = await api.get('users/admin/stats/');
+            const response = await api.get('users/admin/stats/', { signal });
             return response.data;
         } catch {
             return { total: 0, active: 0, inactive: 0, unassigned: 0 };
         }
     },
 
-    getCoordinatorStats: async (orgId = null) => {
+    getCoordinatorStats: async (orgId = null, signal = null) => {
         try {
             const response = await api.get('users/coordinator/stats/', {
-                params: orgId ? { organisation_id: orgId } : {}
+                params: orgId ? { organisation_id: orgId } : {},
+                signal
             });
             return response.data;
         } catch (error) {
@@ -123,12 +124,12 @@ export const userService = {
         }
     },
 
-    getFilterOptions: async () => {
+    getFilterOptions: async (signal = null) => {
         try {
             // Fetch real organizations and sites from backend
             const [orgsData, sitesData] = await Promise.all([
-                organizationService.getOrganizations({ dropdown: 'true' }),
-                organizationService.getSites()
+                organizationService.getOrganizations({ dropdown: 'true' }, '', { signal }),
+                organizationService.getSites({}, { signal })
             ]);
 
             const orgs = Array.isArray(orgsData) ? orgsData : (orgsData.results || []);
@@ -166,10 +167,11 @@ export const userService = {
     /**
      * FETCH SUPERVISORS (COORDINATORS)
      */
-    getCoordinators: async (orgId = null) => {
+    getCoordinators: async (orgId = null, signal = null) => {
         try {
             const response = await api.get('users/coordinators/', { 
-                params: orgId ? { organisation_id: orgId } : {} 
+                params: orgId ? { organisation_id: orgId } : {} ,
+                signal
             });
             return response.data;
         } catch (error) {

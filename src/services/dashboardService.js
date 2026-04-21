@@ -6,14 +6,13 @@ import { mapToActivityFeed } from '../utils/dashboardCalculations';
  */
 
 // \u2500\u2500\u2500 UNIFIED DASHBOARD ENDPOINT (1 call replaces 3) \u2500\u2500\u2500
-export const getDashboardSummary = async () => {
-    console.count("SUMMARY API CALLED");
-    const response = await api.get('/users/dashboard/summary/');
+export const getDashboardSummary = async (signal = null) => {
+    const response = await api.get('/users/dashboard/summary/', { signal });
     return response.data; // { stats, metrics, recent_activity }
 };
 
 // \u2500\u2500\u2500 HISTORY (server-side paginated) \u2500\u2500\u2500
-export const getAllHistory = async (filters = {}) => {
+export const getAllHistory = async (filters = {}, signal = null) => {
     const finalFilters = {};
     Object.keys(filters).forEach(key => {
         const value = filters[key];
@@ -33,7 +32,8 @@ export const getAllHistory = async (filters = {}) => {
             ...finalFilters,
             page: finalFilters.page || 1,
             page_size: finalFilters.page_size || 10,
-        }
+        },
+        signal
     });
     return {
         results: mapToActivityFeed(response.data.results || []),

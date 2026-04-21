@@ -7,7 +7,7 @@ import api from './api';
  */
 export const hierarchyService = {
     // --- SITES ---
-    getSites: async (filters = {}) => {
+    getSites: async (filters = {}, signal = null) => {
         /**
          * @ENDPOINT: GET /api/organisations/sites/
          * @QUERY_PARAMS: ?organisation=uuid&org_id=uuid&coord_id=uuid
@@ -21,8 +21,8 @@ export const hierarchyService = {
         if (Array.isArray(params.coord_id)) {
             params.coord_id = params.coord_id.join(',');
         }
-
-        const response = await api.get('organisations/sites/', { params });
+ 
+        const response = await api.get('organisations/sites/', { params, signal });
         return response.data;
     },
 
@@ -32,20 +32,21 @@ export const hierarchyService = {
     },
 
     // --- FLOORS ---
-    getFloors: async (siteId = null) => {
+    getFloors: async (siteId = null, signal = null) => {
         // If siteId is an array with multiple values, use the 'all-floors' endpoint with query params
         const isMulti = Array.isArray(siteId) && siteId.length > 1;
         const singleId = Array.isArray(siteId) ? siteId[0] : siteId;
-
+ 
         if (isMulti) {
             return (await api.get('organisations/all-floors/', { 
-                params: { site_id: siteId.join(',') } 
+                params: { site_id: siteId.join(',') },
+                signal
             })).data;
         }
-
+ 
         const isValidId = singleId && typeof singleId === 'string' && singleId.trim() !== '';
         const url = isValidId ? `organisations/floors/${singleId}/` : `organisations/all-floors/`;
-        const response = await api.get(url);
+        const response = await api.get(url, { signal });
         return response.data;
     },
 
@@ -58,7 +59,7 @@ export const hierarchyService = {
     },
 
     // --- ZONES ---
-    getZones: async (floorId = null, filters = {}) => {
+    getZones: async (floorId = null, filters = {}, signal = null) => {
         // Handle multi-select for floors: if it's an array with multiple values, use the 'all-zones' endpoint
         const isMultiFloor = Array.isArray(floorId) && floorId.length > 1;
         const singleFloorId = (Array.isArray(floorId) && floorId.length > 0) ? floorId[0] : (floorId === 'all' ? null : floorId);
@@ -79,7 +80,7 @@ export const hierarchyService = {
             url = `organisations/floors/${singleFloorId}/zones/`;
         }
 
-        const response = await api.get(url, { params });
+        const response = await api.get(url, { params, signal });
         return response.data;
     },
 

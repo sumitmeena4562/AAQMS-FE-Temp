@@ -80,8 +80,8 @@ export const useOrganizations = (filters = {}, search = '', options = {}) => {
 
   return useQuery({
     queryKey: ['organizations', { filters: cleanFilters, search }],
-    queryFn: async () => {
-      const response = await organizationService.getOrganizations({ ...cleanFilters, search });
+    queryFn: async ({ signal }) => {
+      const response = await organizationService.getOrganizations({ ...cleanFilters, search }, signal);
       const data = response.data || response.results || response;
       return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
     },
@@ -93,8 +93,8 @@ export const useOrganizations = (filters = {}, search = '', options = {}) => {
 export const useOrganizationDetails = (id, options = {}) => {
   return useQuery({
     queryKey: ['organization', id],
-    queryFn: async () => {
-      const data = await organizationService.getOrganizationById(id);
+    queryFn: async ({ signal }) => {
+      const data = await organizationService.getOrganizationById(id, signal);
       return mapOrgToFrontend(data);
     },
     enabled: !!id,
