@@ -78,7 +78,6 @@ const Organizations = React.memo(() => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingOrg, setEditingOrg] = useState(null);
     const [isViewOnly, setIsViewOnly] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
 
     // --- Memoized Computations ---
     const enrichedOrgs = useMemo(() => {

@@ -27,25 +27,11 @@ const PUBLIC_ENDPOINTS = ['users/login/', 'users/token/refresh/', 'users/registe
 // ─── DIAGNOSTIC REQUEST COUNTER ───
 let requestCount = 0;
 
-// ─── REQUEST DEDUPLICATION CACHE ───
-const pendingRequests = new Map();
-
 api.interceptors.request.use(
     (config) => {
         requestCount++;
         if (requestCount % 10 === 0) {
             console.warn(`[AAQMS-DEBUG] High request volume detected: ${requestCount} requests since load.`);
-        }
-
-        // ── REQUEST DEDUPLICATION ──
-        // Only deduplicate GET requests to prevent race conditions on writes.
-        if (config.method?.toLowerCase() === 'get') {
-            const requestKey = `${config.url}${JSON.stringify(config.params || {})}`;
-            if (pendingRequests.has(requestKey)) {
-                return Promise.reject({ isDeduplicated: true, key: requestKey });
-            }
-            pendingRequests.set(requestKey, true);
-            config._requestKey = requestKey;
         }
 
         // ── CSRF PROTECTION ──
@@ -99,25 +85,9 @@ const processQueue = (error, token = null) => {
 };
 
 api.interceptors.response.use(
-    (response) => {
-        // Clear pending request tracker on success
-        if (response.config?._requestKey) {
-            pendingRequests.delete(response.config._requestKey);
-        }
-        return response;
-    },
+    (response) => response,
     async (error) => {
-        // If the request was deduplicated, we don't treat it as a real error
-        if (error.isDeduplicated) {
-            // We return a never-resolving promise or similar, but React Query will handle the actual data
-            // from the first request that was sent.
-            return new Promise(() => { });
-        }
-
         const originalRequest = error.config;
-        if (originalRequest?._requestKey) {
-            pendingRequests.delete(originalRequest._requestKey);
-        }
 
         const isSilent = originalRequest?._silent === true;
 

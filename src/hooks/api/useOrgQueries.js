@@ -84,21 +84,28 @@ export const useOrganizations = (filters = {}, search = '', page = 1, pageSize =
     queryFn: async ({ signal }) => {
       const response = await organizationService.getOrganizations({ ...cleanFilters, search, page, pageSize }, signal);
       
-      // Handle DRF Paginated Response
+      // 1. Direct results in response (Handled by service/StandardPagination)
       if (response && response.results) {
         return {
-          results: response.results.map(mapOrgToFrontend),
-          count: response.count,
-          next: response.next,
-          previous: response.previous
+          results: Array.isArray(response.results) ? response.results.map(mapOrgToFrontend) : [],
+          count: response.count || 0
         };
       }
       
-      const data = response.data || response;
-      return Array.isArray(data) ? data.map(mapOrgToFrontend) : { results: [], count: 0 };
+      // 2. Direct data array (Fallback for non-paginated or error states)
+      const data = response?.data || response;
+      if (Array.isArray(data)) {
+        return {
+          results: data.map(mapOrgToFrontend),
+          count: data.length
+        };
+      }
+
+      // 3. Absolute Fallback
+      return { results: [], count: 0 };
     },
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 60 * 60 * 1000,    // 1 hour
+    staleTime: 5 * 60 * 1000, 
+    gcTime: 10 * 60 * 1000,
     placeholderData: (previousData) => previousData,
     ...options
   });
