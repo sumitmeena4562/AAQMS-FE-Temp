@@ -62,7 +62,7 @@ const createOrgFormData = (data) => {
 
 export const organizationService = {
     // Get all organisations (with search/filtering)
-    getOrganizations: async (filters = {}) => {
+    getOrganizations: async (filters = {}, signal = null) => {
         try {
             const params = { ...filters };
             
@@ -82,7 +82,7 @@ export const organizationService = {
                 params.industry = params.industry.join(',');
             }
 
-            const response = await api.get('organisations/', { params });
+            const response = await api.get('organisations/', { params, signal });
             return response.data;
         } catch (err) {
             throw new Error(extractError(err, "Failed to load organisations"));

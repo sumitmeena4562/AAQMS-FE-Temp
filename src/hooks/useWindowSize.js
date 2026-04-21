@@ -11,15 +11,23 @@ export const useWindowSize = () => {
     });
 
     useEffect(() => {
+        let timeoutId = null;
         const handleResize = () => {
-            setWindowSize({
-                width: window.innerWidth,
-                height: window.innerHeight,
-            });
+            // Basic throttle to prevent excessive state updates during resize
+            if (timeoutId) clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                setWindowSize({
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                });
+            }, 150);
         };
 
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     return windowSize;

@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * Highly reusable Table component using Tailwind CSS.
+ * Optimized with React.memo and efficient rendering.
  */
 const Table = ({
     columns = [],
@@ -27,11 +28,9 @@ const Table = ({
     const handleToggleAll = () => {
         if (onSelectionChange) {
             if (isAllSelected) {
-                // Remove all visible IDs from the selection
                 const visibleIds = data.map(item => String(item.id));
                 onSelectionChange(selectedIds.filter(id => !visibleIds.includes(String(id))));
             } else {
-                // Add all missing visible IDs to the selection
                 const newSelection = [...selectedIds];
                 data.forEach(item => {
                     const idStr = String(item.id);
@@ -59,7 +58,6 @@ const Table = ({
 
     return (
         <div className={`w-full ${className}`}>
-            {/* Table View */}
             <div className="overflow-x-auto custom-scrollbar">
                 <table className="w-full border-collapse min-w-[700px] lg:min-w-full">
                     <thead>
@@ -104,53 +102,57 @@ const Table = ({
                                 </tr>
                             ))
                         ) : data.length > 0 ? (
-                            data.map((row, ri) => {
-                                const isSelected = selectedIdSet.has(String(row.id));
-                                const isClickable = !!onRowClick;
+                            <AnimatePresence mode="popLayout">
+                                {data.map((row, ri) => {
+                                    const isSelected = selectedIdSet.has(String(row.id));
+                                    const isClickable = !!onRowClick;
 
-                                return (
-                                    <motion.tr
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.3, delay: ri * 0.04 }}
-                                        key={row.id || ri}
-                                        onClick={() => onRowClick && onRowClick(row)}
-                                        className={`
-                                            group transition-all duration-300
-                                            ${isSelected ? 'bg-primary/[0.04]' : 'hover:bg-base/70'}
-                                            ${isClickable ? 'cursor-pointer' : 'cursor-default'}
-                                            ${rowClassName ? rowClassName(row) : ''}
-                                        `}
-                                    >
-                                        {selectable && (
-                                            <td className="px-4 py-2.5 w-10 relative focus-within:z-10">
-                                                {isSelected && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary shadow-[1px_0_8px_rgba(var(--color-primary-rgb),0.2)]" />}
-                                                <div className="flex items-center justify-start">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="w-4 h-4 rounded-[4px] border-border-main text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50 translate-x-1"
-                                                        checked={isSelected}
-                                                        onChange={e => handleToggleRow(e, row.id)}
-                                                        onClick={e => e.stopPropagation()}
-                                                    />
-                                                </div>
-                                            </td>
-                                        )}
-                                        {columns.map((col, ci) => (
-                                            <td
-                                                key={ci}
-                                                className={`
-                                                    px-2.5 py-2.5 text-[12px] font-medium text-body vertical-middle
-                                                    ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
-                                                    ${col.className || ''}
-                                                `}
-                                            >
-                                                {col.render ? col.render(row[col.accessor], row) : (row[col.accessor] || '-')}
-                                            </td>
-                                        ))}
-                                    </motion.tr>
-                                );
-                            })
+                                    return (
+                                        <motion.tr
+                                            layout
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            key={row.id || ri}
+                                            onClick={() => onRowClick && onRowClick(row)}
+                                            className={`
+                                                group transition-all duration-300
+                                                ${isSelected ? 'bg-primary/[0.04]' : 'hover:bg-base/70'}
+                                                ${isClickable ? 'cursor-pointer' : 'cursor-default'}
+                                                ${rowClassName ? rowClassName(row) : ''}
+                                            `}
+                                        >
+                                            {selectable && (
+                                                <td className="px-4 py-2.5 w-10 relative focus-within:z-10">
+                                                    {isSelected && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-primary shadow-[1px_0_8px_rgba(var(--color-primary-rgb),0.2)]" />}
+                                                    <div className="flex items-center justify-start">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="w-4 h-4 rounded-[4px] border-border-main text-primary focus:ring-primary/20 cursor-pointer transition-all hover:border-primary/50 translate-x-1"
+                                                            checked={isSelected}
+                                                            onChange={e => handleToggleRow(e, row.id)}
+                                                            onClick={e => e.stopPropagation()}
+                                                        />
+                                                    </div>
+                                                </td>
+                                            )}
+                                            {columns.map((col, ci) => (
+                                                <td
+                                                    key={ci}
+                                                    className={`
+                                                        px-2.5 py-2.5 text-[12px] font-medium text-body vertical-middle
+                                                        ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
+                                                        ${col.className || ''}
+                                                    `}
+                                                >
+                                                    {col.render ? col.render(row[col.accessor], row) : (row[col.accessor] || '-')}
+                                                </td>
+                                            ))}
+                                        </motion.tr>
+                                    );
+                                })}
+                            </AnimatePresence>
                         ) : (
                             <tr>
                                 <td colSpan={columns.length + (selectable ? 1 : 0)} className="py-24 text-center">
@@ -170,4 +172,4 @@ const Table = ({
     );
 };
 
-export default Table;
+export default React.memo(Table);

@@ -6,8 +6,8 @@ import api from './api';
  */
 export const inventoryService = {
     // Get all inventory items (with optional filters)
-    getInventory: async (params = {}) => {
-        const response = await api.get('organisations/inventory/', { params });
+    getInventory: async (params = {}, signal = null) => {
+        const response = await api.get('organisations/inventory/', { params, signal });
         return response.data;
     },
 

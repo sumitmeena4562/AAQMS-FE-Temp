@@ -8,7 +8,7 @@ const CollapsibleSection = ({ isOpen, children }) => {
     const [height, setHeight] = useState(0);
     useEffect(() => { if (ref.current) setHeight(ref.current.scrollHeight); }, [children, isOpen]);
     return (
-        <div 
+        <div
             className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
             style={{ maxHeight: isOpen ? `${height}px` : '0px' }}
         >
@@ -24,9 +24,9 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
     const [openMenus, setOpenMenus] = useState({});
 
     const isActive = useCallback((path) => location.pathname === path || location.pathname.startsWith(path + '/'), [location.pathname]);
-    const isParentActive = useCallback((item) => 
+    const isParentActive = useCallback((item) =>
         item.children ? item.children.some(c => isActive(c.path)) : isActive(item.path)
-    , [isActive]);
+        , [isActive]);
 
     const [prevPath, setPrevPath] = useState(location.pathname);
 
@@ -48,7 +48,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         setOpenMenus(p => ({ ...p, [item.label]: !p[item.label] }));
         // 🔹 Navigate immediately if parent has a default path
         if (item.path) {
-           navigate(item.path);
+            navigate(item.path);
         }
     };
 
@@ -64,8 +64,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     className={() => `
                         flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
-                        ${act 
-                            ? 'bg-primary/10 text-primary font-bold shadow-sm' 
+                        ${act
+                            ? 'bg-primary/10 text-primary font-bold shadow-sm'
                             : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
                     `}
                 >
@@ -82,7 +82,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         const isOpen = openMenus[item.label];
         const childActive = isParentActive(item);
         const activeOrOpen = childActive || isOpen;
-        
+
         return (
             <div key={item.label} className="mb-0.5 group">
                 <button
@@ -90,8 +90,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     className={`
                         w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 border-none outline-none cursor-pointer
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'justify-start'}
-                        ${activeOrOpen 
-                            ? 'bg-primary/10 text-primary font-bold' 
+                        ${activeOrOpen
+                            ? 'bg-primary/10 text-primary font-bold'
                             : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
                     `}
                 >
@@ -100,8 +100,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     </span>
                     {!collapsed && <span className="flex-1 text-left truncate tracking-tight">{item.label}</span>}
                     {!collapsed && (
-                        <svg 
-                            xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" 
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                             className={`shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'rotate-0 text-slate-400'}`}
                         >
                             <polyline points="6 9 12 15 18 9" />
@@ -119,7 +119,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                                     {/* ── Tree Branches ── */}
                                     <div className={`absolute left-0 top-0 w-[1.5px] bg-slate-200 transition-colors group-hover/child:bg-slate-300 ${isLast ? 'h-[50%]' : 'h-full'}`} />
                                     <div className="absolute left-0 top-[50%] w-3 h-[1.5px] bg-slate-200 transition-colors group-hover/child:bg-slate-300" />
-                                    
+
                                     {/* ── Active Indicator ── */}
                                     {cAct && <div className="absolute left-[-2px] top-[50%] -translate-y-1/2 w-[5px] h-[5px] rounded-full bg-primary shadow-[0_0_8px_rgba(7,34,103,0.3)] z-10" />}
 
@@ -127,8 +127,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                                         to={child.path}
                                         className={`
                                             flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
-                                            ${cAct 
-                                                ? 'bg-primary/5 text-primary font-bold border border-primary/10' 
+                                            ${cAct
+                                                ? 'bg-primary/5 text-primary font-bold border border-primary/10'
                                                 : 'text-slate-600 hover:text-slate-950 font-medium'}
                                         `}
                                     >
@@ -152,9 +152,9 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         <>
             {/* Mobile Overlay */}
             {mobileOpen && (
-                <div 
-                    onClick={() => setMobileOpen(false)} 
-                    className="fixed inset-0 bg-title/40 backdrop-blur-[1px] z-[999]" 
+                <div
+                    onClick={() => setMobileOpen(false)}
+                    className="fixed inset-0 bg-title/40 backdrop-blur-[1px] z-[999]"
                 />
             )}
 

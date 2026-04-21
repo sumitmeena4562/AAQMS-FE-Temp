@@ -7,7 +7,7 @@ export const userService = {
     /**
      * GET USERS: Fetch with search & filters
      */
-    getUsers: async (filters = {}, search = '', page = 1, pageSize = 20) => {
+    getUsers: async (filters = {}, search = '', page = 1, pageSize = 20, signal = null) => {
         try {
             const finalFilters = {};
             Object.keys(filters).forEach(key => {
@@ -27,9 +27,9 @@ export const userService = {
                 params: {
                     ...finalFilters,
                     search: search || undefined,
-                    page: page,
                     page_size: pageSize,
-                }
+                },
+                signal: signal
             });
 
             const data = response.data;

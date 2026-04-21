@@ -76,10 +76,9 @@ const Coordinator = () => {
         }
     }, [responsiveLimit, limit, setLimit]);
 
-    // Role-locked Users Query
+    // ── DATA FETCHING ──
     const queryFilters = { ...filters, role: 'coordinator' };
     const { data: usersData, isLoading: isUsersLoading } = useUsers(queryFilters, debouncedSearch, page, limit);
-    useCoordinatorStats(filters.organization);
     
     // ── HIERARCHY DATA (UNIFIED) ──
     const { organizations } = useHierarchy({ includeSites: false, includeCoords: false });
@@ -116,10 +115,10 @@ const Coordinator = () => {
     }, [usersData, sortKey, sortDir]);
 
     // ── Handlers ──
-    const handleAddUser = () => {
+    const handleAddUser = useCallback(() => {
         setEditingUser({ role: 'coordinator', organisation_id: orgIdFromUrl });
         setIsFormOpen(true);
-    };
+    }, [orgIdFromUrl]);
 
     const handleEditUser = useCallback((user) => {
         setEditingUser(user);
@@ -127,7 +126,7 @@ const Coordinator = () => {
         setIsPeekOpen(false);
     }, []);
 
-    const handleFormSubmit = async (data) => {
+    const handleFormSubmit = useCallback(async (data) => {
         // Force role as coordinator
         const finalData = { ...data, role: 'coordinator' };
         const res = editingUser?.id
@@ -152,8 +151,7 @@ const Coordinator = () => {
             toast.error(res.error || 'Failed to save');
         }
         return res;
-    };
-
+    }, [editingUser, updateUser, createUser]);
     const handleBulkActivate = async () => {
         const res = await bulkAction('activate', selectedIds);
         if (res.success) toast.success(`Activated ${selectedIds.length} profiles`);

@@ -26,7 +26,7 @@ import { AnimatePresence, motion } from 'framer-motion';
  *   selectionFooter - ReactNode: Specific footer shown when rows are selected
  *   className       - string: Extra classes for container
  */
-const DataTable = ({
+const DataTable = React.memo(({
     title,
     subtitle,
     rightContent,
@@ -192,6 +192,6 @@ const DataTable = ({
             )}
         </div>
     );
-};
+});
 
 export default DataTable;

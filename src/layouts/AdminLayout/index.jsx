@@ -46,6 +46,9 @@ const AdminLayoutInner = () => {
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
     const [isCollapsed, setIsCollapsed] = React.useState(false);
 
+    // ── Memoized Nav Items ──
+    const memoizedNavItems = React.useMemo(() => navItems, []);
+
     React.useEffect(() => {
         // Let dynamic pages manage their own breadcrumbs
         const dynamicRoutes = [
@@ -56,16 +59,21 @@ const AdminLayoutInner = () => {
             '/admin/zones'
         ];
         const isDynamic = dynamicRoutes.some(route => location.pathname.startsWith(route));
+        
         if (!isDynamic) {
-            const autoCrumbs = generateBreadcrumbs(navItems, location.pathname);
-            setBreadcrumbs(autoCrumbs);
+            const autoCrumbs = generateBreadcrumbs(memoizedNavItems, location.pathname);
+            // Only update if crumbs actually changed (shallow check)
+            setBreadcrumbs(prev => {
+                if (JSON.stringify(prev) === JSON.stringify(autoCrumbs)) return prev;
+                return autoCrumbs;
+            });
         }
-    }, [location.pathname, setBreadcrumbs]);
+    }, [location.pathname, setBreadcrumbs, memoizedNavItems]);
 
     return (
         <div className="flex h-screen overflow-hidden bg-page font-sans">
             <Sidebar
-                navItems={navItems}
+                navItems={memoizedNavItems}
                 logo={<Link to="/"><Logo /></Link>}
                 collapsed={isCollapsed}
                 onToggle={() => setIsCollapsed(c => !c)}

@@ -29,7 +29,8 @@ export const useUsers = (filters = {}, search = '', page = 1, limit = 20) => {
   return useQuery({
     queryKey: ['users', { filters: cleanFilters, search, page, limit }],
     queryFn: () => userService.getUsers(cleanFilters, search, page, limit),
-    staleTime: 2 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+    placeholderData: (previousData) => previousData,
   });
 };
 

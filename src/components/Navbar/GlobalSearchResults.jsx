@@ -131,10 +131,11 @@ const GlobalSearchResults = ({ isOpen, onClose }) => {
                  * Production-Ready: Handle failures gracefully.
                  * If one service fails, we still want to show results from others.
                  */
+                const signal = abortControllerRef.current.signal;
                 const results_raw = await Promise.allSettled([
-                    userService.getUsers({}, debouncedQuery, 1, 3),
-                    inventoryService.getInventory({ search: debouncedQuery, page_size: 3 }),
-                    organizationService.getOrganizations({ search: debouncedQuery, page_size: 3 })
+                    userService.getUsers({}, debouncedQuery, 1, 3, signal),
+                    inventoryService.getInventory({ search: debouncedQuery, page_size: 3 }, signal),
+                    organizationService.getOrganizations({ search: debouncedQuery, page_size: 3 }, signal)
                 ]);
 
                 // Extract values from settled promises
