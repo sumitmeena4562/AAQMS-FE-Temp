@@ -16,11 +16,11 @@ export const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
-      retry: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000,   // 10 minutes (formerly cacheTime)
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
+      staleTime: 60 * 1000,    // 1 minute (Instant reload feel with fresh data)
+      gcTime: 5 * 60 * 1000,   // 5 minutes cache
+      refetchOnWindowFocus: false, // Performance optimization
+      retry: 1,                // Backend recommendation for resilience
+      refetchOnReconnect: true,
     },
     mutations: {
       retry: 1,

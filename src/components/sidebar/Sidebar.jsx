@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import { queryClient } from '../../lib/queryClient';
+import { organizationService } from '../../services/organizationService';
+import { userService } from '../../services/userService';
 
 /* ── Animated Collapsible ── */
 const CollapsibleSection = ({ isOpen, children }) => {
@@ -52,6 +55,20 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         }
     };
 
+    const handlePrefetch = (path) => {
+        if (path === '/admin/organizations') {
+            queryClient.prefetchQuery({
+                queryKey: ['organizations', { filters: {}, search: '' }],
+                queryFn: () => organizationService.getOrganizations({ filters: {}, search: '' })
+            });
+        } else if (path === '/admin/users') {
+            queryClient.prefetchQuery({
+                queryKey: ['users', 'list', { filters: {}, search: '', page: 1, limit: 12 }],
+                queryFn: () => userService.getUsers({}, '', 1, 12)
+            });
+        }
+    };
+
     useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname, setMobileOpen]);
 
     const renderSimple = (item) => {
@@ -61,6 +78,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 {act && <div className="absolute left-[-10px] top-2 bottom-2 w-[3px] bg-primary rounded-r-full shadow-[0_0_8px_rgba(7,34,103,0.2)] transition-all duration-300" />}
                 <NavLink
                     to={item.path}
+                    onMouseEnter={() => handlePrefetch(item.path)}
                     className={() => `
                         flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
@@ -125,6 +143,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
                                     <NavLink
                                         to={child.path}
+                                        onMouseEnter={() => handlePrefetch(child.path)}
                                         className={`
                                             flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
                                             ${cAct

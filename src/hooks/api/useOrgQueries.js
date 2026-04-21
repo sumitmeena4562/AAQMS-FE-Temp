@@ -85,7 +85,8 @@ export const useOrganizations = (filters = {}, search = '', options = {}) => {
       const data = response.data || response.results || response;
       return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
     },
-    staleTime: 5 * 60 * 1000, 
+    staleTime: 60 * 1000, 
+    placeholderData: (previousData) => previousData,
     ...options
   });
 };
@@ -98,7 +99,8 @@ export const useOrganizationDetails = (id, options = {}) => {
       return mapOrgToFrontend(data);
     },
     enabled: !!id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 60 * 1000,
+    placeholderData: (previousData) => previousData,
     ...options
   });
 };

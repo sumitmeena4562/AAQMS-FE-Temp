@@ -6,46 +6,38 @@ import { extractError } from "../utils/errorUtils";
 export const userService = {
     /**
      * GET USERS: Fetch with search & filters
+     * Optimized: Removed redundant loops, ensured clean params, supported signal cancellation.
      */
     getUsers: async (filters = {}, search = '', page = 1, pageSize = 20, signal = null) => {
         try {
-            const finalFilters = {};
-            Object.keys(filters).forEach(key => {
-                const value = filters[key];
-                if (Array.isArray(value)) {
-                    if (value.length > 0) {
-                        // Map FE 'organization' to BE 'organisation_id'
-                        const targetKey = key === 'organization' ? 'organisation_id' : key;
-                        finalFilters[targetKey] = value.join(',');
-                    }
-                } else if (value !== undefined && value !== null && value !== '') {
-                    finalFilters[key] = value;
-                }
+            const params = {
+                page_size: pageSize,
+                page: page,
+                search: search?.trim() || undefined
+            };
+
+            // Map and clean filters in a single pass
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) return;
+                
+                const targetKey = key === 'organization' ? 'organisation_id' : key;
+                params[targetKey] = Array.isArray(value) ? value.join(',') : value;
             });
 
-            const response = await api.get('users/admin/', {
-                params: {
-                    ...finalFilters,
-                    search: search || undefined,
-                    page_size: pageSize,
-                },
-                signal: signal
-            });
-
+            const response = await api.get('users/admin/', { params, signal });
             const data = response.data;
-            if (data && typeof data === 'object' && 'results' in data) {
-                return {
-                    users: Array.isArray(data.results) ? data.results : [],
-                    totalCount: data.count || 0
-                };
-            }
+
+            // Normalize response structure
+            const results = data?.results || (Array.isArray(data) ? data : []);
+            const count = data?.count || (Array.isArray(data) ? data.length : 0);
 
             return {
-                users: Array.isArray(data) ? data : [],
-                totalCount: Array.isArray(data) ? data.length : 0
+                users: results,
+                totalCount: count
             };
         } catch (error) {
-            throw new Error(extractError(error, 'Failed to load user list. Please refresh the page.'));
+            if (error.name === 'CanceledError') throw error;
+            throw new Error(extractError(error, 'Failed to load user list.'));
         }
     },
 
@@ -57,7 +49,7 @@ export const userService = {
             const response = await api.post('users/admin/', userData);
             return response.data;
         } catch (error) {
-            throw new Error(extractError(error, 'Failed to create user. Please check all fields.'));
+            throw new Error(extractError(error, 'Failed to create user.'));
         }
     },
 
@@ -66,7 +58,7 @@ export const userService = {
             const response = await api.patch(`users/admin/${id}/`, updates);
             return response.data;
         } catch (error) {
-            throw new Error(extractError(error, 'Failed to update user profile.'));
+            throw new Error(extractError(error, 'Failed to update user.'));
         }
     },
 
@@ -84,18 +76,10 @@ export const userService = {
      */
     bulkAction: async (ids, action) => {
         try {
-            // Map frontend action names to backend expected values
-            const actionMap = { 
-                'activate': 'activate', 
-                'deactivate': 'deactivate',
-                'delete': 'delete',
-                'block': 'block'
-            };
-            const backendAction = actionMap[action] || action;
-            const response = await api.post('users/admin/bulk-action/', { ids, action: backendAction });
+            const response = await api.post('users/admin/bulk-action/', { ids, action });
             return response.data;
         } catch (error) {
-            throw new Error(extractError(error, 'Bulk action failed. Please try again.'));
+            throw new Error(extractError(error, 'Bulk action failed.'));
         }
     },
 
@@ -105,62 +89,36 @@ export const userService = {
     getUserStats: async (signal = null) => {
         try {
             const response = await api.get('users/admin/stats/', { signal });
-            return response.data;
-        } catch {
+            return response.data || { total: 0, active: 0, inactive: 0, unassigned: 0 };
+        } catch (error) {
+            if (error.name === 'CanceledError') throw error;
             return { total: 0, active: 0, inactive: 0, unassigned: 0 };
         }
     },
 
     getCoordinatorStats: async (orgId = null, signal = null) => {
         try {
-            const response = await api.get('users/coordinator/stats/', {
-                params: orgId ? { organisation_id: orgId } : {},
-                signal
-            });
-            return response.data;
+            const params = orgId ? { organisation_id: Array.isArray(orgId) ? orgId.join(',') : orgId } : {};
+            const response = await api.get('users/coordinator/stats/', { params, signal });
+            return response.data || { total: 0, active: 0, inactive: 0, unassigned: 0 };
         } catch (error) {
-            console.error("Failed to fetch coordinator stats:", error);
+            if (error.name === 'CanceledError') throw error;
             return { total: 0, active: 0, inactive: 0, unassigned: 0 };
-        }
-    },
-
-    getFilterOptions: async (signal = null) => {
-        try {
-            // Fetch real organizations and sites from backend
-            const [orgsData, sitesData] = await Promise.all([
-                organizationService.getOrganizations({ dropdown: 'true' }, '', { signal }),
-                organizationService.getSites({}, { signal })
-            ]);
-
-            const orgs = Array.isArray(orgsData) ? orgsData : (orgsData.results || []);
-            const sites = Array.isArray(sitesData) ? sitesData : (sitesData.results || []);
-
-            const roles = [
-                { value: 'admin', label: 'Admin' },
-                { value: 'coordinator', label: 'Coordinator' },
-                { value: 'field_officer', label: 'Field Officer' }
-            ];
-
-            return {
-                organizations: orgs.map(o => ({ value: o.id, label: o.organisation_name || o.name || 'Unnamed Org' })),
-                roles: roles,
-                regions: sites.map(s => ({ value: s.id, label: s.site_name })),
-            };
-        } catch (error) {
-            console.error("Failed to fetch filter options:", error);
-            return { organizations: [], roles: [], regions: [] };
         }
     },
 
     /**
      * EXPORT
      */
-    exportCSV: async () => {
+    exportCSV: async (filters = {}, search = '') => {
         try {
-            const response = await api.get('users/admin/export/', { responseType: 'blob' });
+            const response = await api.get('users/admin/export/', { 
+                params: { ...filters, search },
+                responseType: 'blob' 
+            });
             return response.data;
         } catch (error) {
-            throw new Error(extractError(error, 'CSV export failed. Please try again.'));
+            throw new Error(extractError(error, 'Export failed.'));
         }
     },
 
@@ -169,16 +127,15 @@ export const userService = {
      */
     getCoordinators: async (orgId = null, signal = null) => {
         try {
-            const response = await api.get('users/coordinators/', { 
-                params: orgId ? { organisation_id: orgId } : {} ,
-                signal
-            });
-            return response.data;
+            const params = orgId ? { organisation_id: Array.isArray(orgId) ? orgId.join(',') : orgId } : {};
+            const response = await api.get('users/coordinators/', { params, signal });
+            return response.data || [];
         } catch (error) {
-            console.error("Failed to load coordinators for role mapping:", error);
+            if (error.name === 'CanceledError') throw error;
             return [];
         }
     },
+};
 
 
 };

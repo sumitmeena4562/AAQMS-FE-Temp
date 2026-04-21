@@ -21,7 +21,7 @@ import useDebounce from '../../hooks/useDebounce';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import UserCard from '../../components/UI/UserCard';
-import { useUsers, useUserStats } from '../../hooks/api/useUserQueries';
+import { useUserManagementData, useUserFilterOptions } from '../../hooks/api/useUserQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import useSearchStore from '../../store/useSearchStore';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
@@ -81,30 +81,29 @@ const Users = React.memo(() => {
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 
     // ── QUERY HOOKS (NEW) ──
+    // ── QUERY HOOKS (OPTIMIZED) ──
     const debouncedSearch = useDebounce(search, 400);
     
-    // Sync React Query with local state
-    const { data: usersData, isLoading: isUsersLoading } = useUsers(filters, debouncedSearch, page, limit);
-    const { data: stats = { total: 0, active: 0, inactive: 0, unassigned: 0 } } = useUserStats();
-    
-    // ── HIERARCHY DATA (UNIFIED) ──
-    const { organizations, sites } = useHierarchy({ includeCoords: false });
-    
-    // Roles are static for the product
-    const STATIC_ROLES = [
-        { value: 'admin', label: 'Admin' },
-        { value: 'coordinator', label: 'Coordinator' },
-        { value: 'field_officer', label: 'Field Officer' }
-    ];
+    const { 
+        users, totalCount, stats, isLoading: isUsersLoading 
+    } = useUserManagementData(filters, debouncedSearch, page, limit);
 
-    const filterOptions = {
+    const { roles: STATIC_ROLES } = useUserFilterOptions();
+    
+    // ── HIERARCHY DATA (OPTIMIZED) ──
+    // Conditional Fetching: Only fetch sites if organizations are selected
+    const hasOrgSelected = filters.organization?.length > 0;
+    const { organizations, sites } = useHierarchy({ 
+        includeOrgs: true, 
+        includeSites: hasOrgSelected, // <--- OPTIMIZATION: Conditional fetch
+        includeCoords: false 
+    });
+
+    const filterOptions = useMemo(() => ({
         organizations: organizations.map(o => ({ value: o.id, label: o.name })),
-        regions: sites.map(s => ({ value: s.id, label: s.site_name || s.name })),
+        regions: hasOrgSelected ? sites.map(s => ({ value: s.id, label: s.site_name || s.name })) : [],
         roles: STATIC_ROLES
-    };
-
-    const users = usersData?.users || [];
-    const totalCount = usersData?.totalCount || 0;
+    }), [organizations, sites, STATIC_ROLES, hasOrgSelected]);
 
     // ── Modal & UI state ──
     const [peekUser, setPeekUser] = useState(null);
@@ -117,7 +116,6 @@ const Users = React.memo(() => {
     const [viewMode, setViewMode] = useState('list');
 
     const sortedUsers = useMemo(() => {
-        const users = usersData?.users || [];
         if (!Array.isArray(users)) return [];
         const list = [...users];
         list.sort((a, b) => {
@@ -126,7 +124,7 @@ const Users = React.memo(() => {
             return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
         });
         return list;
-    }, [usersData, sortKey, sortDir]);
+    }, [users, sortKey, sortDir]);
 
     const activeFilterCount = Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v && v !== '' && v !== 'all').length;
 
