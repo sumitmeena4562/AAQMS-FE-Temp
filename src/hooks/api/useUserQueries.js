@@ -44,6 +44,28 @@ export const useUserStats = (options = {}) => {
   });
 };
 
+export const useCoordinators = (orgId = null, options = {}) => {
+  return useQuery({
+    queryKey: ['coordinators', orgId],
+    queryFn: ({ signal }) => userService.getCoordinators(orgId, signal),
+    staleTime: STALE_TIME,
+    gcTime: CACHE_TIME,
+    refetchOnWindowFocus: false,
+    ...options
+  });
+};
+
+export const useCoordinatorStats = (orgId = null, options = {}) => {
+  return useQuery({
+    queryKey: ['coordinators', 'stats', orgId],
+    queryFn: ({ signal }) => userService.getCoordinatorStats(orgId, signal),
+    staleTime: STALE_TIME,
+    gcTime: CACHE_TIME,
+    refetchOnWindowFocus: false,
+    ...options
+  });
+};
+
 /**
  * ── OPTIMIZED ORCHESTRATOR HOOK ──
  * Combines Users, Stats, and Filter Hierarchy into a single optimized lifecycle.
