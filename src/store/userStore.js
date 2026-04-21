@@ -42,6 +42,7 @@ const useUserStore = create((set, get) => ({
             const data = await userService.createUser(userData);
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
+            set({ loading: false }); // Reset loading on success
             return { success: true, data };
         } catch (err) {
             set({ loading: false, error: err.message });
@@ -55,6 +56,7 @@ const useUserStore = create((set, get) => ({
             const data = await userService.updateUser(id, updates);
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
+            set({ loading: false }); // Reset loading on success
             return { success: true, data };
         } catch (err) {
             set({ loading: false, error: err.message });
@@ -66,7 +68,7 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             await userService.deleteUser(id);
-            set(s => ({ selectedIds: s.selectedIds.filter(i => i !== id) }));
+            set(s => ({ selectedIds: s.selectedIds.filter(i => i !== id), loading: false })); // Reset loading
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
             return { success: true };
@@ -86,7 +88,7 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             await userService.bulkAction(ids, action);
-            set({ selectedIds: [] }); 
+            set({ selectedIds: [], loading: false }); // Reset loading
             await queryClient.invalidateQueries(['users']);
             await queryClient.invalidateQueries(['user-stats']);
             toast.success("Done! The changes have been applied.");
@@ -139,14 +141,27 @@ const useUserStore = create((set, get) => ({
                 "Full Name", "Email", "Phone", "Role", "Organization", "Status"
             ];
             
-            const tableRows = users.map(u => [
-                u.name,
-                u.email,
-                u.mobile_number || 'N/A',
-                u.role?.toUpperCase() || 'N/A',
-                u.org_name || 'Unassigned',
-                u.status?.toUpperCase() || 'N/A'
-            ]);
+            const tableRows = users.map(u => {
+                // Format Role: e.g., 'FIELD_OFFICER' -> 'Field Officer'
+                const formattedRole = (u.role || 'N/A')
+                    .replace(/_/g, ' ')
+                    .toLowerCase()
+                    .replace(/\b\w/g, l => l.toUpperCase());
+
+                // Format Status: e.g., 'ACTIVE' -> 'Active'
+                const formattedStatus = (u.status || 'N/A')
+                    .toLowerCase()
+                    .replace(/\b\w/g, l => l.toUpperCase());
+
+                return [
+                    u.name || 'N/A',
+                    u.email || 'N/A',
+                    u.mobile_number || 'N/A',
+                    formattedRole,
+                    u.org_name || 'Unassigned',
+                    formattedStatus
+                ];
+            });
 
             autoTable(doc, {
                 head: [tableColumn],

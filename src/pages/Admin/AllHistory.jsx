@@ -208,7 +208,7 @@ export default function AllHistory() {
                         options={allSites.map(s => ({ value: s.id, label: s.site_name || s.name }))}
                         value={filters.site}
                         onChange={v => updateFilter('site', v)}
-                        allLabel="Select Org First"
+                        allLabel={filters.organisation.length > 0 ? "All Sites" : "Select Org First"}
                         multiple={true}
                         disabled={filters.organisation.length === 0}
                     />
@@ -218,7 +218,7 @@ export default function AllHistory() {
                         options={allFloors.map(f => ({ value: f.id, label: f.name }))}
                         value={filters.floor}
                         onChange={v => updateFilter('floor', v)}
-                        allLabel="Select Site First"
+                        allLabel={filters.site.length > 0 ? "All Floors" : "Select Site First"}
                         multiple={true}
                         disabled={filters.site.length === 0}
                     />
