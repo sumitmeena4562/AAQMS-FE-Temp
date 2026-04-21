@@ -121,16 +121,6 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
                         <span className="truncate">{allLabel}</span>
                     </button>
 
-                    {multiple && options.length > 0 && (
-                        <button
-                            onClick={() => handleSelect('select_all')}
-                            className="w-full px-3 py-1.5 text-left rounded-lg transition-all duration-200 text-[10.5px] font-bold text-primary hover:bg-primary/5 flex items-center gap-3 border-b border-border-main/40 mb-1"
-                        >
-                            <div className="w-4" /> {/* Spacer to align with others */}
-                            <span>{Array.isArray(value) && value.length === options.length ? 'Deselect All' : 'Select All'}</span>
-                        </button>
-                    )}
-
                     <div className="max-h-[240px] overflow-y-auto no-scrollbar pt-1">
                         {options.map((opt, i) => {
                             const val = typeof opt === 'string' ? opt : opt.value;

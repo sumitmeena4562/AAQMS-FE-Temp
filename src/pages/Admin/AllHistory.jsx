@@ -59,17 +59,17 @@ export default function AllHistory() {
         if (key === 'organisation') { newFilters.site = []; newFilters.floor = []; }
         else if (key === 'site') { newFilters.floor = []; }
         setFilters(newFilters);
-        setCurrentPage(1); 
+        setCurrentPage(1);
     };
 
     const resetFilters = () => {
-        setFilters({ 
-            organisation: [], 
-            site: [], 
-            floor: [], 
-            role: [], 
-            operation: [], 
-            category: [] 
+        setFilters({
+            organisation: [],
+            site: [],
+            floor: [],
+            role: [],
+            operation: [],
+            category: []
         });
         setCurrentPage(1);
     };
@@ -129,11 +129,10 @@ export default function AllHistory() {
             accessor: 'time',
             render: (value, row) => (
                 <div className="flex items-center gap-2.5 whitespace-nowrap">
-                    <div className={`w-1.5 h-1.5 rounded-full ${
-                        row.statusVariant === 'danger' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' : 
-                        row.statusVariant === 'warning' ? 'bg-orange-500' :
-                        row.statusVariant === 'success' ? 'bg-emerald-500' : 'bg-primary'
-                    }`} />
+                    <div className={`w-1.5 h-1.5 rounded-full ${row.statusVariant === 'danger' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' :
+                            row.statusVariant === 'warning' ? 'bg-orange-500' :
+                                row.statusVariant === 'success' ? 'bg-emerald-500' : 'bg-primary'
+                        }`} />
                     <span className="text-[13px] text-gray font-bold tracking-tight">{value}</span>
                 </div>
             ),
@@ -151,7 +150,7 @@ export default function AllHistory() {
                 ]}
                 rightContent={
                     <div className="flex items-center gap-3">
-                         <div className="flex flex-col items-end px-4 border-r border-border-main/50 translate-y-[2px]">
+                        <div className="flex flex-col items-end px-4 border-r border-border-main/50 translate-y-[2px]">
                             <span className="text-[9px] font-black text-gray uppercase tracking-widest opacity-60 leading-none mb-1">Status</span>
                             <div className="flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
