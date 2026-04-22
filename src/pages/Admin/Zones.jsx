@@ -72,38 +72,49 @@ const Zones = () => {
 
     const { 
         selectedOrg, selectedCoord, selectedSite, selectedFloor,
-        setOrg, setCoord, setSite, setFloor, resetFilters 
+        setOrg, setCoord, setSite, setFloor, resetFilters, bulkSync 
     } = useFilterStore();
     const { query: searchQuery, clearSearch } = useSearchStore();
     
-    // const { clearHierarchy } = useHierarchyStore(); // removed unused
-      // --- QUERY HOOKS (UNIFIED) ---
-    const { organizations: orgs, sites: allSites } = useHierarchy({ includeCoords: false });
-    const { data: floorData } = useFloors(selectedSite);
-    const allFloors = floorData?.results || [];
-    const { data: zoneData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError, refetch: refetchZones } = useZones(selectedFloor.length > 0 ? selectedFloor : undefined, {
-        site_id: selectedSite.length > 0 ? selectedSite : undefined,
-        org_id: selectedOrg.length > 0 ? selectedOrg : undefined
-    });
-
-    const zones = zoneData.results || [];
-    const totalZonesCount = zoneData.total || zones.length;
-
-    const passedOrgId = searchParams.get('org_id') || searchParams.get('org');
-    const passedSiteId = searchParams.get('site_id') || searchParams.get('site');
-    const passedFloorId = searchParams.get('floor_id') || searchParams.get('floor');
-    const passedCoordId = searchParams.get('coord_id') || searchParams.get('coord');
-
-    // URL → Store sync (mount-only, guarded)
+    // URL → Store sync (Atomic Bulk Sync)
     const hasSynced = useRef(false);
     useEffect(() => {
         if (hasSynced.current) return;
         hasSynced.current = true;
-        if (passedOrgId && selectedOrg.length === 0) setOrg(passedOrgId);
-        if (passedSiteId && selectedSite.length === 0) setSite(passedSiteId);
-        if (passedFloorId && selectedFloor.length === 0) setFloor(passedFloorId);
-        if (passedCoordId && selectedCoord.length === 0) setCoord(passedCoordId);
-    }, [passedOrgId, passedSiteId, passedFloorId, passedCoordId, selectedOrg.length, selectedSite.length, selectedFloor.length, selectedCoord.length, setOrg, setSite, setFloor, setCoord]);
+
+        const pOrg = searchParams.get('org_id') || searchParams.get('org');
+        const pSite = searchParams.get('site_id') || searchParams.get('site');
+        const pFloor = searchParams.get('floor_id') || searchParams.get('floor');
+        const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
+
+        if (pOrg || pSite || pFloor || pCoord) {
+            bulkSync({ org: pOrg, site: pSite, floor: pFloor, coord: pCoord });
+        }
+    }, [searchParams, bulkSync]);
+
+    // --- QUERY HOOKS (UNIFIED) ---
+    const { organizations: orgs, sites: allSites } = useHierarchy({ 
+        includeOrgs: true,
+        includeCoords: true,
+        includeSites: true 
+    });
+
+    const { data: floorData } = useFloors(selectedSite, {
+        enabled: selectedSite.length > 0
+    });
+    const allFloors = floorData?.results || [];
+
+    const { data: zoneData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError, refetch: refetchZones } = useZones(
+        selectedFloor.length > 0 ? selectedFloor : undefined, 
+        {
+            site_id: selectedSite.length > 0 ? selectedSite : undefined,
+            org_id: selectedOrg.length > 0 ? selectedOrg : undefined
+        },
+        { enabled: hasSynced.current } // Only fire main data after URL sync
+    );
+
+    const zones = zoneData.results || [];
+    const totalZonesCount = zoneData.total || zones.length;
 
     useEffect(() => {
         const newParams = new URLSearchParams();

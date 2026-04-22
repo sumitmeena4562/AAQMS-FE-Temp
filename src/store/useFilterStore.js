@@ -103,7 +103,32 @@ export const useFilterStore = create((set, get) => ({
     selectedStatus: [],
     searchTerm: '',
     page: 1
-  })
+  }),
+
+  // --- BULK ACTIONS ---
+  bulkSync: (params) => {
+    const current = get();
+    const updates = {};
+    
+    const normalize = (val) => Array.isArray(val) ? val : (typeof val === 'string' ? val.split(',').filter(Boolean) : [val].filter(Boolean));
+
+    if (params.org && JSON.stringify(current.selectedOrg) !== JSON.stringify(normalize(params.org))) {
+        updates.selectedOrg = normalize(params.org);
+    }
+    if (params.site && JSON.stringify(current.selectedSite) !== JSON.stringify(normalize(params.site))) {
+        updates.selectedSite = normalize(params.site);
+    }
+    if (params.floor && JSON.stringify(current.selectedFloor) !== JSON.stringify(normalize(params.floor))) {
+        updates.selectedFloor = normalize(params.floor);
+    }
+    if (params.coord && JSON.stringify(current.selectedCoord) !== JSON.stringify(normalize(params.coord))) {
+        updates.selectedCoord = normalize(params.coord);
+    }
+
+    if (Object.keys(updates).length > 0) {
+        set({ ...updates, page: 1 });
+    }
+  }
 }));
 
 export default useFilterStore;

@@ -56,7 +56,9 @@ const FilterBar = ({
 
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites } = useHierarchy(hierarchyOptions);
 
-    const { data: floorData } = useFloors(selectedSite, { enabled: renderFloor });
+    const { data: floorData } = useFloors(selectedSite, { 
+        enabled: renderFloor && selectedSite.length > 0 
+    });
     const allFloors = floorData?.results || [];
 
     // Dynamic Relational Options mapping (using Real IDs) - Memoized to prevent re-render loops
