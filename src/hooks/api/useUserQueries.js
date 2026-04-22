@@ -9,7 +9,7 @@ import { userService } from '../../services/userService';
 /**
  * ── CONSTANTS & CONFIG ──
  */
-const STALE_TIME = 5 * 60 * 1000; // 5 minutes
+const STALE_TIME = 30 * 1000; // 30 seconds
 const CACHE_TIME = 30 * 60 * 1000; // 30 minutes
 
 export const useUserDetails = (id, options = {}) => {

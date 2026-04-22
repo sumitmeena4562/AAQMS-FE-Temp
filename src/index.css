@@ -5,6 +5,8 @@
     /* ── Typography System ── */
     --font-family-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --font-sans: var(--font-family-sans);
+    --font-heading: var(--font-family-sans);
+    --font-body: var(--font-family-sans);
 
     /* ── Pro Palette (High Contrast) ── */
     --color-primary: #072267;

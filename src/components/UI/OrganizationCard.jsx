@@ -49,7 +49,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
   return (
     <div
-      className={`h-[360px] elite-card elite-card-hover flex flex-col overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
+      className={`min-h-[340px] elite-card elite-card-hover flex flex-col overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
       onClick={handleCardClick}
       onMouseEnter={onMouseEnter}
     >
@@ -110,15 +110,11 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
         {/* Header Section */}
         <div>
-          <div className="flex items-center justify-between mb-1">
-             <span className="text-[8px] font-black text-gray/50 uppercase tracking-[0.2em]">
-               {isSiteCard ? 'OPERATIONAL SITE' : 'REGISTERED ORG'}
-             </span>
-          </div>
-          <div className="relative min-h-[44px]">
-            <h3 
-              className="text-lg font-bold text-primary tracking-tight leading-tight mb-2 line-clamp-2 break-words group-hover/card:line-clamp-none group-hover/card:absolute group-hover/card:top-[-4px] group-hover/card:left-[-8px] group-hover/card:right-[-8px] group-hover/card:bg-card group-hover/card:z-50 group-hover/card:p-2 group-hover/card:rounded-xl group-hover/card:shadow-2xl group-hover/card:ring-1 group-hover/card:ring-primary/10 transition-all duration-300"
-            >
+          <div className="relative mb-2">
+            <h3 className="text-lg font-bold text-primary tracking-tight leading-tight line-clamp-2 break-words group-hover/card:invisible">
+              {org.site_name || org.name}
+            </h3>
+            <h3 className="absolute top-0 left-0 right-0 text-lg font-bold text-primary tracking-tight leading-tight invisible group-hover/card:visible bg-card z-50 p-2 -mx-2 rounded-xl shadow-xl ring-1 ring-primary/10 break-words">
               {org.site_name || org.name}
             </h3>
           </div>
@@ -149,27 +145,25 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         </div>
 
         {/* Stats Section */}
-        <div className="grid grid-cols-3 gap-2 mt-5">
-          <div className="flex flex-col">
-            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider mb-1 opacity-70">
+        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border-main/40">
+          <div className="flex flex-col gap-1">
+            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider opacity-70">
               {isSiteCard ? 'FLOORS' : 'COORDS'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
               {isSiteCard ? siteComputedFloors : totalComputedCoordinators}
             </p>
           </div>
-          <div className="flex flex-col">
-            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider mb-1 opacity-70">
+          <div className="flex flex-col gap-1">
+            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider opacity-70">
               {isSiteCard ? 'ZONES' : 'SITES'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
-              {isSiteCard ? siteComputedZones : (
-                org.plannedSites > 0 ? `${totalComputedSites}/${org.plannedSites}` : totalComputedSites
-              )}
+              {isSiteCard ? siteComputedZones : totalComputedSites}
             </p>
           </div>
-          <div className="flex flex-col">
-            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider mb-1 opacity-70">
+          <div className="flex flex-col gap-1">
+            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider opacity-70">
               {isSiteCard ? 'ASSETS' : 'FLOORS'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
@@ -181,7 +175,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         {/* Bottom Button */}
         <button
           onClick={handleManage}
-          className="mt-auto w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-2 group">
+          className="mt-4 w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-2 group">
           <span>
             {isSiteCard ? 'View Floors' : 'Manage Org'}
           </span>

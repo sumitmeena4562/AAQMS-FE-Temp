@@ -75,7 +75,7 @@ const SectionHeader = ({
                     <Text 
                         size="lg" 
                         className={cn(
-                            "text-slate-500 max-w-2xl leading-relaxed font-medium md:text-xl",
+                            "text-body max-w-2xl leading-relaxed font-medium md:text-xl",
                             isCenter ? "mx-auto" : ""
                         )}
                     >

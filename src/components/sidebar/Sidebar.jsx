@@ -103,7 +103,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
                         ${act
                             ? 'bg-primary/10 text-primary font-bold shadow-sm'
-                            : 'text-slate-700 hover:bg-primary/[0.04] hover:text-primary font-medium'}
+                            : 'text-body hover:bg-primary/[0.04] hover:text-primary font-medium'}
                     `}
                 >
                     <span 
@@ -132,17 +132,17 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'justify-start'}
                         ${activeOrOpen
                             ? 'bg-primary/10 text-primary font-bold'
-                            : 'text-slate-700 hover:bg-primary/[0.04] hover:text-primary font-medium'}
+                            : 'text-body hover:bg-primary/[0.04] hover:text-primary font-medium'}
                     `}
                 >
-                    <span className={`flex items-center shrink-0 transition-colors ${activeOrOpen ? 'text-primary' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                    <span className={`flex items-center shrink-0 transition-colors ${activeOrOpen ? 'text-primary' : 'text-gray group-hover:text-title'}`}>
                         {item.icon}
                     </span>
                     {!collapsed && <span className="flex-1 text-left truncate tracking-tight">{item.label}</span>}
                     {!collapsed && (
                         <svg
                             xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                            className={`shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'rotate-0 text-slate-400'}`}
+                            className={`shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : 'rotate-0 text-gray'}`}
                         >
                             <polyline points="6 9 12 15 18 9" />
                         </svg>
@@ -157,8 +157,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                             return (
                                 <div key={child.path} className="relative group/child pl-4 py-0.5">
                                     {/* ── Tree Branches ── */}
-                                    <div className={`absolute left-0 top-0 w-[1.5px] bg-slate-200 transition-colors group-hover/child:bg-slate-300 ${isLast ? 'h-[50%]' : 'h-full'}`} />
-                                    <div className="absolute left-0 top-[50%] w-3 h-[1.5px] bg-slate-200 transition-colors group-hover/child:bg-slate-300" />
+                                    <div className={`absolute left-0 top-0 w-[1.5px] bg-border-main transition-colors group-hover/child:bg-border-hover ${isLast ? 'h-[50%]' : 'h-full'}`} />
+                                    <div className="absolute left-0 top-[50%] w-3 h-[1.5px] bg-border-main transition-colors group-hover/child:bg-border-hover" />
 
                                     {/* ── Active Indicator ── */}
                                     {cAct && <div className="absolute left-[-2px] top-[50%] -translate-y-1/2 w-[5px] h-[5px] rounded-full bg-primary shadow-[0_0_8px_rgba(7,34,103,0.3)] z-10" />}
@@ -170,11 +170,11 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                                             flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
                                             ${cAct
                                                 ? 'bg-primary/5 text-primary font-bold border border-primary/10'
-                                                : 'text-slate-600 hover:bg-primary/[0.04] hover:text-primary font-medium'}
+                                                : 'text-body hover:bg-primary/[0.04] hover:text-primary font-medium'}
                                         `}
                                     >
                                         {child.icon && (
-                                            <span className={`flex items-center shrink-0 transition-colors ${cAct ? 'text-primary' : 'text-slate-400 group-hover/child:text-slate-600'}`}>
+                                            <span className={`flex items-center shrink-0 transition-colors ${cAct ? 'text-primary' : 'text-gray group-hover/child:text-body'}`}>
                                                 {child.icon}
                                             </span>
                                         )}
@@ -234,7 +234,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
                     {/* Section Label */}
                     {!collapsed && (
-                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.12em] px-6 pt-5 pb-2 select-none">
+                        <div className="text-[10px] font-bold text-gray uppercase tracking-[0.12em] px-6 pt-5 pb-2 select-none">
                             Oversight Hub
                         </div>
                     )}
@@ -250,11 +250,11 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 </div>
 
                 {/* User Card */}
-                <div className="mt-auto p-3 border-t border-slate-200 bg-slate-50/50 sticky bottom-0 z-10">
+                <div className="mt-auto p-3 border-t border-border-main bg-base/50 sticky bottom-0 z-10">
                     {user && (
                         <div
                             className={`
-                                flex items-center rounded-xl bg-white border border-slate-200 transition-all duration-300 cursor-pointer group hover:border-primary/40 hover:shadow-md
+                                flex items-center rounded-xl bg-card border border-border-main transition-all duration-300 cursor-pointer group hover:border-primary/40 hover:shadow-md
                                 ${collapsed ? 'p-2 justify-center' : 'p-2.5 gap-3 justify-start'}
                             `}
                         >
@@ -271,10 +271,10 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                             </div>
                             {!collapsed && (
                                 <div className="overflow-hidden flex-1">
-                                    <p className="text-slate-900 text-[13px] font-bold truncate leading-tight group-hover:text-primary transition-colors">
+                                    <p className="text-title text-[13px] font-bold truncate leading-tight group-hover:text-primary transition-colors">
                                         {user.name || 'System User'}
                                     </p>
-                                    <p className="text-slate-500 text-[10px] font-bold truncate mt-0.5 tracking-tight">
+                                    <p className="text-gray text-[10px] font-bold truncate mt-0.5 tracking-tight">
                                         {user.email || 'user@system.com'}
                                     </p>
                                 </div>

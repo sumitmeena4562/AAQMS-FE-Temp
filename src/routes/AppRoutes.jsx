@@ -81,14 +81,14 @@ const AppRoutes = () => {
                 toastOptions={{
                     duration: 4000,
                     style: {
-                        background: '#ffffff',
-                        color: '#1e293b',
+                        background: 'var(--color-card)',
+                        color: 'var(--color-title)',
                         borderRadius: '16px',
                         padding: '16px 24px',
                         fontSize: '13px',
                         fontWeight: '700',
                         boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-                        border: '1px solid #f1f5f9',
+                        border: '1px solid var(--color-border-main)',
                     }
                 }}
             />

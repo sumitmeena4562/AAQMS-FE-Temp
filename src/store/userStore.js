@@ -41,15 +41,8 @@ const useUserStore = create((set, get) => ({
         try {
             const data = await userService.createUser(userData);
             
-            // OPTIMISTIC LOCAL UPDATE: Add new user directly to the list cache
-            queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
-                if (!oldData?.results) return oldData;
-                return {
-                    ...oldData,
-                    count: (oldData.count || 0) + 1,
-                    results: [data, ...oldData.results]
-                };
-            });
+            // Invalidate users query so list refetches with new user
+            await queryClient.invalidateQueries({ queryKey: ['users'] });
 
             // Update stats if returned
             if (data.updated_stats) {
@@ -73,14 +66,9 @@ const useUserStore = create((set, get) => ({
         try {
             const data = await userService.updateUser(id, updates);
             
-            // OPTIMISTIC LOCAL UPDATE: Immediately reflect changes in the UI table
-            queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
-                if (!oldData?.results) return oldData;
-                return {
-                    ...oldData,
-                    results: oldData.results.map(u => u.id === id ? { ...u, ...data } : u)
-                };
-            });
+            // Force refetch — invalidate + refetch immediately
+            await queryClient.invalidateQueries({ queryKey: ['users'] });
+            await queryClient.refetchQueries({ queryKey: ['users', 'list'] });
 
             // Update stats if returned
             if (data.updated_stats) {
@@ -133,22 +121,11 @@ const useUserStore = create((set, get) => ({
 
         set({ loading: true, error: null });
         try {
-            const data = await userService.bulkAction(ids, action);
+            await userService.bulkAction(ids, action);
             
-            // SINGLE-CALL OPTIMIZATION: Update all targeted users in cache
-            if (data?.results || Array.isArray(data)) {
-                const updatedUsers = data.results || data;
-                queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
-                    if (!oldData?.results) return oldData;
-                    return {
-                        ...oldData,
-                        results: oldData.results.map(u => {
-                            const updated = updatedUsers.find(uu => String(uu.id) === String(u.id));
-                            return updated ? { ...u, ...updated } : u;
-                        })
-                    };
-                });
-            }
+            // Force refetch so status change reflects immediately
+            await queryClient.invalidateQueries({ queryKey: ['users'] });
+            await queryClient.refetchQueries({ queryKey: ['users', 'list'] });
 
             set({ selectedIds: [], loading: false });
             
