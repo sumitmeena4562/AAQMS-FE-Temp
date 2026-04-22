@@ -432,7 +432,6 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                           icon={<Phone />}
                           type="tel"
                           required
-                          placeholder="10-digit number"
                           {...register("contactPhone")}
                           onKeyDown={(e) => {
                               // Allow: backspace, delete, tab, escape, enter, control+a, home, end, left, right
