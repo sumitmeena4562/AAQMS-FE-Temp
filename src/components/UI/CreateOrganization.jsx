@@ -358,12 +358,13 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                             <InputField
                               label="Total Sites"
                               type="number"
+                              min="0"
+                              max="20"
+                              onKeyDown={(e) => {
+                                if (['-', 'e', '+', '.'].includes(e.key)) e.preventDefault();
+                              }}
                               placeholder="e.g., 5"
                               {...register('plannedSites', { valueAsNumber: true })}
-                              onInput={(e) => {
-                                if (e.target.value > 20) e.target.value = 20;
-                                if (e.target.value < 0) e.target.value = 0;
-                              }}
                               error={errors.plannedSites?.message}
                               disabled={isViewOnly}
                             />

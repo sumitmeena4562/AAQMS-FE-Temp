@@ -33,7 +33,7 @@ export const useHierarchy = (options = {}) => {
     // 2. Coordinators (Cascading: only if org is selected)
     const coordsQuery = useCoordinators(
         activeOrgs.length > 0 ? activeOrgs : undefined, 
-        { enabled: includeCoords && enabled && activeOrgs.length > 0 }
+        { enabled: includeCoords && enabled }
     );
 
     // 3. Sites (Cascading: only if org is selected)
@@ -43,7 +43,7 @@ export const useHierarchy = (options = {}) => {
 
     const sitesQuery = useSites(
         siteFilters,
-        { enabled: includeSites && enabled && activeOrgs.length > 0 }
+        { enabled: includeSites && enabled }
     );
 
     return React.useMemo(() => ({

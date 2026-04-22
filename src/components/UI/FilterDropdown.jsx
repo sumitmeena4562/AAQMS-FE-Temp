@@ -103,7 +103,7 @@ const FilterDropdown = React.memo(({ label, value, options = [], onChange, allLa
                         left: coords.left,
                         width: 'max-content',
                         minWidth: Math.max(coords.width, 160),
-                        maxWidth: 240,
+                        maxWidth: 320,
                         zIndex: 9999
                     }}
                     className="bg-card border border-border-main rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.12)] overflow-hidden p-1.5"
@@ -177,7 +177,7 @@ const FilterDropdown = React.memo(({ label, value, options = [], onChange, allLa
                     <>
                         <div className="flex flex-col items-start leading-tight">
                             <span className="text-[8px] font-black text-primary/60 uppercase tracking-[0.12em]">{label}</span>
-                            <span className="text-[10px] font-bold text-primary truncate max-w-[80px]">
+                            <span className="text-[10px] font-bold text-primary truncate max-w-[140px]">
                                 {(() => {
                                     const getLabel = (val) => {
                                         const opt = options.find(o => String(typeof o === 'string' ? o : o.value) === String(val));
