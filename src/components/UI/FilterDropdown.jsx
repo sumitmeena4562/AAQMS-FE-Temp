@@ -3,7 +3,10 @@ import { createPortal } from 'react-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiCheck, FiX } from 'react-icons/fi';
 
-const FilterDropdown = React.memo(({ label, value, options = [], onChange, allLabel = 'All', multiple = false, disabled = false }) => {
+const FilterDropdown = React.memo(({ 
+    label, value, options = [], onChange, allLabel = 'All', 
+    multiple = false, disabled = false, loading = false 
+}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
     const containerRef = useRef(null);
@@ -161,19 +164,24 @@ const FilterDropdown = React.memo(({ label, value, options = [], onChange, allLa
     return (
         <div ref={containerRef} className="relative inline-block">
             <button
-                disabled={disabled}
-                onClick={() => !disabled && setIsOpen(!isOpen)}
+                disabled={disabled || loading}
+                onClick={() => !disabled && !loading && setIsOpen(!isOpen)}
                 className={`flex items-center gap-2 px-3 py-1.5 bg-card border rounded-md transition-all duration-300 group whitespace-nowrap
-                    ${disabled 
+                    ${(disabled || loading)
                         ? 'opacity-60 cursor-not-allowed border-border-main/80 bg-base/30' 
                         : 'cursor-pointer'}
                     ${isOpen
                         ? 'border-primary ring-4 ring-primary/5 shadow-md scale-[1.01]'
                         : isFilterActive
                             ? 'border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10 shadow-sm'
-                            : !disabled ? 'border-border-main hover:border-border-hover shadow-sm' : ''}`}
+                            : !(disabled || loading) ? 'border-border-main hover:border-border-hover shadow-sm' : ''}`}
             >
-                {isFilterActive ? (
+                {loading ? (
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                        <span className="text-[11px] font-bold text-gray">{label}...</span>
+                    </div>
+                ) : isFilterActive ? (
                     <>
                         <div className="flex flex-col items-start leading-tight">
                             <span className="text-[8px] font-black text-primary/60 uppercase tracking-[0.12em]">{label}</span>

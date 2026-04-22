@@ -21,8 +21,7 @@ import useDebounce from '../../hooks/useDebounce';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import UserCard from '../../components/UI/UserCard';
-import { useUserManagementData, useUserFilterOptions } from '../../hooks/api/useUserQueries';
-import { useHierarchy } from '../../hooks/api/useHierarchy';
+import { useUserManagementData, useUserFilterOptions, useUserFormOptions } from '../../hooks/api/useUserQueries';
 import useSearchStore from '../../store/useSearchStore';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
@@ -95,21 +94,24 @@ const Users = React.memo(() => {
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
 
-    // ── HIERARCHY DATA (OPTIMIZED) ──
-    const hasOrgSelected = filters.organization?.length > 0;
-    const { organizations, sites } = useHierarchy({ 
-        includeOrgs: true, 
-        includeSites: hasOrgSelected, 
-        includeCoords: false,
-        enabled: isReady,
-        orgId: filters.organization
-    });
+    // ── FORM & FILTER OPTIONS (UNIFIED SINGLE CALL) ──
+    const { data: formOptions, isLoading: isLoadingOptions } = useUserFormOptions({ enabled: isReady });
 
     const filterOptions = useMemo(() => ({
-        organizations: organizations?.map(o => ({ value: o?.id, label: o?.name })) || [],
-        regions: hasOrgSelected ? sites?.map(s => ({ value: s?.id, label: s?.site_name || s?.name })) || [] : [],
+        organizations: formOptions?.organisations?.map(o => ({ value: o.value, label: o.label })) || [],
+        regions: formOptions?.sites?.map(s => ({ 
+            value: s.value, 
+            label: s.label,
+            org_id: s.org_id 
+        })) || [],
         roles: STATIC_ROLES
-    }), [organizations, sites, STATIC_ROLES, hasOrgSelected]);
+    }), [formOptions, STATIC_ROLES]);
+
+    // Local filtering for Site dropdown based on selected Organization
+    const filteredSites = useMemo(() => {
+        if (!filters.organization?.length) return filterOptions.regions;
+        return filterOptions.regions.filter(s => filters.organization.includes(s.org_id));
+    }, [filterOptions.regions, filters.organization]);
 
     // ── Modal & UI state ──
     const [peekUser, setPeekUser] = useState(null);
@@ -240,9 +242,11 @@ const Users = React.memo(() => {
                         <FiBriefcase size={12} className="text-gray/40 shrink-0" />
                         <span className="text-[13px] font-black text-title truncate leading-none">{value || 'Unassigned'}</span>
                     </div>
-                    <span className="text-[9px] text-gray/60 font-bold uppercase tracking-wider mt-1 truncate pl-4">
-                        {row?.region || row?.zone || 'Master Unit'}
-                    </span>
+                    {(row?.region || row?.zone) && (
+                        <span className="text-[9px] text-gray/60 font-bold uppercase tracking-wider mt-1 truncate pl-4">
+                            {row.region || row.zone}
+                        </span>
+                    )}
                 </div>
             )
         },
@@ -296,8 +300,8 @@ const Users = React.memo(() => {
             align: 'right',
             render: (_, row) => (
                 <div className="flex items-center justify-end gap-1.5 pr-2">
-                    <button onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }} className="w-8 h-8 flex items-center justify-center text-gray border border-border-main hover:text-white hover:bg-title transition-all rounded-xl active:scale-95 bg-card shadow-sm"><FiUser size={13} /></button>
-                    <button onClick={(e) => { e.stopPropagation(); handleEditUser(row); }} className="px-4 h-8 flex items-center justify-center text-gray border border-border-main hover:text-white hover:bg-primary transition-all rounded-xl active:scale-95 bg-card font-black uppercase tracking-widest text-[9px] hidden md:flex">Edit</button>
+                    <button onClick={(e) => { e.stopPropagation(); setPeekUser(row); setIsPeekOpen(true); }} className="w-8 h-8 flex items-center justify-center text-gray border border-border-main hover:text-white hover:bg-primary transition-all rounded-xl active:scale-95 bg-card shadow-sm hover:border-primary"><FiUser size={14} strokeWidth={2.5} /></button>
+                    <button onClick={(e) => { e.stopPropagation(); handleEditUser(row); }} className="px-4 h-8 flex items-center justify-center text-gray border border-border-main hover:text-white hover:bg-primary transition-all rounded-xl active:scale-95 bg-card font-black uppercase tracking-widest text-[10px] hidden md:flex hover:border-primary">Edit</button>
                 </div>
             )
         }
@@ -354,8 +358,8 @@ const Users = React.memo(() => {
     );
 
 
-    const currentOrg = filters.organization?.length === 1 ? organizations.find(o => String(o.id) === String(filters.organization[0])) : null;
-    const orgLabel = (filters.organization?.length > 1) ? `Multiple Orgs (${filters.organization.length})` : currentOrg?.name;
+    const currentOrg = filters.organization?.length === 1 ? formOptions?.organisations?.find(o => String(o.value) === String(filters.organization[0])) : null;
+    const orgLabel = (filters.organization?.length > 1) ? `Multiple Orgs (${filters.organization.length})` : currentOrg?.label;
 
     const breadcrumbs = useMemo(() => {
         const base = [{ label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> }];
@@ -406,7 +410,7 @@ const Users = React.memo(() => {
                     <Button
                         variant={selectionMode ? "primary" : "outline"}
                         onClick={() => setSelectionMode(!selectionMode)}
-                        className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : ''}`}
+                        className={`!h-9 !px-3 !text-[11px] !font-black !uppercase !tracking-widest flex items-center gap-1.5 shrink-0 ${selectionMode ? 'shadow-md shadow-primary/20' : 'hover:bg-primary/[0.03]'}`}
                     >
                         {selectionMode ? <FiCheckSquare size={13} /> : <FiSquare size={13} />}
                         Select
@@ -415,9 +419,9 @@ const Users = React.memo(() => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-2 flex-1">
+                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v, region: [] })} allLabel="All Orgs" multiple={true} loading={isLoadingOptions} />
+                    <FilterDropdown label="Site" options={filteredSites} value={filters.region} onChange={v => setFilters({ ...filters, region: v })} allLabel="All Sites" multiple={true} loading={isLoadingOptions} />
                     <FilterDropdown label="Role" options={filterOptions.roles} value={filters.role} onChange={v => setFilters({ ...filters, role: v })} allLabel="All Roles" multiple={true} />
-                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v, region: [] })} allLabel="All Orgs" multiple={true} />
-                    <FilterDropdown label="Zone" options={filterOptions.regions} value={filters.region} onChange={v => setFilters({ ...filters, region: v })} allLabel="All Zones" multiple={true} />
                     <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" multiple={true} />
                 </div>
 

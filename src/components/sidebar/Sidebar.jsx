@@ -103,7 +103,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
                         ${act
                             ? 'bg-primary/10 text-primary font-bold shadow-sm'
-                            : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
+                            : 'text-slate-700 hover:bg-primary/[0.04] hover:text-primary font-medium'}
                     `}
                 >
                     <span 
@@ -132,7 +132,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'justify-start'}
                         ${activeOrOpen
                             ? 'bg-primary/10 text-primary font-bold'
-                            : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
+                            : 'text-slate-700 hover:bg-primary/[0.04] hover:text-primary font-medium'}
                     `}
                 >
                     <span className={`flex items-center shrink-0 transition-colors ${activeOrOpen ? 'text-primary' : 'text-slate-500 group-hover:text-slate-900'}`}>
@@ -170,7 +170,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                                             flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
                                             ${cAct
                                                 ? 'bg-primary/5 text-primary font-bold border border-primary/10'
-                                                : 'text-slate-600 hover:text-slate-950 font-medium'}
+                                                : 'text-slate-600 hover:bg-primary/[0.04] hover:text-primary font-medium'}
                                         `}
                                     >
                                         {child.icon && (
