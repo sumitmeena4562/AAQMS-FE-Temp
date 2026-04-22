@@ -64,10 +64,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         enabled: isOpen && isEdit
     });
 
-    // Extract options from the unified hook
-    const availableOrgs = formOptions?.organizations || [];
+    // Extract options from the unified hook (matching backend keys)
+    const availableOrgs = formOptions?.organisations || [];
     const availableCoordinators = formOptions?.coordinators || [];
-    const allZones = formOptions?.zones || []; // Unified zones if returned
+    const allZones = formOptions?.sites || []; 
 
     // Local state for filtered zones based on selected org
     const [assignmentData, setAssignmentData] = useState([]);
@@ -79,7 +79,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             setAssignmentData([]);
             return;
         }
-        const filtered = allZones.filter(z => String(z.organisation_id) === String(orgId));
+        const filtered = allZones.filter(z => String(z.org_id) === String(orgId));
         setAssignmentData(filtered);
     }, [allZones]);
 
@@ -474,7 +474,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 label="Organization / Company"
                                                                 {...register('organisation_id')}
                                                                 error={errors.organisation_id?.message}
-                                                                options={(availableOrgs || []).map(o => ({ value: o.id, label: o.organisation_name || o.name || 'Unnamed' }))}
+                                                                options={(availableOrgs || []).map(o => ({ value: o.value, label: o.label }))}
                                                                 loading={isLoadingOptions}
                                                                 required={['coordinator', 'field_officer'].includes(currentRole)}
                                                                 onChange={(e) => {
@@ -492,8 +492,8 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                         {...register('zone')}
                                                                         error={errors.zone?.message}
                                                                         options={(assignmentData || []).map(item => ({ 
-                                                                            value: item?.id, 
-                                                                            label: item?.zone_name || item?.name || 'Unnamed Zone'
+                                                                            value: item?.value, 
+                                                                            label: item?.label || 'Unnamed Zone'
                                                                         })).filter(opt => opt.value)}
                                                                         disabled={!watch('organisation_id')}
                                                                         loading={isLoadingSites}
@@ -504,9 +504,11 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                             placeholder="Select supervisor..."
                                                                             {...register('coordinator_id')}
                                                                             error={errors.coordinator_id?.message}
-                                                                            options={(availableCoordinators || []).map(c => ({ 
-                                                                                value: c.id, 
-                                                                                label: c.name 
+                                                                            options={(availableCoordinators || [])
+                                                                            .filter(c => !watch('organisation_id') || String(c.org_id) === String(watch('organisation_id')))
+                                                                            .map(c => ({ 
+                                                                                value: c.value, 
+                                                                                label: c.label 
                                                                             }))}
                                                                             disabled={!watch('organisation_id')}
                                                                             loading={isLoadingOptions}
