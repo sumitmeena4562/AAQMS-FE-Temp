@@ -6,6 +6,12 @@ import { queryClient } from './lib/queryClient.js'
 import './index.css'
 import App from './App.jsx'
 
+// Keep Neon DB alive — ping every 4 minutes to prevent cold start
+const API_BASE = import.meta.env.VITE_API_URL || '/api/';
+setInterval(() => {
+  fetch(`${API_BASE.replace('/api/', '')}/ping/`, { credentials: 'include' }).catch(() => {});
+}, 4 * 60 * 1000);
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <HelmetProvider>
