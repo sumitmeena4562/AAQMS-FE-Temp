@@ -12,14 +12,20 @@ import Badge from './Badge';
 
 
 const orgSchema = z.object({
-  name: z.string().trim().min(3, "Name of Organization must be at least 3 characters").max(255, "Name too long"),
+  name: z.string().trim()
+    .min(3, "Name of Organization must be at least 3 characters")
+    .max(50, "Organization name cannot exceed 50 characters"),
   industry: z.string().min(1, "Industry Type is required"),
   occupancyType: z.string().min(1, "Occupancy Type is required"),
   classification: z.string().min(1, 'Classification is required'),
-  plannedSites: z.number().min(0, 'Must be 0 or more').default(0),
+  plannedSites: z.number()
+    .min(0, 'Must be positive')
+    .max(20, 'Maximum 20 sites allowed')
+    .default(0),
   contactPerson: z.string().min(1, 'Contact person is required'),
   contactEmail: z.string().trim().min(1, "Contact Email is required").email("Invalid email format"),
-  contactPhone: z.string().trim().regex(/^\d{10}$/, "Must be exactly 10 digits"),
+  contactPhone: z.string().trim()
+    .regex(/^(?:\+91|91)?[6-9]\d{9}$/, "Must be a valid Indian number (+91 followed by 10 digits)"),
   address: z.string().trim().min(5, "Address must be at least 5 characters"),
   city: z.string().trim().min(1, "City is required"),
   state: z.string().trim().min(1, "State is required"),
@@ -304,6 +310,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                             icon={<Building />}
                             placeholder="e.g. Apex Global Industries"
                             {...register("name")}
+                            maxLength={50}
                             error={errors.name?.message}
                             isValid={isNameValid}
                             disabled={isViewOnly}
@@ -348,6 +355,10 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                             type="number"
                             placeholder="e.g., 5"
                             {...register('plannedSites', { valueAsNumber: true })}
+                            onInput={(e) => {
+                                if (e.target.value > 20) e.target.value = 20;
+                                if (e.target.value < 0) e.target.value = 0;
+                            }}
                             error={errors.plannedSites?.message}
                             disabled={isViewOnly}
                           />
@@ -423,6 +434,28 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                           required
                           placeholder="10-digit number"
                           {...register("contactPhone")}
+                          onKeyDown={(e) => {
+                              // Allow: backspace, delete, tab, escape, enter, control+a, home, end, left, right
+                              if ([46, 8, 9, 27, 13, 110, 190].indexOf(e.keyCode) !== -1 ||
+                                  (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                                  (e.keyCode >= 35 && e.keyCode <= 40)) {
+                                  return;
+                              }
+                              // Ensure that it is a number and stop the keypress if length >= 13 (to allow +91 + 10 digits)
+                              const isNumber = (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
+                              const isPlus = e.keyCode === 107 || (e.shiftKey && e.keyCode === 187);
+                              
+                              if (!isNumber && !isPlus) {
+                                  e.preventDefault();
+                              }
+                              
+                              const currentVal = e.target.value;
+                              const digitCount = currentVal.replace(/[^0-9]/g, '').length;
+                              if (digitCount >= 12 && isNumber && ![8, 46, 37, 39].includes(e.keyCode)) {
+                                   e.preventDefault();
+                              }
+                          }}
+                          placeholder="+91 00000 00000"
                           error={errors.contactPhone?.message}
                         />
                       </Motion.div>
@@ -555,9 +588,22 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                     whileTap={{ scale: 0.98 }}
                     onClick={handleSubmit(submitForm)}
                     disabled={isSubmitting}
-                    className={`h-11 px-8 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 ${isSubmitting ? 'bg-base text-gray cursor-not-allowed' : 'bg-primary hover:bg-primary/95 text-white shadow-primary/20'}`}
+                    className={`h-11 px-8 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2 min-w-[160px] ${isSubmitting ? 'bg-base text-gray cursor-not-allowed opacity-80' : 'bg-primary hover:bg-primary/95 text-white shadow-primary/20'}`}
                   >
-                    {isSubmitting ? 'Processing...' : org ? 'Commit Changes' : 'Finalize Registration'}
+                    {isSubmitting ? (
+                      <>
+                        <svg className="animate-spin h-4 w-4 text-current" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        {org ? 'Commit Changes' : 'Finalize Registration'}
+                        <ChevronRight size={16} />
+                      </>
+                    )}
                   </Motion.button>
                 )}
               </div>

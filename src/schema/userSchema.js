@@ -14,7 +14,7 @@ export const userSchema = z.object({
     region: z.string().optional().nullable(),
     zone: z.string().optional().nullable(),
     mobile_number: z.string()
-        .regex(/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/, { message: "Please enter a valid phone number" })
+        .regex(/^(?:\+91|91)?[6-9]\d{9}$/, { message: "Must be a valid Indian number (+91 followed by 10 digits)" })
         .optional().nullable().or(z.literal('')),
     coordinator_id: z.string().optional().nullable(),
     assignment: z.string().default('standby'),

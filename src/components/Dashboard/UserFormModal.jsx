@@ -388,8 +388,24 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                             <div className="col-span-2 sm:col-span-1">
                                                 <InputField
                                                     label="Contact Number"
-                                                    placeholder="e.g. +91 9876543210"
+                                                    placeholder="+91 00000 00000"
                                                     {...register('mobile_number')}
+                                                    onKeyDown={(e) => {
+                                                        if ([46, 8, 9, 27, 13, 110, 190].indexOf(e.keyCode) !== -1 ||
+                                                            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                                                            (e.keyCode >= 35 && e.keyCode <= 40)) {
+                                                            return;
+                                                        }
+                                                        const isNumber = (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
+                                                        const isPlus = e.keyCode === 107 || (e.shiftKey && e.keyCode === 187);
+                                                        if (!isNumber && !isPlus) e.preventDefault();
+                                                        
+                                                        const currentVal = e.target.value;
+                                                        const digitCount = currentVal.replace(/[^0-9]/g, '').length;
+                                                        if (digitCount >= 12 && isNumber && ![8, 46, 37, 39].includes(e.keyCode)) {
+                                                             e.preventDefault();
+                                                        }
+                                                    }}
                                                     error={errors.mobile_number?.message}
                                                 />
                                             </div>
