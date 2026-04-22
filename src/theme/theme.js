@@ -158,7 +158,7 @@ const fontWeight = {
 
 // ── Font Family ─────────────────────────────────────────────────────────────────
 const fontFamily = {
-    sans: "'Inter', -apple-system, system-ui, sans-serif",
+    sans: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     mono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
 };
 

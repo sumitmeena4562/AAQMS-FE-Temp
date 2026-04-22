@@ -15,8 +15,9 @@ export default {
                 border: 'var(--color-border)',
             },
             fontFamily: {
-                heading: 'var(--font-heading)',
-                body: 'var(--font-body)',
+                sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                heading: ['Inter', 'sans-serif'],
+                body: ['Inter', 'sans-serif'],
             },
             spacing: {
                 xs: 'var(--spacing-xs)',

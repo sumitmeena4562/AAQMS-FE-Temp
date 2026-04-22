@@ -60,7 +60,7 @@ export const DESIGN_TOKENS = {
 
     // ── TYPOGRAPHY ──
     FONTS: {
-        FAMILY: "'Inter', -apple-system, system-ui, sans-serif",
+        FAMILY: "'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
         SIZES: {
             XXS: '0.625rem',  // 10px
             XS: '0.75rem',    // 12px

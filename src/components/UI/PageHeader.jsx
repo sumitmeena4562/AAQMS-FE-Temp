@@ -32,7 +32,7 @@ const PageHeader = ({
           <div className="flex flex-col gap-1.5 min-w-0 flex-1">
             <h1 
               className="text-xl sm:text-2xl font-black leading-tight tracking-tight truncate"
-              style={{ color: DESIGN_TOKENS.COLORS.TEXT_TITLE, fontFamily: DESIGN_TOKENS.FONTS.FAMILY }}
+              style={{ color: DESIGN_TOKENS.COLORS.TEXT_TITLE }}
             >
               {title}
             </h1>

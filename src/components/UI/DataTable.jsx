@@ -130,7 +130,7 @@ const DataTable = React.memo(({
                                 onChange={searchProps.onChange}
                                 placeholder={searchProps.placeholder || "Search..."}
                                 className="w-full h-11 pl-10 pr-4 bg-card border border-border-main rounded-[var(--radius-input)] text-[13px] font-semibold placeholder:text-gray focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
-                                style={{ color: DESIGN_TOKENS.COLORS.TEXT_BODY, fontFamily: DESIGN_TOKENS.FONTS.FAMILY }}
+                                style={{ color: DESIGN_TOKENS.COLORS.TEXT_BODY }}
                             />
                         </div>
                     )}
