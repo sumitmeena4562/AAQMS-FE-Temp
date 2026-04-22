@@ -16,7 +16,10 @@ const formatLastSync = (timestamp) => {
     if (!timestamp) return 'Fetching...';
     const diffInSeconds = Math.floor((Date.now() - timestamp) / 1000);
     if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} mins ago`;
+    if (diffInSeconds < 3600) {
+        const mins = Math.floor(diffInSeconds / 60);
+        return `${mins} min${mins > 1 ? 's' : ''} ago`;
+    }
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
 

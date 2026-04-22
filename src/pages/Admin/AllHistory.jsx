@@ -81,7 +81,7 @@ export default function AllHistory() {
     // ── 3. Derived Data ──
     // Map backend results to frontend activity feed format
     const activityList = useMemo(() => 
-        mapToActivityFeed(historyData?.results || []), 
+        historyData?.results || [], 
     [historyData?.results]);
     
     const totalCount = historyData?.count || 0;

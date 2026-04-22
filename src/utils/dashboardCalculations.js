@@ -178,12 +178,39 @@ export const mapToMetricCards = (rawData) => {
  */
 export const formatRelativeTime = (timestamp) => {
     if (!timestamp) return 'Just now';
-    const diffInSeconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
     
+    let sanitized = typeof timestamp === 'string' ? timestamp.trim().replace(' ', 'T') : timestamp;
+    
+    // Handle DD-MM-YYYY or DD/MM/YYYY formats which new Date() often fails on
+    if (typeof sanitized === 'string' && /^\d{2}[-/]\d{2}[-/]\d{4}/.test(sanitized)) {
+        const parts = sanitized.split(/[-/T]/);
+        const timePart = sanitized.includes('T') ? sanitized.split('T')[1] : '';
+        sanitized = `${parts[2]}-${parts[1]}-${parts[0]}${timePart ? 'T' + timePart : ''}`;
+    }
+
+    const date = new Date(sanitized);
+    if (isNaN(date.getTime())) return 'Recently';
+    
+    const diffInSeconds = Math.floor((new Date() - date) / 1000);
+    
+    if (diffInSeconds < 0) return 'Just now';
     if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} mins ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    
+    if (diffInSeconds < 3600) {
+        const mins = Math.floor(diffInSeconds / 60);
+        return `${mins} min${mins > 1 ? 's' : ''} ago`;
+    }
+    
+    if (diffInSeconds < 86400) {
+        const hrs = Math.floor(diffInSeconds / 3600);
+        return `${hrs} hr${hrs > 1 ? 's' : ''} ago`;
+    }
+    
+    const days = Math.floor(diffInSeconds / 86400);
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return `${days} days ago`;
+    
+    return date.toLocaleDateString([], { day: '2-digit', month: 'short' });
 };
 
 /**

@@ -178,11 +178,22 @@ const FilterDropdown = React.memo(({ label, value, options = [], onChange, allLa
                         <div className="flex flex-col items-start leading-tight">
                             <span className="text-[8px] font-black text-primary/60 uppercase tracking-[0.12em]">{label}</span>
                             <span className="text-[10px] font-bold text-primary truncate max-w-[80px]">
-                                {multiple && Array.isArray(value) && value.length > 1 
-                                    ? `${value.length} Selected` 
-                                    : multiple && Array.isArray(value) && value.length === 1
-                                        ? options.find(o => String(typeof o === 'string' ? o : o.value) === String(value[0]))?.label || value[0]
-                                        : !multiple ? options.find(o => String(typeof o === 'string' ? o : o.value) === String(value))?.label || value : ''}
+                                {(() => {
+                                    const getLabel = (val) => {
+                                        const opt = options.find(o => String(typeof o === 'string' ? o : o.value) === String(val));
+                                        if (opt) return typeof opt === 'string' ? opt : opt.label;
+                                        // If GUID-like and not found, show loading
+                                        if (typeof val === 'string' && val.includes('-') && val.length > 20) return 'Loading...';
+                                        return val;
+                                    };
+
+                                    if (multiple && Array.isArray(value)) {
+                                        if (value.length > 1) return `${value.length} Selected`;
+                                        if (value.length === 1) return getLabel(value[0]);
+                                    }
+                                    if (!multiple) return getLabel(value);
+                                    return '';
+                                })()}
                             </span>
                         </div>
                         <div
