@@ -92,9 +92,19 @@ const useUserStore = create((set, get) => ({
     deleteUser: async (id) => {
         set({ loading: true, error: null });
         try {
-            await userService.deleteUser(id);
-            set(s => ({ selectedIds: s.selectedIds.filter(i => i !== id), loading: false })); // Reset loading
-            await queryClient.invalidateQueries(['users']);
+            // SINGLE-CALL OPTIMIZATION: Manually remove user from all cached lists
+            queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
+                if (!oldData?.results) return oldData;
+                return {
+                    ...oldData,
+                    count: oldData.count - 1,
+                    results: oldData.results.filter(u => String(u.id) !== String(id))
+                };
+            });
+
+            set(s => ({ selectedIds: s.selectedIds.filter(i => i !== id), loading: false })); 
+            
+            // Still invalidate stats as they are harder to update manually perfectly
             await queryClient.invalidateQueries(['user-stats']);
             await queryClient.invalidateQueries(['dashboard', 'summary']);
             return { success: true };
@@ -115,17 +125,22 @@ const useUserStore = create((set, get) => ({
         try {
             const data = await userService.bulkAction(ids, action);
             
-            // SINGLE-CALL OPTIMIZATION: Update global stats immediately
-            if (data?.updated_stats) {
-                queryClient.setQueryData(['dashboard', 'summary'], old => ({
-                    ...old,
-                    stats: { ...old?.stats, ...data.updated_stats }
-                }));
-                queryClient.setQueryData(['user-stats'], data.updated_stats);
+            // SINGLE-CALL OPTIMIZATION: Update all targeted users in cache
+            if (data?.results || Array.isArray(data)) {
+                const updatedUsers = data.results || data;
+                queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
+                    if (!oldData?.results) return oldData;
+                    return {
+                        ...oldData,
+                        results: oldData.results.map(u => {
+                            const updated = updatedUsers.find(uu => String(uu.id) === String(u.id));
+                            return updated ? { ...u, ...updated } : u;
+                        })
+                    };
+                });
             }
 
             set({ selectedIds: [], loading: false });
-            await queryClient.invalidateQueries(['users']); // Invalidate list only
             
             toast.success("Done! The changes have been applied.");
             return { success: true };

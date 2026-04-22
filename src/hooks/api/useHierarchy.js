@@ -27,7 +27,7 @@ export const useHierarchy = (options = {}) => {
     const activeOrgs = orgId !== null ? (Array.isArray(orgId) ? orgId : [orgId]) : selectedOrg;
 
     // 1. Organizations (Top level) - Memoize filters to prevent re-fetch loops
-    const orgFilters = React.useMemo(() => ({ dropdown: 'true' }), []);
+    const orgFilters = React.useMemo(() => ({ lookup: 'true' }), []);
     const orgsQuery = useOrganizations(orgFilters, '', 1, 100, { enabled: includeOrgs && enabled });
 
     // 2. Coordinators (Cascading: only if org is selected)

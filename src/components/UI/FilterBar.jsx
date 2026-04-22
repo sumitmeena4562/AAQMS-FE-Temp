@@ -98,38 +98,31 @@ const FilterBar = ({
                         />
                     )}
 
-                    {renderSite && (
-                        <div className={selectedCoord.length === 0 ? 'opacity-50 pointer-events-none' : ''}>
-                            <FilterDropdown 
-                                label="Site"
-                                options={siteOptions}
-                                value={selectedSite}
-                                onChange={(val) => setSite(val)}
-                                allLabel="Select Site"
-                                multiple={true}
-                            />
-                        </div>
-                    )}
+                        <FilterDropdown 
+                            label="Site"
+                            options={siteOptions}
+                            value={selectedSite}
+                            onChange={(val) => setSite(val)}
+                            allLabel="Select Site"
+                            multiple={true}
+                        />
 
-                    {renderFloor && (
-                        <div className={selectedSite.length === 0 ? 'opacity-50 pointer-events-none' : ''}>
-                            <FilterDropdown 
-                                label="Floor"
-                                options={floorOptions}
-                                value={selectedFloor}
-                                onChange={(val) => setFloor(val)}
-                                allLabel="Select Floor"
-                                multiple={true}
-                            />
-                        </div>
-                    )}
+                        <FilterDropdown 
+                            label="Floor"
+                            options={floorOptions}
+                            value={selectedFloor}
+                            onChange={(val) => setFloor(val)}
+                            allLabel="Select Floor"
+                            multiple={true}
+                        />
 
                     {showStatus && (
                         <FilterDropdown 
                             label="Status"
                             options={[
-                                { value: 'ACTIVE', label: 'Active Only' },
-                                { value: 'INACTIVE', label: 'Inactive Only' }
+                                { value: 'ACTIVE', label: 'Active' },
+                                { value: 'BLOCKED', label: 'Blocked' },
+                                { value: 'PENDING', label: 'Pending' }
                             ]}
                             value={selectedStatus}
                             onChange={(val) => setStatus(val)}

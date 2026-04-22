@@ -71,7 +71,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         const fetchOrgs = async () => {
             setIsLoadingOrgs(true);
             try {
-                const data = await organizationService.getOrganizations({ dropdown: 'true' });
+                const data = await organizationService.getOrganizations({ lookup: 'true' });
                 setAvailableOrgs(Array.isArray(data) ? data : (data.results || []));
             } catch (err) {
                 console.error("Failed to load orgs for form:", err);

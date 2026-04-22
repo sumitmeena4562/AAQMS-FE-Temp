@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { X, Edit2, MapPin, Globe, Briefcase, Mail, Phone, Info, Layout, Camera } from 'lucide-react';
+import { X, Edit2, MapPin, Globe, Briefcase, Mail, Phone, Info, Layout, Camera, Loader2 } from 'lucide-react';
 import Badge from './Badge';
+import { useOrganizationDetails } from '../../hooks/api/useOrgQueries';
 
 const DetailItem = ({ icon: Icon, label, value }) => (
     <div className="flex items-start gap-4 p-4 rounded-2xl bg-page/30 border border-border-main/40">
@@ -36,7 +37,10 @@ const ImagePreview = ({ label, url }) => (
 );
 
 const OrganizationDetailsModal = ({ isOpen, org, onClose, onEdit }) => {
+    const { data: fullOrg, isLoading } = useOrganizationDetails(org?.id, { enabled: isOpen && !!org?.id });
+    
     if (!org) return null;
+    const displayOrg = fullOrg || org;
 
     return (
         <AnimatePresence>
@@ -56,11 +60,17 @@ const OrganizationDetailsModal = ({ isOpen, org, onClose, onEdit }) => {
                         exit={{ opacity: 0, scale: 0.98, y: 10 }}
                         className="relative w-full max-w-[850px] max-h-[90vh] bg-card border border-border-main rounded-[32px] shadow-2xl flex flex-col overflow-hidden"
                     >
+                        {isLoading && !fullOrg && (
+                            <div className="absolute inset-0 z-[1100] bg-card/60 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
+                                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Fetching Detailed Profile...</span>
+                            </div>
+                        )}
                         {/* Header Section with Profile */}
                         <div className="relative h-48 w-full shrink-0 bg-base overflow-hidden border-b border-border-main">
                             <img 
-                                src={org.imagery?.profile || org.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop'} 
-                                alt={org.name} 
+                                src={displayOrg.imagery?.profile || displayOrg.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop'} 
+                                alt={displayOrg.name} 
                                 className="w-full h-full object-cover grayscale-[0.2]"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
@@ -77,22 +87,22 @@ const OrganizationDetailsModal = ({ isOpen, org, onClose, onEdit }) => {
                             <div className="absolute bottom-0 left-0 w-full p-8 flex items-end justify-between">
                                 <div className="flex items-center gap-6">
                                     <div className="w-20 h-20 rounded-3xl bg-card p-1 shadow-xl border border-border-main -mb-12 overflow-hidden ring-4 ring-card select-none">
-                                         <img src={org.imagery?.profile || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop'} alt="logo" className="w-full h-full object-cover rounded-2xl" />
+                                         <img src={displayOrg.imagery?.profile || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop'} alt="logo" className="w-full h-full object-cover rounded-2xl" />
                                     </div>
                                     <div className="pb-2">
-                                        <h2 className="text-2xl font-black text-title leading-tight tracking-tight mb-1">{org.name}</h2>
+                                        <h2 className="text-2xl font-black text-title leading-tight tracking-tight mb-1">{displayOrg.name}</h2>
                                         <div className="flex items-center gap-3">
-                                            <Badge variant="soft" className="!text-[9px] !px-2.5 !py-0.5 text-primary bg-primary/5">{org.industry}</Badge>
+                                            <Badge variant="soft" className="!text-[9px] !px-2.5 !py-0.5 text-primary bg-primary/5">{displayOrg.industry}</Badge>
                                             <span className="w-1 h-1 rounded-full bg-title/40" />
                                             <span className="text-[10px] font-black text-title uppercase tracking-widest bg-card px-2 py-0.5 rounded-md border border-border-main shadow-sm flex items-center justify-center">
-                                                ID: {org.id?.toString().substring(0, 8)}
+                                                ID: {displayOrg.id?.toString().substring(0, 8)}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <button
-                                    onClick={() => onEdit?.(org)}
+                                    onClick={() => onEdit?.(displayOrg)}
                                     className="flex items-center gap-2 px-5 py-2.5 bg-primary rounded-2xl text-white text-[11px] font-black uppercase tracking-widest hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-95 shadow-sm mb-2"
                                 >
                                     <Edit2 size={13} />
@@ -112,9 +122,9 @@ const OrganizationDetailsModal = ({ isOpen, org, onClose, onEdit }) => {
                                         Information Overview
                                     </h4>
                                     <div className="grid grid-cols-1 gap-4">
-                                        <DetailItem icon={Layout} label="Occupancy Type" value={org.occupancyType} />
-                                        <DetailItem icon={Globe} label="Classification" value={org.classification} />
-                                        <DetailItem icon={MapPin} label="Physical Address" value={org.address} />
+                                        <DetailItem icon={Layout} label="Occupancy Type" value={displayOrg.occupancyType} />
+                                        <DetailItem icon={Globe} label="Classification" value={displayOrg.classification} />
+                                        <DetailItem icon={MapPin} label="Physical Address" value={displayOrg.address} />
                                     </div>
                                 </div>
 
@@ -124,9 +134,9 @@ const OrganizationDetailsModal = ({ isOpen, org, onClose, onEdit }) => {
                                         Contact Point
                                     </h4>
                                     <div className="grid grid-cols-1 gap-4">
-                                        <DetailItem icon={Briefcase} label="Contact Person" value={org.contactPerson} />
-                                        <DetailItem icon={Mail} label="Operational Email" value={org.contactEmail} />
-                                        <DetailItem icon={Phone} label="Primary Phone" value={org.contactPhone} />
+                                        <DetailItem icon={Briefcase} label="Contact Person" value={displayOrg.contactPerson} />
+                                        <DetailItem icon={Mail} label="Operational Email" value={displayOrg.contactEmail} />
+                                        <DetailItem icon={Phone} label="Primary Phone" value={displayOrg.contactPhone} />
                                     </div>
                                 </div>
 
@@ -137,11 +147,11 @@ const OrganizationDetailsModal = ({ isOpen, org, onClose, onEdit }) => {
                                         Site Asset Documentation
                                     </h4>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                                        <ImagePreview label="North View" url={org.imagery?.north} />
-                                        <ImagePreview label="South View" url={org.imagery?.south} />
-                                        <ImagePreview label="East View" url={org.imagery?.east} />
-                                        <ImagePreview label="West View" url={org.imagery?.west} />
-                                        {org.imagery?.extra?.map((url, idx) => (
+                                        <ImagePreview label="North View" url={displayOrg.imagery?.north} />
+                                        <ImagePreview label="South View" url={displayOrg.imagery?.south} />
+                                        <ImagePreview label="East View" url={displayOrg.imagery?.east} />
+                                        <ImagePreview label="West View" url={displayOrg.imagery?.west} />
+                                        {displayOrg.imagery?.extra?.map((url, idx) => (
                                             <ImagePreview key={idx} label={`Other View ${idx + 1}`} url={url} />
                                         ))}
                                     </div>
@@ -152,7 +162,7 @@ const OrganizationDetailsModal = ({ isOpen, org, onClose, onEdit }) => {
                                     <h4 className="text-[11px] font-black text-gray uppercase tracking-widest pl-1 mb-2">Other Details</h4>
                                     <div className="bg-page/40 p-6 rounded-[24px] border border-border-main/40 min-h-[100px]">
                                         <p className="text-sm font-bold text-gray leading-relaxed italic opacity-80">
-                                            {org.otherInfo ? `"${org.otherInfo}"` : 'No additional tactical information provided for this entity.'}
+                                            {displayOrg.otherInfo ? `"${displayOrg.otherInfo}"` : 'No additional tactical information provided for this entity.'}
                                         </p>
                                     </div>
                                 </div>

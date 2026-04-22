@@ -90,7 +90,7 @@ const Organizations = React.memo(() => {
     // --- QUERY HOOK (UPDATED) ---
     // Note: We use server-side pagination and filtering
     const { data, isLoading, isError, error, refetch } = useOrganizations(filters, searchQuery, currentPage, itemsPerPage);
-    
+
     // Debug logging to isolate loading issues
     useEffect(() => {
         if (isLoading) console.debug("[AAQMS-UI] Organizations: Loading data...");
@@ -240,7 +240,7 @@ const Organizations = React.memo(() => {
                 const isBlocked = computedStatus === 'BLOCKED';
 
                 const { COLORS } = DESIGN_TOKENS;
-                
+
                 const style = isActive
                     ? { backgroundColor: COLORS.BADGES.SUCCESS_BG, color: COLORS.BADGES.SUCCESS_TEXT, borderColor: `${COLORS.BADGES.SUCCESS_TEXT}33` }
                     : isPending
@@ -250,7 +250,7 @@ const Organizations = React.memo(() => {
                             : { backgroundColor: COLORS.BADGES.DANGER_BG, color: COLORS.BADGES.DANGER_TEXT, borderColor: `${COLORS.BADGES.DANGER_TEXT}33` };
 
                 return (
-                    <div 
+                    <div
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border"
                         style={style}
                     >
