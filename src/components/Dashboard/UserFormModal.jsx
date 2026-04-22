@@ -44,7 +44,7 @@ const ROLE_DETAILS = [
 
 const STATUS_OPTIONS = ['active', 'deactive'];
 
-const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false }) => {
+const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false, formOptions: externalFormOptions }) => {
     const isEdit = !!(user && user.id);
     const [step, setStep] = useState(0);
     const [submitError, setSubmitError] = useState('');
@@ -56,8 +56,12 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     const lastProcessedRef = useRef('');
 
-    // Unified Form Options Hook
-    const { data: formOptions, isLoading: isLoadingOptions } = useUserFormOptions({ enabled: isOpen });
+    // Unified Form Options Hook (Only if not passed from parent)
+    const { data: internalFormOptions, isLoading: isLoadingOptions } = useUserFormOptions({ 
+        enabled: isOpen && !externalFormOptions 
+    });
+    
+    const formOptions = externalFormOptions || internalFormOptions;
     
     // Detailed User Hook for Edit Mode (Fetch IDs if missing from list response)
     const { data: fullUserDetails, isLoading: isFetchingUserDetails } = useUserDetails(user?.id, { 
