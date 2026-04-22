@@ -104,8 +104,8 @@ export const useOrganizations = (filters = {}, search = '', page = 1, pageSize =
       // 3. Absolute Fallback
       return { results: [], count: 0 };
     },
-    staleTime: 5 * 60 * 1000, 
-    gcTime: 10 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, 
+    gcTime: 15 * 60 * 1000,
     placeholderData: (previousData) => previousData,
     ...options
   });

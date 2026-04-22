@@ -14,6 +14,10 @@ import DotStatus from '../../components/UI/DotStatus';
 import Badge from '../../components/UI/Badge';
 import FilterBar from '../../components/UI/FilterBar';
 import TableSkeleton from '../../components/UI/TableSkeleton';
+import CardSkeleton from '../../components/UI/CardSkeleton';
+import { useQueryClient } from '@tanstack/react-query';
+import { organizationService } from '../../services/organizationService';
+import { mapOrgToFrontend } from '../../hooks/api/useOrgQueries';
 
 import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiShieldOff, FiEye } from 'react-icons/fi';
 import useSearchStore from '../../store/useSearchStore';
@@ -62,6 +66,20 @@ const Organizations = React.memo(() => {
         isSubmitting
     } = useOrgStore();
     const { query: searchQuery, clearSearch } = useSearchStore();
+    const queryClient = useQueryClient();
+
+    // --- PREFETCH LOGIC ---
+    const handlePrefetch = useCallback((id) => {
+        if (!id) return;
+        queryClient.prefetchQuery({
+            queryKey: ['organization', id],
+            queryFn: async ({ signal }) => {
+                const data = await organizationService.getOrganizationById(id, signal);
+                return mapOrgToFrontend(data);
+            },
+            staleTime: 10 * 60 * 1000
+        });
+    }, [queryClient]);
 
     // --- QUERY HOOK (NEW) ---
     // Note: We use the global filters and search directly in the query key for automatic refetching
@@ -337,8 +355,14 @@ const Organizations = React.memo(() => {
 
                 {/* Main Content Area */}
                 {isLoading ? (
-                    <div className="bg-card rounded-3xl p-6 border border-border-main shadow-sm w-full">
-                        <TableSkeleton rows={5} />
+                    <div className="w-full">
+                        {viewMode === 'grid' ? (
+                            <CardSkeleton count={itemsPerPage} columns={5} />
+                        ) : (
+                            <div className="bg-card rounded-3xl p-6 border border-border-main shadow-sm w-full">
+                                <TableSkeleton rows={5} />
+                            </div>
+                        )}
                     </div>
                 ) : isError ? (
                     <div className="w-full flex flex-col items-center justify-center py-24 bg-rose-50/30 border-2 border-dashed border-rose-200 rounded-3xl animate-in zoom-in duration-300">
@@ -368,6 +392,7 @@ const Organizations = React.memo(() => {
                                             onEdit={() => handleEdit(org)}
                                             onView={() => handleView(org)}
                                             onBlock={() => handleBlock(org)}
+                                            onMouseEnter={() => handlePrefetch(org.id)}
                                         />
                                     </div>
                                 ))}

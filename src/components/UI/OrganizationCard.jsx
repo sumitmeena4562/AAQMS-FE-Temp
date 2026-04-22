@@ -4,7 +4,7 @@ import { FiEdit2, FiEye, FiShieldOff } from 'react-icons/fi';
 import { useFilterStore } from '../../store/useFilterStore';
 import { getOrgStatus } from '../../utils/orgUtils';
 
-const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onView }) => {
+const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onView, onMouseEnter }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const totalComputedCoordinators = org.stats?.coordinators || 0;
@@ -51,6 +51,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
     <div
       className={`h-[360px] elite-card elite-card-hover flex flex-col overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
       onClick={handleCardClick}
+      onMouseEnter={onMouseEnter}
     >
 
       {/* Top Image Section */}
