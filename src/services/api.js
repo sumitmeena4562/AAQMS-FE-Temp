@@ -37,17 +37,6 @@ api.interceptors.request.use(
             console.warn(`[AAQMS-DEBUG] High request volume detected: ${requestCount} requests since load.`);
         }
 
-        // ── REQUEST DEDUPLICATION ──
-        // Only deduplicate GET requests to prevent race conditions on writes.
-        if (config.method?.toLowerCase() === 'get') {
-            const requestKey = `${config.url}${JSON.stringify(config.params || {})}`;
-            if (pendingRequests.has(requestKey)) {
-                return Promise.reject({ isDeduplicated: true, key: requestKey });
-            }
-            pendingRequests.set(requestKey, true);
-            config._requestKey = requestKey;
-        }
-
         // ── CSRF PROTECTION ──
         // For state-changing requests, attach the X-CSRFToken header.
         if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
@@ -60,8 +49,6 @@ api.interceptors.request.use(
                 config.headers['X-CSRFToken'] = csrfToken;
             }
         }
-
-        // ── PARAMETER SANITIZATION ──
         // Remove 'undefined', 'null' or literal "undefined" strings from query params
         if (config.params) {
             const cleanParams = { ...config.params };
@@ -72,6 +59,18 @@ api.interceptors.request.use(
                 }
             });
             config.params = cleanParams;
+        }
+
+        // ── REQUEST DEDUPLICATION (LOGGING ONLY) ──
+        // We previously used a Map to block duplicate GETs, but it caused hangs with React Query.
+        // Now we just monitor for potential request explosions.
+        if (config.method?.toLowerCase() === 'get') {
+            const requestKey = `${config.url}${JSON.stringify(config.params || {})}`;
+            if (pendingRequests.has(requestKey)) {
+                console.debug(`[AAQMS-API] Concurrent request detected for: ${requestKey}. Letting it pass.`);
+            }
+            pendingRequests.set(requestKey, true);
+            config._requestKey = requestKey;
         }
 
         return config;
@@ -107,13 +106,6 @@ api.interceptors.response.use(
         return response;
     },
     async (error) => {
-        // If the request was deduplicated, we don't treat it as a real error
-        if (error.isDeduplicated) {
-            // We return a never-resolving promise or similar, but React Query will handle the actual data
-            // from the first request that was sent.
-            return new Promise(() => { });
-        }
-
         const originalRequest = error.config;
         if (originalRequest?._requestKey) {
             pendingRequests.delete(originalRequest._requestKey);

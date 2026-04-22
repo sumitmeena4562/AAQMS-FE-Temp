@@ -70,7 +70,15 @@ const Organizations = React.memo(() => {
 
     // --- QUERY HOOK (UPDATED) ---
     // Note: We use server-side pagination and filtering
-    const { data, isLoading } = useOrganizations(filters, searchQuery, currentPage, itemsPerPage);
+    const { data, isLoading, isError, error, refetch } = useOrganizations(filters, searchQuery, currentPage, itemsPerPage);
+    
+    // Debug logging to isolate loading issues
+    useEffect(() => {
+        if (isLoading) console.debug("[AAQMS-UI] Organizations: Loading data...");
+        if (data) console.debug("[AAQMS-UI] Organizations: Data received", { count: data.count });
+        if (isError) console.error("[AAQMS-UI] Organizations: Load failed", error);
+    }, [isLoading, data, isError, error]);
+
     const orgs = data?.results || [];
     const totalCount = data?.count || 0;
 
@@ -78,7 +86,6 @@ const Organizations = React.memo(() => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingOrg, setEditingOrg] = useState(null);
     const [isViewOnly, setIsViewOnly] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
 
     // --- Memoized Computations ---
     const enrichedOrgs = useMemo(() => {
@@ -332,6 +339,23 @@ const Organizations = React.memo(() => {
                 {isLoading ? (
                     <div className="bg-card rounded-3xl p-6 border border-border-main shadow-sm w-full">
                         <TableSkeleton rows={5} />
+                    </div>
+                ) : isError ? (
+                    <div className="w-full flex flex-col items-center justify-center py-24 bg-rose-50/30 border-2 border-dashed border-rose-200 rounded-3xl animate-in zoom-in duration-300">
+                        <div className="w-16 h-16 bg-rose-100 rounded-2xl flex items-center justify-center mb-5 rotate-3">
+                            <FiShieldOff className="w-7 h-7 text-rose-500" />
+                        </div>
+                        <h3 className="text-lg font-black text-rose-900 mb-1">Failed to Load Data</h3>
+                        <p className="text-rose-600/70 text-xs mb-8 text-center max-w-[340px] px-4 font-medium leading-relaxed">
+                            {error?.message || "There was an error connecting to the server. Please check your connection and try again."}
+                        </p>
+                        <button
+                            onClick={() => refetch()}
+                            className="flex items-center gap-2 px-6 py-2.5 bg-white border border-rose-200 rounded-xl text-xs font-black text-rose-600 hover:bg-rose-50 transition-all shadow-sm active:scale-95"
+                        >
+                            <FiRefreshCcw className="w-3.5 h-3.5" />
+                            Retry Connection
+                        </button>
                     </div>
                 ) : filteredOrgs.length > 0 ? (
                     viewMode === 'grid' ? (
