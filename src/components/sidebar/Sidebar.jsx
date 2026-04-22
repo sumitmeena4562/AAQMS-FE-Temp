@@ -241,8 +241,16 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                                 ${collapsed ? 'p-2 justify-center' : 'p-2.5 gap-3 justify-start'}
                             `}
                         >
-                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-[13px] font-black shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform">
-                                {user.avatar || user.name?.charAt(0)?.toUpperCase() || user.first_name?.charAt(0)?.toUpperCase() || 'U'}
+                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-[13px] font-black shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform overflow-hidden">
+                                {user.avatar ? (
+                                    <img 
+                                        src={user.avatar.startsWith('http') ? user.avatar : `http://127.0.0.1:8000${user.avatar}`} 
+                                        className="w-full h-full object-cover" 
+                                        alt={user.name} 
+                                    />
+                                ) : (
+                                    user.name?.charAt(0)?.toUpperCase() || user.first_name?.charAt(0)?.toUpperCase() || 'U'
+                                )}
                             </div>
                             {!collapsed && (
                                 <div className="overflow-hidden flex-1">

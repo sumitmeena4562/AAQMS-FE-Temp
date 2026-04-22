@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import * as dashboardService from '../../services/dashboardService';
 
@@ -23,7 +24,7 @@ export const useDashboardSummary = () => {
  */
 export const useAllHistory = (filters = {}) => {
   // Normalize filters for query key stability
-  const cleanFilters = Object.fromEntries(
+  const cleanFilters = useMemo(() => Object.fromEntries(
     Object.entries(filters).filter(([, v]) => 
       v !== undefined && 
       v !== null && 
@@ -31,7 +32,7 @@ export const useAllHistory = (filters = {}) => {
       v !== '' && 
       !(Array.isArray(v) && v.length === 0)
     )
-  );
+  ), [filters]);
 
   return useQuery({
     queryKey: ['dashboard', 'history', cleanFilters],

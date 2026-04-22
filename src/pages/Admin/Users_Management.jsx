@@ -85,12 +85,14 @@ const Users = React.memo(() => {
     const debouncedSearch = useDebounce(search, 400);
     const isReady = isInitialized && responsiveLimit === limit;
     
+    const queryOptions = useMemo(() => ({ enabled: isReady }), [isReady]);
+
     const { 
         users, totalCount, stats, isLoading: isUsersLoading 
-    } = useUserManagementData(filters, debouncedSearch, page, limit, { enabled: isReady });
+    } = useUserManagementData(filters, debouncedSearch, page, limit, queryOptions);
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
-    
+
     // ── HIERARCHY DATA (OPTIMIZED) ──
     const hasOrgSelected = filters.organization?.length > 0;
     const { organizations, sites } = useHierarchy({ 

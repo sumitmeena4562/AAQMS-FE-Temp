@@ -50,8 +50,9 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const [step, setStep] = useState(0);
     const [submitError, setSubmitError] = useState('');
     const [showWorkAssignment, setShowWorkAssignment] = useState(false);
-        // Image selection state
+    // Image selection state
     const [imagePreview, setImagePreview] = useState(user?.avatar || null);
+    const [avatarFile, setAvatarFile] = useState(null); // Actual binary file
     const fileInputRef = useRef(null); // Ye hidden file input ko trigger karne ke liye hai
 
     const lastProcessedRef = useRef('');
@@ -160,7 +161,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 avatar: avatarVal
             });
             
-            setImagePreview(avatarVal || null);
+            setImagePreview(avatarVal ? (avatarVal.startsWith('http') ? avatarVal : `http://127.0.0.1:8000${avatarVal}`) : null);
             setShowWorkAssignment(!!orgId);
             if (orgId) fetchAssignmentDataForOrg(orgId);
             setStep(1);
@@ -190,35 +191,33 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const onFormSubmit = async (data) => {
         setSubmitError('');
         
-        // Prepare comprehensive payload for backend sync
-        const payload = { 
-            ...data,
-            role: data.role.toUpperCase(),
-            is_active: data.status === 'active',
-            avatar: imagePreview, // Use current preview (Base64 or existing URL)
-            mobile_number: data.mobile_number || null,
-            organisation_id: data.organisation_id || null
-        };
+        // Use FormData for binary uploads (optimized performance)
+        const formData = new FormData();
+        
+        // Basic Fields
+        formData.append('name', data.name);
+        formData.append('email', data.email);
+        formData.append('role', data.role.toUpperCase());
+        formData.append('is_active', data.status === 'active');
+        if (data.mobile_number) formData.append('mobile_number', data.mobile_number);
+        if (data.organisation_id) formData.append('organisation_id', data.organisation_id);
+        if (!isEdit && data.password) formData.append('password', data.password);
 
-        // Automatic assignment state for UI/logic if needed
-        payload.assignment = (payload.organisation_id || data.region || data.zone) ? 'assigned' : 'standby';
-
-        // Role-specific field mapping for BE consistency
-        if (payload.role === 'COORDINATOR') {
-            payload.region = data.region || null;
-            payload.zone = null;
-            payload.coordinator_id = null;
-        } else if (payload.role === 'FIELD_OFFICER') {
-            payload.zone = data.zone || null;
-            payload.region = null;
-            payload.coordinator_id = data.coordinator_id || null;
-        } else {
-            payload.region = null;
-            payload.zone = null;
-            payload.coordinator_id = null;
+        // Avatar (File object if changed, or URL/null if not)
+        if (avatarFile) {
+            formData.append('avatar', avatarFile);
         }
 
-        const result = await onSubmit(payload);
+        // Role-specific fields
+        const role = data.role.toUpperCase();
+        if (role === 'COORDINATOR') {
+            if (data.region) formData.append('region', data.region);
+        } else if (role === 'FIELD_OFFICER') {
+            if (data.zone) formData.append('zone', data.zone);
+            if (data.coordinator_id) formData.append('coordinator_id', data.coordinator_id);
+        }
+
+        const result = await onSubmit(formData);
         if (result?.success) {
             onClose();
         } else {
@@ -229,11 +228,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            setAvatarFile(file); // Store the actual file for FormData
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImagePreview(reader.result);
-                setValue('avatar', reader.result); 
-
+                setImagePreview(reader.result); // Base64 ONLY for UI preview
             };
             reader.readAsDataURL(file);
         }
@@ -460,7 +458,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 required={['coordinator', 'field_officer'].includes(currentRole)}
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
-                                                                    setValue('organisation_id', val);
+                                                                    setValue('organisation_id', val, { shouldValidate: true });
                                                                     fetchAssignmentDataForOrg(val); // Fetch assignment data when org changes
                                                                 }}
                                                             />

@@ -6,20 +6,20 @@ import { extractError } from "../utils/errorUtils";
 export const userService = {
     /**
      * GET USERS: Fetch with search & filters
-     * Optimized: Removed redundant loops, ensured clean params, supported signal cancellation.
+     * Optimized: Consolidated list and stats into a single request.
      */
     getUsers: async (filters = {}, search = '', page = 1, pageSize = 20, signal = null) => {
         try {
             const params = {
                 page_size: pageSize,
                 page: page,
-                search: search?.trim() || undefined
+                search: search?.trim() || undefined,
+                include_stats: 'true'
             };
 
-            // Map and clean filters in a single pass
+            // Map and clean filters
             Object.entries(filters).forEach(([key, value]) => {
                 if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) return;
-                
                 const targetKey = key === 'organization' ? 'organisation_id' : key;
                 params[targetKey] = Array.isArray(value) ? value.join(',') : value;
             });
@@ -27,13 +27,10 @@ export const userService = {
             const response = await api.get('users/admin/', { params, signal });
             const data = response.data;
 
-            // Normalize response structure
-            const results = data?.results || (Array.isArray(data) ? data : []);
-            const count = data?.count || (Array.isArray(data) ? data.length : 0);
-
             return {
-                users: results,
-                totalCount: count
+                users: data?.results || [],
+                totalCount: data?.count || 0,
+                stats: data?.stats
             };
         } catch (error) {
             if (error.name === 'CanceledError') throw error;
@@ -46,7 +43,11 @@ export const userService = {
      */
     createUser: async (userData) => {
         try {
-            const response = await api.post('users/admin/', userData);
+            // Check if userData is FormData (for binary uploads)
+            const isFormData = userData instanceof FormData;
+            const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+            
+            const response = await api.post('users/admin/', userData, config);
             return response.data;
         } catch (error) {
             throw new Error(extractError(error, 'Failed to create user.'));
@@ -55,7 +56,10 @@ export const userService = {
 
     updateUser: async (id, updates) => {
         try {
-            const response = await api.patch(`users/admin/${id}/`, updates);
+            const isFormData = updates instanceof FormData;
+            const config = isFormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+            
+            const response = await api.patch(`users/admin/${id}/`, updates, config);
             return response.data;
         } catch (error) {
             throw new Error(extractError(error, 'Failed to update user.'));
@@ -84,7 +88,7 @@ export const userService = {
     },
 
     /**
-     * ANALYTICS & OPTIONS
+     * ANALYTICS & OPTIONS (LEGACY - use stats from getUsers where possible)
      */
     getUserStats: async (signal = null) => {
         try {

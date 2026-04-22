@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { FiBriefcase, FiUsers, FiShield, FiBox, FiActivity } from "react-icons/fi";
 import PageHeader from "../../components/UI/PageHeader";
@@ -39,9 +39,8 @@ const Dashboard = () => {
     // ── SINGLE unified call: 1 request replaces 3 ──
     const { data: summary, isLoading, isError, dataUpdatedAt } = useDashboardSummary();
 
-    // ── Map unified summary → UI shapes ──
-    // stats: flat keys from /dashboard/summary/ — build StatsGrid format directly
-    const stats = summary?.stats ? [
+    // ── Map unified summary → UI shapes (MEMOIZED) ──
+    const stats = useMemo(() => summary?.stats ? [
         {
             title: "Organizations",
             value: (summary.stats.total_organisations || 0).toLocaleString(),
@@ -78,10 +77,9 @@ const Dashboard = () => {
             icon: React.createElement(FiBox, { size: 18 }),
             iconBgClass: "bg-orange-50", iconColorClass: "text-orange-600",
         },
-    ] : null;
+    ] : null, [summary]);
 
-    // metricCards: use inline metrics array directly from API (already shaped correctly)
-    const metricCards = summary?.metrics
+    const metricCards = useMemo(() => summary?.metrics
         ? summary.metrics.map(m => ({
             title: m.label,
             value: m.unit ? `${m.value}${m.unit}` : String(m.value ?? 0),
@@ -91,17 +89,18 @@ const Dashboard = () => {
             progress: 70,
             secondaryLabel: m.trend === 'up' ? 'Increasing' : m.trend === 'down' ? 'Decreasing' : 'Stable',
         }))
-        : null;
+        : null, [summary]);
 
-    // activity: BE sends `action` field, mapToActivityFeed expects `type` — remap
-    const rawActivity = (summary?.recent_activity || []).map(item => ({
-        ...item,
-        type: item.action || item.type || 'Event',
-        user: item.user_name || item.user?.name || item.user || 'System',
-        entity: item.entity_type || item.entity || '',
-        time: item.created_at || item.time,
-    }));
-    const activity = mapToActivityFeed(rawActivity);
+    const activity = useMemo(() => {
+        const rawActivity = (summary?.recent_activity || []).map(item => ({
+            ...item,
+            type: item.action || item.type || 'Event',
+            user: item.user_name || item.user?.name || item.user || 'System',
+            entity: item.entity_type || item.entity || '',
+            time: item.created_at || item.time,
+        }));
+        return mapToActivityFeed(rawActivity);
+    }, [summary]);
 
     const isDashboardLoading = isLoading;
     const isDashboardError   = isError;

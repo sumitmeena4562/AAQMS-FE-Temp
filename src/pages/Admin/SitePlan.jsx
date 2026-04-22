@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import OrganizationCard from '../../components/UI/OrganizationCard';
@@ -28,13 +28,16 @@ const SitePlan = () => {
 
   // --- QUERY HOOKS ---
   const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
-  const { data: siteData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useSites({ 
+  
+  const siteFilters = useMemo(() => ({ 
       organisation: activeOrgId, 
       coord_id: activeCoordId 
-  });
+  }), [activeOrgId, activeCoordId]);
 
-  const sitePlans = siteData.results || [];
-  const totalPlans = siteData.total || sitePlans.length;
+  const { data: siteData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useSites(siteFilters);
+
+  const sitePlans = siteData?.results || [];
+  const totalPlans = siteData?.total || sitePlans.length;
   const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
 
   const handleResetAll = () => {

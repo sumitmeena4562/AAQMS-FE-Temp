@@ -3,8 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiCheck, FiX } from 'react-icons/fi';
 
-
-const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All', multiple = false, disabled = false }) => {
+const FilterDropdown = React.memo(({ label, value, options = [], onChange, allLabel = 'All', multiple = false, disabled = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 });
     const containerRef = useRef(null);
@@ -208,6 +207,6 @@ const FilterDropdown = ({ label, value, options = [], onChange, allLabel = 'All'
             {createPortal(dropdownMenu, document.body)}
         </div>
     );
-};
+});
 
 export default FilterDropdown;

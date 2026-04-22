@@ -26,8 +26,9 @@ export const useHierarchy = (options = {}) => {
     const { selectedOrg } = useFilterStore();
     const activeOrgs = orgId !== null ? (Array.isArray(orgId) ? orgId : [orgId]) : selectedOrg;
 
-    // 1. Organizations (Top level)
-    const orgsQuery = useOrganizations({ dropdown: 'true' }, '', 1, 1000, { enabled: includeOrgs && enabled });
+    // 1. Organizations (Top level) - Memoize filters to prevent re-fetch loops
+    const orgFilters = React.useMemo(() => ({ dropdown: 'true' }), []);
+    const orgsQuery = useOrganizations(orgFilters, '', 1, 1000, { enabled: includeOrgs && enabled });
 
     // 2. Coordinators (Cascading: only if org is selected)
     const coordsQuery = useCoordinators(
@@ -36,8 +37,12 @@ export const useHierarchy = (options = {}) => {
     );
 
     // 3. Sites (Cascading: only if org is selected)
+    const siteFilters = React.useMemo(() => ({ 
+        organisation: activeOrgs.length > 0 ? activeOrgs : undefined 
+    }), [activeOrgs]);
+
     const sitesQuery = useSites(
-        { organisation: activeOrgs.length > 0 ? activeOrgs : undefined },
+        siteFilters,
         { enabled: includeSites && enabled }
     );
 

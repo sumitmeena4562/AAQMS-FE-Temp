@@ -9,8 +9,8 @@ import { userService } from '../../services/userService';
 /**
  * ── CONSTANTS & CONFIG ──
  */
-const STALE_TIME = 5 * 60 * 1000; // 5 minutes (Increased from 1 min)
-const CACHE_TIME = 30 * 60 * 1000; // 30 minutes (Increased from 5 min)
+const STALE_TIME = 5 * 60 * 1000; // 5 minutes
+const CACHE_TIME = 30 * 60 * 1000; // 30 minutes
 
 /**
  * ── INDIVIDUAL QUERIES ──
@@ -72,33 +72,23 @@ export const useCoordinatorStats = (orgId = null, options = {}) => {
  * Combines Users, Stats, and Filter Hierarchy into a single optimized lifecycle.
  */
 export const useUserManagementData = (filters, search, page, limit, options = {}) => {
-    // 1. Core Users Query
+    // 1. Core Users Query (Now includes Stats)
     const usersQuery = useUsers(filters, search, page, limit, options);
-
-    // 2. Global Stats Query
-    const statsQuery = useUserStats(options);
-
-    // 3. Conditional Hierarchy Querying
-    // Only fetch sites if organizations are selected (Cascading logic)
-    const orgIds = filters?.organization || [];
-    const hasOrgSelected = Array.isArray(orgIds) && orgIds.length > 0;
 
     return {
         users: usersQuery.data?.users || [],
         totalCount: usersQuery.data?.totalCount || 0,
-        stats: statsQuery.data || { total: 0, active: 0, inactive: 0, unassigned: 0 },
-        isLoading: usersQuery.isLoading || statsQuery.isLoading,
-        isFetching: usersQuery.isFetching || statsQuery.isFetching,
-        isError: usersQuery.isError || statsQuery.isError,
+        stats: usersQuery.data?.stats || { total: 0, active: 0, inactive: 0, unassigned: 0 },
+        isLoading: usersQuery.isLoading,
+        isFetching: usersQuery.isFetching,
+        isError: usersQuery.isError,
         refetchAll: () => {
             usersQuery.refetch();
-            statsQuery.refetch();
         }
     };
 };
 
 export const useUserFilterOptions = () => {
-    // Roles are static, don't need a query, but keeping for compatibility
     return {
         roles: [
             { value: 'admin', label: 'Admin' },
@@ -107,4 +97,3 @@ export const useUserFilterOptions = () => {
         ]
     };
 };
-

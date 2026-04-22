@@ -59,11 +59,11 @@ const FilterBar = ({
     const { data: floorData } = useFloors(selectedSite, { enabled: renderFloor });
     const allFloors = floorData?.results || [];
 
-    // Dynamic Relational Options mapping (using Real IDs)
-    const orgOptions = orgs.map(o => ({ value: o.id, label: o.name }));
-    const coordOptions = allCoordinators.map(c => ({ value: c.id, label: c.name }));
-    const siteOptions = allSites.map(s => ({ value: s.id, label: s.site_name || s.name }));
-    const floorOptions = allFloors.map(f => ({ value: f.id, label: f.name }));
+    // Dynamic Relational Options mapping (using Real IDs) - Memoized to prevent re-render loops
+    const orgOptions = React.useMemo(() => orgs.map(o => ({ value: o.id, label: o.name })), [orgs]);
+    const coordOptions = React.useMemo(() => allCoordinators.map(c => ({ value: c.id, label: c.name })), [allCoordinators]);
+    const siteOptions = React.useMemo(() => allSites.map(s => ({ value: s.id, label: s.site_name || s.name })), [allSites]);
+    const floorOptions = React.useMemo(() => allFloors.map(f => ({ value: f.id, label: f.name })), [allFloors]);
 
     const isFilterActive = [selectedOrg, selectedCoord, selectedSite, selectedFloor, selectedStatus].some(arr => Array.isArray(arr) && arr.length > 0) || searchTerm !== '' || searchQuery !== '';
 
