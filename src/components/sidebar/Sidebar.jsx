@@ -61,9 +61,9 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
     const handlePrefetch = async (path) => {
         if (path === '/admin/organizations') {
             queryClient.prefetchQuery({
-                queryKey: ['organizations', { filters: {}, search: '' }],
+                queryKey: ['organizations', { filters: {}, search: '', page: 1, pageSize: 12 }],
                 queryFn: async () => {
-                    const response = await organizationService.getOrganizations({});
+                    const response = await organizationService.getOrganizations({ page: 1, page_size: 12 });
                     const data = response.data || response.results || response;
                     return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
                 }

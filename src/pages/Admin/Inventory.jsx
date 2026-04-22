@@ -49,26 +49,32 @@ const Inventory = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const PAGE_SIZE = useResponsiveLimit(12);
 
-    // ── DATA FETCHING (Separate Optimized Calls) ──
+    // ── DATA FETCHING (Separate Optimized Calls with Debouncing) ──
     const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
     
-    const siteQueryParams = useMemo(() => ({ organisation: selectedOrg }), [selectedOrg]);
-    const { data: siteData } = useSites(siteQueryParams, { enabled: selectedOrg.length > 0 });
+    // Debounce the entire filter set to prevent "Request Waterfall" and cancellations
+    const debouncedOrg = useDebounce(selectedOrg, 400);
+    const debouncedSite = useDebounce(selectedSite, 400);
+    const debouncedFloor = useDebounce(selectedFloor, 400);
+    const debouncedZone = useDebounce(selectedZone, 400);
+
+    const siteQueryParams = useMemo(() => ({ organisation: debouncedOrg }), [debouncedOrg]);
+    const { data: siteData } = useSites(siteQueryParams, { enabled: debouncedOrg.length > 0 });
     const allSites = siteData?.results || [];
 
-    const { data: floorData } = useFloors(selectedSite, { enabled: selectedSite.length > 0 });
+    const { data: floorData } = useFloors(debouncedSite, { enabled: debouncedSite.length > 0 });
     const allFloors = floorData?.results || [];
 
-    const { data: zoneData } = useZones(selectedFloor, {}, { enabled: selectedFloor.length > 0 });
+    const { data: zoneData } = useZones(debouncedFloor, {}, { enabled: debouncedFloor.length > 0 });
     const allZones = zoneData?.results || [];
 
     const activeFilters = useMemo(() => ({
-        org: selectedOrg.length > 0 ? selectedOrg : 'all',
-        site: selectedSite.length > 0 ? selectedSite : 'all',
-        floor: selectedFloor.length > 0 ? selectedFloor : 'all',
-        zone: selectedZone.length > 0 ? selectedZone : 'all',
+        org: debouncedOrg.length > 0 ? debouncedOrg : 'all',
+        site: debouncedSite.length > 0 ? debouncedSite : 'all',
+        floor: debouncedFloor.length > 0 ? debouncedFloor : 'all',
+        zone: debouncedZone.length > 0 ? debouncedZone : 'all',
         search: debouncedSearch
-    }), [selectedOrg, selectedSite, selectedFloor, selectedZone, debouncedSearch]);
+    }), [debouncedOrg, debouncedSite, debouncedFloor, debouncedZone, debouncedSearch]);
 
     const { data: inventoryData, isLoading } = useInventory(activeFilters, currentPage, PAGE_SIZE);
 

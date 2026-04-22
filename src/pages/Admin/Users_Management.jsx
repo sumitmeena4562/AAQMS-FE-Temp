@@ -81,15 +81,17 @@ const Users = React.memo(() => {
 
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 
-    // ── QUERY HOOKS (OPTIMIZED) ──
+    // ── QUERY HOOKS (OPTIMIZED + DEBOUNCED) ──
     const debouncedSearch = useDebounce(search, 400);
+    const debouncedFilters = useDebounce(filters, 400); // Prevent request flood on multi-select
+    
     const isReady = isInitialized && responsiveLimit === limit;
     
     const queryOptions = useMemo(() => ({ enabled: isReady }), [isReady]);
 
     const { 
         users, totalCount, stats, isLoading: isUsersLoading 
-    } = useUserManagementData(filters, debouncedSearch, page, limit, queryOptions);
+    } = useUserManagementData(debouncedFilters, debouncedSearch, page, limit, queryOptions);
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
 
@@ -97,7 +99,7 @@ const Users = React.memo(() => {
     const hasOrgSelected = filters.organization?.length > 0;
     const { organizations, sites } = useHierarchy({ 
         includeOrgs: true, 
-        includeSites: hasOrgSelected, // <--- OPTIMIZATION: Conditional fetch
+        includeSites: hasOrgSelected, 
         includeCoords: false,
         enabled: isReady,
         orgId: filters.organization

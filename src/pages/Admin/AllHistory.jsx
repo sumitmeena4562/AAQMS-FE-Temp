@@ -10,6 +10,7 @@ import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useSites, useFloors } from '../../hooks/api/useHierarchyQueries';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import { mapToActivityFeed } from '../../utils/dashboardCalculations';
+import useDebounce from '../../hooks/useDebounce';
 
 // STATIC DATA
 
@@ -47,9 +48,12 @@ export default function AllHistory() {
         category: []
     });
 
-    // ── 2. DATA FETCHING (Restored Granular Hooks) ──
+    // ── 2. DATA FETCHING (Restored Granular Hooks + Debouncing) ──
     const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
     
+    // Debounce filters to prevent "Request Explosion" (canceled requests in network tab)
+    const debouncedFilters = useDebounce(filters, 400);
+
     const siteQueryParams = useMemo(() => ({ organisation: filters.organisation }), [filters.organisation]);
     const { data: siteData } = useSites(siteQueryParams, { 
         enabled: filters.organisation.length > 0 
@@ -62,15 +66,15 @@ export default function AllHistory() {
     const allFloors = floorData?.results || [];
 
     const queryParams = useMemo(() => ({
-        org_id: filters.organisation,
-        site_id: filters.site,
-        floor: filters.floor,
-        role: filters.role,
-        operation: filters.operation,
-        category: filters.category,
+        org_id: debouncedFilters.organisation,
+        site_id: debouncedFilters.site,
+        floor: debouncedFilters.floor,
+        role: debouncedFilters.role,
+        operation: debouncedFilters.operation,
+        category: debouncedFilters.category,
         page: currentPage,
         limit: 10
-    }), [filters, currentPage]);
+    }), [debouncedFilters, currentPage]);
 
     const { data: historyData, isLoading } = useAllHistory(queryParams);
 

@@ -49,10 +49,10 @@ const FilterBar = ({
 
     // ─── QUERY HOOKS (UNIFIED) ───
     const hierarchyOptions = React.useMemo(() => ({
-        includeOrgs: true,
+        includeOrgs: renderOrg,
         includeCoords: renderCoord,
         includeSites: renderSite || renderFloor
-    }), [renderCoord, renderSite, renderFloor]);
+    }), [renderOrg, renderCoord, renderSite, renderFloor]);
 
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites } = useHierarchy(hierarchyOptions);
 
