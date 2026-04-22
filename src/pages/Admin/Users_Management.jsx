@@ -420,7 +420,6 @@ const Users = React.memo(() => {
                 
                 <div className="flex flex-wrap items-center gap-2 flex-1">
                     <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v, region: [] })} allLabel="All Orgs" multiple={true} loading={isLoadingOptions} />
-                    <FilterDropdown label="Site" options={filteredSites} value={filters.region} onChange={v => setFilters({ ...filters, region: v })} allLabel="All Sites" multiple={true} loading={isLoadingOptions} />
                     <FilterDropdown label="Role" options={filterOptions.roles} value={filters.role} onChange={v => setFilters({ ...filters, role: v })} allLabel="All Roles" multiple={true} />
                     <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" multiple={true} />
                 </div>

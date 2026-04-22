@@ -98,6 +98,7 @@ const FilterBar = ({
                         />
                     )}
 
+                    {renderSite && (
                         <FilterDropdown 
                             label="Site"
                             options={siteOptions}
@@ -106,7 +107,9 @@ const FilterBar = ({
                             allLabel="Select Site"
                             multiple={true}
                         />
+                    )}
 
+                    {renderFloor && (
                         <FilterDropdown 
                             label="Floor"
                             options={floorOptions}
@@ -115,6 +118,7 @@ const FilterBar = ({
                             allLabel="Select Floor"
                             multiple={true}
                         />
+                    )}
 
                     {showStatus && (
                         <FilterDropdown 
