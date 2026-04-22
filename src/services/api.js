@@ -27,9 +27,6 @@ const PUBLIC_ENDPOINTS = ['users/login/', 'users/token/refresh/', 'users/registe
 // ─── DIAGNOSTIC REQUEST COUNTER ───
 let requestCount = 0;
 
-// ─── REQUEST DEDUPLICATION CACHE ───
-const pendingRequests = new Map();
-
 api.interceptors.request.use(
     (config) => {
         requestCount++;
@@ -98,18 +95,9 @@ const processQueue = (error, token = null) => {
 };
 
 api.interceptors.response.use(
-    (response) => {
-        // Clear pending request tracker on success
-        if (response.config?._requestKey) {
-            pendingRequests.delete(response.config._requestKey);
-        }
-        return response;
-    },
+    (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        if (originalRequest?._requestKey) {
-            pendingRequests.delete(originalRequest._requestKey);
-        }
 
         const isSilent = originalRequest?._silent === true;
 
