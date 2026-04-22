@@ -81,16 +81,14 @@ const Users = React.memo(() => {
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 
     // ── QUERY HOOKS (OPTIMIZED + DEBOUNCED) ──
-    const debouncedSearch = useDebounce(search, 400);
-    const debouncedFilters = useDebounce(filters, 400); // Prevent request flood on multi-select
+    const debouncedSearch = useDebounce(search, 500);
+    const debouncedFilters = useDebounce(filters, 500);
     
     const isReady = isInitialized && responsiveLimit === limit;
     
-    const queryOptions = useMemo(() => ({ enabled: isReady }), [isReady]);
-
     const { 
         users, totalCount, stats, isLoading: isUsersLoading 
-    } = useUserManagementData(debouncedFilters, debouncedSearch, page, limit, queryOptions);
+    } = useUserManagementData(debouncedFilters, debouncedSearch, page, limit, { enabled: isReady });
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
 

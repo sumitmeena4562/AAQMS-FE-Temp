@@ -24,19 +24,11 @@ const api = axios.create({
  */
 const PUBLIC_ENDPOINTS = ['users/login/', 'users/token/refresh/', 'users/register/', 'users/request-reset/', 'users/verify-otp/', 'users/reset-password/'];
 
-// ─── DIAGNOSTIC REQUEST COUNTER ───
-let requestCount = 0;
-
-// ─── REQUEST DEDUPLICATION CACHE ───
+// ─── REQUEST TRACKING (Monitoring Concurrent Calls) ───
 const pendingRequests = new Map();
 
 api.interceptors.request.use(
     (config) => {
-        requestCount++;
-        if (requestCount % 10 === 0) {
-            console.warn(`[AAQMS-DEBUG] High request volume detected: ${requestCount} requests since load.`);
-        }
-
         // ── CSRF PROTECTION ──
         // For state-changing requests, attach the X-CSRFToken header.
         if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
