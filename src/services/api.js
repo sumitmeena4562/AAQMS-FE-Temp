@@ -30,7 +30,6 @@ const pendingRequests = new Map();
 api.interceptors.request.use(
     (config) => {
         // ── CSRF PROTECTION ──
-        // For state-changing requests, attach the X-CSRFToken header.
         if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
             const csrfToken = document.cookie
                 .split('; ')
@@ -91,17 +90,10 @@ const processQueue = (error, token = null) => {
 
 api.interceptors.response.use(
     (response) => {
-        // Clear pending request tracker on success
-        if (response.config?._requestKey) {
-            pendingRequests.delete(response.config._requestKey);
-        }
         return response;
     },
     async (error) => {
         const originalRequest = error.config;
-        if (originalRequest?._requestKey) {
-            pendingRequests.delete(originalRequest._requestKey);
-        }
 
         const isSilent = originalRequest?._silent === true;
 

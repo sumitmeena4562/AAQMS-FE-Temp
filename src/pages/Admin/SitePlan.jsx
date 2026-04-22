@@ -31,24 +31,14 @@ const SitePlan = () => {
     selectedCoord.length > 0 ? selectedCoord : (passedCoordId ? [passedCoordId] : []),
   [selectedCoord, passedCoordId]);
 
-  // --- QUERY HOOKS ---
-  const { organizations: orgs } = useHierarchy({ 
-    includeSites: false, 
+  // --- QUERY HOOKS (Unified Super-API for instant loading) ---
+  const { organizations: orgs, sites: sitePlans, isLoading: loading, error: hierarchyError } = useHierarchy({ 
+    includeSites: true, 
     includeCoords: false,
     enabled: isSynced
   });
   
-  const siteFilters = useMemo(() => ({ 
-      organisation: activeOrgId, 
-      coord_id: activeCoordId 
-  }), [activeOrgId, activeCoordId]);
-
-  const { data: siteData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useSites(siteFilters, {
-    enabled: isSynced
-  });
-
-  const sitePlans = siteData?.results || [];
-  const totalPlans = siteData?.total || sitePlans.length;
+  const totalPlans = sitePlans.length;
   const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
 
   const handleResetAll = () => {

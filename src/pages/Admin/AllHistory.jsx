@@ -48,17 +48,14 @@ export default function AllHistory() {
         category: []
     });
 
-    // ── 2. DATA FETCHING (Restored Granular Hooks + Debouncing) ──
-    const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
+    // ── 2. DATA FETCHING (Unified Super-API for Dropdowns) ──
+    const { organizations: orgs, sites: allSites } = useHierarchy({ 
+        includeSites: true, 
+        includeCoords: false 
+    });
     
     // Debounce filters to prevent "Request Explosion" (canceled requests in network tab)
     const debouncedFilters = useDebounce(filters, 400);
-
-    const siteQueryParams = useMemo(() => ({ organisation: filters.organisation }), [filters.organisation]);
-    const { data: siteData } = useSites(siteQueryParams, { 
-        enabled: filters.organisation.length > 0 
-    });
-    const allSites = siteData?.results || [];
 
     const { data: floorData } = useFloors(filters.site, { 
         enabled: filters.site.length > 0 

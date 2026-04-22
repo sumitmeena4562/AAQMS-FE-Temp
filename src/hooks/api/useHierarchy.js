@@ -15,9 +15,9 @@ const EMPTY_ARRAY = [];
  * @param {Object} options - { includeOrgs, includeSites, includeCoords }
  */
 export const useHierarchy = (options = {}) => {
-    const { 
-        includeOrgs = true, 
-        includeSites = true, 
+    const {
+        includeOrgs = true,
+        includeSites = true,
         includeCoords = true,
         enabled = true,
         orgId = null
@@ -32,12 +32,12 @@ export const useHierarchy = (options = {}) => {
 
     // 2. Coordinators (Cascading: only if org is selected)
     const coordsQuery = useCoordinators(
-        activeOrgs.length > 0 ? activeOrgs : undefined, 
+        activeOrgs.length > 0 ? activeOrgs : undefined,
         { enabled: includeCoords && enabled }
     );
 
     // 3. Sites (Cascading: only if org is selected)
-    const siteFilters = React.useMemo(() => ({ 
+    const siteFilters = React.useMemo(() => ({
         organisation: activeOrgs.length > 0 ? activeOrgs : undefined,
         dropdown: 'true'
     }), [activeOrgs]);
@@ -52,19 +52,19 @@ export const useHierarchy = (options = {}) => {
         organizations: orgsQuery.data?.results || (Array.isArray(orgsQuery.data) ? orgsQuery.data : EMPTY_ARRAY),
         coordinators: coordsQuery.data?.results || (Array.isArray(coordsQuery.data) ? coordsQuery.data : EMPTY_ARRAY),
         sites: sitesQuery.data?.results || (Array.isArray(sitesQuery.data) ? sitesQuery.data : EMPTY_ARRAY),
-        
+
         // Loading States
-        isLoading: (includeOrgs && orgsQuery.isLoading) || 
-                   (includeCoords && coordsQuery.isLoading) || 
-                   (includeSites && sitesQuery.isLoading),
-                   
-        isFetching: (includeOrgs && orgsQuery.isFetching) || 
-                    (includeCoords && coordsQuery.isFetching) || 
-                    (includeSites && sitesQuery.isFetching),
-        
+        isLoading: (includeOrgs && orgsQuery.isLoading) ||
+            (includeCoords && coordsQuery.isLoading) ||
+            (includeSites && sitesQuery.isLoading),
+
+        isFetching: (includeOrgs && orgsQuery.isFetching) ||
+            (includeCoords && coordsQuery.isFetching) ||
+            (includeSites && sitesQuery.isFetching),
+
         // Error States
         error: orgsQuery.error || coordsQuery.error || sitesQuery.error,
-        
+
         // Raw Queries (for more control if needed)
         queries: {
             orgs: orgsQuery,
