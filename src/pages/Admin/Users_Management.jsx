@@ -38,7 +38,7 @@ const Users = React.memo(() => {
         setPage, setFilters, toggleSelectRow, 
         setSelectedIds, setLimit // setError removed
     } = useUserStore();
-    const { query: search } = useSearchStore();
+    const { query: search, clearSearch } = useSearchStore();
 
     // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
     const [isInitialized, setIsInitialized] = useState(false);
@@ -426,7 +426,15 @@ const Users = React.memo(() => {
 
                 <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
                     <FilterBar.ViewToggle mode={viewMode} onChange={setViewMode} />
-                    {activeFilterCount > 0 && <button onClick={resetFilters} className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest bg-title/5 rounded-xl group"><FiRefreshCcw size={12} className={`group-hover:rotate-180 transition-transform duration-500 ${isUsersLoading ? 'animate-spin' : ''}`} />Reset</button>}
+                    {(activeFilterCount > 0 || search) && (
+                        <button 
+                            onClick={() => { resetFilters(); clearSearch(); }} 
+                            className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest bg-title/5 rounded-xl group transition-all hover:bg-rose-50"
+                        >
+                            <FiRefreshCcw size={12} className={`group-hover:rotate-180 transition-transform duration-500 ${isUsersLoading ? 'animate-spin' : ''}`} />
+                            Reset
+                        </button>
+                    )}
                 </div>
             </FilterBar>
 

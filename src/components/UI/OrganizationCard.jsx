@@ -115,9 +115,13 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
                {isSiteCard ? 'OPERATIONAL SITE' : 'REGISTERED ORG'}
              </span>
           </div>
-          <h3 className="text-lg font-bold text-primary tracking-tight leading-none mb-2 truncate">
-            {org.site_name || org.name}
-          </h3>
+          <div className="relative min-h-[44px]">
+            <h3 
+              className="text-lg font-bold text-primary tracking-tight leading-tight mb-2 line-clamp-2 break-words group-hover/card:line-clamp-none group-hover/card:absolute group-hover/card:top-[-4px] group-hover/card:left-[-8px] group-hover/card:right-[-8px] group-hover/card:bg-card group-hover/card:z-50 group-hover/card:p-2 group-hover/card:rounded-xl group-hover/card:shadow-2xl group-hover/card:ring-1 group-hover/card:ring-primary/10 transition-all duration-300"
+            >
+              {org.site_name || org.name}
+            </h3>
+          </div>
 
           {isSiteCard ? (
             <div className="space-y-1.5">
