@@ -111,10 +111,6 @@ const SitePlan = () => {
         hideAddButton={true}
         rightContent={
           <div className="flex items-center gap-3">
-             <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
-                  <FiLoader size={14} className={loading ? 'animate-spin' : ''} />
-                  <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
-              </Button>
               {totalPlans > 0 && (
                 <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                     {totalPlans} Total Projects

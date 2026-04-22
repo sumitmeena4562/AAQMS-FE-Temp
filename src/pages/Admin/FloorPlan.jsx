@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
@@ -14,25 +14,36 @@ const FloorPlan = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSynced, setIsSynced] = useState(false);
-
   const { resetFilters, selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
 
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const passedOrgId = searchParams.get('org_id');
+  const passedOrgName = searchParams.get('org_name');
+  const passedSiteId = searchParams.get('site_id');
+  const passedSiteName = searchParams.get('site');
+  const passedCoordId = searchParams.get('coord_id');
+  const passedCoordName = searchParams.get('coord');
+
   const activeSiteId = useMemo(() => 
-    selectedSite.length > 0 ? selectedSite : (searchParams.get('site_id') ? [searchParams.get('site_id')] : []),
-  [selectedSite, searchParams]);
+    selectedSite.length > 0 ? selectedSite : (passedSiteId ? [passedSiteId] : []),
+  [selectedSite, passedSiteId]);
 
   const activeOrgId = useMemo(() => 
-    selectedOrg.length > 0 ? selectedOrg : (searchParams.get('org_id') ? [searchParams.get('org_id')] : []),
-  [selectedOrg, searchParams]);
+    selectedOrg.length > 0 ? selectedOrg : (passedOrgId ? [passedOrgId] : []),
+  [selectedOrg, passedOrgId]);
 
   const activeCoordId = useMemo(() => 
-    selectedCoord.length > 0 ? selectedCoord : (searchParams.get('coord_id') ? [searchParams.get('coord_id')] : []),
-  [selectedCoord, searchParams]);
+    selectedCoord.length > 0 ? selectedCoord : (passedCoordId ? [passedCoordId] : []),
+  [selectedCoord, passedCoordId]);
 
   // --- DATA FETCHING (Restored Granular Hooks) ---
   const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
   
-  const { data: floorData, isLoading, error: hierarchyError } = useFloors(activeSiteId);
+  const { data: floorData, isLoading, error: hierarchyError } = useFloors(activeSiteId, {
+    page: currentPage,
+    page_size: 10
+  });
   const floorList = floorData?.results || [];
   const totalLevels = floorData?.count || 0;
 
@@ -112,10 +123,6 @@ const FloorPlan = () => {
         hideAddButton={true}
         rightContent={
           <div className="flex items-center gap-3">
-             <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
-                  <FiLoader size={14} className={isLoading ? 'animate-spin' : ''} />
-                  <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
-              </Button>
               {totalLevels > 0 && (
                  <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">
                     {totalLevels} Total Levels

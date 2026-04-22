@@ -185,10 +185,6 @@ const Zones = () => {
                 hideAddButton={true}
                 rightContent={
                     <div className="flex items-center gap-3">
-                        <Button onClick={handleResetAll} variant="outline" size="sm" className="!h-[38px] bg-card border-dashed border-primary/30 hover:border-primary/60 transition-all text-primary flex items-center gap-2 px-4 shadow-sm">
-                            <FiLoader size={14} className={loading ? 'animate-spin' : ''} />
-                            <span className="font-black text-[10px] uppercase tracking-widest ">Clear Context</span>
-                        </Button>
                         {totalZonesCount > 0 && <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">{totalZonesCount} Active Zones</span>}
                     </div>
                 }

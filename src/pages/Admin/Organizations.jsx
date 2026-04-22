@@ -398,7 +398,6 @@ const Organizations = React.memo(() => {
                                             onEdit={() => handleEdit(org)}
                                             onView={() => handleView(org)}
                                             onBlock={() => handleBlock(org)}
-                                            onMouseEnter={() => handlePrefetch(org.id)}
                                         />
                                     </div>
                                 ))}
