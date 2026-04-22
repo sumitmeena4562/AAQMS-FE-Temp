@@ -54,6 +54,16 @@ export const userService = {
         }
     },
 
+    getUserById: async (id, signal = null) => {
+        try {
+            const response = await api.get(`users/admin/${id}/`, { signal });
+            return response.data;
+        } catch (error) {
+            if (error.name === 'CanceledError') throw error;
+            throw new Error(extractError(error, 'Failed to fetch user details.'));
+        }
+    },
+
     updateUser: async (id, updates) => {
         try {
             const isFormData = updates instanceof FormData;

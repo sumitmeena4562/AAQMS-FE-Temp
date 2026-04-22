@@ -10,7 +10,7 @@ import {
 import Button from '../UI/Button';
 import InputField from '../UI/InputField';
 import SelectField from '../UI/SelectField';
-import { useUserFormOptions } from '../../hooks/api/useUserQueries';
+import { useUserFormOptions, useUserDetails } from '../../hooks/api/useUserQueries';
 
 const ROLE_DETAILS = [
     { 
@@ -58,6 +58,11 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     // Unified Form Options Hook
     const { data: formOptions, isLoading: isLoadingOptions } = useUserFormOptions({ enabled: isOpen });
+    
+    // Detailed User Hook for Edit Mode (Fetch IDs if missing from list response)
+    const { data: fullUserDetails, isLoading: isFetchingUserDetails } = useUserDetails(user?.id, { 
+        enabled: isOpen && isEdit
+    });
 
     // Extract options from the unified hook
     const availableOrgs = formOptions?.organizations || [];
@@ -118,37 +123,40 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
             return;
         }
         
-        const currentKey = `${user?.id || 'new'}-${isOpen}`;
+        const effectiveUser = fullUserDetails || user;
+        const currentKey = `${effectiveUser?.id || 'new'}-${isOpen}-${!!fullUserDetails}`;
         if (lastProcessedRef.current === currentKey) return;
         lastProcessedRef.current = currentKey;
 
-        if (user) {
+        if (effectiveUser) {
             // Flatten nested profile data for the form
-            const roleStr = typeof user.role === 'string' ? user.role : (user.role_name || user.role?.role_name || '');
+            const roleStr = typeof effectiveUser.role === 'string' ? effectiveUser.role : (effectiveUser.role_name || effectiveUser.role?.role_name || '');
             const role_name = roleStr.toUpperCase();
-            const profile = user.field_officer_profile || user.coordinator_profile || user.admin_profile || {};
+            const profile = effectiveUser.field_officer_profile || effectiveUser.coordinator_profile || effectiveUser.admin_profile || {};
             
-            // Extract IDs carefully (handle both object and ID string cases)
-            const orgId = user.organisation_id || (typeof profile.organisation === 'object' ? profile.organisation?.id : profile.organisation) || '';
-            const phone = user.mobile_number || profile.mobile_number || '';
-            const avatarVal = user.avatar || profile.avatar || '';
+            // Extract IDs carefully (handle both direct IDs and nested object cases)
+            const orgId = effectiveUser.organisation_id || effectiveUser.org_id || (typeof profile.organisation === 'object' ? profile.organisation?.id : profile.organisation) || '';
+            const phone = effectiveUser.mobile_number || profile.mobile_number || '';
+            const avatarVal = effectiveUser.avatar || profile.avatar || '';
+            const zoneId = effectiveUser.zone || effectiveUser.zone_id || (typeof profile.current_zone === 'object' ? profile.current_zone?.id : profile.current_zone) || '';
+            const coordId = effectiveUser.coordinator_id || (typeof profile.coordinator === 'object' ? profile.coordinator?.id : profile.coordinator) || '';
 
             reset({
-                name: user.name || '',
-                email: user.email || '',
+                name: effectiveUser.name || '',
+                email: effectiveUser.email || '',
                 organisation_id: orgId,
                 role: role_name.toLowerCase(),
-                assignment: (orgId || profile.assigned_region || profile.current_zone) ? 'assigned' : 'standby',
-                status: user.is_active ? 'active' : 'deactive',
+                assignment: (orgId || profile.assigned_region || zoneId) ? 'assigned' : 'standby',
+                status: effectiveUser.is_active ? 'active' : 'deactive',
                 region: profile.assigned_region || '',
-                zone: (typeof profile.current_zone === 'object' ? profile.current_zone?.id : profile.current_zone) || profile.current_zone || '',
-                coordinator_id: (typeof profile.coordinator === 'object' ? profile.coordinator?.id : profile.coordinator) || profile.coordinator || '',
+                zone: zoneId,
+                coordinator_id: coordId,
                 mobile_number: phone,
                 avatar: avatarVal
             });
             
             setImagePreview(avatarVal ? (avatarVal.startsWith('http') ? avatarVal : `http://127.0.0.1:8000${avatarVal}`) : null);
-            setShowWorkAssignment(!!orgId);
+            setShowWorkAssignment(!!orgId || !!profile.assigned_region || !!zoneId);
             if (orgId) fetchAssignmentDataForOrg(orgId);
             setStep(1);
         } else {
@@ -159,12 +167,12 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                 mobile_number: '', avatar: '',
                 coordinator_id: ''
             });
-            setShowWorkAssignment(false);
+            setShowWorkAssignment(['coordinator', 'field_officer'].includes(currentRole));
             setImagePreview(null);
             setStep(0);
         }
         setSubmitError('');
-    }, [user, isOpen, reset, fetchAssignmentDataForOrg]);
+    }, [user, fullUserDetails, isOpen, reset, fetchAssignmentDataForOrg, currentRole]);
 
     // Re-fetch assignment data if role changes during edit mode
     useEffect(() => {
@@ -225,6 +233,10 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     const handleRoleSelect = (roleId) => {
         setValue('role', roleId);
+        // Automatically show work assignment for roles that require it
+        if (['coordinator', 'field_officer'].includes(roleId)) {
+            setShowWorkAssignment(true);
+        }
         setStep(1);
     };
 
@@ -309,6 +321,13 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                         {submitError && (
                                             <div className="flex items-center gap-2 p-3 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 text-[12px] font-bold">
                                                 <FiAlertCircle size={14} /> {submitError}
+                                            </div>
+                                        )}
+
+                                        {Object.keys(errors).length > 0 && (
+                                            <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-700 text-[11px] font-bold">
+                                                <FiAlertCircle size={14} /> 
+                                                <span>Please check the form for errors. {errors.organisation_id ? "Organization is mandatory." : ""}</span>
                                             </div>
                                         )}
 

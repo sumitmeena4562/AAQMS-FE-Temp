@@ -14,8 +14,8 @@ export const userSchema = z.object({
     region: z.string().optional().nullable(),
     zone: z.string().optional().nullable(),
     mobile_number: z.string()
-        .regex(/^(?:\+91|91)?[6-9]\d{9}$/, { message: "Must be a valid Indian number (+91 followed by 10 digits)" })
-        .optional().nullable().or(z.literal('')),
+        .min(1, { message: "Contact number is required" })
+        .regex(/^(?:\+91|91)?[6-9]\d{9}$/, { message: "Invalid format. Use +91 or 91 followed by 10 digits (e.g., +91 9876543210)" }),
     coordinator_id: z.string().optional().nullable(),
     assignment: z.string().default('standby'),
     avatar: z.string().optional().nullable(),
@@ -25,11 +25,12 @@ export const userSchema = z.object({
         .optional(),
 }).refine((data) => {
     // If role is coordinator or field officer, organisation_id MUST be present
-    if (['coordinator', 'field_officer'].includes(data.role.toLowerCase())) {
+    const role = (data.role || '').toLowerCase();
+    if (['coordinator', 'field_officer'].includes(role)) {
         return !!data.organisation_id;
     }
     return true;
 }, {
-    message: "Organization is mandatory for this role",
+    message: "Organization assignment is mandatory for this role",
     path: ["organisation_id"]
 });

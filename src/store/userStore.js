@@ -73,17 +73,21 @@ const useUserStore = create((set, get) => ({
         try {
             const data = await userService.updateUser(id, updates);
             
-            // SINGLE-CALL OPTIMIZATION: Manually update the specific user in all cached pages
+            // OPTIMISTIC LOCAL UPDATE: Immediately reflect changes in the UI table
             queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
                 if (!oldData?.results) return oldData;
                 return {
                     ...oldData,
-                    results: oldData.results.map(u => String(u.id) === String(id) ? { ...u, ...data } : u)
+                    results: oldData.results.map(u => u.id === id ? { ...u, ...data } : u)
                 };
             });
 
             // Update stats if returned
             if (data.updated_stats) {
+                queryClient.setQueryData(['dashboard', 'summary'], old => ({
+                    ...old,
+                    stats: { ...old?.stats, ...data.updated_stats }
+                }));
                 queryClient.setQueryData(['user-stats'], data.updated_stats);
             }
 

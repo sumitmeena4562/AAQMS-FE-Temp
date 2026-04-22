@@ -12,6 +12,17 @@ import { userService } from '../../services/userService';
 const STALE_TIME = 5 * 60 * 1000; // 5 minutes
 const CACHE_TIME = 30 * 60 * 1000; // 30 minutes
 
+export const useUserDetails = (id, options = {}) => {
+  return useQuery({
+    queryKey: ['users', 'detail', id],
+    queryFn: ({ signal }) => userService.getUserById(id, signal),
+    staleTime: STALE_TIME,
+    gcTime: CACHE_TIME,
+    enabled: !!id,
+    ...options
+  });
+};
+
 /**
  * ── INDIVIDUAL QUERIES ──
  */
