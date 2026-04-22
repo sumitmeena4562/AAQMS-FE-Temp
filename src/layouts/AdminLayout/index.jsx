@@ -71,7 +71,7 @@ const AdminLayoutInner = () => {
     }, [location.pathname, setBreadcrumbs, memoizedNavItems]);
 
     return (
-        <div className="flex h-screen overflow-hidden bg-page font-sans">
+        <div className="flex h-screen overflow-hidden bg-page font-sans relative">
             <Sidebar
                 navItems={memoizedNavItems}
                 logo={<Link to="/"><Logo /></Link>}
@@ -81,7 +81,7 @@ const AdminLayoutInner = () => {
                 setMobileOpen={setIsMobileOpen}
             />
 
-            <div className="flex-1 flex flex-col h-full overflow-hidden bg-page">
+            <div className="flex-1 flex flex-col h-full overflow-hidden bg-page relative">
                 <Navbar
                     showMenuButton={true}
                     onMenuClick={() => setIsMobileOpen(true)}

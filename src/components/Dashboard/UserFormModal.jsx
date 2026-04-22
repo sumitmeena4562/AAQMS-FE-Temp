@@ -10,8 +10,7 @@ import {
 import Button from '../UI/Button';
 import InputField from '../UI/InputField';
 import SelectField from '../UI/SelectField';
-import { organizationService } from '../../services/organizationService';
-import { userService } from '../../services/userService';
+import { useUserFormOptions } from '../../hooks/api/useUserQueries';
 
 const ROLE_DETAILS = [
     { 
@@ -57,30 +56,27 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     const lastProcessedRef = useRef('');
 
-    // Dynamic Options State
-    const [availableOrgs, setAvailableOrgs] = useState([]);
+    // Unified Form Options Hook
+    const { data: formOptions, isLoading: isLoadingOptions } = useUserFormOptions({ enabled: isOpen });
+
+    // Extract options from the unified hook
+    const availableOrgs = formOptions?.organizations || [];
+    const availableCoordinators = formOptions?.coordinators || [];
+    const allZones = formOptions?.zones || []; // Unified zones if returned
+
+    // Local state for filtered zones based on selected org
     const [assignmentData, setAssignmentData] = useState([]);
-    const [availableCoordinators, setAvailableCoordinators] = useState([]);
-    const [isLoadingOrgs, setIsLoadingOrgs] = useState(false);
     const [isLoadingSites, setIsLoadingSites] = useState(false);
-    const [isLoadingCoordinators, setIsLoadingCoordinators] = useState(false);
 
-
-    // Fetch initial organizations
-    useEffect(() => {
-        const fetchOrgs = async () => {
-            setIsLoadingOrgs(true);
-            try {
-                const data = await organizationService.getOrganizations({ lookup: 'true' });
-                setAvailableOrgs(Array.isArray(data) ? data : (data.results || []));
-            } catch (err) {
-                console.error("Failed to load orgs for form:", err);
-            } finally {
-                setIsLoadingOrgs(false);
-            }
-        };
-        if (isOpen) fetchOrgs();
-    }, [isOpen]);
+    // Filter zones locally based on organization
+    const filterZonesByOrg = useCallback((orgId) => {
+        if (!orgId) {
+            setAssignmentData([]);
+            return;
+        }
+        const filtered = allZones.filter(z => String(z.organisation_id) === String(orgId));
+        setAssignmentData(filtered);
+    }, [allZones]);
 
     const {
         register,
@@ -99,29 +95,19 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
         }
     });
 
-    // Helper to fetch data (Sites or Zones) based on role
+    // Manual re-fetch only if necessary (legacy fallback or specific filtering)
     const fetchAssignmentDataForOrg = useCallback(async (orgId) => {
-        setIsLoadingSites(true);
-        setIsLoadingCoordinators(true);
-        try {
-            const role_name = watch('role')?.toUpperCase();
-            let data = [];
-            if (role_name === 'FIELD_OFFICER') {
-                data = await organizationService.getZonesByOrg(orgId);
-                // Also fetch coordinators for this org
-                const coords = await userService.getCoordinators(orgId);
-                setAvailableCoordinators(Array.isArray(coords) ? coords : []);
-                setAssignmentData(Array.isArray(data) ? data : (data.results || []));
-            } else {
-                setAssignmentData([]);
-            }
-        } catch (err) {
-            console.error("Failed to load assignment data:", err);
-        } finally {
-            setIsLoadingSites(false);
-            setIsLoadingCoordinators(false);
+        if (!orgId) {
+            setAssignmentData([]);
+            return;
         }
-    }, [watch]);
+        
+        // First try local filtering from unified options
+        if (allZones.length > 0) {
+            filterZonesByOrg(orgId);
+            return;
+        }
+    }, [allZones, filterZonesByOrg]);
 
     const currentRole = watch('role');
     const currentStatus = watch('status');
@@ -470,12 +456,12 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                 {...register('organisation_id')}
                                                                 error={errors.organisation_id?.message}
                                                                 options={(availableOrgs || []).map(o => ({ value: o.id, label: o.organisation_name || o.name || 'Unnamed' }))}
-                                                                loading={isLoadingOrgs}
+                                                                loading={isLoadingOptions}
                                                                 required={['coordinator', 'field_officer'].includes(currentRole)}
                                                                 onChange={(e) => {
                                                                     const val = e.target.value;
                                                                     setValue('organisation_id', val, { shouldValidate: true });
-                                                                    fetchAssignmentDataForOrg(val); // Fetch assignment data when org changes
+                                                                    fetchAssignmentDataForOrg(val); 
                                                                 }}
                                                             />
 
@@ -504,7 +490,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                                 label: c.name 
                                                                             }))}
                                                                             disabled={!watch('organisation_id')}
-                                                                            loading={isLoadingCoordinators}
+                                                                            loading={isLoadingOptions}
                                                                             required
                                                                         />
                                                                 </>

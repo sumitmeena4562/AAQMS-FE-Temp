@@ -97,3 +97,14 @@ export const useUserFilterOptions = () => {
         ]
     };
 };
+
+export const useUserFormOptions = (options = {}) => {
+  return useQuery({
+    queryKey: ['users', 'form-options'],
+    queryFn: ({ signal }) => userService.getFormOptions(signal),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    ...options
+  });
+};

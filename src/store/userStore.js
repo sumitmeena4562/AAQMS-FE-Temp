@@ -41,7 +41,17 @@ const useUserStore = create((set, get) => ({
         try {
             const data = await userService.createUser(userData);
             
-            // SINGLE-CALL OPTIMIZATION: Update stats without re-fetching
+            // OPTIMISTIC LOCAL UPDATE: Add new user directly to the list cache
+            queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
+                if (!oldData?.results) return oldData;
+                return {
+                    ...oldData,
+                    count: (oldData.count || 0) + 1,
+                    results: [data, ...oldData.results]
+                };
+            });
+
+            // Update stats if returned
             if (data.updated_stats) {
                 queryClient.setQueryData(['dashboard', 'summary'], old => ({
                     ...old,
@@ -49,10 +59,6 @@ const useUserStore = create((set, get) => ({
                 }));
                 queryClient.setQueryData(['user-stats'], data.updated_stats);
             }
-
-            // Invalidate users list to show new user (since order might change)
-            // but we skip the heavy dashboard/stats invalidation
-            await queryClient.invalidateQueries(['users']);
             
             set({ loading: false });
             return { success: true, data };

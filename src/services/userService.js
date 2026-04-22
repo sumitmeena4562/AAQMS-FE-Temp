@@ -126,17 +126,30 @@ export const userService = {
         }
     },
 
-    /**
-     * FETCH SUPERVISORS (COORDINATORS)
-     */
     getCoordinators: async (orgId = null, signal = null) => {
         try {
-            const params = orgId ? { organisation_id: Array.isArray(orgId) ? orgId.join(',') : orgId } : {};
+            const params = { dropdown: 'true' };
+            if (orgId) params.organisation_id = Array.isArray(orgId) ? orgId.join(',') : orgId;
             const response = await api.get('users/coordinators/', { params, signal });
             return response.data || [];
         } catch (error) {
             if (error.name === 'CanceledError') throw error;
             return [];
+        }
+    },
+    
+    /**
+     * UNIFIED FORM OPTIONS
+     * Fetch all dropdown data in a single request for optimized modal loading.
+     */
+    getFormOptions: async (signal = null) => {
+        try {
+            const response = await api.get('users/form-options/', { signal });
+            return response.data || { organizations: [], sites: [], coordinators: [], roles: [] };
+        } catch (error) {
+            if (error.name === 'CanceledError') throw error;
+            console.error("[AAQMS-UI] Failed to load form options", error);
+            return { organizations: [], sites: [], coordinators: [], roles: [] };
         }
     },
 };
