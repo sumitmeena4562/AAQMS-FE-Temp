@@ -23,6 +23,7 @@ import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiShieldOff, FiEye
 import useSearchStore from '../../store/useSearchStore';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
+import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 /**
  * Helper for consistent status calculation
@@ -238,16 +239,21 @@ const Organizations = React.memo(() => {
                 const isPending = computedStatus === 'PENDING';
                 const isBlocked = computedStatus === 'BLOCKED';
 
-                const bgClass = isActive
-                    ? 'bg-[#e6f4ea] border-[#137333]/20 text-[#137333]'
+                const { COLORS } = DESIGN_TOKENS;
+                
+                const style = isActive
+                    ? { backgroundColor: COLORS.BADGES.SUCCESS_BG, color: COLORS.BADGES.SUCCESS_TEXT, borderColor: `${COLORS.BADGES.SUCCESS_TEXT}33` }
                     : isPending
-                        ? 'bg-amber-50 border-amber-200/50 text-amber-600'
+                        ? { backgroundColor: COLORS.BADGES.PENDING_BG, color: COLORS.BADGES.PENDING_TEXT, borderColor: `${COLORS.BADGES.PENDING_TEXT}33` }
                         : isBlocked
-                            ? 'bg-rose-100 border-rose-600/20 text-rose-600'
-                            : 'bg-[#fce8e6] border-[#c5221f]/20 text-[#c5221f]';
+                            ? { backgroundColor: COLORS.BADGES.BLOCKED_BG, color: COLORS.BADGES.BLOCKED_TEXT, borderColor: `${COLORS.BADGES.BLOCKED_TEXT}33` }
+                            : { backgroundColor: COLORS.BADGES.DANGER_BG, color: COLORS.BADGES.DANGER_TEXT, borderColor: `${COLORS.BADGES.DANGER_TEXT}33` };
 
                 return (
-                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border ${bgClass}`}>
+                    <div 
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border"
+                        style={style}
+                    >
                         <DotStatus status={isActive ? 'active' : isPending ? 'pending' : (isBlocked ? 'inactive' : 'inactive')} />
                         <span className="text-[9px] font-black uppercase tracking-widest leading-none">
                             {computedStatus}
@@ -417,7 +423,7 @@ const Organizations = React.memo(() => {
                                     onPageChange={setCurrentPage}
                                     totalItems={totalCount}
                                     itemsPerPage={itemsPerPage}
-                                    className="!bg-transparent !border-none !shadow-none !px-0 !py-2"
+                                    variant="ghost"
                                 />
                             }
                         />

@@ -153,6 +153,13 @@ const fontWeight = {
     medium:   500,
     semibold: 600,
     bold:     700,
+    black:    900,
+};
+
+// ── Font Family ─────────────────────────────────────────────────────────────────
+const fontFamily = {
+    sans: "'Inter', -apple-system, system-ui, sans-serif",
+    mono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
 };
 
 // ── Shadows ─────────────────────────────────────────────────────────────────────
@@ -209,6 +216,7 @@ export const t = {
     transition,
     layout,
     zIndex,
+    fontFamily,
 };
 
 export default t;

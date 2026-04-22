@@ -57,7 +57,18 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
       {/* Top Image Section */}
       <div className="relative h-[140px] w-full shrink-0 bg-base overflow-hidden">
         <img
-          src={org.imagery?.profile || org.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop'}
+          src={org.imagery?.profile || org.image || (() => {
+            const fallbacks = [
+              "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=800&auto=format&fit=crop", // Hallway
+              "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop", // Skyscraper
+              "https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=80&w=800&auto=format&fit=crop", // Warehouse
+              "https://images.unsplash.com/photo-1497366754035-f200968a6e72?q=80&w=800&auto=format&fit=crop", // Office
+              "https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=800&auto=format&fit=crop", // Industrial
+              "https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=800&auto=format&fit=crop"  // Tech
+            ];
+            const hash = (org.id || org.name || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            return fallbacks[hash % fallbacks.length];
+          })()}
           alt={org.name}
           className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110"
           loading="lazy"

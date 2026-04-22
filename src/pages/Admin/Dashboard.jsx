@@ -9,6 +9,8 @@ import { MatricCardSkeleton } from "../../components/Dashboard/StatsCardSkeleton
 import { useDashboardSummary } from "../../hooks/api/useDashboardQueries";
 import { mapToActivityFeed } from "../../utils/dashboardCalculations";
 
+import { DESIGN_TOKENS } from "../../constants/designTokens";
+
 // Helper outside component to format elapsed time elegantly
 const formatLastSync = (timestamp) => {
     if (!timestamp) return 'Fetching...';
@@ -151,8 +153,18 @@ const Dashboard = () => {
                                 System Status
                             </span>
                             <div className="flex items-baseline gap-1.5 leading-none">
-                                <span className="text-[11px] font-medium text-gray/40 italic">Synced</span>
-                                <span className="text-[12px] font-black text-title tracking-tight group-hover:text-primary transition-colors">{syncText}</span>
+                                <span 
+                                    className="text-[11px] font-bold italic"
+                                    style={{ color: DESIGN_TOKENS.COLORS.TEXT_MUTED }}
+                                >
+                                    Synced
+                                </span>
+                                <span 
+                                    className="text-[12px] font-black tracking-tight group-hover:text-primary transition-colors"
+                                    style={{ color: DESIGN_TOKENS.COLORS.TEXT_TITLE }}
+                                >
+                                    {syncText}
+                                </span>
                             </div>
                         </div>
                     </div>

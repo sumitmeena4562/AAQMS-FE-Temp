@@ -111,7 +111,8 @@
     --navbar-height: 80px;
 
     /* ── Font Family ── */
-    --font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-sans: var(--font-family);
 
     /* ── COMPATIBILITY ALIASES (For Landing Page & Components) ── */
     --color-background: var(--color-page);

@@ -12,7 +12,7 @@ import CardSkeleton from '../../components/UI/CardSkeleton';
 
 const SitePlan = () => {
   const { selectedOrg, selectedCoord, setOrg, setCoord } = useFilterStore();
-
+  const [isSynced, setIsSynced] = useState(false);
   
   const [searchParams, setSearchParams] = useSearchParams();
   const { resetFilters } = useFilterStore();
@@ -23,18 +23,29 @@ const SitePlan = () => {
   const passedCoordId = searchParams.get('coord_id');
   const passedCoordNameFromUrl = searchParams.get('coord');
 
-  const activeOrgId = selectedOrg.length > 0 ? selectedOrg : (passedOrgId ? [passedOrgId] : []);
-  const activeCoordId = selectedCoord.length > 0 ? selectedCoord : (passedCoordId ? [passedCoordId] : []);
+  const activeOrgId = useMemo(() => 
+    selectedOrg.length > 0 ? selectedOrg : (passedOrgId ? [passedOrgId] : []),
+  [selectedOrg, passedOrgId]);
+
+  const activeCoordId = useMemo(() => 
+    selectedCoord.length > 0 ? selectedCoord : (passedCoordId ? [passedCoordId] : []),
+  [selectedCoord, passedCoordId]);
 
   // --- QUERY HOOKS ---
-  const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
+  const { organizations: orgs } = useHierarchy({ 
+    includeSites: false, 
+    includeCoords: false,
+    enabled: isSynced
+  });
   
   const siteFilters = useMemo(() => ({ 
       organisation: activeOrgId, 
       coord_id: activeCoordId 
   }), [activeOrgId, activeCoordId]);
 
-  const { data: siteData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useSites(siteFilters);
+  const { data: siteData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError } = useSites(siteFilters, {
+    enabled: isSynced
+  });
 
   const sitePlans = siteData?.results || [];
   const totalPlans = siteData?.total || sitePlans.length;
@@ -46,10 +57,7 @@ const SitePlan = () => {
   };
 
   // URL → Store sync (mount-only guard)
-  const hasSynced = useRef(false);
   useEffect(() => {
-    if (hasSynced.current) return;
-    
     const pOrg = searchParams.get('org_id') || searchParams.get('org');
     const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
 
@@ -61,7 +69,7 @@ const SitePlan = () => {
         if (pCoord) setCoord(pCoord.split(','));
     }
 
-    hasSynced.current = true;
+    setIsSynced(true);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const currentOrg = activeOrgId.length === 1 ? orgs.find(o => String(o.id) === String(activeOrgId[0])) : null;
   const orgLabel = activeOrgId.length > 1 ? `Organizations (${activeOrgId.length})` : currentOrg?.name || passedOrgNameFromUrl;

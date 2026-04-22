@@ -4,7 +4,9 @@ import useAuthStore from '../../store/authStore';
 import { queryClient } from '../../lib/queryClient';
 import { organizationService } from '../../services/organizationService';
 import { userService } from '../../services/userService';
+import { inventoryService } from '../../services/inventoryService';
 import { mapOrgToFrontend } from '../../hooks/api/useOrgQueries';
+import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 /* ── Animated Collapsible ── */
 const CollapsibleSection = ({ isOpen, children }) => {
@@ -71,6 +73,18 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 queryKey: ['users', 'list', { filters: {}, search: '', page: 1, limit: 12 }],
                 queryFn: () => userService.getUsers({}, '', 1, 12)
             });
+        } else if (path === '/admin/inventory') {
+            queryClient.prefetchQuery({
+                queryKey: ['inventory', { org: 'all', site: 'all', floor: 'all', zone: 'all', search: '' }, 1, 12],
+                queryFn: async () => {
+                    const response = await inventoryService.getInventory({ page: 1, page_size: 12 });
+                    return {
+                        results: response.results || response,
+                        stats: response.stats || null,
+                        count: response.count || 0,
+                    };
+                }
+            });
         }
     };
 
@@ -84,7 +98,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 <NavLink
                     to={item.path}
                     onMouseEnter={() => handlePrefetch(item.path)}
-                    className={() => `
+                    className={({ isActive: act }) => `
                         flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
                         ${act
@@ -92,7 +106,10 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                             : 'text-slate-700 hover:bg-slate-200/50 hover:text-slate-900 font-medium'}
                     `}
                 >
-                    <span className={`flex items-center shrink-0 transition-colors ${act ? 'text-primary' : 'text-slate-500 group-hover:text-slate-900'}`}>
+                    <span 
+                        className={`flex items-center shrink-0 transition-colors ${act ? 'text-primary' : ''}`}
+                        style={{ color: !act ? DESIGN_TOKENS.COLORS.TEXT_MUTED : undefined }}
+                    >
                         {item.icon}
                     </span>
                     {!collapsed && <span className="truncate tracking-tight">{item.label}</span>}

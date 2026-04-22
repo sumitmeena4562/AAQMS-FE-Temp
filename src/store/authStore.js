@@ -51,12 +51,23 @@ const useAuthStore = create((set, get) => ({
         localStorage.removeItem("rememberedEmail");
       }
 
-      // 1-STEP LOGIN: Backend returns full user profile now
+      // 1-STEP LOGIN: Backend returns full user profile and bootstrap data
       if (loginResponse && loginResponse.user) {
         const userData = { 
           ...loginResponse.user, 
           role: (loginResponse.user.role || '').toLowerCase() 
         };
+
+        // BOOTSTRAP OPTIMIZATION: Seed the dashboard summary cache immediately
+        if (loginResponse.bootstrap) {
+          const { queryClient } = await import("../lib/queryClient");
+          queryClient.setQueryData(['dashboard', 'summary'], loginResponse.bootstrap);
+          
+          // Also seed the user stats if present
+          if (loginResponse.bootstrap.stats) {
+            queryClient.setQueryData(['user-stats'], loginResponse.bootstrap.stats);
+          }
+        }
 
         storage.saveUser(userData);
 

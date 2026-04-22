@@ -1,5 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { inventoryService } from '../../services/inventoryService';
+import api from '../../services/api';
+import { queryClient } from '../../lib/queryClient';
+import toast from 'react-hot-toast';
 
 /**
  * ── INVENTORY QUERIES ──
@@ -39,7 +42,9 @@ export const useInventory = (filters = {}, page = 1, pageSize = 20) => {
         count: response.count || 0,
       };
     },
-    staleTime: 30 * 1000, 
+    staleTime: 10 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
+    placeholderData: (prev) => prev,
   });
 };
 
@@ -49,5 +54,36 @@ export const useAssetDetails = (id) => {
     queryFn: () => inventoryService.getAssetById(id),
     enabled: !!id,
     staleTime: 2 * 60 * 1000,
+  });
+};
+export const useVerifyAsset = () => {
+  return useMutation({
+    mutationFn: async (id) => {
+      const response = await api.post(`organisations/inventory/${id}/verify/`);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      // SINGLE-CALL OPTIMIZATION: Update global dashboard counters
+      if (data.updated_stats) {
+        queryClient.setQueryData(['dashboard', 'summary'], old => {
+            if (!old) return old;
+            return {
+                ...old,
+                stats: { ...old.stats, ...data.updated_stats }
+            };
+        });
+      }
+
+      // Update specific asset status in the list cache
+      queryClient.setQueriesData({ queryKey: ['inventory'] }, (oldData) => {
+        if (!oldData?.results) return oldData;
+        return {
+          ...oldData,
+          results: oldData.results.map(a => String(a.id) === String(data.id) ? { ...a, ...data } : a)
+        };
+      });
+
+      toast.success("Asset verified successfully");
+    }
   });
 };

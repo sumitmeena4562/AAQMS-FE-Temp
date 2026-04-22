@@ -9,6 +9,7 @@ import { useAllHistory } from '../../hooks/api/useDashboardQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useSites, useFloors } from '../../hooks/api/useHierarchyQueries';
 import TableSkeleton from '../../components/UI/TableSkeleton';
+import { mapToActivityFeed } from '../../utils/dashboardCalculations';
 
 // STATIC DATA
 
@@ -27,10 +28,10 @@ const OPERATION_TYPES = [
 ];
 
 const EVENT_CATEGORIES = [
-    { value: 'USER', label: 'Users & Staff' },
-    { value: 'ORGANISATION', label: 'Organizations' },
-    { value: 'SITE', label: 'Infrastructure / Sites' },
-    { value: 'INVENTORY', label: 'Assets & Equipment' },
+    { value: 'USER', label: 'User Activity' },
+    { value: 'ORGANISATION', label: 'Organization Logs' },
+    { value: 'SITE', label: 'Site / Infra Activity' },
+    { value: 'INVENTORY', label: 'Inventory Logs' },
     { value: 'REPORT', label: 'Audit Reports' }
 ];
 
@@ -46,15 +47,41 @@ export default function AllHistory() {
         category: []
     });
 
-    // ── 2. QUERY HOOKS (Declarative Cascades) ──
+    // ── 2. DATA FETCHING (Restored Granular Hooks) ──
     const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
     
     const siteQueryParams = useMemo(() => ({ organisation: filters.organisation }), [filters.organisation]);
-    const { data: siteData } = useSites(siteQueryParams);
+    const { data: siteData } = useSites(siteQueryParams, { 
+        enabled: filters.organisation.length > 0 
+    });
     const allSites = siteData?.results || [];
 
-    const { data: floorData } = useFloors(filters.site);
+    const { data: floorData } = useFloors(filters.site, { 
+        enabled: filters.site.length > 0 
+    });
     const allFloors = floorData?.results || [];
+
+    const queryParams = useMemo(() => ({
+        org_id: filters.organisation,
+        site_id: filters.site,
+        floor: filters.floor,
+        role: filters.role,
+        operation: filters.operation,
+        category: filters.category,
+        page: currentPage,
+        limit: 10
+    }), [filters, currentPage]);
+
+    const { data: historyData, isLoading } = useAllHistory(queryParams);
+
+    // ── 3. Derived Data ──
+    // Map backend results to frontend activity feed format
+    const activityList = useMemo(() => 
+        mapToActivityFeed(historyData?.results || []), 
+    [historyData?.results]);
+    
+    const totalCount = historyData?.count || 0;
+    const totalPages = Math.ceil(totalCount / 10);
 
     // ── 4. State Management Actions ──
     const updateFilter = (key, val) => {
@@ -76,20 +103,6 @@ export default function AllHistory() {
         });
         setCurrentPage(1);
     };
-
-    // ── 5. Fetching Activity Logs (Server-side paginated) ──
-    const queryFilters = useMemo(() => ({
-        ...filters,
-        page: currentPage,
-        page_size: 10
-    }), [filters, currentPage]);
-
-    const { data: historyResponse, isLoading } = useAllHistory(queryFilters);
-    const activityList = historyResponse?.results || [];
-    const totalCount = historyResponse?.count || 0;
-    const totalPages = Math.ceil(totalCount / 10);
-
-    // ── 6. Industrial Column Renderers ──
     const columns = useMemo(() => [
         {
             header: 'Operation',

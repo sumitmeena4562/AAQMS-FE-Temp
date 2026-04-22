@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 const ChevronIcon = () => (
   <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,7 +29,11 @@ const Breadcrumb = ({ items = [] }) => {
             {item.isActive ? (
               <div 
                 onClick={handleClick}
-                className="flex items-center gap-1.5 px-2 py-1 bg-blue-50/50 text-primary rounded-md cursor-pointer hover:bg-blue-100/50 transition-colors"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-md cursor-pointer transition-colors"
+                style={{ 
+                    backgroundColor: DESIGN_TOKENS.COLORS.PRIMARY_SOFT, 
+                    color: DESIGN_TOKENS.COLORS.TEXT_PRIMARY 
+                }}
               >
                 {item.icon && <span className="flex items-center opacity-90">{item.icon}</span>}
                 <span className="text-[11.5px] font-bold tracking-tight">
@@ -39,7 +44,8 @@ const Breadcrumb = ({ items = [] }) => {
               /* Inactive Style - Subtle */
               <div
                 onClick={handleClick}
-                className="flex items-center gap-1.5 px-1.5 py-1 text-[11.5px] font-medium text-slate-400 hover:text-primary transition-all duration-200 group cursor-pointer"
+                className="flex items-center gap-1.5 px-1.5 py-1 text-[11.5px] font-medium hover:text-primary transition-all duration-200 group cursor-pointer"
+                style={{ color: DESIGN_TOKENS.COLORS.TEXT_MUTED }}
               >
                 {item.icon && <span className="opacity-60 group-hover:opacity-100 flex items-center transition-opacity">{item.icon}</span>}
                 <span className="tracking-tight">{item.label}</span>

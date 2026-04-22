@@ -13,27 +13,28 @@ import CardSkeleton from '../../components/UI/CardSkeleton';
 const FloorPlan = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const passedOrgId = searchParams.get('org_id');
-  const passedOrgName = searchParams.get('org_name');
-  const [currentPage, setCurrentPage] = useState(1);
-  const passedCoordId = searchParams.get('coord_id');
-  const passedCoordName = searchParams.get('coord');
-  const passedSiteId = searchParams.get('site_id');
-  const passedSiteName = searchParams.get('site');
+  const [isSynced, setIsSynced] = useState(false);
 
   const { resetFilters, selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
 
-  const activeSiteId = selectedSite.length > 0 ? selectedSite : (searchParams.get('site_id') ? [searchParams.get('site_id')] : []);
-  const activeOrgId = selectedOrg.length > 0 ? selectedOrg : (searchParams.get('org_id') ? [searchParams.get('org_id')] : []);
-  const activeCoordId = selectedCoord.length > 0 ? selectedCoord : (searchParams.get('coord_id') ? [searchParams.get('coord_id')] : []);
+  const activeSiteId = useMemo(() => 
+    selectedSite.length > 0 ? selectedSite : (searchParams.get('site_id') ? [searchParams.get('site_id')] : []),
+  [selectedSite, searchParams]);
 
-  // --- QUERY HOOKS (UNIFIED) ---
+  const activeOrgId = useMemo(() => 
+    selectedOrg.length > 0 ? selectedOrg : (searchParams.get('org_id') ? [searchParams.get('org_id')] : []),
+  [selectedOrg, searchParams]);
+
+  const activeCoordId = useMemo(() => 
+    selectedCoord.length > 0 ? selectedCoord : (searchParams.get('coord_id') ? [searchParams.get('coord_id')] : []),
+  [selectedCoord, searchParams]);
+
+  // --- DATA FETCHING (Restored Granular Hooks) ---
   const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
-  const { data: floorData = { results: [], total: 0 }, isLoading, error: hierarchyError } = useFloors(activeSiteId);
-
-  const floorList = floorData.results || [];
-  const totalLevels = floorData.total || floorList.length;
+  
+  const { data: floorData, isLoading, error: hierarchyError } = useFloors(activeSiteId);
+  const floorList = floorData?.results || [];
+  const totalLevels = floorData?.count || 0;
 
   const handleResetAll = () => {
     setSearchParams({});
@@ -41,10 +42,7 @@ const FloorPlan = () => {
   };
 
   // URL → Store sync (mount-only guard)
-  const hasSynced = useRef(false);
   useEffect(() => {
-    if (hasSynced.current) return;
-    
     const pOrg = searchParams.get('org_id') || searchParams.get('org');
     const pSite = searchParams.get('site_id') || searchParams.get('site');
     const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
@@ -58,7 +56,7 @@ const FloorPlan = () => {
         if (pCoord) setCoord(pCoord.split(','));
     }
 
-    hasSynced.current = true;
+    setIsSynced(true);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const currentOrg = activeOrgId.length === 1 ? orgs.find(o => String(o.id) === String(activeOrgId[0])) : null;
   const orgLabel = activeOrgId.length > 1 ? `Organizations (${activeOrgId.length})` : currentOrg?.name || passedOrgName;

@@ -3,6 +3,7 @@ import Table from './Table';
 import TableSkeleton from './TableSkeleton';
 import { FiSearch } from 'react-icons/fi';
 import { AnimatePresence, motion } from 'framer-motion';
+import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 /**
  * Premium DataTable Wrapper
@@ -42,7 +43,8 @@ const DataTable = React.memo(({
     filterContent,
     footer,
     selectionFooter,
-    className = ""
+    className = "",
+    onRowMouseEnter
 }) => {
     const hasSelection = selectable && selectedIds.length > 0;
     const scrollRef = useRef(null);
@@ -87,12 +89,22 @@ const DataTable = React.memo(({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between py-5 px-4 sm:px-6 border-b border-border-main/80 gap-4">
                     <div className="flex items-center gap-3">
                         {title && (
-                            <h3 className="text-xl font-black text-title leading-none m-0 tracking-tight">
+                            <h3 
+                                className="text-xl font-black leading-none m-0 tracking-tight"
+                                style={{ color: DESIGN_TOKENS.COLORS.TEXT_TITLE }}
+                            >
                                 {title}
                             </h3>
                         )}
                         {subtitle && (
-                            <span className="inline-flex items-center text-[10px] font-black text-primary/70 bg-primary/5 border border-primary/10 rounded-full px-2.5 py-0.5 uppercase tracking-wider">
+                            <span 
+                                className="inline-flex items-center text-[10px] font-black rounded-full px-2.5 py-0.5 uppercase tracking-wider"
+                                style={{ 
+                                    color: DESIGN_TOKENS.COLORS.TEXT_PRIMARY, 
+                                    backgroundColor: DESIGN_TOKENS.COLORS.PRIMARY_SOFT,
+                                    border: `1px solid ${DESIGN_TOKENS.COLORS.BORDER}`
+                                }}
+                            >
                                 {subtitle}
                             </span>
                         )}
@@ -117,7 +129,8 @@ const DataTable = React.memo(({
                                 value={searchProps.value}
                                 onChange={searchProps.onChange}
                                 placeholder={searchProps.placeholder || "Search..."}
-                                className="w-full h-11 pl-10 pr-4 bg-card border border-border-main rounded-[var(--radius-input)] text-[13px] font-semibold text-body placeholder:text-gray focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
+                                className="w-full h-11 pl-10 pr-4 bg-card border border-border-main rounded-[var(--radius-input)] text-[13px] font-semibold placeholder:text-gray focus:outline-none focus:ring-2 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
+                                style={{ color: DESIGN_TOKENS.COLORS.TEXT_BODY, fontFamily: DESIGN_TOKENS.FONTS.FAMILY }}
                             />
                         </div>
                     )}
@@ -177,6 +190,7 @@ const DataTable = React.memo(({
                     columns={columns}
                     data={data}
                     onRowClick={onRowClick}
+                    onRowMouseEnter={onRowMouseEnter}
                     selectable={selectable}
                     selectedIds={selectedIds}
                     onSelectionChange={onSelectionChange}

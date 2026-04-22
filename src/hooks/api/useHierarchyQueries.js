@@ -20,7 +20,7 @@ export const useSites = (filters = {}, options = {}) => {
   ), [filters]);
 
   return useQuery({
-    queryKey: ['sites', cleanFilters],
+    queryKey: ['sites', JSON.stringify(cleanFilters)],
     queryFn: async ({ signal }) => {
       const response = await hierarchyService.getSites(cleanFilters, signal);
       
@@ -44,7 +44,7 @@ export const useSites = (filters = {}, options = {}) => {
 
 export const useFloors = (siteId = null, options = {}) => {
   return useQuery({
-    queryKey: ['floors', siteId],
+    queryKey: ['floors', Array.isArray(siteId) ? siteId.join(',') : siteId],
     queryFn: async ({ signal }) => {
       const response = await hierarchyService.getFloors(siteId, signal);
       
@@ -69,7 +69,7 @@ export const useZones = (floorId = null, filters = {}, options = {}) => {
   ), [filters]);
 
   return useQuery({
-    queryKey: ['zones', floorId, cleanFilters],
+    queryKey: ['zones', Array.isArray(floorId) ? floorId.join(',') : floorId, JSON.stringify(cleanFilters)],
     queryFn: async ({ signal }) => {
       const response = await hierarchyService.getZones(floorId, cleanFilters, signal);
       

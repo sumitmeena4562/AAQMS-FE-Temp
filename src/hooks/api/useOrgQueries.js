@@ -3,12 +3,24 @@ import { useQuery } from '@tanstack/react-query';
 import { organizationService } from '../../services/organizationService';
 
 // Helper to clean mangled Cloudinary URLs (from useOrgStore logic)
+// Helper to clean mangled Cloudinary URLs and ensure relative paths are prefixed
 const cleanImageUrl = (url) => {
-    if (typeof url !== 'string') return url;
+    if (!url || typeof url !== 'string') return url;
+    
+    // 1. Handle double http (mangled by some stores)
     if (url.includes('http') && url.split('http').length > 2) {
         const parts = url.split('http');
-        return 'http' + parts[parts.length - 1]; 
+        url = 'http' + parts[parts.length - 1]; 
     }
+
+    // 2. Handle relative paths (e.g. media/organisations/...)
+    if (!url.startsWith('http') && !url.startsWith('data:')) {
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+        const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+        const cleanPath = url.startsWith('/') ? url : `/${url}`;
+        return `${cleanBase}${cleanPath}`;
+    }
+
     return url;
 };
 

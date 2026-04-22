@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiArrowUpRight, FiArrowDownRight } from 'react-icons/fi';
+import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 /**
  * StatsCard — Simplified Elite Design.
@@ -47,10 +48,16 @@ const StatsCard = React.memo(({
             
             <div className="flex items-start justify-between gap-4 relative z-10">
                 <div className="flex flex-col min-w-0 flex-1">
-                    <p className="text-[10px] font-bold tracking-widest text-slate-500 uppercase mb-1 truncate">
+                    <p 
+                        className="text-[10px] font-bold tracking-widest uppercase mb-1 truncate"
+                        style={{ color: DESIGN_TOKENS.COLORS.TEXT_MUTED }}
+                    >
                         {displayTitle}
                     </p>
-                    <h2 className="text-2xl font-black text-title leading-none mt-1 tracking-tight truncate">
+                    <h2 
+                        className="text-2xl font-black leading-none mt-1 tracking-tight truncate"
+                        style={{ color: DESIGN_TOKENS.COLORS.TEXT_TITLE }}
+                    >
                         {value}
                     </h2>
                 </div>
@@ -78,7 +85,10 @@ const StatsCard = React.memo(({
                         </span>
                     )}
                     {description && (
-                        <span className="text-[11px] font-medium text-slate-500 truncate flex-1 text-right italic">
+                        <span 
+                            className="text-[11px] font-medium truncate flex-1 text-right italic"
+                            style={{ color: DESIGN_TOKENS.COLORS.TEXT_MUTED }}
+                        >
                             {description}
                         </span>
                     )}

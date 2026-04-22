@@ -15,7 +15,8 @@ const Table = ({
     className = "",
     rowClassName,
     emptyMessage = "No data found",
-    loading = false
+    loading = false,
+    onRowMouseEnter
 }) => {
     // O(1) performance boost: Convert selected array to a Set
     const selectedIdSet = useMemo(() => new Set(selectedIds.map(String)), [selectedIds]);
@@ -116,6 +117,7 @@ const Table = ({
                                             transition={{ duration: 0.2 }}
                                             key={row.id || ri}
                                             onClick={() => onRowClick && onRowClick(row)}
+                                            onMouseEnter={() => onRowMouseEnter && onRowMouseEnter(row)}
                                             className={`
                                                 group transition-all duration-300
                                                 ${isSelected ? 'bg-primary/[0.04]' : 'hover:bg-base/70'}

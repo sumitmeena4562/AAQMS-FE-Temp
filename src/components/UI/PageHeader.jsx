@@ -2,6 +2,7 @@ import React from 'react';
 import { FiPlus, FiDownload, FiRefreshCw } from 'react-icons/fi';
 import Breadcrumb from '../Breadcrumb/Breadcrumb';
 import Button from './Button';
+import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 const PageHeader = ({ 
   title,
@@ -29,11 +30,17 @@ const PageHeader = ({
         {/* 2. TITLE & SUBTITLE — High Density Typography */}
         {title && (
           <div className="flex flex-col gap-1.5 min-w-0 flex-1">
-            <h1 className="text-xl sm:text-2xl font-black text-title leading-tight tracking-tight truncate">
+            <h1 
+              className="text-xl sm:text-2xl font-black leading-tight tracking-tight truncate"
+              style={{ color: DESIGN_TOKENS.COLORS.TEXT_TITLE, fontFamily: DESIGN_TOKENS.FONTS.FAMILY }}
+            >
               {title}
             </h1>
             {subtitle && (
-              <div className="text-[11px] sm:text-[12px] font-bold text-gray/90 uppercase tracking-widest leading-none">
+              <div 
+                className="text-[11px] sm:text-[12px] font-bold uppercase tracking-widest leading-none"
+                style={{ color: DESIGN_TOKENS.COLORS.TEXT_MUTED }}
+              >
                 {subtitle}
               </div>
             )}

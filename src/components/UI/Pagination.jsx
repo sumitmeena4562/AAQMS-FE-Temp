@@ -16,6 +16,7 @@ const Pagination = ({
     onPageChange, 
     totalItems, 
     itemsPerPage,
+    variant = "default", // "default" or "ghost"
     className = "" 
 }) => {
     if (totalPages <= 1 && totalItems <= itemsPerPage) return null;
@@ -39,8 +40,10 @@ const Pagination = ({
         return pages;
     };
 
+    const isGhost = variant === "ghost";
+
     return (
-        <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm animate-in fade-in slide-in-from-bottom-2 ${className}`}>
+        <div className={`flex flex-col sm:flex-row items-center justify-between gap-4 w-full ${isGhost ? '' : 'px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm'} animate-in fade-in slide-in-from-bottom-2 ${className}`}>
             <div className="flex flex-col">
                 <span className="text-[10px] font-black text-gray uppercase tracking-[0.15em] leading-none mb-1">Navigation</span>
                 <p className="text-[12px] font-bold text-title whitespace-nowrap">

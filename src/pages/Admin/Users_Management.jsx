@@ -26,8 +26,8 @@ import { useHierarchy } from '../../hooks/api/useHierarchy';
 import useSearchStore from '../../store/useSearchStore';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
-
 import { useSearchParams } from 'react-router-dom';
+import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 const Users = React.memo(() => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -347,7 +347,7 @@ const Users = React.memo(() => {
             onPageChange={setPage}
             totalItems={totalCount}
             itemsPerPage={limit}
-            className="!rounded-t-none !border-t-0"
+            variant="ghost"
         />
     );
 

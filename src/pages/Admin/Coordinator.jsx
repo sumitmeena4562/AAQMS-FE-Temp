@@ -25,6 +25,7 @@ import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
+import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 /**
  * COORDINATOR MANAGEMENT PAGE
@@ -269,7 +270,7 @@ const Coordinator = React.memo(() => {
             onPageChange={setPage}
             totalItems={totalCount}
             itemsPerPage={limit}
-            className="!rounded-t-none !border-t-0"
+            variant="ghost"
         />
     );
 

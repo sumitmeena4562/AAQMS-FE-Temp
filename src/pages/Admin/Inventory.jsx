@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
@@ -15,6 +15,8 @@ import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
+import { useQueryClient } from '@tanstack/react-query';
+import { inventoryService } from '../../services/inventoryService';
 
 
 import { useFilterStore } from '../../store/useFilterStore';
@@ -28,68 +30,37 @@ import useSearchStore from '../../store/useSearchStore';
 import useDebounce from '../../hooks/useDebounce';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
+import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 
 
 const Inventory = () => {
     const [searchParams, setSearchParams] = useSearchParams();
+    const [isSynced, setIsSynced] = useState(false);
 
     const {
         selectedOrg, selectedSite, selectedFloor, selectedZone,
         setOrg, setCoord, setSite, setFloor, setZone, resetFilters
     } = useFilterStore();
 
-    // ── QUERY HOOKS (UNIFIED) ──
-    const { organizations: orgs, sites: allSites } = useHierarchy({ includeCoords: false });
-    const { data: floorData } = useFloors(selectedSite);
-    const allFloors = floorData?.results || [];
-    const { data: zoneData } = useZones(selectedFloor);
-    const allZones = zoneData?.results || [];
-
     // ── LOCAL STATE ──
-    const [selectedAsset, setSelectedAsset] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const { query: searchQuery, clearSearch } = useSearchStore();
-    const [viewMode, setViewMode] = useState('list');
-    // Server-side pagination — page number drives the API call
+    const debouncedSearch = useDebounce(searchQuery, 400);
     const [currentPage, setCurrentPage] = useState(1);
     const PAGE_SIZE = useResponsiveLimit(12);
 
-    // Reset to page 1 if page size changes to avoid 'Invalid page' errors
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [PAGE_SIZE]);
+    // ── DATA FETCHING (Separate Optimized Calls) ──
+    const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
+    
+    const siteQueryParams = useMemo(() => ({ organisation: selectedOrg }), [selectedOrg]);
+    const { data: siteData } = useSites(siteQueryParams, { enabled: selectedOrg.length > 0 });
+    const allSites = siteData?.results || [];
 
-    // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
-    const hasSynced = useRef(false);
-    useEffect(() => {
-        if (hasSynced.current) return;
+    const { data: floorData } = useFloors(selectedSite, { enabled: selectedSite.length > 0 });
+    const allFloors = floorData?.results || [];
 
-        const pOrg = searchParams.get('org_id') || searchParams.get('org');
-        const pSite = searchParams.get('site_id') || searchParams.get('site');
-        const pFloor = searchParams.get('floor_id') || searchParams.get('floor');
-        const pZone = searchParams.get('zone_id') || searchParams.get('zone');
-        const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
-
-        // Logic Review: "Admin direct aaye to sari dikh"
-        // If NO hierarchy params are present in URL, we assume direct navigation and reset filters
-        if (!pOrg && !pSite && !pFloor && !pZone && !pCoord) {
-            resetFilters();
-            clearSearch();
-        } else {
-            // Otherwise, prioritize URL params for deep-linking
-            if (pOrg) setOrg(pOrg.split(','));
-            if (pSite) setSite(pSite.split(','));
-            if (pFloor) setFloor(pFloor.split(','));
-            if (pZone) setZone(pZone.split(','));
-            if (pCoord) setCoord(pCoord.split(','));
-        }
-
-        hasSynced.current = true;
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    // ── DEBOUNCED SEARCH ──
-    const debouncedSearch = useDebounce(searchQuery, 400);
+    const { data: zoneData } = useZones(selectedFloor, {}, { enabled: selectedFloor.length > 0 });
+    const allZones = zoneData?.results || [];
 
     const activeFilters = useMemo(() => ({
         org: selectedOrg.length > 0 ? selectedOrg : 'all',
@@ -99,16 +70,55 @@ const Inventory = () => {
         search: debouncedSearch
     }), [selectedOrg, selectedSite, selectedFloor, selectedZone, debouncedSearch]);
 
-
-
-    // ── FETCH INVENTORY (server-side pagination) ──
     const { data: inventoryData, isLoading } = useInventory(activeFilters, currentPage, PAGE_SIZE);
 
     const inventory = inventoryData?.results || [];
     const inventoryStats = inventoryData?.stats || null;
     const inventoryTotalCount = inventoryData?.count || 0;
 
-    // Page changes handled by local state (currentPage)
+    const [selectedAsset, setSelectedAsset] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [viewMode, setViewMode] = useState('list');
+
+    // Reset to page 1 if page size changes to avoid 'Invalid page' errors
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [PAGE_SIZE]);
+
+    // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
+    useEffect(() => {
+        const pOrg = searchParams.get('org_id') || searchParams.get('org');
+        const pSite = searchParams.get('site_id') || searchParams.get('site');
+        const pFloor = searchParams.get('floor_id') || searchParams.get('floor');
+        const pZone = searchParams.get('zone_id') || searchParams.get('zone');
+        const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
+
+        if (!pOrg && !pSite && !pFloor && !pZone && !pCoord) {
+            resetFilters();
+            clearSearch();
+        } else {
+            if (pOrg) setOrg(pOrg.split(','));
+            if (pSite) setSite(pSite.split(','));
+            if (pFloor) setFloor(pFloor.split(','));
+            if (pZone) setZone(pZone.split(','));
+            if (pCoord) setCoord(pCoord.split(','));
+        }
+
+        setIsSynced(true);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const queryClient = useQueryClient();
+
+    // ── PREFETCH LOGIC ──
+    const handlePrefetch = useCallback((id) => {
+        if (!id) return;
+        queryClient.prefetchQuery({
+            queryKey: ['asset', id],
+            queryFn: () => inventoryService.getAssetById(id),
+            staleTime: 5 * 60 * 1000
+        });
+    }, [queryClient]);
+
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
@@ -244,8 +254,14 @@ const Inventory = () => {
             />
 
             {isLoading && !inventoryStats ? (
-                <div className="grid grid-cols-4 gap-4 w-full h-[148px] animate-pulse">
-                    {[1, 2, 3, 4].map(i => <div key={i} className="bg-card rounded-2xl border border-border-main" />)}
+                <div className="grid grid-cols-4 gap-4 w-full h-[108px]">
+                    {[1, 2, 3, 4].map(i => (
+                        <div key={i} className="bg-card rounded-2xl border border-border-main p-4 flex flex-col gap-2 relative overflow-hidden">
+                            <div className="w-8 h-8 bg-base rounded-lg animate-pulse" />
+                            <div className="h-4 w-20 bg-base rounded animate-pulse" />
+                            <div className="absolute right-4 top-4 h-6 w-10 bg-base rounded-md animate-pulse" />
+                        </div>
+                    ))}
                 </div>
             ) : (
                 <StatsRow items={[
@@ -284,6 +300,7 @@ const Inventory = () => {
                             data={displayedInventory}
                             loading={isLoading}
                             onRowClick={handleAssetClick}
+                            onRowMouseEnter={(row) => handlePrefetch(row.id)}
                             emptyMessage={<EmptyState onReset={handleReset} />}
                             footer={
                                 <Pagination 
@@ -292,7 +309,7 @@ const Inventory = () => {
                                     onPageChange={handlePageChange}
                                     totalItems={inventoryTotalCount}
                                     itemsPerPage={PAGE_SIZE}
-                                    className="!bg-transparent !border-none !shadow-none !px-0 !py-2"
+                                    variant="ghost"
                                 />
                             }
                         />
@@ -304,7 +321,14 @@ const Inventory = () => {
                         ) : displayedInventory.length > 0 ? (
                             <div className="flex flex-col gap-8">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5">
-                                    {displayedInventory.map(asset => <AssetCard key={asset.id} asset={asset} onClick={handleAssetClick} />)}
+                                    {displayedInventory.map(asset => (
+                                        <AssetCard 
+                                            key={asset.id} 
+                                            asset={asset} 
+                                            onClick={handleAssetClick} 
+                                            onMouseEnter={() => handlePrefetch(asset.id)}
+                                        />
+                                    ))}
                                 </div>
                                 <Pagination 
                                     currentPage={currentPage}

@@ -40,10 +40,21 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             const data = await userService.createUser(userData);
+            
+            // SINGLE-CALL OPTIMIZATION: Update stats without re-fetching
+            if (data.updated_stats) {
+                queryClient.setQueryData(['dashboard', 'summary'], old => ({
+                    ...old,
+                    stats: { ...old?.stats, ...data.updated_stats }
+                }));
+                queryClient.setQueryData(['user-stats'], data.updated_stats);
+            }
+
+            // Invalidate users list to show new user (since order might change)
+            // but we skip the heavy dashboard/stats invalidation
             await queryClient.invalidateQueries(['users']);
-            await queryClient.invalidateQueries(['user-stats']);
-            await queryClient.invalidateQueries(['dashboard', 'summary']);
-            set({ loading: false }); // Reset loading on success
+            
+            set({ loading: false });
             return { success: true, data };
         } catch (err) {
             set({ loading: false, error: err.message });
@@ -55,10 +66,22 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             const data = await userService.updateUser(id, updates);
-            await queryClient.invalidateQueries(['users']);
-            await queryClient.invalidateQueries(['user-stats']);
-            await queryClient.invalidateQueries(['dashboard', 'summary']);
-            set({ loading: false }); // Reset loading on success
+            
+            // SINGLE-CALL OPTIMIZATION: Manually update the specific user in all cached pages
+            queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
+                if (!oldData?.results) return oldData;
+                return {
+                    ...oldData,
+                    results: oldData.results.map(u => String(u.id) === String(id) ? { ...u, ...data } : u)
+                };
+            });
+
+            // Update stats if returned
+            if (data.updated_stats) {
+                queryClient.setQueryData(['user-stats'], data.updated_stats);
+            }
+
+            set({ loading: false });
             return { success: true, data };
         } catch (err) {
             set({ loading: false, error: err.message });
@@ -90,11 +113,20 @@ const useUserStore = create((set, get) => ({
 
         set({ loading: true, error: null });
         try {
-            await userService.bulkAction(ids, action);
-            set({ selectedIds: [], loading: false }); // Reset loading
-            await queryClient.invalidateQueries(['users']);
-            await queryClient.invalidateQueries(['user-stats']);
-            await queryClient.invalidateQueries(['dashboard', 'summary']);
+            const data = await userService.bulkAction(ids, action);
+            
+            // SINGLE-CALL OPTIMIZATION: Update global stats immediately
+            if (data?.updated_stats) {
+                queryClient.setQueryData(['dashboard', 'summary'], old => ({
+                    ...old,
+                    stats: { ...old?.stats, ...data.updated_stats }
+                }));
+                queryClient.setQueryData(['user-stats'], data.updated_stats);
+            }
+
+            set({ selectedIds: [], loading: false });
+            await queryClient.invalidateQueries(['users']); // Invalidate list only
+            
             toast.success("Done! The changes have been applied.");
             return { success: true };
         } catch (err) {
