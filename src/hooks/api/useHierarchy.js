@@ -49,8 +49,8 @@ export const useHierarchy = (options = {}) => {
     return React.useMemo(() => ({
         // Data
         organizations: orgsQuery.data?.results || (Array.isArray(orgsQuery.data) ? orgsQuery.data : EMPTY_ARRAY),
-        coordinators: coordsQuery.data || EMPTY_ARRAY,
-        sites: sitesQuery.data?.results || EMPTY_ARRAY,
+        coordinators: coordsQuery.data?.results || (Array.isArray(coordsQuery.data) ? coordsQuery.data : EMPTY_ARRAY),
+        sites: sitesQuery.data?.results || (Array.isArray(sitesQuery.data) ? sitesQuery.data : EMPTY_ARRAY),
         
         // Loading States
         isLoading: (includeOrgs && orgsQuery.isLoading) || 
