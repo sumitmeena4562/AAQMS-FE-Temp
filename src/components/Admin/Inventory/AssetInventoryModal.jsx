@@ -157,45 +157,74 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
                                 <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Visual Diagnostics</h3>
                                 <div className="h-0.5 flex-1 mx-6 bg-slate-100 rounded-full" />
                             </div>
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between px-2">
-                                        <span className="text-[11px] font-black text-slate-900 flex items-center gap-2 uppercase tracking-tighter">
-                                            <FiCheckCircle size={14} className="text-success" /> Baseline Standard
-                                        </span>
-                                        <span className="text-[9px] font-bold text-slate-400 uppercase font-mono">Capture Oct 22</span>
-                                    </div>
-                                    <div className="aspect-[16/10] rounded-2xl border border-slate-200 overflow-hidden bg-slate-100 shadow-lg shadow-slate-200/50">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1598018554941-0ed5d336302a?q=80&w=600&fit=crop" 
-                                            className="w-full h-full object-cover"
-                                            alt="Baseline"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between px-2">
-                                        <span className="text-[11px] font-black text-slate-900 flex items-center gap-2 uppercase tracking-tighter">
-                                            <FiAlertTriangle size={14} className="text-danger" /> Latest Audit View
-                                        </span>
-                                        <span className="text-[9px] font-bold text-danger uppercase font-mono">Discrepancy Detected</span>
-                                    </div>
-                                    <div className="relative aspect-[16/10] rounded-2xl border-2 border-dashed border-danger/30 overflow-hidden bg-danger/[0.02] flex items-center justify-center p-8 group">
-                                        <img 
-                                            src="https://images.unsplash.com/photo-1598018554941-0ed5d336302a?q=80&w=600&fit=crop" 
-                                            className="absolute inset-0 w-full h-full object-cover grayscale-0 opacity-40 transition-opacity group-hover:opacity-60"
-                                            alt="Current"
-                                        />
-                                        <div className="relative z-10 text-center">
-                                            <div className="w-16 h-16 rounded-full bg-danger/10 text-danger flex items-center justify-center mx-auto mb-4 border border-danger/20">
-                                                <FiActivity size={32} />
+                            
+                            {/* Derive Images from Backend Data */}
+                            {(() => {
+                                const baselineImg = asset.media?.find(m => m.media_tag === 'BASELINE')?.media_url;
+                                const latestImg = asset.media?.find(m => m.media_tag === 'INSPECTION')?.media_url || asset.media?.[0]?.media_url;
+                                const placeholder = "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800&auto=format&fit=crop";
+
+                                return (
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between px-2">
+                                                <span className="text-[11px] font-black text-slate-900 flex items-center gap-2 uppercase tracking-tighter">
+                                                    <FiCheckCircle size={14} className="text-success" /> Baseline Standard
+                                                </span>
+                                                <span className="text-[9px] font-bold text-slate-400 uppercase font-mono">
+                                                    {baselineImg ? 'Baseline Captured' : 'No Baseline Image'}
+                                                </span>
                                             </div>
-                                            <p className="text-[14px] font-black text-danger uppercase tracking-[0.1em]">AI Alert: Mismatch</p>
-                                            <p className="text-[10px] font-medium text-danger/60 mt-1 px-4 py-1 rounded-full bg-danger/5 border border-danger/10 inline-block uppercase tracking-widest">Confidence 98.4%</p>
+                                            <div className="aspect-[16/10] rounded-2xl border border-slate-200 overflow-hidden bg-slate-100 shadow-lg shadow-slate-200/50 relative">
+                                                <img 
+                                                    src={baselineImg || placeholder} 
+                                                    className={`w-full h-full object-cover ${!baselineImg ? 'opacity-40 grayscale' : ''}`}
+                                                    alt="Baseline"
+                                                />
+                                                {!baselineImg && (
+                                                    <div className="absolute inset-0 flex items-center justify-center bg-black/5">
+                                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Digital Twin Unavailable</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between px-2">
+                                                <span className="text-[11px] font-black text-slate-900 flex items-center gap-2 uppercase tracking-tighter">
+                                                    {asset.status === 'Verified' ? <FiCheckCircle size={14} className="text-success" /> : <FiAlertTriangle size={14} className="text-danger" />}
+                                                    Latest Audit View
+                                                </span>
+                                                <span className={`text-[9px] font-bold uppercase font-mono ${asset.status === 'Mismatch' ? 'text-danger' : 'text-slate-400'}`}>
+                                                    {asset.status === 'Mismatch' ? 'Discrepancy Detected' : 'Verified Scan'}
+                                                </span>
+                                            </div>
+                                            <div className={`relative aspect-[16/10] rounded-2xl border-2 overflow-hidden bg-slate-50 flex items-center justify-center group ${asset.status === 'Mismatch' ? 'border-dashed border-danger/30' : 'border-slate-200 shadow-lg shadow-slate-200/50'}`}>
+                                                <img 
+                                                    src={latestImg || placeholder} 
+                                                    className={`absolute inset-0 w-full h-full object-cover transition-opacity ${asset.status === 'Mismatch' ? 'opacity-40 grayscale group-hover:opacity-60' : 'opacity-100'}`}
+                                                    alt="Current"
+                                                />
+                                                
+                                                {asset.status === 'Mismatch' ? (
+                                                    <div className="relative z-10 text-center p-8">
+                                                        <div className="w-16 h-16 rounded-full bg-danger/10 text-danger flex items-center justify-center mx-auto mb-4 border border-danger/20">
+                                                            <FiActivity size={32} />
+                                                        </div>
+                                                        <p className="text-[14px] font-black text-danger uppercase tracking-[0.1em]">AI Alert: Mismatch</p>
+                                                        <p className="text-[10px] font-medium text-danger/60 mt-1 px-4 py-1 rounded-full bg-danger/5 border border-danger/10 inline-block uppercase tracking-widest">Confidence 98.4%</p>
+                                                    </div>
+                                                ) : !latestImg && (
+                                                     <div className="relative z-10 text-center">
+                                                        <FiBox size={32} className="text-slate-300 mx-auto mb-2" />
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No Recent Scan</p>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                );
+                            })()}
                         </div>
 
                         {/* Recent Activity Log */}

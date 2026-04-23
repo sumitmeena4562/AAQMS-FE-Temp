@@ -161,8 +161,12 @@ const Inventory = () => {
             header: 'ASSET NAME', accessor: 'name', width: '24%',
             render: (name, row) => (
                 <div className="flex items-center gap-3.5 py-1.5 pr-2">
-                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-card text-title shrink-0 border border-border-main shadow-sm group-hover:border-primary/30 transition-all">
-                        <AssetIcon type={row.icon || row.category} className="w-5 h-5 text-title/80" />
+                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-card text-title shrink-0 border border-border-main shadow-sm group-hover:border-primary/30 transition-all overflow-hidden">
+                        {row.media?.[0]?.media_url ? (
+                            <img src={row.media[0].media_url} alt={name} className="w-full h-full object-cover" />
+                        ) : (
+                            <AssetIcon type={row.icon || row.category} className="w-5 h-5 text-title/80" />
+                        )}
                     </div>
                     <div className="flex flex-col min-w-0">
                         <span className="text-[14px] font-black text-title leading-tight truncate">{name || row.asset_name}</span>

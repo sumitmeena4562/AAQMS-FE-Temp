@@ -7,8 +7,7 @@ import AssetIcon from './AssetIcon';
 const AssetCard = ({ asset, onClick }) => {
 
     const statusColor = asset.status === 'Verified' ? 'success' : asset.status === 'Mismatch' ? 'danger' : 'warning';
-    
-
+    const thumbnail = asset.media?.[0]?.media_url;
     
     return (
         <motion.div
@@ -16,7 +15,7 @@ const AssetCard = ({ asset, onClick }) => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             onClick={() => onClick(asset)}
-            className="group relative elite-card elite-card-hover p-6 cursor-pointer overflow-hidden flex flex-col min-h-[170px]"
+            className="group relative elite-card elite-card-hover p-6 cursor-pointer overflow-hidden flex flex-col min-h-[220px]"
         >
             {/* Subtle Gradient Accent */}
             <div className={`absolute top-0 right-0 w-24 h-24 -mr-12 -mt-12 rounded-full opacity-[0.04] group-hover:opacity-[0.08] transition-all group-hover:scale-150 ${
@@ -24,8 +23,16 @@ const AssetCard = ({ asset, onClick }) => {
             }`} />
 
             <div className="flex justify-between items-start mb-5 relative z-10">
-                <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-base border border-border-main shadow-sm group-hover:bg-card group-hover:border-primary/20 transition-all duration-300">
-                    <AssetIcon type={asset.icon} className="w-5 h-5 text-title/70 group-hover:text-primary transition-colors" />
+                <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-base border border-border-main shadow-sm overflow-hidden group-hover:border-primary/40 transition-all duration-300">
+                    {thumbnail ? (
+                        <img 
+                            src={thumbnail} 
+                            alt={asset.name} 
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+                        />
+                    ) : (
+                        <AssetIcon type={asset.icon} className="w-6 h-6 text-title/70 group-hover:text-primary transition-colors" />
+                    )}
                 </div>
                 <Badge
                     variant="light"
