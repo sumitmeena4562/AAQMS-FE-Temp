@@ -139,7 +139,7 @@ export const userService = {
     getCoordinators: async (orgId = null, signal = null) => {
         try {
             const params = { dropdown: 'true' };
-            if (orgId) params.organisation_id = Array.isArray(orgId) ? orgId.join(',') : orgId;
+            if (orgId) params.organisation = Array.isArray(orgId) ? orgId.join(',') : orgId;
             const response = await api.get('users/coordinators/', { params, signal });
             return response.data || [];
         } catch (error) {

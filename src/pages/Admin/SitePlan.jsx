@@ -90,11 +90,11 @@ const SitePlan = () => {
 
       {/* HEADER */}
       <PageHeader
-        title={activeOrgId ? "Site Plan Selection" : "All Operational Sites"}
+        title={activeOrgId.length > 0 ? "Site Plan Selection" : "All Operational Sites"}
         subtitle={
-            activeCoordId 
+            activeCoordId.length > 0
                 ? `Managing ${activePlansCount} active site plans for ${coordInfo?.name}` 
-                : activeOrgId
+                : activeOrgId.length > 0
                     ? `Showing all sites for ${orgInfo?.name}`
                     : "Viewing all sites across all organizations"
         }
