@@ -15,7 +15,9 @@ const FilterBar = ({
     showStatus = false,
     showSearch = false,
     searchPlaceholder = "Search...",
-    hideClearButton = false
+    hideClearButton = false,
+    isCustomFilterActive = false,
+    onClear
 }) => {
     const {
         selectedOrg, setOrg,
@@ -32,6 +34,7 @@ const FilterBar = ({
 
     const handleResetAll = () => {
         resetFilters();
+        if (onClear) onClear();
         setSearchParams({});
         clearSearch();
     };
@@ -151,7 +154,7 @@ const FilterBar = ({
 
                 {/* 🔹 RIGHT SIDE: Clear Button & Toggles */}
                 <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 sm:border-l border-border-main/40 pt-3 sm:pt-0 sm:pl-3 ml-0 sm:ml-auto w-full sm:w-auto justify-end">
-                    {isFilterActive && !hideClearButton && (
+                    {(isFilterActive || isCustomFilterActive) && !hideClearButton && (
                         <button
                             onClick={handleResetAll}
                             className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-[0.15em] transition-all rounded-xl bg-rose-50/30 hover:bg-rose-50 shadow-sm border border-rose-100/50 hover:border-rose-200 group animate-in zoom-in duration-300"
