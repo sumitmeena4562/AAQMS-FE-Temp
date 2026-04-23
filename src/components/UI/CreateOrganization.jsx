@@ -117,7 +117,9 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
     };
   };
 
-  const { data: fullOrg } = useOrganizationDetails(org?.id, { enabled: !!org?.id && isOpen });
+  // Sirf tab fetch karo jab org ka contact data missing ho (fresh from list card)
+  const needsFetch = !!org?.id && isOpen && !org?.contactEmail;
+  const { data: fullOrg } = useOrganizationDetails(org?.id, { enabled: needsFetch });
 
     useEffect(() => {
       if (!isOpen) {
