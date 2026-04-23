@@ -105,6 +105,11 @@ const Coordinator = React.memo(() => {
     const [selectionMode, setSelectionMode] = useState(false);
     const [viewMode] = useState('list');
 
+    // ── Sync peekUser with latest list data (prevents stale snapshot in modal) ──
+    const livePeekUser = useMemo(() => {
+        if (!peekUser?.id || !usersData?.users) return peekUser;
+        return usersData.users.find(u => String(u.id) === String(peekUser.id)) || peekUser;
+    }, [peekUser, usersData]);
 
 
     const sortedUsers = useMemo(() => {
@@ -373,7 +378,7 @@ const Coordinator = React.memo(() => {
                 </div>
             )}
 
-            <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={peekUser} onEdit={handleEditUser} onViewSites={handleViewSites} />
+            <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={livePeekUser} onEdit={handleEditUser} onViewSites={handleViewSites} />
             <React.Suspense fallback={null}>
                 <UserFormModal isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingUser(null); }} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} formOptions={formOptions} />
                 <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Status Lock" message={`Are you sure you want to change status?`} confirmText="Confirm" danger={true} />

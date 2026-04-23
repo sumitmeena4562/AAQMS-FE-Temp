@@ -15,6 +15,7 @@ import Button from '../UI/Button';
 
 const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate, onViewSites }) => {
     if (!user) return null;
+    const isActive = user.is_active === true || user.status?.toLowerCase() === 'active';
     const { initials, colors } = getAvatar(user.name);
 
     return (
@@ -81,11 +82,11 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate, onViewSites
                                         <div className="text-[12px] text-body font-medium truncate">{user.email}</div>
                                         <div className={`
                                             px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider border
-                                            ${user.status === 'active' 
+                                            ${isActive 
                                                 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
                                                 : 'bg-slate-50 text-slate-600 border-slate-200'}
                                         `}>
-                                            {user.status === 'active' ? 'Active' : 'Deactive'}
+                                            {isActive ? 'Active' : 'Deactive'}
                                         </div>
                                         {/* Dynamic Assignment Status */}
                                         <div className={`
@@ -159,7 +160,7 @@ const UserPeekView = ({ isOpen, onClose, user, onEdit, onDeactivate, onViewSites
                                     View Managed Sites
                                 </Button>
                             )}
-                            {user.status === 'active' && (
+                            {isActive && (
                                 <Button
                                     variant="danger"
                                     onClick={() => onDeactivate(user)}

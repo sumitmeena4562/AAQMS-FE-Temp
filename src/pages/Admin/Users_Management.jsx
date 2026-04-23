@@ -121,6 +121,12 @@ const Users = React.memo(() => {
     const [selectionMode, setSelectionMode] = useState(false);
     const [viewMode, setViewMode] = useState('list');
 
+    // ── Sync peekUser with latest list data (prevents stale snapshot in modal) ──
+    const livePeekUser = useMemo(() => {
+        if (!peekUser?.id || !users) return peekUser;
+        return users.find(u => String(u.id) === String(peekUser.id)) || peekUser;
+    }, [peekUser, users]);
+
     const sortedUsers = useMemo(() => {
         if (!Array.isArray(users)) return [];
         const list = [...users];
@@ -510,7 +516,7 @@ const Users = React.memo(() => {
             )}
 
             {/* Modals */}
-            <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={peekUser} onEdit={handleEditUser} onDeactivate={(u) => { setPeekUser(null); setIsPeekOpen(false); setStatusTarget(u); }} />
+            <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={livePeekUser} onEdit={handleEditUser} onDeactivate={(u) => { setPeekUser(null); setIsPeekOpen(false); setStatusTarget(u); }} />
             <React.Suspense fallback={null}>
                 <UserFormModal isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingUser(null); }} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} formOptions={formOptions} />
                 <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Deactivate Account" message={`Are you sure you want to deactivate "${statusTarget?.name}"?`} confirmText="Confirm Deactivation" danger={true} loading={storeLoading} />
