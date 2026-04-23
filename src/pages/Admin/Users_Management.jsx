@@ -203,23 +203,6 @@ const Users = React.memo(() => {
                         </div>
                         <div className="flex flex-col min-w-0">
                             <span className="text-[14px] font-black text-title leading-tight truncate">{displayName}</span>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border leading-none shrink-0 ${
-                                    (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : ''))?.toLowerCase().includes('admin') ? 'bg-amber-50 text-amber-700 border-amber-100' :
-                                    (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : ''))?.toLowerCase().includes('coordinator') ? 'bg-blue-50 text-blue-700 border-blue-100' :
-                                    (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : ''))?.toLowerCase().includes('field_officer') || (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : ''))?.toLowerCase().includes('fieldofficer') ? 'bg-teal-50 text-teal-700 border-teal-100' :
-                                    'bg-gray-50 text-gray-600 border-gray-100'
-                                }`}>
-                                    {(() => {
-                                        const r = (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : '') || '').toLowerCase();
-                                        if (r.includes('admin')) return 'Admin';
-                                        if (r.includes('coordinator')) return 'Coordinator';
-                                        if (r.includes('field_officer') || r.includes('fieldofficer')) return 'Field Officer';
-                                        return r || 'User';
-                                    })()}
-                                </span>
-                                <span className="text-[9px] font-medium text-gray/60 truncate italic leading-none">• system entity</span>
-                            </div>
                         </div>
                     </div>
                 );
@@ -418,7 +401,7 @@ const Users = React.memo(() => {
 
             <StatsRow items={statsData} />
 
-            <FilterBar className="!p-2.5">
+            <FilterBar className="!p-2.5" hideClearButton={true}>
                 <div className="flex items-center gap-3">
                     <Button
                         variant={selectionMode ? "primary" : "outline"}

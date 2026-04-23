@@ -152,10 +152,10 @@ const FilterBar = ({
                     {isFilterActive && !hideClearButton && (
                         <button 
                             onClick={handleResetAll}
-                            className="h-9 flex items-center gap-1.5 px-3 text-danger hover:text-danger/80 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-danger/5 hover:bg-danger/10 shadow-sm border border-transparent hover:border-danger/20 group animate-in zoom-in duration-300"
+                            className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-[0.15em] transition-all rounded-xl bg-rose-50/30 hover:bg-rose-50 shadow-sm border border-rose-100/50 hover:border-rose-200 group animate-in zoom-in duration-300"
                         >
                             <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
-                            Clear Filters
+                            Reset
                         </button>
                     )}
                 </div>

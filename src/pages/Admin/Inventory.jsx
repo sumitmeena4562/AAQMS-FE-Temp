@@ -9,7 +9,7 @@ import {
     FiAlertCircle, FiClock, FiGrid,
     FiMonitor, FiLayout, FiRefreshCcw,
 } from 'react-icons/fi';
-import AssetIcon from '../../components/Admin/Inventory/AssetIcon';
+import AssetIcon from '../../components/Admin/inventory/AssetIcon';
 import Button from '../../components/UI/Button';
 import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
@@ -23,9 +23,9 @@ import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors, useZones } from '../../hooks/api/useHierarchyQueries';
 import { useInventory } from '../../hooks/api/useInventoryQueries';
-import AssetInventoryModal from '../../components/Admin/Inventory/AssetInventoryModal';
-import EmptyState from '../../components/Admin/Inventory/EmptyState';
-import AssetCard from '../../components/Admin/Inventory/AssetCard';
+import AssetInventoryModal from '../../components/Admin/inventory/AssetInventoryModal';
+import EmptyState from '../../components/Admin/inventory/EmptyState';
+import AssetCard from '../../components/Admin/inventory/AssetCard';
 import useSearchStore from '../../store/useSearchStore';
 import useDebounce from '../../hooks/useDebounce';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';

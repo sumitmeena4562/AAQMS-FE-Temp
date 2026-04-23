@@ -183,7 +183,7 @@ export default function AllHistory() {
                 }
             />
 
-            <FilterBar className="!p-2.5">
+            <FilterBar hideClearButton={true} className="!p-2.5">
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-1">
                     <FilterDropdown
                         label="Organization"
@@ -240,6 +240,18 @@ export default function AllHistory() {
                         multiple={true}
                         disabled={filters.site.length === 0}
                     />
+                </div>
+                
+                <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
+                    {(Object.values(filters).some(arr => arr.length > 0)) && (
+                        <button 
+                            onClick={resetFilters} 
+                            className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-[0.15em] transition-all rounded-xl bg-rose-50/30 hover:bg-rose-50 shadow-sm border border-rose-100/50 hover:border-rose-200 group"
+                        >
+                            <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                            Reset
+                        </button>
+                    )}
                 </div>
             </FilterBar>
 
