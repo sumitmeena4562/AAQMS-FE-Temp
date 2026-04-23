@@ -387,12 +387,6 @@ const Users = React.memo(() => {
                 breadcrumbs={breadcrumbs}
                 rightContent={
                     <div className="flex items-center gap-3">
-                         <div className="flex flex-col items-end px-4 border-r border-border-main/50 translate-y-[2px]">
-                            <span className="text-[10px] font-black text-gray/40 uppercase tracking-widest leading-none">Management Context</span>
-                            <button onClick={handleHardReset} className="text-[9px] font-black text-primary hover:text-primary-hover uppercase tracking-tighter mt-1 flex items-center gap-1">
-                               <FiRefreshCcw size={10} /> Clear Context
-                            </button>
-                        </div>
                         <Button onClick={() => exportPDF(users)} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 shadow-sm border-dashed border-primary/30">
                             <FiDownload size={14} className="text-primary/70" />
                             <span className="font-black text-[10px] uppercase tracking-widest text-title">PDF Export</span>
@@ -417,9 +411,9 @@ const Users = React.memo(() => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-2 flex-1">
-                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v, region: [] })} allLabel="All Orgs" multiple={true} loading={isLoadingOptions} />
-                    <FilterDropdown label="Role" options={filterOptions.roles} value={filters.role} onChange={v => setFilters({ ...filters, role: v })} allLabel="All Roles" multiple={true} />
-                    <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" multiple={true} />
+                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v, region: [] })} allLabel="All" multiple={true} loading={isLoadingOptions} />
+                    <FilterDropdown label="Role" options={filterOptions.roles} value={filters.role} onChange={v => setFilters({ ...filters, role: v })} allLabel="All" multiple={true} />
+                    <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Inactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All" multiple={true} />
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">

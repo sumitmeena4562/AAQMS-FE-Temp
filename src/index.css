@@ -139,6 +139,8 @@
     --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.12);
     --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
     --shadow-premium: 0 10px 40px -10px rgba(7, 34, 103, 0.12);
+    --color-hover-blue: #072267;
+    --color-hover-blue-soft: #f0f4ff;
 }
 
 /* ============================================
@@ -254,8 +256,8 @@ a {
 
 .elite-card-hover:hover {
     transform: translateY(-6px);
-    box-shadow: 0 25px 50px -12px rgba(7, 34, 103, 0.18);
-    border-color: rgba(7, 34, 103, 0.3) !important;
+    box-shadow: 0 25px 50px -12px rgba(7, 34, 103, 0.15);
+    border-color: var(--color-hover-blue) !important;
 }
 
 @keyframes loading-bar {

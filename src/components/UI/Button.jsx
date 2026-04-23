@@ -20,9 +20,9 @@ const Button = ({
   const baseStyles = "inline-flex items-center justify-center font-bold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-50 disabled:pointer-events-none active:scale-95";
 
   const variants = {
-    primary: "bg-primary text-white shadow-soft hover:bg-primary/90 hover:shadow-md",
-    secondary: "bg-secondary text-white shadow-soft hover:bg-secondary/90 hover:shadow-md",
-    outline: "bg-transparent border-2 border-border text-text hover:bg-border/10",
+    primary: "bg-primary text-white shadow-soft hover:bg-[var(--color-hover-blue)] hover:shadow-md",
+    secondary: "bg-secondary text-white shadow-soft hover:bg-[var(--color-hover-blue)] hover:shadow-md",
+    outline: "bg-transparent border-2 border-border text-text hover:bg-[var(--color-hover-blue)] hover:text-white hover:border-[var(--color-hover-blue)]",
   };
 
   const sizes = {

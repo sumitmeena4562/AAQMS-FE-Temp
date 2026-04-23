@@ -102,11 +102,11 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                         flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
                         ${act
-                            ? 'bg-primary/10 text-primary font-bold shadow-sm'
-                            : 'text-body hover:bg-primary/[0.04] hover:text-primary font-medium'}
+                            ? 'bg-[var(--color-hover-blue-soft)] text-[var(--color-hover-blue)] font-bold shadow-sm'
+                            : 'text-body hover:bg-[var(--color-hover-blue-soft)] hover:text-[var(--color-hover-blue)] font-medium'}
                     `}
                 >
-                    <span 
+                    <span
                         className={`flex items-center shrink-0 transition-colors ${act ? 'text-primary' : ''}`}
                         style={{ color: !act ? DESIGN_TOKENS.COLORS.TEXT_MUTED : undefined }}
                     >
@@ -131,8 +131,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                         w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 border-none outline-none cursor-pointer
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'justify-start'}
                         ${activeOrOpen
-                            ? 'bg-primary/10 text-primary font-bold'
-                            : 'text-body hover:bg-primary/[0.04] hover:text-primary font-medium'}
+                            ? 'bg-[var(--color-hover-blue-soft)] text-[var(--color-hover-blue)] font-bold'
+                            : 'text-body hover:bg-[var(--color-hover-blue-soft)] hover:text-[var(--color-hover-blue)] font-medium'}
                     `}
                 >
                     <span className={`flex items-center shrink-0 transition-colors ${activeOrOpen ? 'text-primary' : 'text-gray group-hover:text-title'}`}>
@@ -169,8 +169,8 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                                         className={`
                                             flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
                                             ${cAct
-                                                ? 'bg-primary/5 text-primary font-bold border border-primary/10'
-                                                : 'text-body hover:bg-primary/[0.04] hover:text-primary font-medium'}
+                                                ? 'bg-[var(--color-hover-blue-soft)] text-[var(--color-hover-blue)] font-bold border border-[var(--color-hover-blue)]/10'
+                                                : 'text-body hover:bg-[var(--color-hover-blue-soft)] hover:text-[var(--color-hover-blue)] font-medium'}
                                         `}
                                     >
                                         {child.icon && (
@@ -254,16 +254,16 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     {user && (
                         <div
                             className={`
-                                flex items-center rounded-xl bg-card border border-border-main transition-all duration-300 cursor-pointer group hover:border-primary/40 hover:shadow-md
+                                flex items-center rounded-xl bg-card border border-border-main transition-all duration-300 cursor-pointer group hover:border-[var(--color-hover-blue)] hover:shadow-md
                                 ${collapsed ? 'p-2 justify-center' : 'p-2.5 gap-3 justify-start'}
                             `}
                         >
                             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white text-[13px] font-black shrink-0 shadow-lg shadow-primary/10 group-hover:scale-105 transition-transform overflow-hidden">
                                 {user.avatar ? (
-                                    <img 
-                                        src={user.avatar.startsWith('http') ? user.avatar : `http://127.0.0.1:8000${user.avatar}`} 
-                                        className="w-full h-full object-cover" 
-                                        alt={user.name} 
+                                    <img
+                                        src={user.avatar.startsWith('http') ? user.avatar : `http://127.0.0.1:8000${user.avatar}`}
+                                        className="w-full h-full object-cover"
+                                        alt={user.name}
                                     />
                                 ) : (
                                     user.name?.charAt(0)?.toUpperCase() || user.first_name?.charAt(0)?.toUpperCase() || 'U'

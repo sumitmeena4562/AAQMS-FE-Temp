@@ -85,7 +85,9 @@ const Dashboard = () => {
     ] : null, [summary]);
 
     const metricCards = useMemo(() => summary?.metrics
-        ? summary.metrics.map(m => ({
+        ? summary.metrics
+            .filter(m => m.label !== "AI Coverage")
+            .map(m => ({
             title: m.label,
             value: m.unit ? `${m.value}${m.unit}` : String(m.value ?? 0),
             icon: React.createElement(FiActivity, { size: 16 }),
@@ -144,7 +146,7 @@ const Dashboard = () => {
                 title="System Overview"
                 subtitle="Monitoring real-time operational metrics and AI risk triggers"
                 rightContent={
-                    <div className="flex items-center gap-3.5 px-4 py-2 bg-white border border-border-main/80 rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_rgba(7,34,103,0.08)] hover:border-primary/30 transition-all duration-500 group cursor-default">
+                    <div className="flex items-center gap-3.5 px-4 py-2 bg-white border border-border-main/80 rounded-full shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_rgba(29,78,216,0.12)] hover:border-[var(--color-hover-blue)]/40 transition-all duration-500 group cursor-default">
                         <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
                             {/* Outer ring */}
                             <div className="absolute inset-0 rounded-full bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors" />
@@ -152,7 +154,7 @@ const Dashboard = () => {
                             <div className="relative h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)] group-hover:shadow-[0_0_12px_rgba(16,185,129,0.5)] transition-all" />
                         </div>
                         <div className="flex flex-col min-w-0">
-                            <span className="text-[10px] font-black text-primary/60 uppercase tracking-[0.2em] leading-tight mb-0.5 group-hover:text-primary transition-colors">
+                            <span className="text-[10px] font-black text-primary/60 uppercase tracking-[0.2em] leading-tight mb-0.5 group-hover:text-[var(--color-hover-blue)] transition-colors">
                                 System Status
                             </span>
                             <div className="flex items-baseline gap-1.5 leading-none">
@@ -163,7 +165,7 @@ const Dashboard = () => {
                                     Synced
                                 </span>
                                 <span 
-                                    className="text-[12px] font-black tracking-tight group-hover:text-primary transition-colors"
+                                    className="text-[12px] font-black tracking-tight group-hover:text-[var(--color-hover-blue)] transition-colors"
                                     style={{ color: DESIGN_TOKENS.COLORS.TEXT_TITLE }}
                                 >
                                     {syncText}

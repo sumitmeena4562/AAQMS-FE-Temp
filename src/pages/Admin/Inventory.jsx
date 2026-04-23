@@ -245,17 +245,6 @@ const Inventory = () => {
                 subtitle={currentOrg ? `Enterprise asset monitoring for ${currentOrg.name}` : "Comprehensive cross-organization asset tracking and AI verification"}
                 hideAddButton={true}
                 breadcrumbs={breadcrumbs}
-                rightContent={
-                    <Button
-                        onClick={handleReset}
-                        variant="outline"
-                        size="sm"
-                        className="h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60"
-                    >
-                        <FiRefreshCcw size={14} className={isLoading ? 'animate-spin' : ''} />
-                        <span className="font-black text-[10px] uppercase tracking-widest text-primary">Clear Context</span>
-                    </Button>
-                }
             />
 
             {isLoading && !inventoryStats ? (

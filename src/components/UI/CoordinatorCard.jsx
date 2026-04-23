@@ -45,19 +45,19 @@ const CoordinatorCard = ({ coordinator, orgName, view = 'list' }) => {
 
         {/* Dynamic Blue-Hover Metrics strictly matching FloorCard */}
         <div className="flex items-center justify-between gap-3 mb-6 mt-auto">
-          <div className="flex-1 bg-gray-50 rounded-[16px] py-4 px-2 flex flex-col items-center justify-center group-hover:bg-blue-50 transition-colors border border-transparent">
-            <span className="text-[12px] font-bold text-body group-hover:text-blue-500 uppercase tracking-[0.15em] mb-1.5 transition-colors text-center">
+          <div className="flex-1 bg-gray-50 rounded-[16px] py-4 px-2 flex flex-col items-center justify-center group-hover:bg-[var(--color-hover-blue-soft)] transition-colors border border-transparent">
+            <span className="text-[12px] font-bold text-body group-hover:text-[var(--color-hover-blue)] uppercase tracking-[0.15em] mb-1.5 transition-colors text-center">
               MNG. SITES
             </span>
-            <span className="text-2xl font-bold text-title leading-none group-hover:text-blue-800 transition-colors">
+            <span className="text-2xl font-bold text-title leading-none group-hover:text-[var(--color-hover-blue)] transition-colors">
               {sites}
             </span>
           </div>
-          <div className="flex-1 bg-gray-50 rounded-[16px] py-4 px-2 flex flex-col items-center justify-center group-hover:bg-blue-50 transition-colors border border-transparent">
-            <span className="text-[12px] font-bold text-body group-hover:text-blue-500 uppercase tracking-[0.15em] mb-1.5 transition-colors text-center">
+          <div className="flex-1 bg-gray-50 rounded-[16px] py-4 px-2 flex flex-col items-center justify-center group-hover:bg-[var(--color-hover-blue-soft)] transition-colors border border-transparent">
+            <span className="text-[12px] font-bold text-body group-hover:text-[var(--color-hover-blue)] uppercase tracking-[0.15em] mb-1.5 transition-colors text-center">
               TOTAL ZONE
             </span>
-            <span className="text-2xl font-bold text-title leading-none group-hover:text-blue-800 transition-colors">
+            <span className="text-2xl font-bold text-title leading-none group-hover:text-[var(--color-hover-blue)] transition-colors">
               {zones}
             </span>
           </div>
@@ -66,9 +66,9 @@ const CoordinatorCard = ({ coordinator, orgName, view = 'list' }) => {
         {/* Action Button matching FloorCard */}
         <button
           onClick={(e) => { e.stopPropagation(); handleNavigate(); }}
-          className="mt-auto w-full py-[14px] px-4 bg-card border border-border-main rounded-2xl text-[14px] font-semibold text-primary flex items-center justify-center gap-2 group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:text-white transition-all overflow-hidden relative"
+          className="mt-auto w-full py-[14px] px-4 bg-card border border-border-main rounded-2xl text-[14px] font-semibold text-primary flex items-center justify-center gap-2 group-hover:bg-[var(--color-hover-blue)] group-hover:border-[var(--color-hover-blue)] group-hover:text-white transition-all overflow-hidden relative"
         >
-          <span className="relative z-10 transition-colors">View Site Plans</span>
+          <span className="relative z-10 transition-colors group-hover:-translate-x-3">View Site Plans</span>
           <ArrowRight className="w-[18px] h-[18px] ml-2 text-gray group-hover:opacity-0 absolute right-5 transition-all" strokeWidth={2} />
           <Map className="w-[18px] h-[18px] ml-2 text-white opacity-0 group-hover:opacity-100 absolute right-5 transition-all" strokeWidth={2} />
         </button>

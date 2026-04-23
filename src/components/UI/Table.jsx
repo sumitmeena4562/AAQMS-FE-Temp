@@ -120,7 +120,7 @@ const Table = ({
                                             onMouseEnter={() => onRowMouseEnter && onRowMouseEnter(row)}
                                             className={`
                                                 group transition-all duration-300
-                                                ${isSelected ? 'bg-primary/[0.04]' : 'hover:bg-primary/[0.03]'}
+                                                ${isSelected ? 'bg-[var(--color-hover-blue-soft)]' : 'hover:bg-[var(--color-hover-blue-soft)]/50'}
                                                 ${isClickable ? 'cursor-pointer' : 'cursor-default'}
                                                 ${rowClassName ? rowClassName(row) : ''}
                                             `}

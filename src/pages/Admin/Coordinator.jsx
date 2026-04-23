@@ -230,7 +230,7 @@ const Coordinator = React.memo(() => {
                     <div className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 border mx-auto shadow-sm transition-all
                         ${isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-100/50' : 'bg-rose-50 text-rose-700 border-rose-100/50'}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-                        {isActive ? 'Active' : 'Deactive'}
+                        {isActive ? 'Active' : 'Inactive'}
                     </div>
                 );
             }
@@ -308,16 +308,7 @@ const Coordinator = React.memo(() => {
                 onAdd={handleAddUser}
                 addButtonText="Add Coordinator"
                 breadcrumbs={breadcrumbs}
-                rightContent={
-                    <div className="flex items-center gap-3">
-                         <div className="flex flex-col items-end px-4 border-r border-border-main/50 translate-y-[2px]">
-                             <span className="text-[10px] font-black text-gray/40 uppercase tracking-widest leading-none">Context Management</span>
-                             <button onClick={handleResetAll} className="text-[9px] font-black text-primary hover:text-primary-hover uppercase tracking-tighter mt-1 flex items-center gap-1">
-                                <FiRefreshCcw size={10} /> Reset All Contexts
-                             </button>
-                         </div>
-                    </div>
-                }
+                rightContent={null}
             />
 
 
@@ -330,8 +321,8 @@ const Coordinator = React.memo(() => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-3">
-                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All Organizations" multiple={true} />
-                    <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Deactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All Statuses" multiple={true} />
+                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All" multiple={true} />
+                    <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Inactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All" multiple={true} />
                 </div>
             </FilterBar>
 

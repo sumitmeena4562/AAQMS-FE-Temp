@@ -41,7 +41,7 @@ const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selec
             color={isActive ? 'success' : 'neutral'}
             className="!text-[9px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest"
           >
-            {isActive ? 'Active' : 'Deactive'}
+            {isActive ? 'Active' : 'Inactive'}
           </Badge>
         </div>
       </div>
@@ -63,7 +63,7 @@ const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selec
         <div className="flex flex-col items-end pb-1 translate-y-2 opacity-0 group-hover/card:opacity-100 group-hover/card:translate-y-0 transition-all duration-300">
            <button 
             onClick={(e) => { e.stopPropagation(); onEdit?.(user); }}
-            className="w-8 h-8 flex items-center justify-center text-gray hover:text-white hover:bg-primary transition-all rounded-xl border border-border-main bg-card shadow-sm"
+            className="w-8 h-8 flex items-center justify-center text-gray hover:text-white hover:bg-[var(--color-hover-blue)] hover:border-[var(--color-hover-blue)] transition-all rounded-xl border border-border-main bg-card shadow-sm"
             title="Edit User"
           >
             <FiEdit2 size={13} />
@@ -121,7 +121,7 @@ const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selec
         {/* 4. Full-Width Footer Action */}
         <button 
           onClick={(e) => { e.stopPropagation(); onView?.(user); }}
-          className="mt-auto w-full py-2.5 px-4 bg-base border border-border-main rounded-xl text-[10.5px] font-black text-primary uppercase tracking-widest hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-2 group/btn"
+          className="mt-auto w-full py-2.5 px-4 bg-base border border-border-main rounded-xl text-[10.5px] font-black text-primary uppercase tracking-widest hover:bg-[var(--color-hover-blue)] hover:text-white hover:border-[var(--color-hover-blue)] transition-all flex items-center justify-center gap-2 group/btn"
         >
           <FiExternalLink className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" size={13} />
           <span>Full Profile</span>

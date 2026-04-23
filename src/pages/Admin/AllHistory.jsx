@@ -189,7 +189,7 @@ export default function AllHistory() {
                         options={orgs.map(o => ({ value: o.id, label: o.name }))}
                         value={filters.organisation}
                         onChange={v => updateFilter('organisation', v)}
-                        allLabel="All Organizations"
+                        allLabel="All"
                         multiple={true}
                     />
 
@@ -198,7 +198,7 @@ export default function AllHistory() {
                         options={OPERATION_TYPES}
                         value={filters.operation}
                         onChange={v => updateFilter('operation', v)}
-                        allLabel="All Actions"
+                        allLabel="All"
                         multiple={true}
                     />
 
@@ -207,7 +207,7 @@ export default function AllHistory() {
                         options={EVENT_CATEGORIES}
                         value={filters.category}
                         onChange={v => updateFilter('category', v)}
-                        allLabel="All Categories"
+                        allLabel="All"
                         multiple={true}
                     />
 
@@ -216,7 +216,7 @@ export default function AllHistory() {
                         options={USER_ROLES}
                         value={filters.role}
                         onChange={v => updateFilter('role', v)}
-                        allLabel="All Roles"
+                        allLabel="All"
                         multiple={true}
                     />
 

@@ -115,7 +115,7 @@ const FilterDropdown = React.memo(({
                     <button
                         onClick={() => handleSelect('')}
                         className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[11.5px] font-black uppercase tracking-widest group flex items-center gap-3
-                            ${!isFilterActive ? 'bg-primary text-white cursor-default' : 'hover:bg-base text-gray/60'}`}
+                            ${!isFilterActive ? 'bg-[var(--color-hover-blue)] text-white cursor-default' : 'hover:bg-[var(--color-hover-blue-soft)] text-gray/60'}`}
                     >
                         <div className="flex items-center justify-center w-4 h-4">
                             {!isFilterActive && <FiCheck size={13} />}
@@ -137,7 +137,7 @@ const FilterDropdown = React.memo(({
                                     id={`option-${val}`}
                                     onClick={() => handleSelect(val)}
                                     className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[12px] font-bold mt-0.5 group flex items-center gap-3
-                                        ${isSelected ? 'bg-primary/5 text-primary' : 'hover:bg-base text-body'}`}
+                                        ${isSelected ? 'bg-[var(--color-hover-blue-soft)] text-[var(--color-hover-blue)]' : 'hover:bg-[var(--color-hover-blue-soft)]/50 text-body'}`}
                                     role="option"
                                     aria-selected={isSelected}
                                 >
@@ -171,10 +171,10 @@ const FilterDropdown = React.memo(({
                         ? 'opacity-60 cursor-not-allowed border-border-main/80 bg-base/30' 
                         : 'cursor-pointer'}
                     ${isOpen
-                        ? 'border-primary ring-4 ring-primary/5 shadow-md scale-[1.01]'
+                        ? 'border-[var(--color-hover-blue)] ring-4 ring-[var(--color-hover-blue)]/5 shadow-md scale-[1.01]'
                         : isFilterActive
-                            ? 'border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10 shadow-sm'
-                            : !(disabled || loading) ? 'border-border-main hover:border-border-hover shadow-sm' : ''}`}
+                            ? 'border-[var(--color-hover-blue)]/30 bg-[var(--color-hover-blue-soft)] hover:border-[var(--color-hover-blue)]/50 hover:bg-[var(--color-hover-blue-soft)] shadow-sm'
+                            : !(disabled || loading) ? 'border-border-main hover:border-[var(--color-hover-blue)]/50 shadow-sm' : ''}`}
             >
                 {loading ? (
                     <div className="flex items-center gap-2">
