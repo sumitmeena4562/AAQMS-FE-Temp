@@ -43,7 +43,8 @@ const FilterBar = ({
 
     // Hierarchy rendering rules
     // Default to rendering Org unless we are on the Organizations page itself
-    const renderOrg = normalizedLevel !== 'organization';
+    // Only auto-render if an activeLevel is provided to avoid duplicates with manual children
+    const renderOrg = activeLevel && normalizedLevel !== 'organization';
     const renderCoord = ['coordinator', 'site', 'floor', 'zone'].includes(normalizedLevel);
     const renderSite = ['site', 'floor', 'zone'].includes(normalizedLevel);
     const renderFloor = ['floor', 'zone'].includes(normalizedLevel);
