@@ -180,23 +180,28 @@ const useUserStore = create((set, get) => ({
             ];
             
             const tableRows = users.map(u => {
-                // Format Role: e.g., 'FIELD_OFFICER' -> 'Field Officer'
-                const formattedRole = (u.role || 'N/A')
+                // Extract Role accurately (handles objects, strings, and different backend keys)
+                const roleStr = (u.role?.role_name || u.role_name || (typeof u.role === 'string' ? u.role : '') || 'N/A');
+                const formattedRole = roleStr
                     .replace(/_/g, ' ')
                     .toLowerCase()
                     .replace(/\b\w/g, l => l.toUpperCase());
 
                 // Format Status: e.g., 'ACTIVE' -> 'Active'
-                const formattedStatus = (u.status || 'N/A')
+                const statusVal = u.status || (u.is_active ? 'Active' : 'Deactive');
+                const formattedStatus = statusVal
                     .toLowerCase()
                     .replace(/\b\w/g, l => l.toUpperCase());
+
+                // Robust Organization Extraction
+                const orgName = u.org_name || u.organisation_name || u.organization || 'Unassigned';
 
                 return [
                     u.name || 'N/A',
                     u.email || 'N/A',
                     u.mobile_number || 'N/A',
                     formattedRole,
-                    u.org_name || 'Unassigned',
+                    orgName,
                     formattedStatus
                 ];
             });
