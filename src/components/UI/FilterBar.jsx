@@ -69,7 +69,7 @@ const FilterBar = ({
         includeSites: renderSite || renderFloor
     }), [renderOrg, renderCoord, renderSite, renderFloor]);
 
-    const { organizations: orgs, coordinators: allCoordinators, sites: allSites } = useHierarchy(hierarchyOptions);
+    const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading } = useHierarchy(hierarchyOptions);
 
     const { data: floorData } = useFloors(selectedSite, {
         enabled: renderFloor && selectedSite.length > 0
@@ -78,7 +78,20 @@ const FilterBar = ({
 
     // Dynamic Relational Options mapping (using Real IDs) - Memoized to prevent re-render loops
     const orgOptions = React.useMemo(() => orgs.map(o => ({ value: o.id, label: o.name })), [orgs]);
-    const coordOptions = React.useMemo(() => allCoordinators.map(c => ({ value: c.id, label: c.name })), [allCoordinators]);
+    const coordOptions = React.useMemo(() => allCoordinators.map((c, i) => {
+        // Robust ID extraction
+        const id = c.id || c.pk || c.employee_id || i;
+        
+        // Robust Name extraction (checking nested user objects and common variants)
+        const name = c.name || 
+                     c.full_name || 
+                     c.coordinator_name || 
+                     c.user?.name || 
+                     c.user?.full_name || 
+                     `Coordinator #${id}`;
+                     
+        return { value: id, label: name };
+    }), [allCoordinators]);
     const siteOptions = React.useMemo(() => allSites.map(s => ({ value: s.id, label: s.site_name || s.name })), [allSites]);
     const floorOptions = React.useMemo(() => allFloors.map(f => ({ value: f.id, label: f.name })), [allFloors]);
 
@@ -110,6 +123,7 @@ const FilterBar = ({
                             onChange={(val) => setCoord(val)}
                             allLabel="All Coordinators"
                             multiple={true}
+                            loading={isLoading}
                         />
                     )}
 

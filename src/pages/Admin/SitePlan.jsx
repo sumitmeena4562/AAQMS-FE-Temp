@@ -12,7 +12,7 @@ import CardSkeleton from '../../components/UI/CardSkeleton';
 import Pagination from '../../components/UI/Pagination';
 
 const SitePlan = () => {
-  const { selectedOrg, selectedCoord, setOrg, setCoord } = useFilterStore();
+  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord } = useFilterStore();
   const [isSynced, setIsSynced] = useState(false);
   
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,9 +38,15 @@ const SitePlan = () => {
     includeCoords: false,
     enabled: isSynced
   });
+
+  // Client-side filtering for the list cards
+  const filteredSitePlans = useMemo(() => {
+    if (!selectedSite || selectedSite.length === 0) return sitePlans;
+    return sitePlans.filter(p => selectedSite.includes(String(p.id)));
+  }, [sitePlans, selectedSite]);
   
-  const totalPlans = sitePlans.length;
-  const activePlansCount = sitePlans.filter(p => p.status === 'ACTIVE').length;
+  const totalPlans = filteredSitePlans.length;
+  const activePlansCount = filteredSitePlans.filter(p => p.status === 'ACTIVE').length;
 
   const handleResetAll = () => {
       setSearchParams({});
@@ -90,11 +96,11 @@ const SitePlan = () => {
 
       {/* HEADER */}
       <PageHeader
-        title={activeOrgId ? "Site Plan Selection" : "All Operational Sites"}
+        title={activeOrgId.length > 0 ? "Site Plan Selection" : "All Operational Sites"}
         subtitle={
-            activeCoordId 
+            activeCoordId.length > 0
                 ? `Managing ${activePlansCount} active site plans for ${coordInfo?.name}` 
-                : activeOrgId
+                : activeOrgId.length > 0
                     ? `Showing all sites for ${orgInfo?.name}`
                     : "Viewing all sites across all organizations"
         }
@@ -124,7 +130,7 @@ const SitePlan = () => {
             <FiAlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
             <p className="text-red-600 font-bold">Failed to load sites</p>
           </div>
-        ) : sitePlans.length === 0 ? (
+        ) : filteredSitePlans.length === 0 ? (
            <div className="text-center py-24 bg-card rounded-2xl border border-border-main mt-4 shadow-sm animate-in fade-in zoom-in">
              <div className="w-16 h-16 rounded-3xl bg-base border border-border-main flex items-center justify-center mx-auto mb-6">
                 <FiBriefcase className="w-6 h-6 text-gray/30" />
@@ -138,7 +144,7 @@ const SitePlan = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {sitePlans.map((item, index) => (
+            {filteredSitePlans.map((item, index) => (
               <div key={item.id || index} className="w-full max-w-[340px]">
                 <OrganizationCard
                   org={item}

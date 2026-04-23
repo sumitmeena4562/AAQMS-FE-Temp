@@ -399,7 +399,7 @@ const Users = React.memo(() => {
                     <div className="flex items-center gap-3">
                         <Button onClick={() => exportPDF(users)} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 shadow-sm border-dashed border-primary/30">
                             <FiDownload size={14} className="text-primary/70" />
-                            <span className="font-black text-[10px] uppercase tracking-widest text-title">PDF Export</span>
+                            <span className="font-black text-[10px] uppercase tracking-widest text-current">PDF Export</span>
                         </Button>
                     </div>
                 }

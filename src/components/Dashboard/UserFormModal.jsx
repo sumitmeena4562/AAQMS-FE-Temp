@@ -188,13 +188,19 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
 
     const onFormSubmit = async (data) => {
         setSubmitError('');
-        
+
+        // Guard: email aur name required hain
+        if (!data.name?.trim() || !data.email?.trim()) {
+            setSubmitError('Name and email are required.');
+            return;
+        }
+
         // Use FormData for binary uploads (optimized performance)
         const formData = new FormData();
         
         // Basic Fields
-        formData.append('name', data.name);
-        formData.append('email', data.email);
+        formData.append('name', data.name.trim());
+        formData.append('email', data.email.trim());
         formData.append('role', data.role.toUpperCase());
         formData.append('is_active', data.status === 'active');
         if (data.mobile_number) formData.append('mobile_number', data.mobile_number);
