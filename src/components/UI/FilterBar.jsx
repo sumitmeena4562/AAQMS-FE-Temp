@@ -24,6 +24,7 @@ const FilterBar = ({
         selectedCoord, setCoord,
         selectedSite, setSite,
         selectedFloor, setFloor,
+        selectedZone, setZone,
         selectedStatus, setStatus,
         searchTerm, setSearch,
         resetFilters
@@ -40,6 +41,15 @@ const FilterBar = ({
     };
 
 
+
+    const isFilterActive = React.useMemo(() => (
+        selectedOrg.length > 0 || 
+        selectedCoord.length > 0 || 
+        selectedSite.length > 0 || 
+        selectedFloor.length > 0 || 
+        selectedZone.length > 0 ||
+        !!searchQuery
+    ), [selectedOrg, selectedCoord, selectedSite, selectedFloor, selectedZone, searchQuery]);
 
     // Safely strip singular/plural mapping for consistent tiering
     const normalizedLevel = activeLevel?.replace(/s$/, '') || '';
@@ -72,7 +82,7 @@ const FilterBar = ({
     const siteOptions = React.useMemo(() => allSites.map(s => ({ value: s.id, label: s.site_name || s.name })), [allSites]);
     const floorOptions = React.useMemo(() => allFloors.map(f => ({ value: f.id, label: f.name })), [allFloors]);
 
-    const isFilterActive = [selectedOrg, selectedCoord, selectedSite, selectedFloor, selectedStatus].some(arr => Array.isArray(arr) && arr.length > 0) || searchTerm !== '' || searchQuery !== '';
+
 
     return (
         <div className={`bg-card border border-border-main/60 rounded-2xl p-2.5 sm:p-3.5 shadow-sm mb-6 ${className}`}>

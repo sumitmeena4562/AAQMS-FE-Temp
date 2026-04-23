@@ -87,7 +87,7 @@ const Users = React.memo(() => {
     const isReady = isInitialized && responsiveLimit === limit;
 
     const {
-        users, totalCount, stats, isLoading: isUsersLoading
+        users, totalCount, stats, isLoading: isUsersLoading, refetchAll
     } = useUserManagementData(debouncedFilters, debouncedSearch, page, limit, { enabled: isReady });
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
@@ -166,6 +166,7 @@ const Users = React.memo(() => {
 
             setIsFormOpen(false);
             setEditingUser(null);
+            refetchAll();
         } else {
             toast.error(res.error || 'Failed to save user');
         }
@@ -174,7 +175,11 @@ const Users = React.memo(() => {
 
     const handleBulkActivate = async () => {
         const res = await bulkAction('activate', selectedIds);
-        if (res.success) toast.success(`Selected ${selectedIds.length} users have been activated`);
+        if (res.success) {
+            toast.success(`Selected ${selectedIds.length} users have been activated`);
+            refetchAll();
+            setSelectedIds([]);
+        }
     };
 
     const handleConfirmDeactivate = async () => {
@@ -184,6 +189,7 @@ const Users = React.memo(() => {
             toast.success(`Selected ${targets.length} personnel have been deactivated`);
             setStatusTarget(null);
             setBulkStatusOpen(false);
+            refetchAll();
         }
     };
 
