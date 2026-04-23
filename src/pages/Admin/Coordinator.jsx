@@ -10,7 +10,7 @@ import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import {
     FiUsers, FiUser, FiRefreshCw, FiRefreshCcw, FiCheckCircle, FiAlertCircle, FiClock,
-    FiExternalLink, FiHome, FiShield,  FiActivity, FiLayers, FiMail, FiPhone, FiX, FiBriefcase
+    FiExternalLink, FiHome, FiShield, FiActivity, FiLayers, FiMail, FiPhone, FiX, FiBriefcase
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
@@ -18,7 +18,7 @@ import UserCard from '../../components/UI/UserCard';
 import useDebounce from '../../hooks/useDebounce';
 import UserAvatar from '../../components/UI/UserAvatar';
 import FilterBar from '../../components/UI/FilterBar';
-import { useUsers, useCoordinatorStats } from '../../hooks/api/useUserQueries';
+import { useUsers, useCoordinatorStats, useUserFormOptions } from '../../hooks/api/useUserQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import useSearchStore from '../../store/useSearchStore';
 import TableSkeleton from '../../components/UI/TableSkeleton';
@@ -38,7 +38,7 @@ const Coordinator = React.memo(() => {
     const orgNameFromUrl = searchParams.get('org_name');
 
     // ── STORES (UI state only) ──
-    const { 
+    const {
         filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
         setPage, setFilters, setSelectedIds, resetFilters, setLimit
     } = useUserStore();
@@ -48,12 +48,12 @@ const Coordinator = React.memo(() => {
 
     // ── QUERY HOOKS (NEW) ──
     const debouncedSearch = useDebounce(search, 400);
-    
+
     // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
     const hasSynced = useRef(false);
     useEffect(() => {
         if (hasSynced.current) return;
-        
+
         const pOrg = searchParams.get('org_id') || searchParams.get('org');
         const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
 
@@ -68,7 +68,7 @@ const Coordinator = React.memo(() => {
 
         hasSynced.current = true;
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
-    
+
     // --- Responsive Pagination Sync ---
     const responsiveLimit = useResponsiveLimit(12);
     useEffect(() => {
@@ -80,16 +80,18 @@ const Coordinator = React.memo(() => {
     // ── DATA FETCHING ──
     const queryFilters = { ...filters, role: 'coordinator' };
     const { data: usersData, isLoading: isUsersLoading } = useUsers(queryFilters, debouncedSearch, page, limit);
-    
+
     // ── HIERARCHY DATA (UNIFIED) ──
     const { organizations } = useHierarchy({ includeSites: false, includeCoords: false });
-    
+
+    // ── FORM OPTIONS (Pre-fetched for modal speed) ──
+    const { data: formOptions } = useUserFormOptions({ enabled: true });
+
     // Roles are static for the product
     const filterOptions = {
         organizations: organizations.map(o => ({ value: o.id, label: o.name })),
         roles: [{ value: 'coordinator', label: 'Coordinator' }]
     };
-
 
     const totalCount = usersData?.totalCount || 0;
 
@@ -116,10 +118,17 @@ const Coordinator = React.memo(() => {
     }, [usersData, sortKey, sortDir]);
 
     // ── Handlers ──
+    // Default values for new coordinator (no id = modal treats as "Add" mode)
+    const defaultNewCoordinator = useMemo(() => ({
+        role: 'coordinator',
+        organisation_id: orgIdFromUrl || '',
+        org_name: orgNameFromUrl || ''
+    }), [orgIdFromUrl, orgNameFromUrl]);
+
     const handleAddUser = useCallback(() => {
-        setEditingUser({ role: 'coordinator', organisation_id: orgIdFromUrl });
+        setEditingUser(defaultNewCoordinator);
         setIsFormOpen(true);
-    }, [orgIdFromUrl]);
+    }, [defaultNewCoordinator]);
 
     const handleEditUser = useCallback((user) => {
         setEditingUser(user);
@@ -128,11 +137,14 @@ const Coordinator = React.memo(() => {
     }, []);
 
     const handleFormSubmit = useCallback(async (data) => {
-        // Force role as coordinator
-        const finalData = { ...data, role: 'coordinator' };
+        // Force role as coordinator (data is FormData — use .set(), NOT spread)
+        // data is FormData — append role directly
+        if (data instanceof FormData) {
+            data.set('role', 'COORDINATOR');
+        }
         const res = editingUser?.id
-            ? await updateUser(editingUser.id, finalData)
-            : await createUser(finalData);
+            ? await updateUser(editingUser.id, data)
+            : await createUser(data);
 
         if (res.success) {
             const userName = res.data?.name || data.name || 'User';
@@ -145,7 +157,7 @@ const Coordinator = React.memo(() => {
             } else {
                 toast.success(editingUser?.id ? 'Profile updated' : 'Coordinator added');
             }
-            
+
             setIsFormOpen(false);
             setEditingUser(null);
         } else {
@@ -203,8 +215,8 @@ const Coordinator = React.memo(() => {
             width: '20%',
             render: (value, row) => (
                 <div className="flex flex-col">
-                    <div className="flex items-center gap-1.5"><FiMail size={11} className="text-gray/40"/><span className="text-[12px] font-medium text-title truncate">{value}</span></div>
-                    <div className="flex items-center gap-1.5 mt-1"><FiPhone size={11} className="text-gray/40"/><span className="text-[11px] font-bold text-gray">{row?.mobile_number || 'No Phone'}</span></div>
+                    <div className="flex items-center gap-1.5"><FiMail size={11} className="text-gray/40" /><span className="text-[12px] font-medium text-title truncate">{value}</span></div>
+                    <div className="flex items-center gap-1.5 mt-1"><FiPhone size={11} className="text-gray/40" /><span className="text-[11px] font-bold text-gray">{row?.mobile_number || 'No Phone'}</span></div>
                 </div>
             )
         },
@@ -214,7 +226,7 @@ const Coordinator = React.memo(() => {
             width: '20%',
             render: (value, row) => (
                 <div className="flex flex-col">
-                    <div className="flex items-center gap-1.5"><FiLayers size={12} className="text-primary/60"/><span className="text-[13px] font-black text-title truncate">{value || 'Unassigned'}</span></div>
+                    <div className="flex items-center gap-1.5"><FiLayers size={12} className="text-primary/60" /><span className="text-[13px] font-black text-title truncate">{value || 'Unassigned'}</span></div>
                     <span className="text-[9px] text-gray/60 font-bold uppercase tracking-wider mt-1">{row?.region || 'National Fleet'}</span>
                 </div>
             )
@@ -242,13 +254,13 @@ const Coordinator = React.memo(() => {
             align: 'right',
             render: (_, row) => (
                 <div className="flex items-center justify-end gap-1.5 pr-2">
-                    <button 
-                        onClick={(e) => { 
-                            e.stopPropagation(); 
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
                             const orgId = row.organisation_id || '';
                             const orgName = row.org_name || '';
-                            navigate(`/admin/site-plan?org_id=${orgId}&org_name=${encodeURIComponent(orgName)}&coord_id=${row.id}&coord=${encodeURIComponent(row.name)}`); 
-                        }} 
+                            navigate(`/admin/site-plan?org_id=${orgId}&org_name=${encodeURIComponent(orgName)}&coord_id=${row.id}&coord=${encodeURIComponent(row.name)}`);
+                        }}
                         className="w-8 h-8 flex items-center justify-center text-primary border border-primary/20 hover:bg-primary hover:text-white rounded-xl transition-all shadow-sm bg-primary/5"
                         title="View Managed Sites"
                     >
@@ -264,7 +276,7 @@ const Coordinator = React.memo(() => {
 
 
     const paginationFooter = (
-        <Pagination 
+        <Pagination
             currentPage={page}
             totalPages={Math.ceil(totalCount / limit) || 1}
             onPageChange={setPage}
@@ -283,9 +295,9 @@ const Coordinator = React.memo(() => {
             { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
         ];
         if (orgLabel) {
-            base.push({ 
-                label: orgLabel, 
-                path: `/admin/coordinators?org_id=${filters.organization?.join(',') || ''}` 
+            base.push({
+                label: orgLabel,
+                path: `/admin/coordinators?org_id=${filters.organization?.join(',') || ''}`
             });
         }
         base.push({ label: "Management", path: "#", isActive: true });
@@ -319,7 +331,7 @@ const Coordinator = React.memo(() => {
                         <FiActivity size={13} /> Select
                     </Button>
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-3">
                     <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All" multiple={true} />
                     <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Inactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All" multiple={true} />
@@ -363,7 +375,7 @@ const Coordinator = React.memo(() => {
 
             <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={peekUser} onEdit={handleEditUser} onViewSites={handleViewSites} />
             <React.Suspense fallback={null}>
-                <UserFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} />
+                <UserFormModal isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingUser(null); }} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} formOptions={formOptions} />
                 <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Status Lock" message={`Are you sure you want to change status?`} confirmText="Confirm" danger={true} />
                 <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Change" message={`Update ${selectedIds.length} profiles?`} confirmText="Confirm All" danger={true} />
             </React.Suspense>

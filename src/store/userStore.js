@@ -41,16 +41,26 @@ const useUserStore = create((set, get) => ({
         try {
             const data = await userService.createUser(userData);
 
+            // OPTIMIZED: Manually prepend the new user to the cache
+            queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
+                if (!oldData || !oldData.users) return oldData;
+                return {
+                    ...oldData,
+                    totalCount: (oldData.totalCount || 0) + 1,
+                    users: [data, ...oldData.users]
+                };
+            });
+
             // Invalidate users query so list refetches with new user
             await queryClient.invalidateQueries({ queryKey: ['users'] });
 
             // Update stats if returned
             if (data.updated_stats) {
+                queryClient.setQueryData(['user-stats'], data.updated_stats);
                 queryClient.setQueryData(['dashboard', 'summary'], old => ({
                     ...old,
                     stats: { ...old?.stats, ...data.updated_stats }
                 }));
-                queryClient.setQueryData(['user-stats'], data.updated_stats);
             }
 
             set({ loading: false });
@@ -66,17 +76,31 @@ const useUserStore = create((set, get) => ({
         try {
             const data = await userService.updateUser(id, updates);
 
+            // OPTIMIZED: Update the user in the cache directly (Avoids full refetch)
+            queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
+                if (!oldData || !oldData.users) return oldData;
+                return {
+                    ...oldData,
+                    users: oldData.users.map(u => String(u.id) === String(id) ? { ...u, ...data } : u)
+                };
+            });
+
+            // Also update the individual user details if they are cached
+            queryClient.setQueryData(['users', 'detail', id], (old) => old ? { ...old, ...data } : data);
+
+            await queryClient.invalidateQueries({ queryKey: ['users'], exact: false })
             // Force refetch — invalidate + refetch immediately
             await queryClient.invalidateQueries({ queryKey: ['users'] });
             await queryClient.refetchQueries({ queryKey: ['users', 'list'] });
 
+
             // Update stats if returned
             if (data.updated_stats) {
+                queryClient.setQueryData(['user-stats'], data.updated_stats);
                 queryClient.setQueryData(['dashboard', 'summary'], old => ({
                     ...old,
                     stats: { ...old?.stats, ...data.updated_stats }
                 }));
-                queryClient.setQueryData(['user-stats'], data.updated_stats);
             }
 
             set({ loading: false });
@@ -92,11 +116,11 @@ const useUserStore = create((set, get) => ({
         try {
             // SINGLE-CALL OPTIMIZATION: Manually remove user from all cached lists
             queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
-                if (!oldData?.results) return oldData;
+                if (!oldData?.users) return oldData;
                 return {
                     ...oldData,
-                    count: oldData.count - 1,
-                    results: oldData.results.filter(u => String(u.id) !== String(id))
+                    totalCount: (oldData.totalCount || 0) - 1,
+                    users: oldData.users.filter(u => String(u.id) !== String(id))
                 };
             });
 
@@ -122,6 +146,22 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             await userService.bulkAction(ids, action);
+
+            // OPTIMIZED: Update status in cache directly for all affected IDs
+            const isActivate = action === 'activate';
+            queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
+                if (!oldData || !oldData.users) return oldData;
+                return {
+                    ...oldData,
+                    users: oldData.users.map(u =>
+                        ids.includes(u.id)
+                            ? { ...u, status: isActivate ? 'active' : 'deactive', is_active: isActivate }
+                            : u
+                    )
+                };
+            });
+
+            await queryClient.invalidateQueries({ queryKey: ['users'], exact: false });
 
             // Force refetch so status change reflects immediately
             await queryClient.invalidateQueries({ queryKey: ['users'] });
