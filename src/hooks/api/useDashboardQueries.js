@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import * as dashboardService from '../../services/dashboardService';
+import { queryClient } from '../../lib/queryClient';
 
 /**
  * useDashboardSummary
@@ -41,5 +42,30 @@ export const useAllHistory = (filters = {}) => {
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
   });
+};
+
+/**
+ * prefetchHistory
+ * Prefetches the next page of history in the background for instant navigation.
+ */
+export const prefetchHistory = async (filters = {}, nextPage) => {
+    if (!nextPage) return;
+
+    const nextFilters = { ...filters, page: nextPage };
+    const cleanFilters = Object.fromEntries(
+        Object.entries(nextFilters).filter(([, v]) => 
+            v !== undefined && 
+            v !== null && 
+            v !== 'all' && 
+            v !== '' && 
+            !(Array.isArray(v) && v.length === 0)
+        )
+    );
+
+    await queryClient.prefetchQuery({
+        queryKey: ['dashboard', 'history', cleanFilters],
+        queryFn: ({ signal }) => dashboardService.getAllHistory(cleanFilters, signal),
+        staleTime: 2 * 60 * 1000,
+    });
 };
 

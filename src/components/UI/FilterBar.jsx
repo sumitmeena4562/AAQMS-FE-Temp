@@ -8,7 +8,7 @@ import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors } from '../../hooks/api/useHierarchyQueries';
 import useSearchStore from '../../store/useSearchStore';
 
-const FilterBar = ({ 
+const FilterBar = ({
     activeLevel, // 'coordinators', 'sites', 'floors', 'zones'
     className = '',
     children,
@@ -17,7 +17,7 @@ const FilterBar = ({
     searchPlaceholder = "Search...",
     hideClearButton = false
 }) => {
-    const { 
+    const {
         selectedOrg, setOrg,
         selectedCoord, setCoord,
         selectedSite, setSite,
@@ -39,7 +39,7 @@ const FilterBar = ({
 
 
     // Safely strip singular/plural mapping for consistent tiering
-    const normalizedLevel = activeLevel?.replace(/s$/, '') || ''; 
+    const normalizedLevel = activeLevel?.replace(/s$/, '') || '';
 
     // Hierarchy rendering rules
     const renderOrg = ['coordinator', 'site', 'floor', 'zone'].includes(normalizedLevel);
@@ -56,8 +56,8 @@ const FilterBar = ({
 
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites } = useHierarchy(hierarchyOptions);
 
-    const { data: floorData } = useFloors(selectedSite, { 
-        enabled: renderFloor && selectedSite.length > 0 
+    const { data: floorData } = useFloors(selectedSite, {
+        enabled: renderFloor && selectedSite.length > 0
     });
     const allFloors = floorData?.results || [];
 
@@ -72,12 +72,12 @@ const FilterBar = ({
     return (
         <div className={`bg-card border border-border-main/60 rounded-2xl p-2.5 sm:p-3.5 shadow-sm mb-6 ${className}`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
-                
+
                 {/* 🔹 LEFT SIDE: Cascading Dropdowns (Mobile Scrollable) */}
                 <div className="flex flex-nowrap sm:flex-wrap items-center gap-2 sm:gap-3 flex-1 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 scrollbar-hide">
-                    
+
                     {renderOrg && (
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Organization"
                             options={orgOptions}
                             value={selectedOrg}
@@ -88,7 +88,7 @@ const FilterBar = ({
                     )}
 
                     {renderCoord && (
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Coordinator"
                             options={coordOptions}
                             value={selectedCoord}
@@ -99,7 +99,7 @@ const FilterBar = ({
                     )}
 
                     {renderSite && (
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Site"
                             options={siteOptions}
                             value={selectedSite}
@@ -110,7 +110,7 @@ const FilterBar = ({
                     )}
 
                     {renderFloor && (
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Floor"
                             options={floorOptions}
                             value={selectedFloor}
@@ -121,7 +121,7 @@ const FilterBar = ({
                     )}
 
                     {showStatus && (
-                        <FilterDropdown 
+                        <FilterDropdown
                             label="Status"
                             options={[
                                 { value: 'ACTIVE', label: 'Active' },
@@ -137,20 +137,20 @@ const FilterBar = ({
 
                     {showSearch && (
                         <div className="w-[200px] ml-1 shrink-0">
-                            <Search 
-                                placeholder={searchPlaceholder} 
+                            <Search
+                                placeholder={searchPlaceholder}
                                 onSearch={(val) => setSearch(val)}
                             />
                         </div>
                     )}
-                    
+
                     {children}
                 </div>
 
                 {/* 🔹 RIGHT SIDE: Clear Button & Toggles */}
                 <div className="flex items-center gap-2 shrink-0 border-t sm:border-t-0 sm:border-l border-border-main/40 pt-3 sm:pt-0 sm:pl-3 ml-0 sm:ml-auto w-full sm:w-auto justify-end">
                     {isFilterActive && !hideClearButton && (
-                        <button 
+                        <button
                             onClick={handleResetAll}
                             className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-[0.15em] transition-all rounded-xl bg-rose-50/30 hover:bg-rose-50 shadow-sm border border-rose-100/50 hover:border-rose-200 group animate-in zoom-in duration-300"
                         >
@@ -170,14 +170,14 @@ export const Separator = ({ className = '' }) => (
 
 export const ViewToggle = ({ mode, onChange, className = '' }) => (
     <div className={`flex items-center gap-1.5 bg-base/40 p-1 rounded-xl border border-border-main/50 ${className}`}>
-        <button 
+        <button
             onClick={() => onChange('list')}
             className={`p-1.5 rounded-lg transition-all ${mode === 'list' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
             title="List View"
         >
             <FiList size={16} />
         </button>
-        <button 
+        <button
             onClick={() => onChange('grid')}
             className={`p-1.5 rounded-lg transition-all ${mode === 'grid' ? 'bg-card text-primary shadow-sm border border-border-main/50' : 'text-gray hover:text-body hover:bg-base'}`}
             title="Grid View"

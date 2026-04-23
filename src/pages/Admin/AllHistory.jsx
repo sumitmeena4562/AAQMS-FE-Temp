@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { FiHome, FiClock, FiBox, FiRefreshCcw } from 'react-icons/fi';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import FilterBar from '../../components/UI/FilterBar';
 import DataTable from '../../components/UI/DataTable';
 import Button from '../../components/UI/Button';
-import { useAllHistory } from '../../hooks/api/useDashboardQueries';
+import { useAllHistory, prefetchHistory } from '../../hooks/api/useDashboardQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useSites, useFloors } from '../../hooks/api/useHierarchyQueries';
 import TableSkeleton from '../../components/UI/TableSkeleton';
@@ -49,17 +49,20 @@ export default function AllHistory() {
         category: []
     });
 
+    const [isFilterInteracted, setIsFilterInteracted] = useState(false);
+
     // ── 2. DATA FETCHING (Unified Super-API for Dropdowns) ──
-    const { organizations: orgs, sites: allSites } = useHierarchy({ 
-        includeSites: true, 
-        includeCoords: false 
+    const { organizations: orgs, sites: allSites } = useHierarchy({
+        includeSites: true,
+        includeCoords: false,
+        enabled: isFilterInteracted || Object.values(filters).some(arr => arr.length > 0)
     });
-    
+
     // Debounce filters to prevent "Request Explosion" (canceled requests in network tab)
     const debouncedFilters = useDebounce(filters, 400);
 
-    const { data: floorData } = useFloors(filters.site, { 
-        enabled: filters.site.length > 0 
+    const { data: floorData } = useFloors(filters.site, {
+        enabled: filters.site.length > 0
     });
     const allFloors = floorData?.results || [];
 
@@ -76,16 +79,23 @@ export default function AllHistory() {
 
     const { data: historyData, isLoading } = useAllHistory(queryParams);
 
-    // ── 3. Derived Data ──
-    // Map backend results to frontend activity feed format
-    const activityList = useMemo(() => 
-        historyData?.results || [], 
-    [historyData?.results]);
-    
     const totalCount = historyData?.count || 0;
     const totalPages = Math.ceil(totalCount / 10);
 
-    // ── 4. State Management Actions ──
+    // ── 3. Pagination Prefetching (Background optimization) ──
+    useEffect(() => {
+        if (currentPage < totalPages) {
+            prefetchHistory(queryParams, currentPage + 1);
+        }
+    }, [currentPage, queryParams, totalPages]);
+
+    // ── 4. Derived Data ──
+    // Map backend results to frontend activity feed format
+    const activityList = useMemo(() =>
+        historyData?.results || [],
+        [historyData?.results]);
+
+    // ── 5. State Management Actions ──
     const updateFilter = (key, val) => {
         const newFilters = { ...filters, [key]: Array.isArray(val) ? val : [val].filter(Boolean) };
         if (key === 'organisation') { newFilters.site = []; newFilters.floor = []; }
@@ -148,8 +158,8 @@ export default function AllHistory() {
             render: (value, row) => (
                 <div className="flex items-center gap-2.5 whitespace-nowrap">
                     <div className={`w-1.5 h-1.5 rounded-full ${row.statusVariant === 'danger' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' :
-                            row.statusVariant === 'warning' ? 'bg-orange-500' :
-                                row.statusVariant === 'success' ? 'bg-emerald-500' : 'bg-primary'
+                        row.statusVariant === 'warning' ? 'bg-orange-500' :
+                            row.statusVariant === 'success' ? 'bg-emerald-500' : 'bg-primary'
                         }`} />
                     <span className="text-[13px] text-gray font-bold tracking-tight">{value}</span>
                 </div>
@@ -168,22 +178,24 @@ export default function AllHistory() {
                 ]}
                 rightContent={
                     <div className="flex items-center gap-3">
-                        <div className="flex flex-col items-end px-4 border-r border-border-main/50 translate-y-[2px]">
+                        <div className="flex flex-col items-end px-4 translate-y-[2px]">
                             <span className="text-[9px] font-black text-gray uppercase tracking-widest opacity-60 leading-none mb-1">Status</span>
                             <div className="flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                                 <span className="text-[11px] font-bold text-title uppercase">Live Sync</span>
                             </div>
                         </div>
-                        <Button onClick={resetFilters} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 border-dashed border-primary/30 hover:border-primary/60 transition-all">
-                            <FiRefreshCcw size={14} className={isLoading ? 'animate-spin' : ''} />
-                            <span className="font-black text-[10px] uppercase tracking-widest text-primary">Reset Filter</span>
-                        </Button>
                     </div>
                 }
             />
 
-            <FilterBar hideClearButton={true} className="!p-2.5">
+            <FilterBar 
+                className="!p-2.5" 
+                onClear={resetFilters} 
+                isCustomFilterActive={Object.values(filters).some(arr => arr.length > 0)}
+                onMouseEnter={() => setIsFilterInteracted(true)}
+                onClick={() => setIsFilterInteracted(true)}
+            >
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-1">
                     <FilterDropdown
                         label="Organization"
@@ -241,18 +253,6 @@ export default function AllHistory() {
                         disabled={filters.site.length === 0}
                     />
                 </div>
-                
-                <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
-                    {(Object.values(filters).some(arr => arr.length > 0)) && (
-                        <button 
-                            onClick={resetFilters} 
-                            className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-[0.15em] transition-all rounded-xl bg-rose-50/30 hover:bg-rose-50 shadow-sm border border-rose-100/50 hover:border-rose-200 group"
-                        >
-                            <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
-                            Reset
-                        </button>
-                    )}
-                </div>
             </FilterBar>
 
             <div className="w-full relative">
@@ -269,7 +269,7 @@ export default function AllHistory() {
                     loading={isLoading || !activityList}
                     emptyMessage="No historical records matched your current filters."
                     footer={
-                        <Pagination 
+                        <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages || 1}
                             onPageChange={setCurrentPage}

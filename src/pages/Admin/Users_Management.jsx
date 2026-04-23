@@ -33,9 +33,9 @@ const Users = React.memo(() => {
     const { resetFilters } = useUserStore();
 
     // ── STORES (UI state only) ──
-    const { 
+    const {
         filters, sortKey, sortDir, selectedIds, page, limit, loading: storeLoading,
-        setPage, setFilters, toggleSelectRow, 
+        setPage, setFilters, toggleSelectRow,
         setSelectedIds, setLimit // setError removed
     } = useUserStore();
     const { query: search, clearSearch } = useSearchStore();
@@ -44,7 +44,7 @@ const Users = React.memo(() => {
     const [isInitialized, setIsInitialized] = useState(false);
     useEffect(() => {
         if (isInitialized) return;
-        
+
         const pOrg = searchParams.get('org_id') || searchParams.get('org');
         const pSite = searchParams.get('site_id') || searchParams.get('site');
         const pRole = searchParams.get('role');
@@ -58,17 +58,17 @@ const Users = React.memo(() => {
             const roles = pRole ? pRole.split(',') : [];
             const statuses = pStatus ? pStatus.split(',') : [];
 
-            setFilters({ 
-                organization: orgs, 
-                region: sites, 
-                role: roles, 
-                status: statuses 
+            setFilters({
+                organization: orgs,
+                region: sites,
+                role: roles,
+                status: statuses
             });
         }
 
         setIsInitialized(true);
     }, [searchParams, resetFilters, setFilters, isInitialized]);
-    
+
     const responsiveLimit = useResponsiveLimit(12);
     const appliedLimit = useRef(limit);
     useEffect(() => {
@@ -83,11 +83,11 @@ const Users = React.memo(() => {
     // ── QUERY HOOKS (OPTIMIZED + DEBOUNCED) ──
     const debouncedSearch = useDebounce(search, 500);
     const debouncedFilters = useDebounce(filters, 500);
-    
+
     const isReady = isInitialized && responsiveLimit === limit;
-    
-    const { 
-        users, totalCount, stats, isLoading: isUsersLoading 
+
+    const {
+        users, totalCount, stats, isLoading: isUsersLoading
     } = useUserManagementData(debouncedFilters, debouncedSearch, page, limit, { enabled: isReady });
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
@@ -97,10 +97,10 @@ const Users = React.memo(() => {
 
     const filterOptions = useMemo(() => ({
         organizations: formOptions?.organisations?.map(o => ({ value: o.value, label: o.label })) || [],
-        regions: formOptions?.sites?.map(s => ({ 
-            value: s.value, 
+        regions: formOptions?.sites?.map(s => ({
+            value: s.value,
             label: s.label,
-            org_id: s.org_id 
+            org_id: s.org_id
         })) || [],
         roles: STATIC_ROLES
     }), [formOptions, STATIC_ROLES]);
@@ -163,7 +163,7 @@ const Users = React.memo(() => {
             } else {
                 toast.success(editingUser ? 'Changes to user profile have been saved' : 'New personnel successfully added to the system');
             }
-            
+
             setIsFormOpen(false);
             setEditingUser(null);
         } else {
@@ -251,7 +251,7 @@ const Users = React.memo(() => {
             align: 'center',
             render: (_, row) => {
                 const rawRole = (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : '') || '').toLowerCase();
-                
+
                 const config = {
                     admin: { color: 'text-amber-800 bg-amber-50 border-amber-200', label: 'Admin' },
                     coordinator: { color: 'text-blue-800 bg-blue-50 border-blue-200', label: 'Coordinator' },
@@ -263,7 +263,7 @@ const Users = React.memo(() => {
                 if (rawRole.includes('admin')) activeConfig = config.admin;
                 else if (rawRole.includes('coordinator')) activeConfig = config.coordinator;
                 else if (rawRole.includes('field_officer') || rawRole.includes('fieldofficer')) activeConfig = config.field_officer;
-                
+
                 const finalConfig = activeConfig || { color: 'text-gray-700 bg-gray-50 border-gray-200', label: rawRole || 'User' };
 
                 return (
@@ -285,8 +285,8 @@ const Users = React.memo(() => {
                 return (
                     <div className="flex justify-center">
                         <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border transition-all duration-300 shadow-sm
-                            ${isActive 
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-100/50 shadow-emerald-100/20' 
+                            ${isActive
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-100/50 shadow-emerald-100/20'
                                 : 'bg-rose-50 text-rose-700 border-rose-100/50 shadow-rose-100/20'}`}>
                             <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500 hover:scale-110 transition-transform'}`} />
                             {isActive ? 'Active' : 'Inactive'}
@@ -310,46 +310,46 @@ const Users = React.memo(() => {
     ], [handleEditUser]);
 
     const statsData = [
-        { 
-            title: 'Total Users', 
-            value: stats?.total || 0, 
-            icon: FiUsers, 
-            iconColorClass: 'text-primary', 
-            iconBgClass: 'bg-primary/10', 
+        {
+            title: 'Total Users',
+            value: stats?.total || 0,
+            icon: FiUsers,
+            iconColorClass: 'text-primary',
+            iconBgClass: 'bg-primary/10',
             secondaryLabel: `${stats?.active || 0} active in system`,
-            description: 'platform-wide' 
+            description: 'platform-wide'
         },
-        { 
-            title: 'Active Accounts', 
-            value: stats?.active || 0, 
-            icon: FiCheckCircle, 
-            iconColorClass: 'text-emerald-600', 
-            iconBgClass: 'bg-emerald-50', 
+        {
+            title: 'Active Accounts',
+            value: stats?.active || 0,
+            icon: FiCheckCircle,
+            iconColorClass: 'text-emerald-600',
+            iconBgClass: 'bg-emerald-50',
             secondaryLabel: 'Verified & operating',
-            description: 'Ready for tasks' 
+            description: 'Ready for tasks'
         },
-        { 
-            title: 'Deactive/Blocked', 
-            value: stats?.inactive || 0, 
-            icon: FiAlertCircle, 
-            iconColorClass: 'text-rose-600', 
-            iconBgClass: 'bg-rose-50', 
+        {
+            title: 'Deactive/Blocked',
+            value: stats?.inactive || 0,
+            icon: FiAlertCircle,
+            iconColorClass: 'text-rose-600',
+            iconBgClass: 'bg-rose-50',
             secondaryLabel: `${stats?.inactive || 0} restricted profiles`,
-            description: 'Access denied' 
+            description: 'Access denied'
         },
-        { 
-            title: 'Unassigned', 
-            value: stats?.unassigned || 0, 
-            icon: FiClock, 
-            iconColorClass: 'text-amber-600', 
-            iconBgClass: 'bg-amber-50', 
+        {
+            title: 'Unassigned',
+            value: stats?.unassigned || 0,
+            icon: FiClock,
+            iconColorClass: 'text-amber-600',
+            iconBgClass: 'bg-amber-50',
             secondaryLabel: 'Pending org linkage',
-            description: 'Requires attention' 
+            description: 'Requires attention'
         },
     ];
 
     const paginationFooter = (
-        <Pagination 
+        <Pagination
             currentPage={page}
             totalPages={Math.ceil(totalCount / limit) || 1}
             onPageChange={setPage}
@@ -366,9 +366,9 @@ const Users = React.memo(() => {
     const breadcrumbs = useMemo(() => {
         const base = [{ label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> }];
         if (orgLabel) {
-            base.push({ 
-                label: orgLabel, 
-                path: `/admin/users?org_id=${filters.organization?.join(',') || ''}` 
+            base.push({
+                label: orgLabel,
+                path: `/admin/users?org_id=${filters.organization?.join(',') || ''}`
             });
         }
         base.push({ label: "User Management", path: "#", isActive: true });
@@ -413,7 +413,7 @@ const Users = React.memo(() => {
                     </Button>
                     <FilterBar.Separator />
                 </div>
-                
+
                 <div className="flex flex-wrap items-center gap-2 flex-1">
                     <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v, region: [] })} allLabel="All" multiple={true} loading={isLoadingOptions} />
                     <FilterDropdown label="Role" options={filterOptions.roles} value={filters.role} onChange={v => setFilters({ ...filters, role: v })} allLabel="All" multiple={true} />
@@ -423,8 +423,8 @@ const Users = React.memo(() => {
                 <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
                     <FilterBar.ViewToggle mode={viewMode} onChange={setViewMode} />
                     {(activeFilterCount > 0 || search) && (
-                        <Button 
-                            onClick={() => { resetFilters(); clearSearch(); }} 
+                        <Button
+                            onClick={() => { resetFilters(); clearSearch(); }}
                             variant="outline"
                             className="!h-9 !px-3 !text-[10px] !font-black !uppercase !tracking-[0.15em] !bg-rose-50/30 !text-rose-500 !border-rose-100/50 hover:!bg-rose-50 hover:!text-rose-600 hover:!border-rose-200 transition-all flex items-center gap-1.5 group"
                         >
@@ -452,7 +452,7 @@ const Users = React.memo(() => {
                     </div>
                 </div>
             )}
-        
+
 
             {/* Main Content Area */}
             {isUsersLoading ? (
@@ -493,8 +493,8 @@ const Users = React.memo(() => {
                     <p className="text-gray text-[13px] mb-8 text-center max-w-[280px] font-medium leading-relaxed italic">
                         "The archive is empty. Try refining your parameters to discover active operators."
                     </p>
-                    <button 
-                        onClick={resetFilters} 
+                    <button
+                        onClick={resetFilters}
                         className="group flex items-center gap-2.5 px-6 py-3 bg-title text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-title/90 transition-all shadow-lg active:scale-95"
                     >
                         <FiRefreshCw className="group-hover:rotate-180 transition-transform duration-700" />
