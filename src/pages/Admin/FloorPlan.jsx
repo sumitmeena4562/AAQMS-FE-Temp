@@ -15,10 +15,10 @@ const FloorPlan = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSynced, setIsSynced] = useState(false);
-  const { resetFilters, selectedOrg, selectedCoord, selectedSite, setOrg, setCoord, setSite } = useFilterStore();
-
+  const { resetFilters, selectedOrg, selectedCoord, selectedSite, selectedFloor, setOrg, setCoord, setSite } = useFilterStore();
+  
   const [currentPage, setCurrentPage] = useState(1);
-
+  
   const passedOrgId = searchParams.get('org_id');
   const passedOrgName = searchParams.get('org_name');
   const passedSiteId = searchParams.get('site_id');
@@ -46,7 +46,15 @@ const FloorPlan = () => {
     page_size: 10
   });
   const floorList = floorData?.results || [];
+
+  // Client-side filtering for the floor cards
+  const filteredFloorList = useMemo(() => {
+    if (!selectedFloor || selectedFloor.length === 0) return floorList;
+    return floorList.filter(f => selectedFloor.includes(String(f.id)));
+  }, [floorList, selectedFloor]);
+
   const totalLevels = floorData?.count || 0;
+  const activePlansCount = filteredFloorList.length;
 
   const handleResetAll = () => {
     setSearchParams({});
@@ -70,6 +78,7 @@ const FloorPlan = () => {
 
     setIsSynced(true);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  
   const currentOrg = activeOrgId.length === 1 ? orgs.find(o => String(o.id) === String(activeOrgId[0])) : null;
   const orgLabel = activeOrgId.length > 1 ? `Organizations (${activeOrgId.length})` : currentOrg?.name || passedOrgName;
   const orgInfo = { name: orgLabel || "Organization" };
@@ -98,8 +107,6 @@ const FloorPlan = () => {
 
   const siteInfo = { name: (activeSiteId.length === 1 ? passedSiteName : `Multiple Sites`) || "Site" };
   const coordInfo = activeCoordId.length > 0 ? { name: passedCoordName || "Coordinator" } : null;
-
-  const activePlansCount = floorList.length;
 
   /**
    * ── NAVIGATION HANDLER ──
@@ -148,9 +155,9 @@ const FloorPlan = () => {
                <FiAlertCircle className="w-8 h-8 mb-3" />
                <p className="text-sm font-medium">{hierarchyError.message || hierarchyError}</p>
             </div>
-          ): floorList.length > 0 ? (
+          ): filteredFloorList.length > 0 ? (
             <>
-              {floorList.map((floor, index) => (
+              {filteredFloorList.map((floor, index) => (
                 <FloorCard 
                   key={floor.id || index} 
                   floor={floor} 
