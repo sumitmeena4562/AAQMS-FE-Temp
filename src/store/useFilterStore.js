@@ -18,7 +18,7 @@ export const useFilterStore = create((set, get) => ({
 
   // --- ACTIONS (with same-value guards to prevent re-render loops) ---
   setOrg: (ids) => {
-    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    const newIds = (Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean))).map(String);
     if (JSON.stringify(get().selectedOrg) === JSON.stringify(newIds)) return;
     set({ 
       selectedOrg: newIds, 
@@ -31,7 +31,7 @@ export const useFilterStore = create((set, get) => ({
   },
   
   setCoord: (ids) => {
-    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    const newIds = (Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean))).map(String);
     if (JSON.stringify(get().selectedCoord) === JSON.stringify(newIds)) return;
     set({ 
       selectedCoord: newIds, 
@@ -43,7 +43,7 @@ export const useFilterStore = create((set, get) => ({
   },
   
   setSite: (ids) => {
-    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    const newIds = (Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean))).map(String);
     if (JSON.stringify(get().selectedSite) === JSON.stringify(newIds)) return;
     set({ 
       selectedSite: newIds, 
@@ -54,17 +54,17 @@ export const useFilterStore = create((set, get) => ({
   },
   
   setFloor: (ids) => {
-    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    const newIds = (Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean))).map(String);
     if (JSON.stringify(get().selectedFloor) === JSON.stringify(newIds)) return;
     set({ 
       selectedFloor: newIds, 
-      selectedZone: '',
+      selectedZone: [],
       page: 1
     });
   },
   
   setZone: (ids) => {
-    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    const newIds = (Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean))).map(String);
     if (JSON.stringify(get().selectedZone) === JSON.stringify(newIds)) return;
     set({ 
       selectedZone: newIds,
@@ -73,7 +73,7 @@ export const useFilterStore = create((set, get) => ({
   },
   
   setStatus: (ids) => {
-    const newIds = Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean));
+    const newIds = (Array.isArray(ids) ? ids : (typeof ids === 'string' ? ids.split(',').filter(Boolean) : [ids].filter(Boolean))).map(String);
     if (JSON.stringify(get().selectedStatus) === JSON.stringify(newIds)) return;
     set({ 
       selectedStatus: newIds,
@@ -110,7 +110,7 @@ export const useFilterStore = create((set, get) => ({
     const current = get();
     const updates = {};
     
-    const normalize = (val) => Array.isArray(val) ? val : (typeof val === 'string' ? val.split(',').filter(Boolean) : [val].filter(Boolean));
+    const normalize = (val) => (Array.isArray(val) ? val : (typeof val === 'string' ? val.split(',').filter(Boolean) : [val].filter(Boolean))).map(String);
 
     if (params.org && JSON.stringify(current.selectedOrg) !== JSON.stringify(normalize(params.org))) {
         updates.selectedOrg = normalize(params.org);

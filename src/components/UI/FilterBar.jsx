@@ -42,10 +42,11 @@ const FilterBar = ({
     const normalizedLevel = activeLevel?.replace(/s$/, '') || '';
 
     // Hierarchy rendering rules
-    const renderOrg = ['coordinator', 'site', 'floor', 'zone'].includes(normalizedLevel);
-    const renderCoord = ['site', 'floor', 'zone'].includes(normalizedLevel);
-    const renderSite = ['floor', 'zone'].includes(normalizedLevel);
-    const renderFloor = ['zone'].includes(normalizedLevel);
+    // Default to rendering Org unless we are on the Organizations page itself
+    const renderOrg = normalizedLevel !== 'organization';
+    const renderCoord = ['coordinator', 'site', 'floor', 'zone'].includes(normalizedLevel);
+    const renderSite = ['site', 'floor', 'zone'].includes(normalizedLevel);
+    const renderFloor = ['floor', 'zone'].includes(normalizedLevel);
 
     // ─── QUERY HOOKS (UNIFIED) ───
     const hierarchyOptions = React.useMemo(() => ({
