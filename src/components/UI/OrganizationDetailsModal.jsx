@@ -29,7 +29,7 @@ const ImagePreview = ({ label, url }) => (
             ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-gray/30 gap-2">
                     <Camera size={20} />
-                    <span className="text-[8px] font-bold uppercase">No Image</span>
+                    <span className="text-[10px] font-bold uppercase">No Image</span>
                 </div>
             )}
         </div>

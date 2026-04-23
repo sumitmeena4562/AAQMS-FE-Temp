@@ -86,14 +86,14 @@ const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selec
             <Badge 
                 variant="solid" 
                 color={user.role === 'coordinator' ? 'coordinator' : user.role === 'admin' ? 'admin' : 'fieldOfficer'}
-                className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
+                className="!text-[10px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
             >
               {user.role === 'field_officer' ? 'Field Officer' : (user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Unknown Role')}
             </Badge>
             <Badge 
                 variant="light" 
                 color={isAssigned ? 'success' : 'neutral'}
-                className="!text-[8px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
+                className="!text-[10px] !px-1.5 !py-0.5 !font-black !uppercase !tracking-widest"
             >
               {isAssigned ? 'Assigned' : 'Standby'}
             </Badge>
@@ -103,7 +103,7 @@ const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selec
         {/* 2-Column Info Grid — Proper Profile Data */}
         <div className="grid grid-cols-2 gap-3 py-3 border-y border-border-main/30 border-dashed">
           <div className="flex flex-col">
-            <span className="text-[7.5px] font-black text-gray/60 uppercase tracking-widest mb-1 leading-none">Assignment: {user.role === 'field_officer' ? 'Org & Zone' : 'Org & Region'}</span>
+            <span className="text-[10px] font-black text-gray/60 uppercase tracking-widest mb-1 leading-none">Assignment: {user.role === 'field_officer' ? 'Org & Zone' : 'Org & Region'}</span>
             <div className="flex flex-col gap-0.5">
                 <span className="text-[11px] font-black text-body truncate block w-full" title={user.organization || 'Unassigned'}>
                   {user.organization || 'Unassigned'}
@@ -114,7 +114,7 @@ const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selec
             </div>
           </div>
           <div className="flex flex-col items-end text-right">
-            <span className="text-[7.5px] font-black text-gray/60 uppercase tracking-widest mb-1 leading-none">Activity & Joined</span>
+            <span className="text-[10px] font-black text-gray/60 uppercase tracking-widest mb-1 leading-none">Activity & Joined</span>
             <div className="flex flex-col gap-0.5">
                 <span className="text-[11px] font-black text-body truncate">{user.last_login || 'Never'}</span>
                 <span className="text-[9px] font-bold text-gray/80 truncate">Joined {user.created_at || 'N/A'}</span>

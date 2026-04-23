@@ -154,7 +154,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         {/* Stats Section */}
         <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border-main/40">
           <div className="flex flex-col gap-1">
-            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider opacity-70">
+            <p className="text-[10px] text-gray uppercase font-bold tracking-wider opacity-70">
               {isSiteCard ? 'FLOORS' : 'COORDS'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
@@ -162,7 +162,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
             </p>
           </div>
           <div className="flex flex-col gap-1">
-            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider opacity-70">
+            <p className="text-[10px] text-gray uppercase font-bold tracking-wider opacity-70">
               {isSiteCard ? 'ZONES' : 'SITES'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
@@ -170,7 +170,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
             </p>
           </div>
           <div className="flex flex-col gap-1">
-            <p className="text-[7.5px] text-gray uppercase font-bold tracking-wider opacity-70">
+            <p className="text-[10px] text-gray uppercase font-bold tracking-wider opacity-70">
               {isSiteCard ? 'ASSETS' : 'FLOORS'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">

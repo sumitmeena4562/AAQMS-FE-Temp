@@ -71,7 +71,7 @@ const FloorCard = ({ floor, site, onClick }) => {
 
         <div className="flex items-center justify-between gap-2.5 mb-auto">
           <div className="flex-1 bg-gray-50 rounded-[12px] py-3 px-1 flex flex-col items-center justify-center group-hover:bg-[var(--color-hover-blue-soft)] transition-colors border border-transparent">
-            <span className="text-[7.5px] font-bold text-body group-hover:text-[var(--color-hover-blue)] uppercase tracking-[0.15em] mb-1 transition-colors">
+            <span className="text-[10px] font-bold text-body group-hover:text-[var(--color-hover-blue)] uppercase tracking-[0.15em] mb-1 transition-colors">
               ZONES
             </span>
             <span className="text-xl font-bold text-title leading-none group-hover:text-[var(--color-hover-blue)] transition-colors">
@@ -79,7 +79,7 @@ const FloorCard = ({ floor, site, onClick }) => {
             </span>
           </div>
           <div className="flex-1 bg-gray-50 rounded-[12px] py-3 px-1 flex flex-col items-center justify-center group-hover:bg-[var(--color-hover-blue-soft)] transition-colors border border-transparent">
-            <span className="text-[7.5px] font-bold text-body group-hover:text-[var(--color-hover-blue)] uppercase tracking-[0.15em] mb-1 transition-colors">
+            <span className="text-[10px] font-bold text-body group-hover:text-[var(--color-hover-blue)] uppercase tracking-[0.15em] mb-1 transition-colors">
               ASSETS
             </span>
             <span className="text-xl font-bold text-title leading-none group-hover:text-[var(--color-hover-blue)] transition-colors">
@@ -89,7 +89,7 @@ const FloorCard = ({ floor, site, onClick }) => {
         </div>
 
         {/* Action Button */}
-        <button className="mt-5 w-full py-[10px] px-3 bg-base border border-border-main rounded-xl text-[11px] font-bold text-primary flex items-center justify-center gap-2 group-hover:bg-[var(--color-hover-blue)] group-hover:border-[var(--color-hover-blue)] group-hover:text-white transition-all overflow-hidden relative">
+        <button className="mt-5 mb-3 w-full py-2 px-3 bg-base border border-border-main rounded-xl text-[10px] font-bold text-primary flex items-center justify-center gap-2 group-hover:bg-[var(--color-hover-blue)] group-hover:border-[var(--color-hover-blue)] group-hover:text-white transition-all overflow-hidden relative">
           <span className="relative z-10 transition-colors uppercase tracking-widest group-hover:-translate-x-2">View Mapping</span>
           <ArrowRight className="w-[14px] h-[14px] ml-2 text-gray group-hover:opacity-0 absolute right-4 transition-all" strokeWidth={2} />
           <Map className="w-[14px] h-[14px] ml-2 text-white opacity-0 group-hover:opacity-100 absolute right-4 transition-all" strokeWidth={2} />

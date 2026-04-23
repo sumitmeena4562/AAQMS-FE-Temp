@@ -184,7 +184,7 @@ const FilterDropdown = React.memo(({
                 ) : isFilterActive ? (
                     <>
                         <div className="flex flex-col items-start leading-tight">
-                            <span className="text-[8px] font-black text-primary/60 uppercase tracking-[0.12em]">{label}</span>
+                            <span className="text-[10px] font-black text-primary/60 uppercase tracking-[0.12em]">{label}</span>
                             <span className="text-[10px] font-bold text-primary truncate max-w-[140px]">
                                 {(() => {
                                     const getLabel = (val) => {
