@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { organizationService } from '../services/organizationService';
+import { mapOrgToFrontend } from '../hooks/api/useOrgQueries';
 import toast from 'react-hot-toast';
 import { queryClient } from '../lib/queryClient.js';
 
@@ -50,8 +51,22 @@ export const useOrgStore = create((set) => ({
   updateOrg: async (id, updatedOrg) => {
     set({ isSubmitting: true, error: null });
     try {
-      await organizationService.updateOrganization(id, updatedOrg);
-      await queryClient.invalidateQueries(['organizations']);
+      const raw = await organizationService.updateOrganization(id, updatedOrg);
+      const updated = mapOrgToFrontend(raw);
+
+      // Update only the specific org in all list queries (no refetch)
+      queryClient.setQueriesData({ queryKey: ['organizations'], exact: false }, (old) => {
+        if (!old?.results) return old;
+        return {
+          ...old,
+          results: old.results.map((o) => (o.id === id ? { ...o, ...updated } : o))
+        };
+      });
+
+      // Update the single org detail cache if it exists
+      queryClient.setQueryData(['organization', id], (old) =>
+        old ? { ...old, ...updated } : old
+      );
 
       set({ isSubmitting: false });
       toast.success("Changes saved successfully!");
