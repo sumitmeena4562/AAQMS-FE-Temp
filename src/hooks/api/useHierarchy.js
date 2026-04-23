@@ -38,8 +38,7 @@ export const useHierarchy = (options = {}) => {
 
     // 3. Sites (Cascading: only if org is selected)
     const siteFilters = React.useMemo(() => ({
-        organisation: activeOrgs.length > 0 ? activeOrgs : undefined,
-        dropdown: 'true'
+        organisation: activeOrgs.length > 0 ? activeOrgs : undefined
     }), [activeOrgs]);
 
     const sitesQuery = useSites(
