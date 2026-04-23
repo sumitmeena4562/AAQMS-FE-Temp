@@ -40,7 +40,7 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             const data = await userService.createUser(userData);
-            
+
             // OPTIMIZED: Manually prepend the new user to the cache
             queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
                 if (!oldData || !oldData.users) return oldData;
@@ -51,6 +51,9 @@ const useUserStore = create((set, get) => ({
                 };
             });
 
+            // Invalidate users query so list refetches with new user
+            await queryClient.invalidateQueries({ queryKey: ['users'] });
+
             // Update stats if returned
             if (data.updated_stats) {
                 queryClient.setQueryData(['user-stats'], data.updated_stats);
@@ -59,7 +62,7 @@ const useUserStore = create((set, get) => ({
                     stats: { ...old?.stats, ...data.updated_stats }
                 }));
             }
-            
+
             set({ loading: false });
             return { success: true, data };
         } catch (err) {
@@ -72,7 +75,7 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             const data = await userService.updateUser(id, updates);
-            
+
             // OPTIMIZED: Update the user in the cache directly (Avoids full refetch)
             queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
                 if (!oldData || !oldData.users) return oldData;
@@ -84,6 +87,12 @@ const useUserStore = create((set, get) => ({
 
             // Also update the individual user details if they are cached
             queryClient.setQueryData(['users', 'detail', id], (old) => old ? { ...old, ...data } : data);
+
+            await queryClient.invalidateQueries({ queryKey: ['users'], exact: false })
+            // Force refetch — invalidate + refetch immediately
+            await queryClient.invalidateQueries({ queryKey: ['users'] });
+            await queryClient.refetchQueries({ queryKey: ['users', 'list'] });
+
 
             // Update stats if returned
             if (data.updated_stats) {
@@ -115,8 +124,8 @@ const useUserStore = create((set, get) => ({
                 };
             });
 
-            set(s => ({ selectedIds: s.selectedIds.filter(i => i !== id), loading: false })); 
-            
+            set(s => ({ selectedIds: s.selectedIds.filter(i => i !== id), loading: false }));
+
             // Still invalidate stats as they are harder to update manually perfectly
             await queryClient.invalidateQueries(['user-stats']);
             await queryClient.invalidateQueries(['dashboard', 'summary']);
@@ -137,23 +146,29 @@ const useUserStore = create((set, get) => ({
         set({ loading: true, error: null });
         try {
             await userService.bulkAction(ids, action);
-            
+
             // OPTIMIZED: Update status in cache directly for all affected IDs
             const isActivate = action === 'activate';
             queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
                 if (!oldData || !oldData.users) return oldData;
                 return {
                     ...oldData,
-                    users: oldData.users.map(u => 
-                        ids.includes(u.id) 
-                            ? { ...u, status: isActivate ? 'active' : 'deactive', is_active: isActivate } 
+                    users: oldData.users.map(u =>
+                        ids.includes(u.id)
+                            ? { ...u, status: isActivate ? 'active' : 'deactive', is_active: isActivate }
                             : u
                     )
                 };
             });
 
+            await queryClient.invalidateQueries({ queryKey: ['users'], exact: false });
+
+            // Force refetch so status change reflects immediately
+            await queryClient.invalidateQueries({ queryKey: ['users'] });
+            await queryClient.refetchQueries({ queryKey: ['users', 'list'] });
+
             set({ selectedIds: [], loading: false });
-            
+
             toast.success("Done! The changes have been applied.");
             return { success: true };
         } catch (err) {
@@ -174,21 +189,21 @@ const useUserStore = create((set, get) => ({
                 return;
             }
             const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-            
+
             // --- HEADER & BRANDING ---
             const primaryColor = [7, 34, 103]; // AAQMS Dark Blue
             const accentColor = [37, 99, 235];  // AAQMS Primary Blue
-            
+
             doc.setFontSize(22);
             doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
             doc.setFont("helvetica", "bold");
             doc.text("AAQMS", 14, 20);
-            
+
             doc.setFontSize(14);
             doc.setTextColor(100);
             doc.setFont("helvetica", "normal");
             doc.text("Personnel Records - Official Report", 14, 28);
-            
+
             doc.setDrawColor(accentColor[0], accentColor[1], accentColor[2]);
             doc.setLineWidth(1);
             doc.line(14, 32, 283, 32);
@@ -203,7 +218,7 @@ const useUserStore = create((set, get) => ({
             const tableColumn = [
                 "Full Name", "Email", "Phone", "Role", "Organization", "Status"
             ];
-            
+
             const tableRows = users.map(u => {
                 // Extract Role accurately (handles objects, strings, and different backend keys)
                 const roleStr = (u.role?.role_name || u.role_name || (typeof u.role === 'string' ? u.role : '') || 'N/A');
@@ -276,10 +291,10 @@ const useUserStore = create((set, get) => ({
     setFilters: (newFilters) => {
         const current = get().filters;
         const merged = typeof newFilters === 'object' ? { ...current, ...newFilters } : newFilters;
-        
+
         // Use JSON check for deep equality since filters are small objects
         if (JSON.stringify(current) === JSON.stringify(merged)) return;
-        
+
         set({ filters: merged, page: 1 });
     },
     setSortKey: (sortKey) => set({ sortKey }),

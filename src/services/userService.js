@@ -138,10 +138,12 @@ export const userService = {
 
     getCoordinators: async (orgId = null, signal = null) => {
         try {
-            const params = { dropdown: 'true' };
-            if (orgId) params.organisation_id = Array.isArray(orgId) ? orgId.join(',') : orgId;
-            const response = await api.get('users/coordinators/', { params, signal });
-            return response.data || [];
+            const filters = { role: 'coordinator' };
+            if (orgId) filters.organization = orgId;
+            
+            // Reuse the robust getUsers method to ensure consistent data mapping
+            const result = await userService.getUsers(filters, '', 1, 100, signal);
+            return result.users || [];
         } catch (error) {
             if (error.name === 'CanceledError') throw error;
             return [];
