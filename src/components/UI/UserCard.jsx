@@ -74,10 +74,12 @@ const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selec
       {/* 3. Card Information Section — Just the Essentials */}
       <div className="p-4 pt-3 flex-1 flex flex-col">
         <div className="mb-4">
-          <h3 className="text-base font-black text-title tracking-tight leading-none mb-1.5 truncate pr-8" title={user.name}>
-            {user.name}
-          </h3>
-          <p className="text-[10px] font-bold text-gray truncate uppercase tracking-widest opacity-80 mb-3">
+          <div className="mb-1.5 min-h-[32px]">
+            <h3 className="text-base font-black text-title tracking-tight leading-none line-clamp-2 break-all pr-8" title={user.name}>
+              {user.name}
+            </h3>
+          </div>
+          <p className="text-[10px] font-bold text-gray truncate uppercase tracking-widest opacity-80 mb-3" title={user.email}>
             {user.email}
           </p>
           <div className="flex items-center gap-1.5">
@@ -103,8 +105,10 @@ const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selec
           <div className="flex flex-col">
             <span className="text-[7.5px] font-black text-gray/60 uppercase tracking-widest mb-1 leading-none">Assignment: {user.role === 'field_officer' ? 'Org & Zone' : 'Org & Region'}</span>
             <div className="flex flex-col gap-0.5">
-                <span className="text-[11px] font-black text-body truncate">{user.organization || 'Unassigned'}</span>
-                <span className="text-[9px] font-bold text-gray/80 truncate">
+                <span className="text-[11px] font-black text-body truncate block w-full" title={user.organization || 'Unassigned'}>
+                  {user.organization || 'Unassigned'}
+                </span>
+                <span className="text-[9px] font-bold text-gray/80 truncate block w-full" title={user.role === 'field_officer' ? (user.zone || 'No Zone') : (user.region || 'No Region')}>
                   {user.role === 'field_officer' ? (user.zone || 'No Zone') : (user.region || 'No Region')}
                 </span>
             </div>

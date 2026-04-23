@@ -42,19 +42,30 @@ const FloorCard = ({ floor, site, onClick }) => {
 
         <div className="flex flex-col mb-1.5">
           {siteName && (
-            <span className="text-[9px] font-black text-primary/60 uppercase tracking-widest mb-1 leading-none">
+            <span 
+              className="text-[9px] font-black text-primary/60 uppercase tracking-widest mb-1 leading-none truncate block w-full"
+              title={siteName}
+            >
               {siteName}
             </span>
           )}
-          <h3 className="text-lg font-bold text-title leading-tight truncate">
-            {name}
-          </h3>
+          <div className="min-h-[44px]">
+            <h3 
+              className="text-lg font-bold text-title leading-tight line-clamp-2 break-all"
+              title={name}
+            >
+              {name}
+            </h3>
+          </div>
         </div>
         {status === 'ACTIVE' && (
           <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] flex-shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.4)] absolute top-4 left-4 z-20"></span>
         )}
 
-        <p className="text-[11px] text-body font-medium mb-4 leading-relaxed line-clamp-1 opacity-80">
+        <p 
+          className="text-[11px] text-body font-medium mb-4 leading-relaxed line-clamp-1 break-all opacity-80"
+          title={description || 'Functional Spaces & Zones'}
+        >
           {description || 'Functional Spaces & Zones'}
         </p>
 

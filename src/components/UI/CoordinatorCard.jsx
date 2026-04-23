@@ -34,7 +34,9 @@ const CoordinatorCard = ({ coordinator, orgName, view = 'list' }) => {
             )}
           </div>
 
-          <h3 className="font-bold text-[18px] text-title leading-tight mb-3 text-center">{name}</h3>
+          <div className="min-h-[44px] flex items-center justify-center mb-3 w-full px-2">
+            <h3 className="font-bold text-[18px] text-title leading-tight line-clamp-2 break-all text-center" title={name}>{name}</h3>
+          </div>
 
           {/* SYSTEM ID Field */}
           <div className="w-full bg-slate-50 border border-slate-100 rounded-lg py-2 px-3 flex flex-col items-center justify-center">
@@ -98,7 +100,7 @@ const CoordinatorCard = ({ coordinator, orgName, view = 'list' }) => {
             <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#f59e0b] shadow-[0_0_8px_rgba(245,158,11,0.4)] border-2 border-white rounded-full"></div>
           )}
         </div>
-        <h3 className="font-bold text-[16px] text-primary leading-tight truncate">{name}</h3>
+        <h3 className="font-bold text-[16px] text-primary leading-tight line-clamp-2 break-all" title={name}>{name}</h3>
       </div>
 
       {/* 2. ID Column */}

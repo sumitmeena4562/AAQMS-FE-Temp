@@ -110,11 +110,11 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
         {/* Header Section */}
         <div>
-          <div className="relative mb-2 group/name">
-            <h3 className="text-lg font-bold text-primary tracking-tight leading-tight line-clamp-2 break-words group-hover/name:invisible">
-              {org.site_name || org.name}
-            </h3>
-            <h3 className="absolute top-0 left-0 right-0 text-lg font-bold text-primary tracking-tight leading-tight invisible group-hover/name:visible bg-card z-50 p-2 -mx-2 rounded-xl shadow-xl ring-1 ring-primary/10 break-words">
+          <div className="mb-2 min-h-[44px]">
+            <h3 
+              className="text-lg font-bold text-primary tracking-tight leading-tight line-clamp-2 break-all" 
+              title={org.site_name || org.name}
+            >
               {org.site_name || org.name}
             </h3>
           </div>
@@ -122,7 +122,10 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
           {isSiteCard ? (
             <div className="space-y-1.5">
               {org.organisation_name && (
-                <p className="text-[9px] text-primary/60 font-bold tracking-widest uppercase truncate">
+                <p 
+                  className="text-[9px] text-primary/60 font-bold tracking-widest uppercase truncate"
+                  title={org.organisation_name}
+                >
                   {org.organisation_name}
                 </p>
               )}
@@ -131,13 +134,19 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <p className="text-[11px] text-secondary font-medium leading-tight line-clamp-1">
+                <p 
+                  className="text-[11px] text-secondary font-medium leading-tight line-clamp-1 break-all"
+                  title={org.address}
+                >
                   {org.address}
                 </p>
               </div>
             </div>
           ) : (
-            <p className="text-[9px] text-gray font-bold tracking-widest uppercase opacity-80 mt-1">
+            <p 
+              className="text-[9px] text-gray font-bold tracking-widest uppercase opacity-80 mt-1 truncate"
+              title={`${org.industry} • ${org.region}`}
+            >
               {org.industry} • {org.region}
             </p>
           )}
