@@ -347,13 +347,10 @@ const Organizations = React.memo(() => {
                         {(activeFiltersCount > 0 || searchQuery) && (
                             <button
                                 onClick={() => { resetFilters(); clearSearch(); }}
-                                className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest transition-all rounded-xl bg-title/5 hover:bg-rose-50 shadow-sm border border-transparent hover:border-rose-100 group"
+                                className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-[0.15em] transition-all rounded-xl bg-rose-50/30 hover:bg-rose-50 shadow-sm border border-rose-100/50 hover:border-rose-200 group"
                             >
                                 <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
-                                Reset Filters
-                                <span className="w-4 h-4 rounded-md bg-rose-100 text-rose-600 flex items-center justify-center text-[9px] ml-1">
-                                    {activeFiltersCount + (searchQuery ? 1 : 0)}
-                                </span>
+                                Reset
                             </button>
                         )}
                     </div>
@@ -408,6 +405,8 @@ const Organizations = React.memo(() => {
                                 onPageChange={setCurrentPage}
                                 totalItems={totalCount}
                                 itemsPerPage={itemsPerPage}
+                                variant="ghost"
+                                className="mt-6"
                             />
                         </div>
                     ) : (

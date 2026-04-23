@@ -203,10 +203,6 @@ const Users = React.memo(() => {
                         </div>
                         <div className="flex flex-col min-w-0">
                             <span className="text-[14px] font-black text-title leading-tight truncate">{displayName}</span>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="text-[9px] font-bold text-gray uppercase tracking-tighter bg-base px-1.5 py-0.5 rounded leading-none shrink-0 border border-border-main/40">{row?.role || 'user'}</span>
-                                <span className="text-[9px] font-medium text-gray/60 truncate italic leading-none">• system entity</span>
-                            </div>
                         </div>
                     </div>
                 );
@@ -253,19 +249,27 @@ const Users = React.memo(() => {
             accessor: 'role',
             width: '15%',
             align: 'center',
-            render: (value) => {
-                const role = value?.toLowerCase();
+            render: (_, row) => {
+                const rawRole = (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : '') || '').toLowerCase();
+                
                 const config = {
-                    admin: { color: 'text-amber-700 bg-amber-50 border-amber-100', icon: <FiShield size={10} />, label: 'Administrator' },
-                    coordinator: { color: 'text-sky-700 bg-sky-50 border-sky-100', icon: <FiLayers size={10} />, label: 'Coordinator' },
-                    field_officer: { color: 'text-teal-700 bg-teal-50 border-teal-100', icon: <FiActivity size={10} />, label: 'Field Officer' }
-                }[role] || { color: 'text-gray bg-base border-border-main', icon: <FiShield size={10} />, label: value };
+                    admin: { color: 'text-amber-800 bg-amber-50 border-amber-200', label: 'Admin' },
+                    coordinator: { color: 'text-blue-800 bg-blue-50 border-blue-200', label: 'Coordinator' },
+                    field_officer: { color: 'text-teal-800 bg-teal-50 border-teal-200', label: 'Field Officer' },
+                    fieldofficer: { color: 'text-teal-800 bg-teal-50 border-teal-200', label: 'Field Officer' }
+                };
+
+                let activeConfig = null;
+                if (rawRole.includes('admin')) activeConfig = config.admin;
+                else if (rawRole.includes('coordinator')) activeConfig = config.coordinator;
+                else if (rawRole.includes('field_officer') || rawRole.includes('fieldofficer')) activeConfig = config.field_officer;
+                
+                const finalConfig = activeConfig || { color: 'text-gray-700 bg-gray-50 border-gray-200', label: rawRole || 'User' };
 
                 return (
                     <div className="flex justify-center">
-                        <div className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 border shadow-sm ${config.color}`}>
-                            {config.icon}
-                            {config.label}
+                        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center justify-center border shadow-sm ${finalConfig.color}`}>
+                            <span>{finalConfig.label}</span>
                         </div>
                     </div>
                 );
@@ -397,7 +401,7 @@ const Users = React.memo(() => {
 
             <StatsRow items={statsData} />
 
-            <FilterBar className="!p-2.5">
+            <FilterBar className="!p-2.5" hideClearButton={true}>
                 <div className="flex items-center gap-3">
                     <Button
                         variant={selectionMode ? "primary" : "outline"}
@@ -419,13 +423,14 @@ const Users = React.memo(() => {
                 <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
                     <FilterBar.ViewToggle mode={viewMode} onChange={setViewMode} />
                     {(activeFilterCount > 0 || search) && (
-                        <button 
+                        <Button 
                             onClick={() => { resetFilters(); clearSearch(); }} 
-                            className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-widest bg-title/5 rounded-xl group transition-all hover:bg-rose-50"
+                            variant="outline"
+                            className="!h-9 !px-3 !text-[10px] !font-black !uppercase !tracking-[0.15em] !bg-rose-50/30 !text-rose-500 !border-rose-100/50 hover:!bg-rose-50 hover:!text-rose-600 hover:!border-rose-200 transition-all flex items-center gap-1.5 group"
                         >
                             <FiRefreshCcw size={12} className={`group-hover:rotate-180 transition-transform duration-500 ${isUsersLoading ? 'animate-spin' : ''}`} />
                             Reset
-                        </button>
+                        </Button>
                     )}
                 </div>
             </FilterBar>

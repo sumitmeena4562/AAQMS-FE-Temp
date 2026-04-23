@@ -11,6 +11,7 @@ import { useSites, useFloors } from '../../hooks/api/useHierarchyQueries';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import { mapToActivityFeed } from '../../utils/dashboardCalculations';
 import useDebounce from '../../hooks/useDebounce';
+import Pagination from '../../components/UI/Pagination';
 
 // STATIC DATA
 
@@ -182,7 +183,7 @@ export default function AllHistory() {
                 }
             />
 
-            <FilterBar className="!p-2.5">
+            <FilterBar hideClearButton={true} className="!p-2.5">
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-1">
                     <FilterDropdown
                         label="Organization"
@@ -240,6 +241,18 @@ export default function AllHistory() {
                         disabled={filters.site.length === 0}
                     />
                 </div>
+                
+                <div className="flex items-center gap-2 shrink-0 border-l border-border-main/40 pl-3 ml-auto">
+                    {(Object.values(filters).some(arr => arr.length > 0)) && (
+                        <button 
+                            onClick={resetFilters} 
+                            className="h-9 flex items-center gap-1.5 px-3 text-rose-500 hover:text-rose-600 font-black text-[10px] uppercase tracking-[0.15em] transition-all rounded-xl bg-rose-50/30 hover:bg-rose-50 shadow-sm border border-rose-100/50 hover:border-rose-200 group"
+                        >
+                            <FiRefreshCcw size={12} className="group-hover:rotate-180 transition-transform duration-500" />
+                            Reset
+                        </button>
+                    )}
+                </div>
             </FilterBar>
 
             <div className="w-full relative">
@@ -256,16 +269,14 @@ export default function AllHistory() {
                     loading={isLoading || !activityList}
                     emptyMessage="No historical records matched your current filters."
                     footer={
-                        <div className="flex justify-between items-center w-full py-2 px-1">
-                            <div className="text-[12px] text-gray font-medium uppercase tracking-tight">Records Found: <span className="font-black text-title">{totalCount.toLocaleString()}</span></div>
-                            {totalPages > 1 && (
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[11px] font-bold text-gray/60">Page {currentPage} of {totalPages}</span>
-                                    <Button variant="outline" size="sm" onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1 || isLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Previous</Button>
-                                    <Button variant="outline" size="sm" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage >= totalPages || isLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Next</Button>
-                                </div>
-                            )}
-                        </div>
+                        <Pagination 
+                            currentPage={currentPage}
+                            totalPages={totalPages || 1}
+                            onPageChange={setCurrentPage}
+                            totalItems={totalCount}
+                            itemsPerPage={10}
+                            variant="ghost"
+                        />
                     }
                 />
             </div>

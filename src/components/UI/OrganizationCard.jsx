@@ -7,14 +7,12 @@ import { getOrgStatus } from '../../utils/orgUtils';
 const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, onEdit, onView, onMouseEnter }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const totalComputedCoordinators = org.stats?.coordinators || 0;
-  const totalComputedSites = org.stats?.sites || 0;
-  const totalComputedFloors = org.stats?.floors || 0;
-
-
-  let siteComputedFloors = org.floors_count || 0;
-  let siteComputedZones = org.zones_count || 0;
-  let siteComputedAssets = org.inventory_count || 0;
+  const stats = org.stats || {};
+  const totalCoordinators = stats.coordinators || 0;
+  const totalSites = stats.sites || 0;
+  const totalFloors = stats.floors || 0;
+  const totalZones = stats.zones || 0;
+  const totalAssets = stats.assets || 0;
 
   // Standardized Status Calculation
   const currentStatus = isSiteCard ? (org.status || 'ACTIVE') : getOrgStatus(org);
@@ -160,7 +158,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               {isSiteCard ? 'FLOORS' : 'COORDS'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
-              {isSiteCard ? siteComputedFloors : totalComputedCoordinators}
+              {isSiteCard ? totalFloors : totalCoordinators}
             </p>
           </div>
           <div className="flex flex-col gap-1">
@@ -168,7 +166,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               {isSiteCard ? 'ZONES' : 'SITES'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
-              {isSiteCard ? siteComputedZones : totalComputedSites}
+              {isSiteCard ? totalZones : totalSites}
             </p>
           </div>
           <div className="flex flex-col gap-1">
@@ -176,7 +174,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               {isSiteCard ? 'ASSETS' : 'FLOORS'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
-              {isSiteCard ? siteComputedAssets.toLocaleString() : totalComputedFloors}
+              {isSiteCard ? totalAssets.toLocaleString() : totalFloors}
             </p>
           </div>
         </div>
