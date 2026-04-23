@@ -61,12 +61,14 @@ export const mapOrgToFrontend = (data) => {
     state: data.state || '',
     country: data.country || '',
     plannedSites: data.planned_sites || 0,
+    plannedFloors: data.planned_floors || 0,
     otherInfo: data.description || data.otherInfo || '',
     isBlocked: data.is_blocked || false,
     imagery: { ...imagery, profile: profileImg },
     stats: {
-      sites: data.sites_count || 0,
-      floors: data.floors_count || 0,
+      // Fallback logic: Show planned counts if actual counts are 0
+      sites: data.sites_count || data.planned_sites || 0,
+      floors: data.floors_count || data.planned_floors || 0,
       zones: data.zones_count || 0,
       assets: data.inventory_count || 0,
       coordinators: data.coordinators_count || 0,

@@ -23,6 +23,10 @@ const orgSchema = z.object({
     .min(0, 'Must be positive')
     .max(20, 'Maximum 20 sites allowed')
     .default(0),
+  plannedFloors: z.number()
+    .min(0, 'Must be positive')
+    .max(200, 'Maximum 200 floors allowed')
+    .default(0),
   contactPerson: z.string().min(1, 'Contact person is required'),
   contactEmail: z.string().trim().min(1, "Contact Email is required").email("Invalid email format"),
   contactPhone: z.string().trim()
@@ -54,6 +58,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
       occupancyType: 'Industrial Factory',
       classification: 'Group H - High Hazard',
       plannedSites: 0,
+      plannedFloors: 0,
       contactPerson: '',
       contactEmail: '',
       contactPhone: '',
@@ -104,6 +109,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
       occupancyType: data.occupancy_type || data.occupancyType || 'Industrial Factory',
       classification: data.classification || 'Group H - High Hazard',
       plannedSites: data.planned_sites !== undefined ? data.planned_sites : (data.plannedSites || 0),
+      plannedFloors: data.planned_floors !== undefined ? data.planned_floors : (data.plannedFloors || 0),
       contactPerson: data.contact_person_name || data.contactPerson || '',
       contactEmail: data.contact_email || data.contactEmail || '',
       contactPhone: data.contact_phone || data.contactPhone || '',
@@ -133,6 +139,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
           occupancyType: 'Industrial Factory',
           classification: 'Group H - High Hazard',
           plannedSites: 0,
+          plannedFloors: 0,
           contactPerson: '',
           contactEmail: '',
           contactPhone: '',
@@ -208,7 +215,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
 
     const nextStep = async () => {
       let fieldsToValidate = [];
-      if (step === 1) fieldsToValidate = ['name', 'industry', 'occupancyType', 'classification', 'plannedSites', 'imagery.profile'];
+      if (step === 1) fieldsToValidate = ['name', 'industry', 'occupancyType', 'classification', 'plannedSites', 'plannedFloors', 'imagery.profile'];
       if (step === 2) fieldsToValidate = ['contactPerson', 'contactEmail', 'contactPhone', 'address', 'city', 'state', 'country'];
 
       const result = await trigger(fieldsToValidate);
@@ -366,6 +373,21 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                               placeholder="e.g., 5"
                               {...register('plannedSites', { valueAsNumber: true })}
                               error={errors.plannedSites?.message}
+                              disabled={isViewOnly}
+                            />
+                          </Motion.div>
+                          <Motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1 } }}>
+                            <InputField
+                              label="Total Floors"
+                              type="number"
+                              min="0"
+                              max="200"
+                              onKeyDown={(e) => {
+                                if (['-', 'e', '+', '.'].includes(e.key)) e.preventDefault();
+                              }}
+                              placeholder="e.g., 10"
+                              {...register('plannedFloors', { valueAsNumber: true })}
+                              error={errors.plannedFloors?.message}
                               disabled={isViewOnly}
                             />
                           </Motion.div>
