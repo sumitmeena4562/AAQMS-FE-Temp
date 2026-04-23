@@ -165,7 +165,7 @@ const Zones = () => {
                 if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
                 if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
                 if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
-                return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.inventory_count ?? 0}` };
+                return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.count ?? 0}` };
             });
     }, [zoneData, searchQuery]);
 
