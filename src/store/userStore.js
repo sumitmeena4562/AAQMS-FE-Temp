@@ -66,9 +66,7 @@ const useUserStore = create((set, get) => ({
         try {
             const data = await userService.updateUser(id, updates);
             
-            // Force refetch — invalidate + refetch immediately
-            await queryClient.invalidateQueries({ queryKey: ['users'] });
-            await queryClient.refetchQueries({ queryKey: ['users', 'list'] });
+            await queryClient.invalidateQueries({ queryKey: ['users'], exact: false });
 
             // Update stats if returned
             if (data.updated_stats) {
@@ -123,9 +121,7 @@ const useUserStore = create((set, get) => ({
         try {
             await userService.bulkAction(ids, action);
             
-            // Force refetch so status change reflects immediately
-            await queryClient.invalidateQueries({ queryKey: ['users'] });
-            await queryClient.refetchQueries({ queryKey: ['users', 'list'] });
+            await queryClient.invalidateQueries({ queryKey: ['users'], exact: false });
 
             set({ selectedIds: [], loading: false });
             

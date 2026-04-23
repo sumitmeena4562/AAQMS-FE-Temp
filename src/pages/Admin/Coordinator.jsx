@@ -128,11 +128,13 @@ const Coordinator = React.memo(() => {
     }, []);
 
     const handleFormSubmit = useCallback(async (data) => {
-        // Force role as coordinator
-        const finalData = { ...data, role: 'coordinator' };
+        // data is FormData — append role directly
+        if (data instanceof FormData) {
+            data.set('role', 'COORDINATOR');
+        }
         const res = editingUser?.id
-            ? await updateUser(editingUser.id, finalData)
-            : await createUser(finalData);
+            ? await updateUser(editingUser.id, data)
+            : await createUser(data);
 
         if (res.success) {
             const userName = res.data?.name || data.name || 'User';
