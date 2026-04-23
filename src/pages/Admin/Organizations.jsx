@@ -408,6 +408,8 @@ const Organizations = React.memo(() => {
                                 onPageChange={setCurrentPage}
                                 totalItems={totalCount}
                                 itemsPerPage={itemsPerPage}
+                                variant="ghost"
+                                className="mt-6"
                             />
                         </div>
                     ) : (

@@ -9,6 +9,7 @@ import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors } from '../../hooks/api/useHierarchyQueries';
 import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
+import Pagination from '../../components/UI/Pagination';
 
 const FloorPlan = () => {
   const navigate = useNavigate();
@@ -159,15 +160,15 @@ const FloorPlan = () => {
               ))}
 
               {totalLevels > 10 && (
-                  <div className="flex items-center justify-between px-4 py-4 bg-card border border-border-main rounded-2xl shadow-sm mt-6 col-span-full">
-                      <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                          Page {currentPage} of {Math.ceil(totalLevels / 10)}
-                      </span>
-                      <div className="flex items-center gap-2">
-                          <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
-                          <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(totalLevels / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
-                      </div>
-                  </div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(totalLevels / 10)}
+                  onPageChange={setCurrentPage}
+                  totalItems={totalLevels}
+                  itemsPerPage={10}
+                  variant="ghost"
+                  className="mt-6 col-span-full"
+                />
               )}
             </>
           ) : (

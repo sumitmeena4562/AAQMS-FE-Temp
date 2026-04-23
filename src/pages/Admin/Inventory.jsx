@@ -114,16 +114,6 @@ const Inventory = () => {
 
     const queryClient = useQueryClient();
 
-    // ── PREFETCH LOGIC ──
-    const handlePrefetch = useCallback((id) => {
-        if (!id) return;
-        queryClient.prefetchQuery({
-            queryKey: ['asset', id],
-            queryFn: () => inventoryService.getAssetById(id),
-            staleTime: 5 * 60 * 1000
-        });
-    }, [queryClient]);
-
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
     };
@@ -294,7 +284,6 @@ const Inventory = () => {
                             data={displayedInventory}
                             loading={isLoading}
                             onRowClick={handleAssetClick}
-                            onRowMouseEnter={(row) => handlePrefetch(row.id)}
                             emptyMessage={<EmptyState onReset={handleReset} />}
                             footer={
                                 <Pagination 
@@ -320,7 +309,6 @@ const Inventory = () => {
                                             key={asset.id} 
                                             asset={asset} 
                                             onClick={handleAssetClick} 
-                                            onMouseEnter={() => handlePrefetch(asset.id)}
                                         />
                                     ))}
                                 </div>

@@ -9,6 +9,7 @@ import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useSites } from '../../hooks/api/useHierarchyQueries';
 import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
+import Pagination from '../../components/UI/Pagination';
 
 const SitePlan = () => {
   const { selectedOrg, selectedCoord, setOrg, setCoord } = useFilterStore();
@@ -148,15 +149,15 @@ const SitePlan = () => {
             ))}
 
             {totalPlans > 10 && (
-                <div className="flex items-center justify-between px-6 py-4 bg-card border border-border-main rounded-2xl shadow-sm mt-6 col-span-full">
-                    <span className="text-[10px] font-black text-gray uppercase tracking-widest">
-                        Page {currentPage} of {Math.ceil(totalPlans / 10)}
-                    </span>
-                    <div className="flex items-center gap-2">
-                        <Button variant="outline" onClick={() => setCurrentPage(p => p - 1)} disabled={currentPage === 1} className="!h-9 !px-4 !text-[10px] !font-black !uppercase">Previous</Button>
-                        <Button variant="outline" onClick={() => setCurrentPage(p => p + 1)} disabled={currentPage >= Math.ceil(totalPlans / 10)} className="!h-9 !px-6 !text-[10px] !font-black !uppercase">Next</Button>
-                    </div>
-                </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(totalPlans / 10)}
+                onPageChange={setCurrentPage}
+                totalItems={totalPlans}
+                itemsPerPage={10}
+                variant="ghost"
+                className="mt-6 col-span-full"
+              />
             )}
           </div>
         )}

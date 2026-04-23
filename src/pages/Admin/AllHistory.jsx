@@ -11,6 +11,7 @@ import { useSites, useFloors } from '../../hooks/api/useHierarchyQueries';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import { mapToActivityFeed } from '../../utils/dashboardCalculations';
 import useDebounce from '../../hooks/useDebounce';
+import Pagination from '../../components/UI/Pagination';
 
 // STATIC DATA
 
@@ -256,16 +257,14 @@ export default function AllHistory() {
                     loading={isLoading || !activityList}
                     emptyMessage="No historical records matched your current filters."
                     footer={
-                        <div className="flex justify-between items-center w-full py-2 px-1">
-                            <div className="text-[12px] text-gray font-medium uppercase tracking-tight">Records Found: <span className="font-black text-title">{totalCount.toLocaleString()}</span></div>
-                            {totalPages > 1 && (
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[11px] font-bold text-gray/60">Page {currentPage} of {totalPages}</span>
-                                    <Button variant="outline" size="sm" onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1 || isLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Previous</Button>
-                                    <Button variant="outline" size="sm" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage >= totalPages || isLoading} className="px-6 font-black tracking-widest uppercase text-[10px] h-10">Next</Button>
-                                </div>
-                            )}
-                        </div>
+                        <Pagination 
+                            currentPage={currentPage}
+                            totalPages={totalPages || 1}
+                            onPageChange={setCurrentPage}
+                            totalItems={totalCount}
+                            itemsPerPage={10}
+                            variant="ghost"
+                        />
                     }
                 />
             </div>

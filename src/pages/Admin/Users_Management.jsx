@@ -204,8 +204,19 @@ const Users = React.memo(() => {
                         <div className="flex flex-col min-w-0">
                             <span className="text-[14px] font-black text-title leading-tight truncate">{displayName}</span>
                             <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="text-[9px] font-bold text-gray uppercase tracking-tighter bg-base px-1.5 py-0.5 rounded leading-none shrink-0 border border-border-main/40">
-                                    {row?.role === 'field_officer' ? 'Field Officer' : row?.role === 'coordinator' ? 'Coordinator' : row?.role || 'User'}
+                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border leading-none shrink-0 ${
+                                    (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : ''))?.toLowerCase().includes('admin') ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                    (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : ''))?.toLowerCase().includes('coordinator') ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                    (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : ''))?.toLowerCase().includes('field_officer') || (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : ''))?.toLowerCase().includes('fieldofficer') ? 'bg-teal-50 text-teal-700 border-teal-100' :
+                                    'bg-gray-50 text-gray-600 border-gray-100'
+                                }`}>
+                                    {(() => {
+                                        const r = (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : '') || '').toLowerCase();
+                                        if (r.includes('admin')) return 'Admin';
+                                        if (r.includes('coordinator')) return 'Coordinator';
+                                        if (r.includes('field_officer') || r.includes('fieldofficer')) return 'Field Officer';
+                                        return r || 'User';
+                                    })()}
                                 </span>
                                 <span className="text-[9px] font-medium text-gray/60 truncate italic leading-none">• system entity</span>
                             </div>
@@ -255,19 +266,27 @@ const Users = React.memo(() => {
             accessor: 'role',
             width: '15%',
             align: 'center',
-            render: (value) => {
-                const role = value?.toLowerCase();
+            render: (_, row) => {
+                const rawRole = (row?.role?.role_name || row?.role_name || (typeof row?.role === 'string' ? row?.role : '') || '').toLowerCase();
+                
                 const config = {
-                    admin: { color: 'text-amber-700 bg-amber-50 border-amber-100', icon: <FiShield size={10} />, label: 'Administrator' },
-                    coordinator: { color: 'text-sky-700 bg-sky-50 border-sky-100', icon: <FiLayers size={10} />, label: 'Coordinator' },
-                    field_officer: { color: 'text-teal-700 bg-teal-50 border-teal-100', icon: <FiActivity size={10} />, label: 'Field Officer' }
-                }[role] || { color: 'text-gray bg-base border-border-main', icon: <FiShield size={10} />, label: value };
+                    admin: { color: 'text-amber-800 bg-amber-50 border-amber-200', label: 'Admin' },
+                    coordinator: { color: 'text-blue-800 bg-blue-50 border-blue-200', label: 'Coordinator' },
+                    field_officer: { color: 'text-teal-800 bg-teal-50 border-teal-200', label: 'Field Officer' },
+                    fieldofficer: { color: 'text-teal-800 bg-teal-50 border-teal-200', label: 'Field Officer' }
+                };
+
+                let activeConfig = null;
+                if (rawRole.includes('admin')) activeConfig = config.admin;
+                else if (rawRole.includes('coordinator')) activeConfig = config.coordinator;
+                else if (rawRole.includes('field_officer') || rawRole.includes('fieldofficer')) activeConfig = config.field_officer;
+                
+                const finalConfig = activeConfig || { color: 'text-gray-700 bg-gray-50 border-gray-200', label: rawRole || 'User' };
 
                 return (
                     <div className="flex justify-center">
-                        <div className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 border shadow-sm ${config.color}`}>
-                            {config.icon}
-                            {config.label}
+                        <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center justify-center border shadow-sm ${finalConfig.color}`}>
+                            <span>{finalConfig.label}</span>
                         </div>
                     </div>
                 );
