@@ -152,7 +152,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
           }
         });
       }
-    }, [org, reset, isOpen]);
+    }, [org, fullOrg, reset, isOpen]);
 
     // eslint-disable-next-line react-hooks/incompatible-library
     const imageryValues = watch('imagery');
