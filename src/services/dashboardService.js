@@ -7,13 +7,13 @@ import { mapToActivityFeed } from '../utils/dashboardCalculations';
 
 // ─── NEW UNIFIED BOOTSTRAP ENDPOINT (Replaces everything for Dashboard) ───
 export const getDashboardBootstrap = async (signal = null) => {
-    const response = await api.get('/users/dashboard/bootstrap/', { signal });
+    const response = await api.get('/users/dashboard/summary/', { signal });
     const data = response.data;
     
     return {
         stats: data.stats || {},
         metrics: data.metrics || [],
-        recent_history: mapToActivityFeed(data.recent_history || []),
+        recent_history: mapToActivityFeed(data.recent_activity || []),
         organisations: data.organisations || []
     };
 };
