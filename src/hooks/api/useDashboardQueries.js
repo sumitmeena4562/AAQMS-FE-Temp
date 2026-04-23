@@ -1,11 +1,26 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import * as dashboardService from '../../services/dashboardService';
 import { queryClient } from '../../lib/queryClient';
 
 /**
+ * useDashboardBootstrap
+ * NEW: Fetches ALL dashboard data (stats, metrics, history, orgs) in one call.
+ */
+export const useDashboardBootstrap = () => {
+  return useQuery({
+    queryKey: ['dashboard', 'bootstrap'],
+    queryFn: ({ signal }) => dashboardService.getDashboardBootstrap(signal),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true, // Always get fresh data when entering dashboard
+  });
+};
+
+/**
  * useDashboardSummary
- * Fetches the unified dashboard summary (stats, metrics, recent_activity)
+ * Fetches the unified dashboard summary (Legacy)
  */
 export const useDashboardSummary = () => {
   return useQuery({
@@ -38,6 +53,7 @@ export const useAllHistory = (filters = {}) => {
   return useQuery({
     queryKey: ['dashboard', 'history', cleanFilters],
     queryFn: ({ signal }) => dashboardService.getAllHistory(cleanFilters, signal),
+    placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000, // History is more dynamic, 2 mins is safer
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

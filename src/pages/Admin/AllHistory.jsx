@@ -77,17 +77,17 @@ export default function AllHistory() {
         limit: 10
     }), [debouncedFilters, currentPage]);
 
-    const { data: historyData, isLoading } = useAllHistory(queryParams);
+    const { data: historyData, isLoading, isFetching } = useAllHistory(queryParams);
 
     const totalCount = historyData?.count || 0;
     const totalPages = Math.ceil(totalCount / 10);
 
     // ── 3. Pagination Prefetching (Background optimization) ──
     useEffect(() => {
-        if (currentPage < totalPages) {
+        if (!isFetching && currentPage < totalPages) {
             prefetchHistory(queryParams, currentPage + 1);
         }
-    }, [currentPage, queryParams, totalPages]);
+    }, [currentPage, queryParams, totalPages, isFetching]);
 
     // ── 4. Derived Data ──
     // Map backend results to frontend activity feed format

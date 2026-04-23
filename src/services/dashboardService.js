@@ -2,16 +2,29 @@ import api from './api';
 import { mapToActivityFeed } from '../utils/dashboardCalculations';
 
 /**
- * \u2500\u2500 DASHBOARD API SERVICE \u2500\u2500
+ * ── DASHBOARD API SERVICE ──
  */
 
-// \u2500\u2500\u2500 UNIFIED DASHBOARD ENDPOINT (1 call replaces 3) \u2500\u2500\u2500
+// ─── NEW UNIFIED BOOTSTRAP ENDPOINT (Replaces everything for Dashboard) ───
+export const getDashboardBootstrap = async (signal = null) => {
+    const response = await api.get('/users/dashboard/bootstrap/', { signal });
+    const data = response.data;
+    
+    return {
+        stats: data.stats || {},
+        metrics: data.metrics || [],
+        recent_history: mapToActivityFeed(data.recent_history || []),
+        organisations: data.organisations || []
+    };
+};
+
+// ─── UNIFIED DASHBOARD ENDPOINT (Legacy - will be deprecated) ───
 export const getDashboardSummary = async (signal = null) => {
     const response = await api.get('/users/dashboard/summary/', { signal });
     return response.data; // { stats, metrics, recent_activity }
 };
 
-// \u2500\u2500\u2500 HISTORY (server-side paginated) \u2500\u2500\u2500
+// ─── HISTORY (server-side paginated) ───
 export const getAllHistory = async (filters = {}, signal = null) => {
     const finalFilters = {};
     Object.keys(filters).forEach(key => {

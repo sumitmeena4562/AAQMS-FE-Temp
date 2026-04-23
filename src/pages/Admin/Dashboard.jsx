@@ -6,7 +6,7 @@ import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
 import RecentActivityTable from "../../components/Dashboard/RecentactivityTable";
 import { MatricCardSkeleton } from "../../components/Dashboard/StatsCardSkeleton";
-import { useDashboardSummary } from "../../hooks/api/useDashboardQueries";
+import { useDashboardBootstrap } from "../../hooks/api/useDashboardQueries";
 import { mapToActivityFeed } from "../../utils/dashboardCalculations";
 
 import { DESIGN_TOKENS } from "../../constants/designTokens";
@@ -41,23 +41,23 @@ const itemVariants = {
 };
 
 const Dashboard = () => {
-    // ── SINGLE unified call: 1 request replaces 3 ──
-    const { data: summary, isLoading, isError, dataUpdatedAt } = useDashboardSummary();
+    // ── BOOTSTRAP: 1 unified call fetches Stats, Metrics, History AND Organizations ──
+    const { data: bootstrap, isLoading, isError, dataUpdatedAt } = useDashboardBootstrap();
 
-    // ── Map unified summary → UI shapes (MEMOIZED) ──
-    const stats = useMemo(() => summary?.stats ? [
+    // ── Map bootstrap data → UI shapes (MEMOIZED) ──
+    const stats = useMemo(() => bootstrap?.stats ? [
         {
             title: "Organizations",
-            value: (summary.stats.total_organisations || 0).toLocaleString(),
+            value: (bootstrap.stats.total_organisations || 0).toLocaleString(),
             trend: 0, changeType: "neutral",
             description: "Active enterprise hubs",
-            secondaryLabel: `${summary.stats.total_sites || 0} sites total`,
+            secondaryLabel: `${bootstrap.stats.total_sites || 0} sites total`,
             icon: React.createElement(FiBriefcase, { size: 18 }),
             iconBgClass: "bg-blue-50", iconColorClass: "text-blue-600",
         },
         {
             title: "Coordinators",
-            value: (summary.stats.total_coordinators || 0).toLocaleString(),
+            value: (bootstrap.stats.total_coordinators || 0).toLocaleString(),
             trend: 0, changeType: "neutral",
             description: "Verified supervisors",
             secondaryLabel: "System administrative layer",
@@ -66,26 +66,26 @@ const Dashboard = () => {
         },
         {
             title: "Total Users",
-            value: (summary.stats.total_users || 0).toLocaleString(),
+            value: (bootstrap.stats.total_users || 0).toLocaleString(),
             trend: 0, changeType: "neutral",
             description: "Registered identities",
-            secondaryLabel: `${summary.stats.active_users || 0} active`,
+            secondaryLabel: `${bootstrap.stats.active_users || 0} active`,
             icon: React.createElement(FiShield, { size: 18 }),
             iconBgClass: "bg-emerald-50", iconColorClass: "text-emerald-600",
         },
         {
             title: "Total Assets",
-            value: (summary.stats.total_assets || 0).toLocaleString(),
+            value: (bootstrap.stats.total_assets || 0).toLocaleString(),
             trend: 0, changeType: "neutral",
             description: "Equipment tracked",
-            secondaryLabel: `${summary.stats.risk_alerts || 0} risk alerts`,
+            secondaryLabel: `${bootstrap.stats.risk_alerts || 0} risk alerts`,
             icon: React.createElement(FiBox, { size: 18 }),
             iconBgClass: "bg-orange-50", iconColorClass: "text-orange-600",
         },
-    ] : null, [summary]);
+    ] : null, [bootstrap]);
 
-    const metricCards = useMemo(() => summary?.metrics
-        ? summary.metrics
+    const metricCards = useMemo(() => bootstrap?.metrics
+        ? bootstrap.metrics
             .filter(m => m.label !== "AI Coverage")
             .map(m => ({
             title: m.label,
@@ -96,18 +96,9 @@ const Dashboard = () => {
             progress: 70,
             secondaryLabel: m.trend === 'up' ? 'Increasing' : m.trend === 'down' ? 'Decreasing' : 'Stable',
         }))
-        : null, [summary]);
+        : null, [bootstrap]);
 
-    const activity = useMemo(() => {
-        const rawActivity = (summary?.recent_activity || []).map(item => ({
-            ...item,
-            type: item.action || item.type || 'Event',
-            user: item.user_name || item.user?.name || item.user || 'System',
-            entity: item.entity_type || item.entity || '',
-            time: item.created_at || item.time,
-        }));
-        return mapToActivityFeed(rawActivity);
-    }, [summary]);
+    const activity = useMemo(() => bootstrap?.recent_history || [], [bootstrap]);
 
     const isDashboardLoading = isLoading;
     const isDashboardError   = isError;
