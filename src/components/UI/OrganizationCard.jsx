@@ -49,13 +49,13 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
   return (
     <div
-      className={`min-h-[340px] elite-card elite-card-hover flex flex-col overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
+      className={`h-[360px] elite-card elite-card-hover flex flex-col overflow-hidden group/card ${isSiteCard ? 'cursor-default' : 'cursor-pointer'}`}
       onClick={handleCardClick}
       onMouseEnter={onMouseEnter}
     >
 
       {/* Top Image Section */}
-      <div className="relative h-[140px] w-full shrink-0 bg-base overflow-hidden">
+      <div className="relative h-[130px] w-full shrink-0 bg-base overflow-hidden">
         <img
           src={org.imagery?.profile || org.image || (() => {
             const fallbacks = [
@@ -110,11 +110,11 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
 
         {/* Header Section */}
         <div>
-          <div className="relative mb-2">
-            <h3 className="text-lg font-bold text-primary tracking-tight leading-tight line-clamp-2 break-words group-hover/card:invisible">
+          <div className="relative mb-2 group/name">
+            <h3 className="text-lg font-bold text-primary tracking-tight leading-tight line-clamp-2 break-words group-hover/name:invisible">
               {org.site_name || org.name}
             </h3>
-            <h3 className="absolute top-0 left-0 right-0 text-lg font-bold text-primary tracking-tight leading-tight invisible group-hover/card:visible bg-card z-50 p-2 -mx-2 rounded-xl shadow-xl ring-1 ring-primary/10 break-words">
+            <h3 className="absolute top-0 left-0 right-0 text-lg font-bold text-primary tracking-tight leading-tight invisible group-hover/name:visible bg-card z-50 p-2 -mx-2 rounded-xl shadow-xl ring-1 ring-primary/10 break-words">
               {org.site_name || org.name}
             </h3>
           </div>
@@ -175,7 +175,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         {/* Bottom Button */}
         <button
           onClick={handleManage}
-          className="mt-4 w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center gap-2 group">
+          className="mt-auto w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-[var(--color-hover-blue)] hover:text-white hover:border-[var(--color-hover-blue)] transition-all flex items-center justify-center gap-2 group">
           <span>
             {isSiteCard ? 'View Floors' : 'Manage Org'}
           </span>
