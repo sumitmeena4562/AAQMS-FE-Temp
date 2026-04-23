@@ -18,7 +18,7 @@ import UserCard from '../../components/UI/UserCard';
 import useDebounce from '../../hooks/useDebounce';
 import UserAvatar from '../../components/UI/UserAvatar';
 import FilterBar from '../../components/UI/FilterBar';
-import { useUsers, useCoordinatorStats } from '../../hooks/api/useUserQueries';
+import { useUsers, useCoordinatorStats, useUserFormOptions } from '../../hooks/api/useUserQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import useSearchStore from '../../store/useSearchStore';
 import TableSkeleton from '../../components/UI/TableSkeleton';
@@ -84,12 +84,14 @@ const Coordinator = React.memo(() => {
     // ── HIERARCHY DATA (UNIFIED) ──
     const { organizations } = useHierarchy({ includeSites: false, includeCoords: false });
     
+    // ── FORM OPTIONS (Pre-fetched for modal speed) ──
+    const { data: formOptions } = useUserFormOptions({ enabled: true });
+
     // Roles are static for the product
     const filterOptions = {
         organizations: organizations.map(o => ({ value: o.id, label: o.name })),
         roles: [{ value: 'coordinator', label: 'Coordinator' }]
     };
-
 
     const totalCount = usersData?.totalCount || 0;
 
@@ -116,10 +118,17 @@ const Coordinator = React.memo(() => {
     }, [usersData, sortKey, sortDir]);
 
     // ── Handlers ──
+    // Default values for new coordinator (no id = modal treats as "Add" mode)
+    const defaultNewCoordinator = useMemo(() => ({
+        role: 'coordinator',
+        organisation_id: orgIdFromUrl || '',
+        org_name: orgNameFromUrl || ''
+    }), [orgIdFromUrl, orgNameFromUrl]);
+
     const handleAddUser = useCallback(() => {
-        setEditingUser({ role: 'coordinator', organisation_id: orgIdFromUrl });
+        setEditingUser(defaultNewCoordinator);
         setIsFormOpen(true);
-    }, [orgIdFromUrl]);
+    }, [defaultNewCoordinator]);
 
     const handleEditUser = useCallback((user) => {
         setEditingUser(user);
@@ -128,11 +137,13 @@ const Coordinator = React.memo(() => {
     }, []);
 
     const handleFormSubmit = useCallback(async (data) => {
-        // Force role as coordinator
-        const finalData = { ...data, role: 'coordinator' };
+        // Force role as coordinator (data is FormData — use .set(), NOT spread)
+        if (data instanceof FormData) {
+            data.set('role', 'COORDINATOR');
+        }
         const res = editingUser?.id
-            ? await updateUser(editingUser.id, finalData)
-            : await createUser(finalData);
+            ? await updateUser(editingUser.id, data)
+            : await createUser(data);
 
         if (res.success) {
             const userName = res.data?.name || data.name || 'User';
@@ -363,7 +374,7 @@ const Coordinator = React.memo(() => {
 
             <UserPeekView isOpen={isPeekOpen} onClose={() => setIsPeekOpen(false)} user={peekUser} onEdit={handleEditUser} onViewSites={handleViewSites} />
             <React.Suspense fallback={null}>
-                <UserFormModal isOpen={isFormOpen} onClose={() => setIsFormOpen(false)} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} />
+                <UserFormModal isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingUser(null); }} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} formOptions={formOptions} />
                 <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Status Lock" message={`Are you sure you want to change status?`} confirmText="Confirm" danger={true} />
                 <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Change" message={`Update ${selectedIds.length} profiles?`} confirmText="Confirm All" danger={true} />
             </React.Suspense>
