@@ -1,5 +1,4 @@
 import api from "./api";
-import { organizationService } from "./organizationService";
 import { extractError } from "../utils/errorUtils";
 
 // --- SERVICE IMPLEMENTATION ---
@@ -14,14 +13,19 @@ export const userService = {
                 page_size: pageSize,
                 page: page,
                 search: search?.trim() || undefined,
-                include_stats: 'true'
+                include_stats: 'true',
+                include_options: 'true' // One-call optimization
             };
 
-            // Map and clean filters
             Object.entries(filters).forEach(([key, value]) => {
                 if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) return;
-                const targetKey = key === 'organization' ? 'organisation_id' : key;
-                params[targetKey] = Array.isArray(value) ? value.join(',') : value;
+                
+                let targetKey = key;
+                if (key === 'organization') targetKey = 'organisation_id';
+                if (key === 'region') targetKey = 'site_id';
+                
+                // Ensure value is a clean string/number for the API
+                params[targetKey] = Array.isArray(value) ? value.filter(Boolean).join(',') : value;
             });
 
             const response = await api.get('users/admin/', { params, signal });
@@ -30,7 +34,8 @@ export const userService = {
             return {
                 users: data?.results || [],
                 totalCount: data?.count || 0,
-                stats: data?.stats
+                stats: data?.stats,
+                options: data?.options // Consolidated dropdown data
             };
         } catch (error) {
             if (error.name === 'CanceledError') throw error;

@@ -6,12 +6,12 @@ import FilterBar from '../../components/UI/FilterBar';
 import DataTable from '../../components/UI/DataTable';
 import Button from '../../components/UI/Button';
 import { useAllHistory, prefetchHistory } from '../../hooks/api/useDashboardQueries';
-import { useUserFormOptions } from '../../hooks/api/useUserQueries';
-import { useFloors } from '../../hooks/api/useHierarchyQueries';
+import { useHierarchy } from '../../hooks/api/useHierarchy';
+import { useSites, useFloors } from '../../hooks/api/useHierarchyQueries';
 import TableSkeleton from '../../components/UI/TableSkeleton';
+import { mapToActivityFeed } from '../../utils/dashboardCalculations';
 import useDebounce from '../../hooks/useDebounce';
 import Pagination from '../../components/UI/Pagination';
-import { useSearchParams } from 'react-router-dom';
 
 // STATIC DATA
 
@@ -38,26 +38,27 @@ const EVENT_CATEGORIES = [
 ];
 
 export default function AllHistory() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    
-    // ── 1. Unified Form Options (Orgs, Sites, Roles) ──
-    // Fetches everything in one cached call, eliminating the useHierarchy waterfall.
-    const { data: formOptions, isLoading: isLoadingOptions } = useUserFormOptions();
+    // ── 1. Local Filter + Pagination State ──
+    const [currentPage, setCurrentPage] = useState(1);
+    const [filters, setFilters] = useState({
+        organisation: [],
+        site: [],
+        floor: [],
+        role: [],
+        operation: [],
+        category: []
+    });
 
-    // ── 2. Local Filter + Pagination State (Synced with URL) ──
-    const currentPage = parseInt(searchParams.get('page') || '1', 10);
-    
-    const filters = useMemo(() => ({
-        organisation: searchParams.get('org_id')?.split(',').filter(Boolean) || [],
-        site: searchParams.get('site_id')?.split(',').filter(Boolean) || [],
-        floor: searchParams.get('floor')?.split(',').filter(Boolean) || [],
-        role: searchParams.get('role')?.split(',').filter(Boolean) || [],
-        operation: searchParams.get('operation')?.split(',').filter(Boolean) || [],
-        category: searchParams.get('category')?.split(',').filter(Boolean) || []
-    }), [searchParams]);
+    const [isFilterInteracted, setIsFilterInteracted] = useState(false);
 
-    // ── 3. DATA FETCHING ──
-    // Debounce filters to prevent "Request Explosion"
+    // ── 2. DATA FETCHING (Unified Super-API for Dropdowns) ──
+    const { organizations: orgs, sites: allSites } = useHierarchy({
+        includeSites: true,
+        includeCoords: false,
+        enabled: isFilterInteracted || Object.values(filters).some(arr => arr.length > 0)
+    });
+
+    // Debounce filters to prevent "Request Explosion" (canceled requests in network tab)
     const debouncedFilters = useDebounce(filters, 400);
 
     const { data: floorData } = useFloors(filters.site, {
@@ -94,38 +95,26 @@ export default function AllHistory() {
         historyData?.results || [],
         [historyData?.results]);
 
-    // ── 5. State Management Actions (Updating URL) ──
+    // ── 5. State Management Actions ──
     const updateFilter = (key, val) => {
-        const newParams = new URLSearchParams(searchParams);
-        const value = Array.isArray(val) ? val.join(',') : val;
-        
-        const targetKey = key === 'organisation' ? 'org_id' : key === 'site' ? 'site_id' : key;
-
-        if (!value || value.length === 0) {
-            newParams.delete(targetKey);
-        } else {
-            newParams.set(targetKey, value);
-        }
-
-        // Reset cascading filters
-        if (key === 'organisation') { newParams.delete('site_id'); newParams.delete('floor'); }
-        else if (key === 'site') { newParams.delete('floor'); }
-
-        newParams.set('page', '1');
-        setSearchParams(newParams);
-    };
-
-    const setCurrentPage = (page) => {
-        const newParams = new URLSearchParams(searchParams);
-        newParams.set('page', String(page));
-        setSearchParams(newParams);
+        const newFilters = { ...filters, [key]: Array.isArray(val) ? val : [val].filter(Boolean) };
+        if (key === 'organisation') { newFilters.site = []; newFilters.floor = []; }
+        else if (key === 'site') { newFilters.floor = []; }
+        setFilters(newFilters);
+        setCurrentPage(1);
     };
 
     const resetFilters = () => {
-        setSearchParams({});
+        setFilters({
+            organisation: [],
+            site: [],
+            floor: [],
+            role: [],
+            operation: [],
+            category: []
+        });
+        setCurrentPage(1);
     };
-
-    const isCustomFilterActive = Object.values(filters).some(arr => arr.length > 0);
     const columns = useMemo(() => [
         {
             header: 'Operation',
@@ -203,17 +192,18 @@ export default function AllHistory() {
             <FilterBar 
                 className="!p-2.5" 
                 onClear={resetFilters} 
-                isCustomFilterActive={isCustomFilterActive}
+                isCustomFilterActive={Object.values(filters).some(arr => arr.length > 0)}
+                onMouseEnter={() => setIsFilterInteracted(true)}
+                onClick={() => setIsFilterInteracted(true)}
             >
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-1">
                     <FilterDropdown
                         label="Organization"
-                        options={formOptions?.organisations || []}
+                        options={orgs.map(o => ({ value: o.id, label: o.name }))}
                         value={filters.organisation}
                         onChange={v => updateFilter('organisation', v)}
                         allLabel="All"
                         multiple={true}
-                        loading={isLoadingOptions}
                     />
 
                     <FilterDropdown
@@ -245,16 +235,12 @@ export default function AllHistory() {
 
                     <FilterDropdown
                         label="Site"
-                        options={(formOptions?.sites || [])
-                            .filter(s => filters.organisation.length === 0 || filters.organisation.includes(String(s.org_id)))
-                            .map(s => ({ value: s.value, label: s.label }))
-                        }
+                        options={allSites.map(s => ({ value: s.id, label: s.site_name || s.name }))}
                         value={filters.site}
                         onChange={v => updateFilter('site', v)}
                         allLabel={filters.organisation.length > 0 ? "All Sites" : "Select Org First"}
                         multiple={true}
                         disabled={filters.organisation.length === 0}
-                        loading={isLoadingOptions}
                     />
 
                     <FilterDropdown

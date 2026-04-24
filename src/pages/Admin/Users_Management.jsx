@@ -8,9 +8,9 @@ import { StatsRow } from '../../components/Dashboard/StatsCard';
 import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import {
-    FiDownload, FiUsers, FiRefreshCw, FiRefreshCcw, FiCalendar, FiCheckCircle, FiAlertCircle, FiClock,
-    FiUser, FiSquare, FiCheckSquare, FiHome, FiBriefcase, FiShield, FiUserCheck, FiUserX,
-    FiMail, FiPhone, FiLayers, FiActivity
+    FiDownload, FiUsers, FiRefreshCw, FiRefreshCcw, FiCheckCircle, FiAlertCircle, FiClock,
+    FiUser, FiSquare, FiCheckSquare, FiHome, FiBriefcase, FiUserCheck, FiUserX,
+    FiMail, FiPhone
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
@@ -21,7 +21,7 @@ import useDebounce from '../../hooks/useDebounce';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import UserCard from '../../components/UI/UserCard';
-import { useUserManagementData, useUserFilterOptions, useUserFormOptions } from '../../hooks/api/useUserQueries';
+import { useUserManagementData, useUserFilterOptions } from '../../hooks/api/useUserQueries';
 import useSearchStore from '../../store/useSearchStore';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
@@ -29,7 +29,7 @@ import { useSearchParams } from 'react-router-dom';
 import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 const Users = React.memo(() => {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const { resetFilters } = useUserStore();
 
     // ── STORES (UI state only) ──
@@ -41,18 +41,15 @@ const Users = React.memo(() => {
     const { query: search, clearSearch } = useSearchStore();
 
     // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
+    // ── SYNC URL PARAMS → GLOBAL FILTERS ──
     const [isInitialized, setIsInitialized] = useState(false);
     useEffect(() => {
-        if (isInitialized) return;
-
         const pOrg = searchParams.get('org_id') || searchParams.get('org');
         const pSite = searchParams.get('site_id') || searchParams.get('site');
         const pRole = searchParams.get('role');
         const pStatus = searchParams.get('status');
 
-        if (!pOrg && !pSite && !pRole && !pStatus) {
-            resetFilters();
-        } else {
+        if (pOrg || pSite || pRole || pStatus) {
             const orgs = pOrg ? pOrg.split(',') : [];
             const sites = pSite ? pSite.split(',') : [];
             const roles = pRole ? pRole.split(',') : [];
@@ -64,10 +61,14 @@ const Users = React.memo(() => {
                 role: roles,
                 status: statuses
             });
+        } else {
+            resetFilters();
         }
 
-        setIsInitialized(true);
-    }, [searchParams, resetFilters, setFilters, isInitialized]);
+        // Delay initialization to allow debounced state to catch up with store updates
+        const timer = setTimeout(() => setIsInitialized(true), 50);
+        return () => clearTimeout(timer);
+    }, [searchParams, resetFilters, setFilters]);
 
     const responsiveLimit = useResponsiveLimit(12);
     const appliedLimit = useRef(limit);
@@ -81,19 +82,22 @@ const Users = React.memo(() => {
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 
     // ── QUERY HOOKS (OPTIMIZED + DEBOUNCED) ──
+    // ── QUERY HOOKS (DEBOUNCED FOR PERFORMANCE) ──
     const debouncedSearch = useDebounce(search, 500);
     const debouncedFilters = useDebounce(filters, 500);
 
     const isReady = isInitialized && responsiveLimit === limit;
 
     const {
-        users, totalCount, stats, isLoading: isUsersLoading, refetchAll
+        users, totalCount, stats, formOptions, isLoading: isUsersLoading, refetchAll
     } = useUserManagementData(debouncedFilters, debouncedSearch, page, limit, { enabled: isReady });
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
 
-    // ── FORM & FILTER OPTIONS (UNIFIED SINGLE CALL) ──
-    const { data: formOptions, isLoading: isLoadingOptions } = useUserFormOptions({ enabled: isReady });
+    // ── NOTE: Separate form-options call removed to enforce "One Screen = One API" ──
+    // Dropdowns will be populated once the backend developer merges the 'options' key 
+    // into the primary admin/ response.
+    const isLoadingOptions = isUsersLoading && !formOptions?.organisations?.length;
 
     const filterOptions = useMemo(() => ({
         organizations: formOptions?.organisations?.map(o => ({ value: o.value, label: o.label })) || [],
@@ -387,10 +391,6 @@ const Users = React.memo(() => {
         return base;
     }, [filters.organization, orgLabel]);
 
-    const handleHardReset = () => {
-        resetFilters();
-        setSearchParams({});
-    };
 
     return (
         <div className="flex flex-col gap-6 w-full pb-10 animate-in fade-in duration-500 relative">
@@ -440,6 +440,15 @@ const Users = React.memo(() => {
 
                 <div className="flex flex-wrap items-center gap-2 flex-1">
                     <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v, region: [] })} allLabel="All" multiple={true} loading={isLoadingOptions} />
+                    <FilterDropdown 
+                        label="Site" 
+                        options={filteredSites} 
+                        value={filters.region} 
+                        onChange={v => setFilters({ ...filters, region: v })} 
+                        allLabel="All Sites" 
+                        multiple={true} 
+                        disabled={!filters.organization?.length && filterOptions.organizations.length > 0}
+                    />
                     <FilterDropdown label="Role" options={filterOptions.roles} value={filters.role} onChange={v => setFilters({ ...filters, role: v })} allLabel="All" multiple={true} />
                     <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Inactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All" multiple={true} />
                 </div>
@@ -538,4 +547,5 @@ const Users = React.memo(() => {
     );
 });
 
+Users.displayName = 'Users';
 export default Users;

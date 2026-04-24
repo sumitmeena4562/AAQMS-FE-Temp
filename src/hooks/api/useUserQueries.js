@@ -9,8 +9,8 @@ import { userService } from '../../services/userService';
 /**
  * ── CONSTANTS & CONFIG ──
  */
-const STALE_TIME = 30 * 1000; // 30 seconds
-const CACHE_TIME = 30 * 60 * 1000; // 30 minutes
+const STALE_TIME = 10 * 60 * 1000; // 10 minutes (Data remains fresh for much longer)
+const CACHE_TIME = 60 * 60 * 1000; // 60 minutes cache retention
 
 export const useUserDetails = (id, options = {}) => {
   return useQuery({
@@ -28,19 +28,13 @@ export const useUserDetails = (id, options = {}) => {
  */
 
 export const useUsers = (filters = {}, search = '', page = 1, limit = 20, options = {}) => {
-  const cleanFilters = useMemo(() => Object.fromEntries(
-    Object.entries(filters).filter(([_, v]) => 
-      v !== undefined && v !== null && v !== 'all' && v !== '' && !(Array.isArray(v) && v.length === 0)
-    )
-  ), [filters]);
-
   return useQuery({
-    queryKey: ['users', 'list', { filters: cleanFilters, search, page, limit }],
-    queryFn: ({ signal }) => userService.getUsers(cleanFilters, search, page, limit, signal),
-    staleTime: STALE_TIME,
-    gcTime: CACHE_TIME,
+    queryKey: ['users', 'list', { filters, search, page, limit }],
+    queryFn: ({ signal }) => userService.getUsers(filters, search, page, limit, signal),
+    staleTime: 30000, // 30 seconds
+    gcTime: 1000 * 60 * 15, // 15 minutes
     refetchOnWindowFocus: false,
-    placeholderData: (prev) => prev,
+    placeholderData: (prev) => prev, // Standard for v5 keepPreviousData behavior
     ...options
   });
 };
@@ -83,19 +77,35 @@ export const useCoordinatorStats = (orgId = null, options = {}) => {
  * Combines Users, Stats, and Filter Hierarchy into a single optimized lifecycle.
  */
 export const useUserManagementData = (filters, search, page, limit, options = {}) => {
-    // 1. Core Users Query (Now includes Stats)
-    const usersQuery = useUsers(filters, search, page, limit, options);
+    // Production-grade query key including all reactive dependencies
+    const queryKey = ['users', 'admin-orchestrator', { filters, search, page, limit }];
+
+    const usersQuery = useQuery({
+        queryKey,
+        queryFn: ({ signal }) => userService.getUsers(filters, search, page, limit, signal),
+        staleTime: 30000, 
+        gcTime: 1000 * 60 * 15,
+        placeholderData: (prev) => prev, // Prevents UI flickering during transitions
+        refetchOnWindowFocus: false,
+        ...options,
+    });
+
+    // Memoized data extraction to prevent unnecessary re-renders
+    const consolidatedData = useMemo(() => {
+        return {
+            users: usersQuery.data?.users || [],
+            totalCount: usersQuery.data?.totalCount || 0,
+            stats: usersQuery.data?.stats || { total: 0, active: 0, inactive: 0, unassigned: 0 },
+            formOptions: usersQuery.data?.options || { organisations: [], sites: [], coordinators: [], roles: [] }
+        };
+    }, [usersQuery.data]);
 
     return {
-        users: usersQuery.data?.users || [],
-        totalCount: usersQuery.data?.totalCount || 0,
-        stats: usersQuery.data?.stats || { total: 0, active: 0, inactive: 0, unassigned: 0 },
+        ...consolidatedData,
         isLoading: usersQuery.isLoading,
         isFetching: usersQuery.isFetching,
         isError: usersQuery.isError,
-        refetchAll: () => {
-            usersQuery.refetch();
-        }
+        refetchAll: () => usersQuery.refetch()
     };
 };
 
