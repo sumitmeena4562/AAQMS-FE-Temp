@@ -66,7 +66,7 @@ export default function AllHistory() {
         limit: 10
     }), [filters, currentPage]), 400);
 
-    const { data: floorData } = useFloors(filters.site, {
+    const { data: floorData } = useFloors(filters.site, {}, {
         enabled: filters.site.length > 0
     });
     const allFloors = floorData?.results || [];

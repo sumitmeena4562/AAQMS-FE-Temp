@@ -10,6 +10,8 @@ import { useFloors } from '../../hooks/api/useHierarchyQueries';
 import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import Pagination from '../../components/UI/Pagination';
+import useDebounce from '../../hooks/useDebounce';
+import { useAllOrganizations } from '../../hooks/api/useOrgQueries';
 
 const FloorPlan = () => {
   const navigate = useNavigate();
@@ -38,20 +40,47 @@ const FloorPlan = () => {
     selectedCoord.length > 0 ? selectedCoord : (passedCoordId ? [passedCoordId] : []),
   [selectedCoord, passedCoordId]);
 
-  // --- DATA FETCHING (Restored Granular Hooks) ---
-  const { organizations: orgs } = useHierarchy({ includeSites: false, includeCoords: false });
-  
-  const { data: floorData, isLoading, error: hierarchyError } = useFloors(activeSiteId, {
-    page: currentPage,
-    page_size: 10
+  // --- DATA FETCHING (GLOBAL: Zero Latency Pattern) ---
+  const { data: orgs = [], sites: allSites = [] } = useHierarchy({ 
+    includeSites: true, 
+    includeCoords: false,
+    enabled: isSynced 
   });
+  
+  const { data: floorData, isLoading, error: hierarchyError } = useFloors(undefined, 
+    { page_size: 5000 }, // Params (2nd arg)
+    { enabled: isSynced } // Options (3rd arg)
+  );
   const floorList = floorData?.results || [];
 
-  // Client-side filtering for the floor cards
+  // Advanced Client-side filtering (Org -> Site -> Floor)
   const filteredFloorList = useMemo(() => {
-    if (!selectedFloor || selectedFloor.length === 0) return floorList;
-    return floorList.filter(f => selectedFloor.includes(String(f.id)));
-  }, [floorList, selectedFloor]);
+    if (!floorList || !Array.isArray(floorList)) return [];
+    let data = floorList;
+
+    // 1. Organization Filter (FE)
+    if (selectedOrg && selectedOrg.length > 0) {
+      data = data.filter(f => {
+        const oId = f.organisation_id || f.org_id || f.organisation?.id || f.site?.organisation_id;
+        return selectedOrg.includes(String(oId));
+      });
+    }
+
+    // 2. Site Filter (FE)
+    if (selectedSite && selectedSite.length > 0) {
+      data = data.filter(f => {
+        const sId = f.site_id || f.site?.id || f.site;
+        return selectedSite.includes(String(sId));
+      });
+    }
+
+    // 3. Floor Dropdown Filter (FE)
+    if (selectedFloor && selectedFloor.length > 0) {
+      data = data.filter(f => selectedFloor.includes(String(f.id)));
+    }
+
+    return data;
+  }, [floorList, selectedOrg, selectedSite, selectedFloor]);
 
   const totalLevels = floorData?.count || 0;
   const activePlansCount = filteredFloorList.length;
@@ -78,43 +107,47 @@ const FloorPlan = () => {
 
     setIsSynced(true);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-reset to page 1 when floor filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFloor]);
   
-  const currentOrg = activeOrgId.length === 1 ? orgs.find(o => String(o.id) === String(activeOrgId[0])) : null;
-  const orgLabel = activeOrgId.length > 1 ? `Organizations (${activeOrgId.length})` : currentOrg?.name || passedOrgName;
-  const orgInfo = { name: orgLabel || "Organization" };
+  // --- Dynamic Naming for Breadcrumbs/Headers ---
+  const currentOrg = selectedOrg.length === 1 ? orgs.find(o => String(o.id) === String(selectedOrg[0])) : null;
+  const currentSite = selectedSite.length === 1 ? allSites.find(s => String(s.id) === String(selectedSite[0])) : null;
+
+  const orgLabel = selectedOrg.length > 1 ? `Multiple Orgs (${selectedOrg.length})` : currentOrg?.name || passedOrgName || "Organization";
+  const siteLabel = selectedSite.length > 1 ? `Multiple Sites (${selectedSite.length})` : currentSite?.name || currentSite?.site_name || passedSiteName || "Site";
 
   const breadcrumbs = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
     { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
   ];
 
-  if (activeOrgId.length > 0) {
+  if (selectedOrg.length > 0) {
     breadcrumbs.push({ 
-        label: orgInfo?.name || "Organization", 
-        path: `/admin/coordinators?org_id=${activeOrgId.join(',')}&org_name=${encodeURIComponent(orgInfo?.name || '')}` 
+        label: orgLabel, 
+        path: `/admin/coordinators?org_id=${selectedOrg.join(',')}` 
     });
   }
 
-  if (activeSiteId.length > 0) {
-    const siteLabel = activeSiteId.length > 1 ? `Sites (${activeSiteId.length})` : passedSiteName || "Site Plan";
+  if (selectedSite.length > 0) {
     breadcrumbs.push({ 
         label: siteLabel, 
-        path: `/admin/site-plan?org_id=${activeOrgId.join(',')}&org_name=${encodeURIComponent(orgInfo?.name || '')}&coord_id=${activeCoordId.join(',')}&coord=${encodeURIComponent(passedCoordName || '')}` 
+        path: `/admin/site-plan?org_id=${selectedOrg.join(',')}&site_id=${selectedSite.join(',')}` 
     });
   }
 
   breadcrumbs.push({ label: "Floor Plan", path: "#", isActive: true });
-
-  const siteInfo = { name: (activeSiteId.length === 1 ? passedSiteName : `Multiple Sites`) || "Site" };
-  const coordInfo = activeCoordId.length > 0 ? { name: passedCoordName || "Coordinator" } : null;
 
   /**
    * ── NAVIGATION HANDLER ──
    * Redirects the user to the Zone mapping for the specific floor.
    */
   const handleFloorClick = (floor) => {
-    navigate(`/admin/zones?org_id=${passedOrgId}&org_name=${encodeURIComponent(passedOrgName || "")}&coord_id=${passedCoordId}&coord=${encodeURIComponent(passedCoordName || "")}&site_id=${passedSiteId}&site=${encodeURIComponent(passedSiteName || "")}&floor_id=${floor.id}&floor=${encodeURIComponent(floor.name || floor.floor_name || "")}`, {
-      state: { floor, site: siteInfo, coordinator: coordInfo, orgName: passedOrgName }
+    navigate(`/admin/zones?org_id=${selectedOrg.join(',')}&site_id=${selectedSite.join(',')}&floor_id=${floor.id}`, {
+      state: { floor, site: currentSite || floor.site, orgName: orgLabel }
     });
   };
 
@@ -123,10 +156,8 @@ const FloorPlan = () => {
       
       {/* HEADER */}
       <PageHeader 
-        title={passedSiteName ? `Floors for ${passedSiteName}` : "All Floor Plans"}
-        subtitle={activeSiteId 
-            ? `Showing ${activePlansCount} active floor levels for ${passedSiteName || 'the selected site'}` 
-            : "Viewing all architectural levels across all sites"}
+        title={selectedSite.length === 1 ? `Floors for ${siteLabel}` : "All Floor Plans"}
+        subtitle={`Viewing ${activePlansCount} floor levels for ${siteLabel}`}
         breadcrumbs={breadcrumbs}
         hideAddButton={true}
         rightContent={
@@ -142,7 +173,11 @@ const FloorPlan = () => {
 
       {/* MAIN BODY */}
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6 px-4 sm:px-6 lg:px-8">
-        <FilterBar activeLevel="floors" />
+        <FilterBar 
+          activeLevel="floors" 
+          hideCoordFilter={true} 
+          externalFloors={floorList}
+        />
 
         {/* CARDS LIST/GRID SECTION */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 gap-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-6">
@@ -157,22 +192,22 @@ const FloorPlan = () => {
             </div>
           ): filteredFloorList.length > 0 ? (
             <>
-              {filteredFloorList.map((floor, index) => (
+              {filteredFloorList.slice((currentPage - 1) * 12, currentPage * 12).map((floor, index) => (
                 <FloorCard 
                   key={floor.id || index} 
                   floor={floor} 
-                  site={siteInfo}
+                  site={currentSite || floor.site}
                   onClick={() => handleFloorClick(floor)} 
                 />
               ))}
 
-              {totalLevels > 10 && (
+              {filteredFloorList.length > 12 && (
                 <Pagination
                   currentPage={currentPage}
-                  totalPages={Math.ceil(totalLevels / 10)}
+                  totalPages={Math.ceil(filteredFloorList.length / 12)}
                   onPageChange={setCurrentPage}
-                  totalItems={totalLevels}
-                  itemsPerPage={10}
+                  totalItems={filteredFloorList.length}
+                  itemsPerPage={12}
                   variant="ghost"
                   className="mt-6 col-span-full"
                 />

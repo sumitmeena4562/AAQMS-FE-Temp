@@ -19,6 +19,7 @@ const FilterBar = ({
     hideClearButton = false,
     isCustomFilterActive = false,
     onClear,
+    externalFloors = null,
     ...rest
 }) => {
     const {
@@ -74,10 +75,23 @@ const FilterBar = ({
 
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading } = useHierarchy(hierarchyOptions);
 
-    const { data: floorData } = useFloors(selectedSite, {
-        enabled: renderFloor && selectedSite.length > 0
+    const { data: floorData } = useFloors(selectedSite, {}, {
+        enabled: !externalFloors && renderFloor && selectedSite.length > 0
     });
-    const allFloors = floorData?.results || [];
+    
+    const allFloors = React.useMemo(() => {
+        if (externalFloors) {
+            // Filter global floors by selected site locally
+            if (selectedSite.length > 0) {
+                return externalFloors.filter(f => {
+                    const sId = f.site_id || f.site?.id || f.site;
+                    return selectedSite.includes(String(sId));
+                });
+            }
+            return externalFloors;
+        }
+        return floorData?.results || [];
+    }, [externalFloors, floorData, selectedSite]);
 
     // Dynamic Relational Options mapping (using Real IDs) - Memoized to prevent re-render loops
     const orgOptions = React.useMemo(() => orgs.map(o => ({ value: o.id, label: o.name })), [orgs]);

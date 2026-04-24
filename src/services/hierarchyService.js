@@ -36,21 +36,24 @@ export const hierarchyService = {
     },
 
     // --- FLOORS ---
-    getFloors: async (siteId = null, signal = null) => {
+    getFloors: async (siteId = null, params = {}, signal = null) => {
         try {
             const isMulti = Array.isArray(siteId) && siteId.length > 1;
             const singleId = Array.isArray(siteId) ? siteId[0] : siteId;
 
+            const queryParams = { ...params };
             if (isMulti) {
-                return (await api.get('organisations/all-floors/', { 
-                    params: { site_id: siteId.join(',') },
+                queryParams.site_id = siteId.join(',');
+                const response = await api.get('organisations/all-floors/', { 
+                    params: queryParams,
                     signal
-                })).data;
+                });
+                return response.data;
             }
 
             const isValidId = singleId && typeof singleId === 'string' && singleId.trim() !== '';
             const url = isValidId ? `organisations/floors/${singleId}/` : `organisations/all-floors/`;
-            const response = await api.get(url, { signal });
+            const response = await api.get(url, { params: queryParams, signal });
             return response.data;
         } catch (error) {
             if (error.name === 'CanceledError') throw error;

@@ -61,7 +61,7 @@ const Inventory = () => {
     const debouncedFloor = useDebounce(selectedFloor, 400);
     const debouncedZone = useDebounce(selectedZone, 400);
 
-    const { data: floorData } = useFloors(debouncedSite, { enabled: debouncedSite.length > 0 });
+    const { data: floorData } = useFloors(debouncedSite, {}, { enabled: debouncedSite.length > 0 });
     const allFloors = floorData?.results || [];
 
     const { data: zoneData } = useZones(debouncedFloor, {}, { enabled: debouncedFloor.length > 0 });

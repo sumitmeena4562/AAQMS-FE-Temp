@@ -42,11 +42,15 @@ export const useSites = (filters = {}, options = {}) => {
   });
 };
 
-export const useFloors = (siteId = null, options = {}) => {
+export const useFloors = (siteId = null, params = {}, options = {}) => {
+  // Ensure we don't pass React Query options as backend params
+  const { enabled, staleTime, gcTime, ...backendParams } = params;
+  const actualParams = Object.keys(backendParams).length > 0 ? backendParams : params;
+
   return useQuery({
-    queryKey: ['floors', Array.isArray(siteId) ? siteId.join(',') : siteId],
+    queryKey: ['floors', Array.isArray(siteId) ? siteId.join(',') : siteId, JSON.stringify(actualParams)],
     queryFn: async ({ signal }) => {
-      const response = await hierarchyService.getFloors(siteId, signal);
+      const response = await hierarchyService.getFloors(siteId, actualParams, signal);
       
       const results = response.results || (Array.isArray(response) ? response : (response.data || []));
       const count = response.count || (Array.isArray(response) ? response.length : 0);
@@ -56,9 +60,6 @@ export const useFloors = (siteId = null, options = {}) => {
           total: count
       };
     },
-    staleTime: 10 * 60 * 1000,
-    gcTime: 60 * 60 * 1000,
-    placeholderData: (prev) => prev,
     ...options
   });
 };

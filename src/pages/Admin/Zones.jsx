@@ -99,7 +99,7 @@ const Zones = () => {
         includeSites: true 
     });
 
-    const { data: floorData } = useFloors(selectedSite, {
+    const { data: floorData } = useFloors(selectedSite, {}, {
         enabled: selectedSite.length > 0
     });
     const allFloors = floorData?.results || [];
