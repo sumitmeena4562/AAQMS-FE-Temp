@@ -104,7 +104,7 @@ const LandingPage = () => {
     return (
         <div className="min-h-screen bg-transparent overflow-x-hidden selection:bg-primary/20 selection:text-primary-dark">
             <Helmet>
-                <title>{`${BRAND_FULL_NAME} | ${BRAND_TAGLINE}`}</title>
+                <title>AAQMS | Enterprise Asset Quality & Safety</title>
                 <meta name="description" content="Advanced Asset Quality Management System (AAQMS) provides elite safety audits, digital twin mapping, and real-time AI risk intelligence for enterprise asset management." />
                 <meta name="keywords" content="AAQMS, Asset Management, Safety Audit, Digital Twin, AI Risk Intelligence, Compliance, Enterprise Safety" />
                 <meta property="og:title" content={`${BRAND_FULL_NAME} - Safety Suite`} />

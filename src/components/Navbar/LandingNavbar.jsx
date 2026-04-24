@@ -14,7 +14,7 @@ const LandingNavbar = ({
     buttons = [],
     sticky = true,
     activeLabel = 'Home',
-    onLinkClick = () => {},
+    onLinkClick = () => { },
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -27,13 +27,13 @@ const LandingNavbar = ({
             setIsScrolled(window.scrollY > 20);
         };
         window.addEventListener('scroll', handleScroll);
-        
+
         if (isMenuOpen) {
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = 'auto';
         }
-        
+
         return () => {
             window.removeEventListener('scroll', handleScroll);
             document.body.style.overflow = 'auto';
@@ -41,17 +41,17 @@ const LandingNavbar = ({
     }, [isMenuOpen]);
 
     const menuVariants = {
-        closed: { 
+        closed: {
             opacity: 0,
             y: -20,
             transition: { type: 'spring', stiffness: 400, damping: 40 }
         },
-        open: { 
+        open: {
             opacity: 1,
             y: 0,
-            transition: { 
-                type: 'spring', 
-                stiffness: 400, 
+            transition: {
+                type: 'spring',
+                stiffness: 400,
                 damping: 40,
                 staggerChildren: 0.1,
                 delayChildren: 0.1
@@ -66,7 +66,7 @@ const LandingNavbar = ({
 
     const renderButton = (btn, i, isMobile = false) => {
         const variant = btn.variant === 'filled' ? 'primary' : 'outline';
-        
+
         return (
             <Link key={i} to={btn.href || '/login'} className={isMobile ? 'w-full' : ''}>
                 <Button
@@ -82,22 +82,22 @@ const LandingNavbar = ({
 
     return (
         <>
-            <motion.header 
+            <motion.header
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 className={`
                     ${sticky ? 'fixed' : 'relative'} top-0 left-0 right-0 z-50 px-4 sm:px-8 transition-all duration-500
-                    ${isScrolled 
-                        ? 'h-20 py-3 glass-panel shadow-sm border-b border-border/10' 
+                    ${isScrolled
+                        ? 'h-20 py-3 glass-panel shadow-sm border-b border-border/10'
                         : 'h-24 py-4 bg-transparent border-b border-transparent'}
                 `}
             >
                 <nav className="flex items-center justify-between h-full max-w-7xl mx-auto">
                     {/* Left — Logo */}
                     <div className="flex-1 flex justify-start z-[60]">
-                        <motion.div 
-                            whileHover={{ scale: 1.02 }} 
+                        <motion.div
+                            whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => {
                                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -127,9 +127,9 @@ const LandingNavbar = ({
                                         <motion.div
                                             layoutId="pill-bg"
                                             className="absolute inset-x-0 h-9 my-auto bg-primary/5 rounded-full -z-10 border border-primary/5 shadow-sm shadow-primary/5"
-                                            transition={{ 
-                                                type: "spring", 
-                                                stiffness: 300, 
+                                            transition={{
+                                                type: "spring",
+                                                stiffness: 300,
                                                 damping: 35,
                                                 mass: 1
                                             }}
@@ -137,12 +137,12 @@ const LandingNavbar = ({
                                     )}
 
                                     {isActive && (
-                                        <motion.div 
+                                        <motion.div
                                             layoutId="active-marker"
                                             className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--color-primary-rgb),0.4)] z-20"
-                                            transition={{ 
-                                                type: "spring", 
-                                                stiffness: 300, 
+                                            transition={{
+                                                type: "spring",
+                                                stiffness: 300,
                                                 damping: 35,
                                                 mass: 1
                                             }}
@@ -166,7 +166,7 @@ const LandingNavbar = ({
                                         <div className="flex items-center gap-1.5 h-full">
                                             {link.label}
                                             {link.hasDropdown && (
-                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"><path d="m6 9 6 6 6-6"/></svg>
+                                                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"><path d="m6 9 6 6 6-6" /></svg>
                                             )}
                                         </div>
                                     </motion.a>
@@ -178,15 +178,15 @@ const LandingNavbar = ({
                     {/* Right — Desktop Buttons & Icons */}
                     <div className="hidden lg:flex items-center justify-end gap-4 xl:gap-6 flex-1">
                         <div className="flex items-center gap-4 text-muted/50">
-                            <motion.button 
-                                whileHover={{ scale: 1.1, color: 'var(--color-primary)' }} 
+                            <motion.button
+                                whileHover={{ scale: 1.1, color: 'var(--color-primary)' }}
                                 aria-label="Change Language"
                                 className="transition-colors p-1"
                             >
                                 <MdOutlineLanguage className="text-xl" />
                             </motion.button>
-                            <motion.button 
-                                whileHover={{ scale: 1.1, color: 'var(--color-text)' }} 
+                            <motion.button
+                                whileHover={{ scale: 1.1, color: 'var(--color-text)' }}
                                 aria-label="GitHub Repository"
                                 className="transition-colors p-1 hidden xl:block"
                             >
@@ -206,17 +206,17 @@ const LandingNavbar = ({
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                     >
                         <div className="w-6 h-5 flex flex-col items-center justify-center gap-1.5">
-                            <motion.span 
+                            <motion.span
                                 animate={isMenuOpen ? { rotate: 45, y: 7 } : { rotate: 0, y: 0 }}
-                                className="w-full h-0.5 bg-current rounded-full" 
+                                className="w-full h-0.5 bg-current rounded-full"
                             />
-                            <motion.span 
+                            <motion.span
                                 animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
-                                className="w-full h-0.5 bg-current rounded-full" 
+                                className="w-full h-0.5 bg-current rounded-full"
                             />
-                            <motion.span 
+                            <motion.span
                                 animate={isMenuOpen ? { rotate: -45, y: -7 } : { rotate: 0, y: 0 }}
-                                className="w-full h-0.5 bg-current rounded-full" 
+                                className="w-full h-0.5 bg-current rounded-full"
                             />
                         </div>
                     </motion.button>
