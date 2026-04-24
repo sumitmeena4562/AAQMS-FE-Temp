@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { organizationService } from '../../services/organizationService';
 
 // Helper to clean mangled Cloudinary URLs (from useOrgStore logic)
@@ -137,5 +137,73 @@ export const useOrganizationDetails = (id, options = {}) => {
     gcTime: 60 * 60 * 1000,
     placeholderData: (previousData) => previousData,
     ...options
+  });
+};
+
+/**
+ * ── METADATA & FILTERS ──
+ */
+
+export const useAllOrganizations = (options = {}) => {
+  return useQuery({
+    queryKey: ['hierarchy', 'orgs'],
+    queryFn: async ({ signal }) => {
+      // Removing dropdown: 'true' because we need FULL data (industry, status, etc.) for filtering
+      const response = await organizationService.getOrganizations({ pageSize: 1000 }, signal);
+      const data = response.results || response.data || response || [];
+      return data.map(mapOrgToFrontend);
+    },
+    staleTime: 60 * 60 * 1000,
+    ...options
+  });
+};
+
+export const useIndustryTypes = () => {
+  const { data: orgs } = useAllOrganizations();
+  return useMemo(() => {
+    if (!orgs) return [];
+    const industries = [...new Set(orgs.map(o => o.industry_type || o.industry).filter(Boolean))];
+    return industries.sort().map(i => ({
+      value: i,
+      label: i.charAt(0).toUpperCase() + i.slice(1)
+    }));
+  }, [orgs]);
+};
+
+/**
+ * ── MUTATIONS ──
+ */
+
+export const useCreateOrganization = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => organizationService.createOrganization(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      queryClient.invalidateQueries({ queryKey: ['hierarchy'] });
+    },
+  });
+};
+
+export const useUpdateOrganization = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => organizationService.updateOrganization(id, data),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      queryClient.invalidateQueries({ queryKey: ['organization', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['hierarchy'] });
+    },
+  });
+};
+
+export const useBlockOrganization = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => organizationService.blockOrganization(id),
+    onSuccess: (data, id) => {
+      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      queryClient.invalidateQueries({ queryKey: ['organization', id] });
+    },
   });
 };

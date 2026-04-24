@@ -1,8 +1,11 @@
 import React from 'react';
-import { useOrganizations } from './useOrgQueries';
+import { useQuery } from '@tanstack/react-query';
+import { useOrganizations, mapOrgToFrontend } from './useOrgQueries';
 import { useSites } from './useHierarchyQueries';
 import { useCoordinators } from './useUserQueries';
 import { useFilterStore } from '../../store/useFilterStore';
+import { organizationService } from '../../services/organizationService';
+import { hierarchyService } from '../../services/hierarchyService';
 
 const EMPTY_ARRAY = [];
 
@@ -26,9 +29,16 @@ export const useHierarchy = (options = {}) => {
     const { selectedOrg } = useFilterStore();
     const activeOrgs = orgId !== null ? (Array.isArray(orgId) ? orgId : [orgId]) : selectedOrg;
 
-    // 1. Organizations (Top level) - Memoize filters to prevent re-fetch loops
-    const orgFilters = React.useMemo(() => ({ dropdown: 'true' }), []);
-    const orgsQuery = useOrganizations(orgFilters, '', 1, 100, { enabled: includeOrgs && enabled });
+    // 1. Organizations (Top level)
+    const orgsQuery = useQuery({
+        queryKey: ['hierarchy', 'orgs'],
+        queryFn: async ({ signal }) => {
+            const response = await organizationService.getOrganizations({ dropdown: 'true', page: 1, pageSize: 1000 }, signal);
+            return (response.results || response.data || response).map(mapOrgToFrontend) || [];
+        },
+        enabled: includeOrgs && enabled,
+        staleTime: 30 * 60 * 1000, // 30 mins
+    });
 
     // 2. Coordinators (Cascading: only if org is selected)
     const coordsQuery = useCoordinators(
@@ -37,14 +47,16 @@ export const useHierarchy = (options = {}) => {
     );
 
     // 3. Sites (Cascading: only if org is selected)
-    const siteFilters = React.useMemo(() => ({
-        organisation: activeOrgs.length > 0 ? activeOrgs : undefined
-    }), [activeOrgs]);
-
-    const sitesQuery = useSites(
-        siteFilters,
-        { enabled: includeSites && enabled }
-    );
+    const sitesQuery = useQuery({
+        queryKey: ['hierarchy', 'sites', activeOrgs],
+        queryFn: async ({ signal }) => {
+            const siteFilters = { organisation: activeOrgs.length > 0 ? activeOrgs : undefined };
+            const response = await hierarchyService.getSites(siteFilters, signal);
+            return response.results || response.data || response || [];
+        },
+        enabled: includeSites && enabled,
+        staleTime: 30 * 60 * 1000,
+    });
 
     return React.useMemo(() => ({
         // Data

@@ -17,7 +17,8 @@ const FilterBar = ({
     searchPlaceholder = "Search...",
     hideClearButton = false,
     isCustomFilterActive = false,
-    onClear
+    onClear,
+    ...rest
 }) => {
     const {
         selectedOrg, setOrg,
@@ -99,7 +100,10 @@ const FilterBar = ({
 
 
     return (
-        <div className={`bg-card border border-border-main/60 rounded-2xl p-2.5 sm:p-3.5 shadow-sm mb-6 ${className}`}>
+        <div 
+            className={`bg-card border border-border-main/60 rounded-2xl p-2.5 sm:p-3.5 shadow-sm mb-6 ${className}`}
+            {...rest}
+        >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
 
                 {/* 🔹 LEFT SIDE: Cascading Dropdowns (Mobile Scrollable) */}

@@ -54,9 +54,10 @@ export const useAllHistory = (filters = {}) => {
     queryKey: ['dashboard', 'history', cleanFilters],
     queryFn: ({ signal }) => dashboardService.getAllHistory(cleanFilters, signal),
     placeholderData: keepPreviousData,
-    staleTime: 2 * 60 * 1000, // History is more dynamic, 2 mins is safer
+    staleTime: 5 * 60 * 1000, // Sync with prefetch (5 mins)
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
+    refetchOnMount: false, // Don't refetch if data is in cache
   });
 };
 
@@ -81,7 +82,7 @@ export const prefetchHistory = async (filters = {}, nextPage) => {
     await queryClient.prefetchQuery({
         queryKey: ['dashboard', 'history', cleanFilters],
         queryFn: ({ signal }) => dashboardService.getAllHistory(cleanFilters, signal),
-        staleTime: 2 * 60 * 1000,
+        staleTime: 5 * 60 * 1000,
     });
 };
 

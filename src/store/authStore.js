@@ -81,6 +81,14 @@ const useAuthStore = create((set, get) => ({
                 organisations: bootstrapData.organisations || []
               };
               queryClient.setQueryData(['dashboard', 'bootstrap'], mappedBootstrap);
+
+              // SEED GLOBAL HIERARCHY: So every dropdown in the app is instant
+              if (bootstrapData.organisations) {
+                queryClient.setQueryData(['hierarchy', 'orgs'], bootstrapData.organisations);
+              }
+              if (bootstrapData.sites) {
+                queryClient.setQueryData(['hierarchy', 'sites'], bootstrapData.sites);
+              }
           } else {
               // If data is partial (only stats), we just seed the stats and let the dashboard refetch
               if (bootstrapData.stats) {

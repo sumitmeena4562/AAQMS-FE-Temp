@@ -1,7 +1,14 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useOrgStore } from '../../store/useOrgStore';
 import { getOrgStatus } from '../../utils/orgUtils';
-import { useOrganizations } from '../../hooks/api/useOrgQueries';
+import { 
+    useOrganizations, 
+    useAllOrganizations,
+    useIndustryTypes, 
+    useCreateOrganization, 
+    useUpdateOrganization, 
+    useBlockOrganization 
+} from '../../hooks/api/useOrgQueries';
 import Button from '../../components/UI/Button';
 
 import OrganizationCard from '../../components/UI/OrganizationCard';
@@ -65,7 +72,6 @@ const Organizations = React.memo(() => {
         filters, viewMode,
         addOrg, updateOrg, blockOrg,
         setFilters, setViewMode, resetFilters,
-        isSubmitting
     } = useOrgStore();
     const { query: searchQuery, clearSearch } = useSearchStore();
     const queryClient = useQueryClient();
@@ -83,24 +89,17 @@ const Organizations = React.memo(() => {
         });
     }, [queryClient]);
 
-    // --- QUERY HOOK (NEW) ---
-    // Note: We use the global filters and search directly in the query key for automatic refetching
-    const itemsPerPage = useResponsiveLimit(12);
+    // --- QUERY HOOK (OPTIMIZED: SINGLE FETCH) ---
+    const { data: allOrgs, isLoading, isError, error, refetch } = useAllOrganizations(); 
+    const industryOptions = useIndustryTypes(); // Now returns the options array directly
     const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = useResponsiveLimit(12);
 
-    // --- QUERY HOOK (UPDATED) ---
-    // Note: We use server-side pagination and filtering
-    const { data, isLoading, isError, error, refetch } = useOrganizations(filters, searchQuery, currentPage, itemsPerPage);
-
-    // Debug logging to isolate loading issues
-    useEffect(() => {
-        if (isLoading) console.debug("[AAQMS-UI] Organizations: Loading data...");
-        if (data) console.debug("[AAQMS-UI] Organizations: Data received", { count: data.count });
-        if (isError) console.error("[AAQMS-UI] Organizations: Load failed", error);
-    }, [isLoading, data, isError, error]);
-
-    const orgs = data?.results || [];
-    const totalCount = data?.count || 0;
+    // --- Mutations ---
+    const createMutation = useCreateOrganization();
+    const updateMutation = useUpdateOrganization();
+    const blockMutation = useBlockOrganization();
+    const isMutating = createMutation.isPending || updateMutation.isPending || blockMutation.isPending;
 
     // --- Local State ---
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -109,29 +108,43 @@ const Organizations = React.memo(() => {
     const [orgToBlock, setOrgToBlock] = useState(null);
     const [isViewOnly, setIsViewOnly] = useState(false);
 
-    // --- Memoized Computations ---
-    const enrichedOrgs = useMemo(() => {
-        return orgs; // They are already enriched by the hook's mapOrgToFrontend
-    }, [orgs]);
+    // --- 🔹 ADVANCED LOCAL FILTERING & SEARCH 🔹 ---
+    const filteredOrgs = useMemo(() => {
+        if (!allOrgs) return [];
+        
+        return allOrgs.filter(org => {
+            // 1. Search Query Match
+            const matchesSearch = !searchQuery || 
+                org.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                org.industry?.toLowerCase().includes(searchQuery.toLowerCase());
 
-    // SERVER-SIDE FILTERING: Remove local filter logic
-    const filteredOrgs = enrichedOrgs;
+            // 2. Industry Filter Match
+            const matchesIndustry = !filters.industry || filters.industry.length === 0 || 
+                filters.industry.includes(org.industry);
 
-    // Auto-reset to page 1 when criteria changes
+            // 3. Status Filter Match
+            const orgStatus = (getOrgStatus(org) || '').toUpperCase();
+            const matchesStatus = !filters.status || filters.status.length === 0 || 
+                filters.status.includes(orgStatus);
+
+            return matchesSearch && matchesIndustry && matchesStatus;
+        });
+    }, [allOrgs, searchQuery, filters]);
+
+    // Derived counts and pagination
+    const totalCount = filteredOrgs.length;
+    const totalPages = Math.ceil(totalCount / itemsPerPage);
+
+    // Local Pagination Slice
+    const paginatedOrgs = useMemo(() => {
+        const start = (currentPage - 1) * itemsPerPage;
+        return filteredOrgs.slice(start, start + itemsPerPage);
+    }, [filteredOrgs, currentPage, itemsPerPage]);
+
+    // Auto-reset to page 1 when filter/search changes
     useEffect(() => {
         setCurrentPage(1);
     }, [filters, searchQuery]);
-
-    const totalPages = Math.ceil(totalCount / itemsPerPage);
-    const paginatedOrgs = filteredOrgs; // Already paginated by server
-
-    const industryOptions = useMemo(() => {
-        const uniqueIndustries = [...new Set(orgs.map(o => o.industry).filter(Boolean))];
-        return uniqueIndustries.map(i => ({
-            value: i,
-            label: i.charAt(0).toUpperCase() + i.slice(1)
-        }));
-    }, [orgs]);
 
     const activeFiltersCount = useMemo(() => {
         return Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v !== 'all' && v !== '').length;
@@ -150,18 +163,19 @@ const Organizations = React.memo(() => {
         setIsCreateModalOpen(true);
     }, []);
 
-    const handleCreateOrUpdate = useCallback(async (data) => {
-        let success = false;
-        if (editingOrg) {
-            success = await updateOrg(editingOrg.id, data);
-        } else {
-            success = await addOrg(data);
-        }
-        if (success) {
+    const handleCreateOrUpdate = useCallback(async (formData) => {
+        try {
+            if (editingOrg) {
+                await updateMutation.mutateAsync({ id: editingOrg.id, data: formData });
+            } else {
+                await createMutation.mutateAsync(formData);
+            }
             setIsCreateModalOpen(false);
             setEditingOrg(null);
+        } catch (err) {
+            console.error("Mutation failed", err);
         }
-    }, [editingOrg, updateOrg, addOrg]);
+    }, [editingOrg, updateMutation, createMutation]);
 
     const handleAddClick = useCallback(() => {
         setEditingOrg(null);
@@ -176,10 +190,14 @@ const Organizations = React.memo(() => {
 
     const confirmBlock = useCallback(async () => {
         if (!orgToBlock) return;
-        await blockOrg(orgToBlock.id);
-        setIsBlockModalOpen(false);
-        setOrgToBlock(null);
-    }, [blockOrg, orgToBlock]);
+        try {
+            await blockMutation.mutateAsync(orgToBlock.id);
+            setIsBlockModalOpen(false);
+            setOrgToBlock(null);
+        } catch (err) {
+            console.error("Block failed", err);
+        }
+    }, [blockMutation, orgToBlock]);
 
     // --- Data Table Columns ---
     const tableColumns = useMemo(() => [
@@ -468,7 +486,7 @@ const Organizations = React.memo(() => {
                         isOpen={isCreateModalOpen}
                         org={editingOrg}
                         isViewOnly={isViewOnly}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={isMutating}
                         onSubmit={handleCreateOrUpdate}
                         onEdit={handleEdit}
                         onClose={() => { setIsCreateModalOpen(false); setEditingOrg(null); }}
@@ -485,7 +503,7 @@ const Organizations = React.memo(() => {
                 confirmText="Deactivate Access"
                 cancelText="Keep Active"
                 danger={true}
-                loading={isSubmitting}
+                loading={isMutating}
             />
         </div>
     );

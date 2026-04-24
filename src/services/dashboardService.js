@@ -43,7 +43,11 @@ export const getAllHistory = async (filters = {}, signal = null) => {
             const value = filters[key];
             if (Array.isArray(value)) {
                 if (value.length > 0) {
-                    const targetKey = key === 'organisation' ? 'organisation_id' : key;
+                    let targetKey = key;
+                    if (key === 'organisation') targetKey = 'organisation_id';
+                    else if (key === 'site') targetKey = 'site_id';
+                    else if (key === 'floor') targetKey = 'floor_id';
+                    
                     finalFilters[targetKey] = value.join(',');
                 }
             } else if (value !== undefined && value !== null && value !== '') {

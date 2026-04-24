@@ -5,7 +5,7 @@ import FilterDropdown from '../../components/UI/FilterDropdown';
 import FilterBar from '../../components/UI/FilterBar';
 import DataTable from '../../components/UI/DataTable';
 import Button from '../../components/UI/Button';
-import { useAllHistory, prefetchHistory } from '../../hooks/api/useDashboardQueries';
+import { useAllHistory } from '../../hooks/api/useDashboardQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useSites, useFloors } from '../../hooks/api/useHierarchyQueries';
 import TableSkeleton from '../../components/UI/TableSkeleton';
@@ -55,44 +55,31 @@ export default function AllHistory() {
     const { organizations: orgs, sites: allSites } = useHierarchy({
         includeSites: true,
         includeCoords: false,
+        orgId: filters.organisation, // Connect local org selection to the hierarchy fetcher
         enabled: isFilterInteracted || Object.values(filters).some(arr => arr.length > 0)
     });
 
-    // Debounce filters to prevent "Request Explosion" (canceled requests in network tab)
-    const debouncedFilters = useDebounce(filters, 400);
+    // Debounce EVERYTHING together (filters + page) to prevent "Double/Duplicate Requests"
+    const debouncedQueryParams = useDebounce(useMemo(() => ({
+        ...filters,
+        page: currentPage,
+        limit: 10
+    }), [filters, currentPage]), 400);
 
     const { data: floorData } = useFloors(filters.site, {
         enabled: filters.site.length > 0
     });
     const allFloors = floorData?.results || [];
 
-    const queryParams = useMemo(() => ({
-        org_id: debouncedFilters.organisation,
-        site_id: debouncedFilters.site,
-        floor: debouncedFilters.floor,
-        role: debouncedFilters.role,
-        operation: debouncedFilters.operation,
-        category: debouncedFilters.category,
-        page: currentPage,
-        limit: 10
-    }), [debouncedFilters, currentPage]);
-
-    const { data: historyData, isLoading, isFetching } = useAllHistory(queryParams);
-
+    const { data: historyData, isLoading, isFetching } = useAllHistory(debouncedQueryParams);
+    
     const totalCount = historyData?.count || 0;
     const totalPages = Math.ceil(totalCount / 10);
 
-    // ── 3. Pagination Prefetching (Background optimization) ──
-    useEffect(() => {
-        if (!isFetching && currentPage < totalPages) {
-            prefetchHistory(queryParams, currentPage + 1);
-        }
-    }, [currentPage, queryParams, totalPages, isFetching]);
-
     // ── 4. Derived Data ──
     // Map backend results to frontend activity feed format
-    const activityList = useMemo(() =>
-        historyData?.results || [],
+    const activityList = useMemo(() => 
+        mapToActivityFeed(historyData?.results || []), 
         [historyData?.results]);
 
     // ── 5. State Management Actions ──
