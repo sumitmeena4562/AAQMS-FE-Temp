@@ -49,6 +49,7 @@ export const mapOrgToFrontend = (data) => {
 
   return {
     ...data,
+    id: String(data.id || data.pk || data.organisation_id || ''),
     name: data.organisation_name || data.site_name || data.name || '',
     industry: data.industry_type || data.industry || 'General',
     occupancyType: data.occupancy_type || data.occupancyType || '',

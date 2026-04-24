@@ -17,34 +17,32 @@ const FilterDropdown = React.memo(({
             if (containerRef.current) {
                 const rect = containerRef.current.getBoundingClientRect();
                 setCoords({
-                    top: rect.bottom + window.scrollY + 6,
-                    left: rect.left + window.scrollX,
+                    top: rect.bottom + 6, // Fixed positioning: no window.scrollY
+                    left: rect.left,
                     width: rect.width
                 });
             }
         };
 
         const handleClickOutside = (event) => {
-            // Check if click is on the trigger button
             if (containerRef.current?.contains(event.target)) return;
-            
-            // Check if click is inside any portal-rendered dropdown
             const portalMenu = event.target.closest('[role="listbox"]');
             if (portalMenu) return;
-
             setIsOpen(false);
         };
 
         if (isOpen) {
-            updatePosition(); // Immediate call on open
+            updatePosition();
             document.addEventListener('mousedown', handleClickOutside);
             document.addEventListener('touchstart', handleClickOutside);
             window.addEventListener('resize', updatePosition);
+            window.addEventListener('scroll', updatePosition, true); // Update on scroll
             
             return () => {
                 document.removeEventListener('mousedown', handleClickOutside);
                 document.removeEventListener('touchstart', handleClickOutside);
                 window.removeEventListener('resize', updatePosition);
+                window.removeEventListener('scroll', updatePosition, true);
             };
         }
     }, [isOpen]);
@@ -101,29 +99,29 @@ const FilterDropdown = React.memo(({
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.98 }}
                     style={{
-                        position: 'absolute',
+                        position: 'fixed',
                         top: coords.top,
                         left: coords.left,
                         width: 'max-content',
-                        minWidth: Math.max(coords.width, 160),
-                        maxWidth: 320,
+                        minWidth: Math.max(coords.width, 140),
+                        maxWidth: 240, // Professional balanced width
                         zIndex: 9999
                     }}
-                    className="bg-card border border-border-main rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.12)] overflow-hidden p-1.5"
+                    className="bg-card border border-border-main rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.15)] overflow-hidden p-1"
                     role="listbox"
                 >
                     <button
                         onClick={() => handleSelect('')}
-                        className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[11.5px] font-black uppercase tracking-widest group flex items-center gap-3
+                        className={`w-full px-3 py-1.5 text-left rounded-lg transition-all duration-200 text-[10.5px] font-black uppercase tracking-widest group flex items-center gap-2.5
                             ${!isFilterActive ? 'bg-[var(--color-hover-blue)] text-white cursor-default' : 'hover:bg-[var(--color-hover-blue-soft)] text-gray/60'}`}
                     >
                         <div className="flex items-center justify-center w-4 h-4">
-                            {!isFilterActive && <FiCheck size={13} />}
+                            {!isFilterActive && <FiCheck size={12} />}
                         </div>
                         <span className="truncate">{allLabel}</span>
                     </button>
 
-                    <div className="max-h-[240px] overflow-y-auto no-scrollbar pt-1">
+                    <div className="max-h-[240px] overflow-y-auto pt-0.5 custom-scrollbar">
                         {options.map((opt, i) => {
                             const val = typeof opt === 'string' ? opt : opt.value;
                             const lbl = typeof opt === 'string' ? opt : opt.label;
@@ -136,7 +134,7 @@ const FilterDropdown = React.memo(({
                                     key={val !== undefined && val !== null ? val : i}
                                     id={`option-${val}`}
                                     onClick={() => handleSelect(val)}
-                                    className={`w-full px-3 py-2 text-left rounded-lg transition-all duration-200 text-[12px] font-bold mt-0.5 group flex items-center gap-3
+                                    className={`w-full px-3 py-1.25 text-left rounded-lg transition-all duration-200 text-[11.5px] font-bold mt-0.5 group flex items-center gap-2.5
                                         ${isSelected ? 'bg-[var(--color-hover-blue-soft)] text-[var(--color-hover-blue)]' : 'hover:bg-[var(--color-hover-blue-soft)]/50 text-body'}`}
                                     role="option"
                                     aria-selected={isSelected}
@@ -148,7 +146,7 @@ const FilterDropdown = React.memo(({
                                         </div>
                                     ) : (
                                         <div className="flex items-center justify-center w-4 h-4 shrink-0">
-                                            {isSelected && <FiCheck size={13} />}
+                                            {isSelected && <FiCheck size={12} />}
                                         </div>
                                     )}
                                     <span className="truncate">{lbl}</span>

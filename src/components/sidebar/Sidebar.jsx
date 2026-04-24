@@ -52,8 +52,9 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
     const toggleMenu = (item) => {
         setOpenMenus(p => ({ ...p, [item.label]: !p[item.label] }));
-        // 🔹 Navigate immediately if parent has a default path
-        if (item.path) {
+        // 🔹 Only navigate if it's a simple item (no children)
+        // Parent items in this sidebar should only act as toggles
+        if (item.path && !item.children) {
             navigate(item.path);
         }
     };
@@ -71,7 +72,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                         flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
                         ${act
-                            ? 'bg-[var(--color-hover-blue-soft)] text-[var(--color-hover-blue)] font-bold shadow-sm'
+                            ? 'bg-[var(--color-hover-blue-soft)] text-[var(--color-hover-blue)] font-semibold shadow-sm'
                             : 'text-body hover:bg-[var(--color-hover-blue-soft)] hover:text-[var(--color-hover-blue)] font-medium'}
                     `}
                 >
@@ -81,7 +82,7 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                     >
                         {item.icon}
                     </span>
-                    {!collapsed && <span className="truncate tracking-tight">{item.label}</span>}
+                    {!collapsed && <span className="truncate tracking-tight leading-none">{item.label}</span>}
                 </NavLink>
             </div>
         );
@@ -100,14 +101,14 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                         w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200 border-none outline-none cursor-pointer
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto' : 'justify-start'}
                         ${activeOrOpen
-                            ? 'bg-[var(--color-hover-blue-soft)] text-[var(--color-hover-blue)] font-bold'
+                            ? 'bg-[var(--color-hover-blue-soft)] text-[var(--color-hover-blue)] font-semibold'
                             : 'text-body hover:bg-[var(--color-hover-blue-soft)] hover:text-[var(--color-hover-blue)] font-medium'}
                     `}
                 >
                     <span className={`flex items-center shrink-0 transition-colors ${activeOrOpen ? 'text-primary' : 'text-gray group-hover:text-title'}`}>
                         {item.icon}
                     </span>
-                    {!collapsed && <span className="flex-1 text-left truncate tracking-tight">{item.label}</span>}
+                    {!collapsed && <span className="flex-1 text-left truncate tracking-tight leading-none">{item.label}</span>}
                     {!collapsed && (
                         <svg
                             xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"

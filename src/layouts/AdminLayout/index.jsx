@@ -25,8 +25,9 @@ const navItems = [
         label: 'Dashboard', path: '/admin/dashboard', icon: <FiHome size={18} />
     },
     {
-        label: 'Organizations', path: '/admin/organizations', icon: <FiBriefcase size={18} />,
+        label: 'Organizations', icon: <FiBriefcase size={18} />,
         children: [
+            { label: 'All Organizations', path: '/admin/organizations', icon: <FiBriefcase size={15} /> },
             { label: 'Coordinators', path: '/admin/coordinators', icon: <FiUsers size={15} /> },
             { label: 'Site Plan', path: '/admin/site-plan', icon: <FiMap size={15} /> },
             { label: 'Floor Plan', path: '/admin/floor-plan', icon: <FiLayers size={15} /> },
