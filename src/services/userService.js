@@ -1,5 +1,4 @@
 import api from "./api";
-import { organizationService } from "./organizationService";
 import { extractError } from "../utils/errorUtils";
 
 // --- SERVICE IMPLEMENTATION ---
@@ -18,11 +17,15 @@ export const userService = {
                 include_options: 'true' // One-call optimization
             };
 
-            // Map and clean filters
             Object.entries(filters).forEach(([key, value]) => {
                 if (value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0)) return;
-                const targetKey = key === 'organization' ? 'organisation_id' : key;
-                params[targetKey] = Array.isArray(value) ? value.join(',') : value;
+                
+                let targetKey = key;
+                if (key === 'organization') targetKey = 'organisation_id';
+                if (key === 'region') targetKey = 'site_id';
+                
+                // Ensure value is a clean string/number for the API
+                params[targetKey] = Array.isArray(value) ? value.filter(Boolean).join(',') : value;
             });
 
             const response = await api.get('users/admin/', { params, signal });
