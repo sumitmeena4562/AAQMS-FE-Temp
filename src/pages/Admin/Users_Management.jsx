@@ -403,6 +403,18 @@ const Users = React.memo(() => {
                 breadcrumbs={breadcrumbs}
                 rightContent={
                     <div className="flex items-center gap-3">
+                         <button 
+                            onClick={() => refetchAll()}
+                            disabled={isUsersLoading}
+                            className={`flex items-center gap-2 px-4 py-2 bg-white border border-border-main/80 rounded-full shadow-sm hover:shadow-md hover:border-primary/30 transition-all group ${isUsersLoading ? 'opacity-70' : ''}`}
+                        >
+                            <div className={`text-primary/40 group-hover:text-primary transition-colors ${isUsersLoading ? 'animate-spin' : ''}`}>
+                                <FiRefreshCw size={14} />
+                            </div>
+                            <span className="text-[11px] font-black text-title uppercase tracking-widest">
+                                {isUsersLoading ? 'Syncing...' : 'Refresh'}
+                            </span>
+                        </button>
                         <Button onClick={() => exportPDF(users)} variant="outline" size="sm" className="!h-[38px] bg-card flex items-center gap-2 px-4 shadow-sm border-dashed border-primary/30">
                             <FiDownload size={14} className="text-primary/70" />
                             <span className="font-black text-[10px] uppercase tracking-widest text-current">PDF Export</span>

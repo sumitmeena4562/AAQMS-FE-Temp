@@ -15,6 +15,7 @@ import Badge from '../../components/UI/Badge';
 import FilterBar from '../../components/UI/FilterBar';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
+import ConfirmModal from '../../components/UI/ConfirmModal';
 import { useQueryClient } from '@tanstack/react-query';
 import { organizationService } from '../../services/organizationService';
 import { mapOrgToFrontend } from '../../hooks/api/useOrgQueries';
@@ -103,7 +104,9 @@ const Organizations = React.memo(() => {
 
     // --- Local State ---
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
     const [editingOrg, setEditingOrg] = useState(null);
+    const [orgToBlock, setOrgToBlock] = useState(null);
     const [isViewOnly, setIsViewOnly] = useState(false);
 
     // --- Memoized Computations ---
@@ -166,11 +169,17 @@ const Organizations = React.memo(() => {
         setIsCreateModalOpen(true);
     }, []);
 
-    const handleBlock = useCallback(async (org) => {
-        const confirmed = window.confirm(`Block ${org.name}? This will deactivate the organization.`);
-        if (!confirmed) return;
-        await blockOrg(org.id);
-    }, [blockOrg]);
+    const handleBlock = useCallback((org) => {
+        setOrgToBlock(org);
+        setIsBlockModalOpen(true);
+    }, []);
+
+    const confirmBlock = useCallback(async () => {
+        if (!orgToBlock) return;
+        await blockOrg(orgToBlock.id);
+        setIsBlockModalOpen(false);
+        setOrgToBlock(null);
+    }, [blockOrg, orgToBlock]);
 
     // --- Data Table Columns ---
     const tableColumns = useMemo(() => [
@@ -446,7 +455,6 @@ const Organizations = React.memo(() => {
                 )}
             </div>
 
-            {/* Modal Sub-components */}
             <React.Suspense fallback={null}>
                 {isViewOnly ? (
                     <OrganizationDetailsModal
@@ -467,6 +475,18 @@ const Organizations = React.memo(() => {
                     />
                 )}
             </React.Suspense>
+
+            <ConfirmModal
+                isOpen={isBlockModalOpen}
+                onClose={() => { setIsBlockModalOpen(false); setOrgToBlock(null); }}
+                onConfirm={confirmBlock}
+                title="Confirm Organization Deactivation"
+                message={`Are you sure you want to block ${orgToBlock?.name}? This will deactivate their portal access and suspend all ongoing operations. This action is reversible from settings.`}
+                confirmText="Deactivate Access"
+                cancelText="Keep Active"
+                danger={true}
+                loading={isSubmitting}
+            />
         </div>
     );
 });

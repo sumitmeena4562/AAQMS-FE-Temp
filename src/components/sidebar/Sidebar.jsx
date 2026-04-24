@@ -58,34 +58,39 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         }
     };
 
-    const handlePrefetch = async (path) => {
-        if (path === '/admin/organizations') {
-            queryClient.prefetchQuery({
-                queryKey: ['organizations', { filters: {}, search: '', page: 1, pageSize: 12 }],
-                queryFn: async () => {
-                    const response = await organizationService.getOrganizations({ page: 1, page_size: 12 });
-                    const data = response.data || response.results || response;
-                    return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
-                }
-            });
-        } else if (path === '/admin/users') {
-            queryClient.prefetchQuery({
-                queryKey: ['users', 'list', { filters: {}, search: '', page: 1, limit: 12 }],
-                queryFn: () => userService.getUsers({}, '', 1, 12)
-            });
-        } else if (path === '/admin/inventory') {
-            queryClient.prefetchQuery({
-                queryKey: ['inventory', { org: 'all', site: 'all', floor: 'all', zone: 'all', search: '' }, 1, 12],
-                queryFn: async () => {
-                    const response = await inventoryService.getInventory({ page: 1, page_size: 12 });
-                    return {
-                        results: response.results || response,
-                        stats: response.stats || null,
-                        count: response.count || 0,
-                    };
-                }
-            });
-        }
+    const prefetchTimeoutRef = useRef(null);
+    const handlePrefetch = (path) => {
+        if (prefetchTimeoutRef.current) clearTimeout(prefetchTimeoutRef.current);
+        
+        prefetchTimeoutRef.current = setTimeout(async () => {
+            if (path === '/admin/organizations') {
+                queryClient.prefetchQuery({
+                    queryKey: ['organizations', { filters: {}, search: '', page: 1, pageSize: 12 }],
+                    queryFn: async () => {
+                        const response = await organizationService.getOrganizations({ page: 1, page_size: 12 });
+                        const data = response.data || response.results || response;
+                        return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
+                    }
+                });
+            } else if (path === '/admin/users') {
+                queryClient.prefetchQuery({
+                    queryKey: ['users', 'list', { filters: {}, search: '', page: 1, limit: 12 }],
+                    queryFn: () => userService.getUsers({}, '', 1, 12)
+                });
+            } else if (path === '/admin/inventory') {
+                queryClient.prefetchQuery({
+                    queryKey: ['inventory', { org: 'all', site: 'all', floor: 'all', zone: 'all', search: '' }, 1, 12],
+                    queryFn: async () => {
+                        const response = await inventoryService.getInventory({ page: 1, page_size: 12 });
+                        return {
+                            results: response.results || response,
+                            stats: response.stats || null,
+                            count: response.count || 0,
+                        };
+                    }
+                });
+            }
+        }, 150); // 150ms debounce
     };
 
     useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname, setMobileOpen]);

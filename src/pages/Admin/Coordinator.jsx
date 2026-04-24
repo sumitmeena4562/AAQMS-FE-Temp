@@ -79,17 +79,14 @@ const Coordinator = React.memo(() => {
 
     // ── DATA FETCHING ──
     const queryFilters = { ...filters, role: 'coordinator' };
-    const { data: usersData, isLoading: isUsersLoading } = useUsers(queryFilters, debouncedSearch, page, limit);
+    const { data: usersData, isLoading: isUsersLoading, refetch, isFetching } = useUsers(queryFilters, debouncedSearch, page, limit);
 
-    // ── HIERARCHY DATA (UNIFIED) ──
-    const { organizations } = useHierarchy({ includeSites: false, includeCoords: false });
-
-    // ── FORM OPTIONS (Pre-fetched for modal speed) ──
-    const { data: formOptions } = useUserFormOptions({ enabled: true });
+    // ── FORM OPTIONS (Unified for Filters & Modal) ──
+    const { data: formOptions, isLoading: isLoadingOptions } = useUserFormOptions({ enabled: true });
 
     // Roles are static for the product
     const filterOptions = {
-        organizations: organizations.map(o => ({ value: o.id, label: o.name })),
+        organizations: (formOptions?.organisations || []).map(o => ({ value: o.value, label: o.label })),
         roles: [{ value: 'coordinator', label: 'Coordinator' }]
     };
 
@@ -325,7 +322,20 @@ const Coordinator = React.memo(() => {
                 onAdd={handleAddUser}
                 addButtonText="Add Coordinator"
                 breadcrumbs={breadcrumbs}
-                rightContent={null}
+                rightContent={
+                    <button 
+                        onClick={() => refetch()}
+                        disabled={isFetching}
+                        className={`flex items-center gap-2 px-4 py-2 bg-white border border-border-main/80 rounded-full shadow-sm hover:shadow-md hover:border-primary/30 transition-all group ${isFetching ? 'opacity-70' : ''}`}
+                    >
+                        <div className={`text-primary/40 group-hover:text-primary transition-colors ${isFetching ? 'animate-spin' : ''}`}>
+                            <FiRefreshCw size={14} />
+                        </div>
+                        <span className="text-[11px] font-black text-title uppercase tracking-widest">
+                            {isFetching ? 'Syncing...' : 'Refresh'}
+                        </span>
+                    </button>
+                }
             />
 
 
@@ -338,7 +348,7 @@ const Coordinator = React.memo(() => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-3">
-                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All" multiple={true} />
+                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All" multiple={true} loading={isLoadingOptions} />
                     <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Inactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All" multiple={true} />
                 </div>
             </FilterBar>
@@ -382,7 +392,7 @@ const Coordinator = React.memo(() => {
             <React.Suspense fallback={null}>
                 <UserFormModal isOpen={isFormOpen} onClose={() => { setIsFormOpen(false); setEditingUser(null); }} onSubmit={handleFormSubmit} user={editingUser} loading={storeLoading} formOptions={formOptions} />
                 <ConfirmModal isOpen={!!statusTarget} onClose={() => setStatusTarget(null)} onConfirm={handleConfirmDeactivate} title="Status Lock" message={`Are you sure you want to change status?`} confirmText="Confirm" danger={true} />
-                <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Change" message={`Update ${selectedIds.length} profiles?`} confirmText="Confirm All" danger={true} />
+                <ConfirmModal isOpen={bulkStatusOpen} onClose={() => setBulkStatusOpen(false)} onConfirm={handleConfirmDeactivate} title="Bulk Deactivation" message={`Are you sure you want to deactivate ${selectedIds.length} profiles? This will suspend their access immediately.`} confirmText="Deactivate All" danger={true} />
             </React.Suspense>
         </div>
     );
