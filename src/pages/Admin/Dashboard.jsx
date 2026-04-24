@@ -7,7 +7,6 @@ import { MatricCardRow } from "../../components/Dashboard/MatricCard";
 import RecentActivityTable from "../../components/Dashboard/RecentactivityTable";
 import { MatricCardSkeleton } from "../../components/Dashboard/StatsCardSkeleton";
 import { useDashboardBootstrap } from "../../hooks/api/useDashboardQueries";
-import { mapToActivityFeed } from "../../utils/dashboardCalculations";
 
 import { DESIGN_TOKENS } from "../../constants/designTokens";
 

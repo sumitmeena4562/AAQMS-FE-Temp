@@ -99,6 +99,9 @@ const useUserStore = create((set, get) => ({
     deleteUser: async (id) => {
         set({ loading: true, error: null });
         try {
+            // ACTUALLY DELETE FROM BACKEND
+            await userService.deleteUser(id);
+
             // SINGLE-CALL OPTIMIZATION: Manually remove user from all cached lists
             queryClient.setQueriesData({ queryKey: ['users'] }, (oldData) => {
                 if (!oldData?.users) return oldData;

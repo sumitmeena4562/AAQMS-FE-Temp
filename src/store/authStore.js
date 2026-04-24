@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import api from "../services/api";
 import toast from "react-hot-toast";
+import { mapToActivityFeed } from "../utils/dashboardCalculations";
 
 /**
  * STORAGE HELPERS
@@ -61,11 +62,31 @@ const useAuthStore = create((set, get) => ({
         // BOOTSTRAP OPTIMIZATION: Seed the dashboard summary cache immediately
         if (loginResponse.bootstrap) {
           const { queryClient } = await import("../lib/queryClient");
-          queryClient.setQueryData(['dashboard', 'summary'], loginResponse.bootstrap);
           
-          // Also seed the user stats if present
-          if (loginResponse.bootstrap.stats) {
-            queryClient.setQueryData(['user-stats'], loginResponse.bootstrap.stats);
+          const bootstrapData = loginResponse.bootstrap || {};
+          
+          // CRITICAL: Only seed the cache if we have the full data (stats + activity + metrics)
+          // Otherwise, React Query will think the empty state is "fresh" and won't fetch the real data.
+          const isFullData = bootstrapData.recent_activity || bootstrapData.metrics;
+
+          if (isFullData) {
+              const mappedBootstrap = {
+                stats: bootstrapData.stats || {},
+                metrics: bootstrapData.metrics || [],
+                recent_history: mapToActivityFeed(
+                  bootstrapData.recent_activity || 
+                  bootstrapData.recent_history || 
+                  []
+                ),
+                organisations: bootstrapData.organisations || []
+              };
+              queryClient.setQueryData(['dashboard', 'bootstrap'], mappedBootstrap);
+          } else {
+              // If data is partial (only stats), we just seed the stats and let the dashboard refetch
+              if (bootstrapData.stats) {
+                queryClient.setQueryData(['user-stats'], bootstrapData.stats);
+              }
+              // We DON'T set ['dashboard', 'bootstrap'] here so it triggers a fresh fetch on the dashboard page
           }
         }
 

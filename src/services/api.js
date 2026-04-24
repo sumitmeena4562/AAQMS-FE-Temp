@@ -90,10 +90,19 @@ const processQueue = (error, token = null) => {
 
 api.interceptors.response.use(
     (response) => {
+        // ── REQUEST TRACKING CLEANUP ──
+        if (response.config?._requestKey) {
+            pendingRequests.delete(response.config._requestKey);
+        }
         return response;
     },
     async (error) => {
         const originalRequest = error.config;
+
+        // ── REQUEST TRACKING CLEANUP (ON ERROR) ──
+        if (originalRequest?._requestKey) {
+            pendingRequests.delete(originalRequest._requestKey);
+        }
 
         const isSilent = originalRequest?._silent === true;
 
