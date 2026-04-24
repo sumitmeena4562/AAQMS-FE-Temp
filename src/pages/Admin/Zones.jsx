@@ -24,37 +24,57 @@ const MediaModal = ({ isOpen, onClose, zone }) => {
         <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-300">
             <div className="absolute inset-0 bg-title/40 backdrop-blur-md" onClick={onClose} />
             <div className="relative bg-card w-full max-w-5xl h-[85vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-border-main animate-in zoom-in-95 duration-300">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border-main bg-base/50">
+                <div className="flex items-center justify-between px-6 py-5 border-b border-border-main bg-base/50">
                     <div className="flex flex-col">
-                        <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                            <h3 className="text-lg font-black text-title uppercase tracking-tight leading-none">
+                        <div className="flex items-center gap-2.5 mb-1">
+                            <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(30,58,138,0.4)] animate-pulse" />
+                            <h3 className="text-xl font-black text-title uppercase tracking-tighter leading-none">
                                 {zone?.name || 'Zone'} Drawing
                             </h3>
                         </div>
-                        <p className="text-[10px] font-bold text-gray uppercase tracking-widest mt-1 opacity-60">
-                            {zone?.site_name} • {zone?.floor_name}
-                        </p>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-black text-primary/70 bg-primary/5 px-2 py-0.5 rounded border border-primary/10 tracking-widest">
+                                ID: {zone?.id}
+                            </span>
+                            <span className="text-[10px] font-bold text-gray uppercase tracking-widest opacity-60">
+                                {zone?.orgName} • {zone?.siteName} • {zone?.floorName}
+                            </span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <button className="p-2.5 rounded-xl bg-card border border-border-main text-gray hover:text-primary transition-all shadow-sm">
-                            <FiDownload size={18} />
+                    <div className="flex items-center gap-3">
+                        <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-card border border-border-main text-[11px] font-bold text-gray hover:text-primary transition-all shadow-sm hover:border-primary/30">
+                            <FiDownload size={14} />
+                            DOWNLOAD
                         </button>
-                        <button onClick={onClose} className="p-2.5 rounded-xl bg-primary/5 border border-primary/20 text-primary hover:bg-primary hover:text-white transition-all shadow-sm">
-                            <FiX size={18} />
+                        <button onClick={onClose} className="p-2.5 rounded-xl bg-title text-white hover:bg-primary transition-all shadow-lg">
+                            <FiX size={20} />
                         </button>
                     </div>
                 </div>
-                <div className="flex-1 bg-base relative overflow-hidden flex items-center justify-center group/viewer">
+                <div className="flex-1 bg-[#f8f9fc] relative overflow-hidden flex items-center justify-center group/viewer p-8">
+                    {/* Grid Background Effect */}
+                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#1e3a8a 1px, transparent 1px)', size: '20px 20px' }} />
+                    
                     <img 
                         src={blueprintUrl} 
                         alt="Zone Drawing" 
                         onLoad={(e) => e.target.classList.add('opacity-100')}
-                        className="max-w-full max-h-full object-contain shadow-2xl transition-all duration-500 hover:scale-105 opacity-0"
+                        className="max-w-full max-h-full object-contain shadow-[0_32px_64px_-12px_rgba(0,0,0,0.14)] transition-all duration-700 hover:scale-[1.02] opacity-0 rounded-lg border border-white/40"
                     />
-                    <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between pointer-events-none">
-                        <div className="px-4 py-2 bg-title/80 backdrop-blur-xl text-white rounded-full border border-white/10 shadow-2xl scale-90 group-hover/viewer:scale-100 transition-all duration-500 opacity-0 group-hover/viewer:opacity-100">
-                           <span className="text-[10px] font-black uppercase tracking-[0.2em]">{zone?.type} ZONE • {zone?.status}</span>
+                    
+                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-4 pointer-events-none">
+                        <div className="px-5 py-2.5 bg-title/90 backdrop-blur-xl text-white rounded-2xl border border-white/10 shadow-2xl group-hover/viewer:translate-y-[-10px] transition-all duration-500">
+                           <div className="flex items-center gap-3">
+                               <div className="flex flex-col items-center">
+                                   <span className="text-[8px] font-black text-white/50 uppercase tracking-[0.2em] mb-0.5">TYPE</span>
+                                   <span className="text-[11px] font-black uppercase tracking-wider">{zone?.type}</span>
+                               </div>
+                               <div className="w-[1px] h-6 bg-white/10" />
+                               <div className="flex flex-col items-center">
+                                   <span className="text-[8px] font-black text-white/50 uppercase tracking-[0.2em] mb-0.5">STATUS</span>
+                                   <span className="text-[11px] font-black uppercase tracking-wider text-green-400">{zone?.status || 'ACTIVE'}</span>
+                               </div>
+                           </div>
                         </div>
                     </div>
                 </div>
@@ -92,25 +112,22 @@ const Zones = () => {
         }
     }, [searchParams, bulkSync]);
 
-    // --- QUERY HOOKS (UNIFIED) ---
+    // --- QUERY HOOKS (OPTIMIZED: Zero Latency Pattern) ---
     const { organizations: orgs, sites: allSites } = useHierarchy({ 
         includeOrgs: true,
-        includeCoords: true,
+        includeCoords: false, // Kill the 7-second lag
         includeSites: true 
     });
 
-    const { data: floorData } = useFloors(selectedSite, {}, {
-        enabled: selectedSite.length > 0
+    const { data: floorData } = useFloors(undefined, { page_size: 5000 }, {
+        enabled: hasSynced.current
     });
-    const allFloors = floorData?.results || [];
+    const allFloors = floorData?.results; // Pass undefined/null while loading so FilterBar knows it's not ready
 
     const { data: zoneData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError, refetch: refetchZones } = useZones(
-        selectedFloor.length > 0 ? selectedFloor : undefined, 
-        {
-            site_id: selectedSite.length > 0 ? selectedSite : undefined,
-            org_id: selectedOrg.length > 0 ? selectedOrg : undefined
-        },
-        { enabled: hasSynced.current } // Only fire main data after URL sync
+        undefined, // Global fetch
+        { page_size: 5000 }, // All zones for FE filtering
+        { enabled: hasSynced.current }
     );
 
     const zones = zoneData.results || [];
@@ -135,39 +152,82 @@ const Zones = () => {
 
     // fetchZones effect removed - handled by useZones query hook
 
+    // --- Dynamic Naming for Breadcrumbs/Headers ---
     const currentOrg = selectedOrg.length === 1 ? orgs.find(o => String(o.id) === String(selectedOrg[0])) : null;
-    const currentSite = selectedSite.length === 1 ? (allSites || []).find(s => String(s.id) === String(selectedSite[0])) : null;
-    const currentFloor = selectedFloor.length === 1 ? (allFloors || []).find(f => String(f.id) === String(selectedFloor[0])) : null;
+    const currentSite = (allSites || []).find(s => String(s.id) === String(selectedSite[0]));
+    const currentFloor = (allFloors || []).find(f => String(f.id) === String(selectedFloor[0]));
 
-    const orgLabel = selectedOrg.length > 1 ? `Organizations (${selectedOrg.length})` : currentOrg?.name;
-    const siteLabel = selectedSite.length > 1 ? `Sites (${selectedSite.length})` : currentSite?.site_name;
-    const floorLabel = selectedFloor.length > 1 ? `Floors (${selectedFloor.length})` : currentFloor?.floor_name;
+    const orgLabel = selectedOrg.length > 1 ? `Multiple Orgs (${selectedOrg.length})` : currentOrg?.name || "Organization";
+    const siteLabel = selectedSite.length > 1 ? `Multiple Sites (${selectedSite.length})` : currentSite?.name || currentSite?.site_name || "Site Plan";
+    const floorLabel = selectedFloor.length > 1 ? `Multiple Floors (${selectedFloor.length})` : currentFloor?.name || currentFloor?.floor_name || "Floor Plan";
 
     const breadcrumbs = [
         { label: "Dashboard", path: "/admin/dashboard", icon: <FiHome size={14} /> },
         { label: "Organizations", path: "/admin/organizations", icon: <FiBriefcase size={14} /> },
     ];
 
-    if (orgLabel) breadcrumbs.push({ label: orgLabel || "Organization", path: `/admin/coordinators?org_id=${selectedOrg.join(',')}&org_name=${encodeURIComponent(currentOrg?.name || '')}` });
-    if (siteLabel) breadcrumbs.push({ label: siteLabel || "Site Plan", path: `/admin/site-plan?org_id=${selectedOrg.join(',')}&site_id=${selectedSite.join(',')}` });
-    if (floorLabel) breadcrumbs.push({ label: floorLabel || "Floor Plan", path: `/admin/site-plan?site_id=${selectedSite.join(',')}&floor_id=${selectedFloor.join(',')}` });
+    if (selectedOrg.length > 0) breadcrumbs.push({ label: orgLabel, path: `/admin/coordinators?org_id=${selectedOrg.join(',')}` });
+    if (selectedSite.length > 0) breadcrumbs.push({ label: siteLabel, path: `/admin/site-plan?org_id=${selectedOrg.join(',')}&site_id=${selectedSite.join(',')}` });
+    if (selectedFloor.length > 0) breadcrumbs.push({ label: floorLabel, path: `/admin/floor-plan?org_id=${selectedOrg.join(',')}&site_id=${selectedSite.join(',')}&floor_id=${selectedFloor.join(',')}` });
     breadcrumbs.push({ label: "Zones", path: "#", isActive: true });
 
     const processedZones = useMemo(() => {
-        const zones = zoneData.results || [];
-        if (!Array.isArray(zones)) return [];
-        return zones
-            .filter(z => !searchQuery || z.name?.toLowerCase().includes(searchQuery.toLowerCase().trim()))
+        const rawZones = zoneData.results || [];
+        
+        return rawZones
             .map(z => {
+                // Defensive extraction of context IDs
+                const getID = (val) => {
+                    if (!val) return '';
+                    if (typeof val === 'object' && val.id) return String(val.id);
+                    if (typeof val === 'object' && val.pk) return String(val.pk);
+                    return String(val);
+                };
+
+                const zOrgId = getID(z.organisation_id || z.org_id || z.organisation);
+                const zSiteId = getID(z.site_id || z.site);
+                const zFloorId = getID(z.floor_id || z.floor);
+
+                // Find context names from global cache (Safe check for undefined)
+                const safeOrgs = orgs || [];
+                const safeSites = allSites || [];
+                const safeFloors = allFloors || [];
+
+                const org = safeOrgs.find(o => String(o.id) === zOrgId);
+                const site = safeSites.find(s => String(s.id) === zSiteId);
+                const floor = safeFloors.find(f => String(f.id) === zFloorId);
+
                 let Icon = Layout;
                 let bgClass = 'bg-blue-50';
                 let txtClass = 'text-blue-600';
                 if (z.type === 'Logistics' || z.type === 'Storage') { Icon = Truck; bgClass = 'bg-orange-50'; txtClass = 'text-orange-600'; }
                 if (z.type === 'Infrastructure' || z.type === 'HVAC') { Icon = Fuel; bgClass = 'bg-green-50'; txtClass = 'text-green-600'; }
                 if (z.type === 'Data Room' || z.type === 'Security') { Icon = Monitor; bgClass = 'bg-indigo-50'; txtClass = 'text-indigo-600'; }
-                return { ...z, icon: Icon, iconBgClass: bgClass, iconTextClass: txtClass, count: `${z.count ?? 0}` };
+
+                return {
+                    ...z,
+                    organisation_id: zOrgId, // Standardize for filter
+                    site_id: zSiteId,
+                    floor_id: zFloorId,
+                    orgName: org?.name || 'Unknown Org',
+                    siteName: site?.name || site?.site_name || 'Unknown Site',
+                    floorName: floor?.name || floor?.floor_name || 'Unknown Floor',
+                    icon: Icon,
+                    iconBgClass: bgClass,
+                    iconTextClass: txtClass,
+                    count: `${z.count ?? 0}`
+                };
+            })
+            .filter(z => {
+                // Use standardized IDs from the map stage above
+                const matchesOrg = !selectedOrg || selectedOrg.length === 0 || selectedOrg.some(id => String(id) === z.organisation_id);
+                const matchesSite = !selectedSite || selectedSite.length === 0 || (Array.isArray(selectedSite) ? selectedSite.includes(z.site_id) : String(selectedSite) === z.site_id);
+                const matchesFloor = !selectedFloor || selectedFloor.length === 0 || (Array.isArray(selectedFloor) ? selectedFloor.includes(z.floor_id) : String(selectedFloor) === z.floor_id);
+                const matchesSearch = !searchQuery || (z.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+                return matchesOrg && matchesSite && matchesFloor && matchesSearch;
             });
-    }, [zoneData, searchQuery]);
+    }, [zoneData, selectedOrg, selectedSite, selectedFloor, searchQuery, orgs, allSites, allFloors]);
 
     const pageSize = useResponsiveLimit(10);
     // 🔹 Auto-reset to page 1 when filters or page size change
@@ -196,13 +256,13 @@ const Zones = () => {
                 hideAddButton={true}
                 rightContent={
                     <div className="flex items-center gap-3">
-                        {totalZonesCount > 0 && <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">{totalZonesCount} Active Zones</span>}
+                        {processedZones.length > 0 && <span className="text-[10px] font-black text-gray uppercase tracking-widest bg-base/50 px-3 py-1.5 rounded-lg border border-border-main/50">{processedZones.length} Result{processedZones.length !== 1 ? 's' : ''}</span>}
                     </div>
                 }
             />
             <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6 overflow-hidden">
                 <div className="mb-6 px-4">
-                    <FilterBar activeLevel="zones" />
+                    <FilterBar activeLevel="zones" hideCoordFilter={true} externalFloors={allFloors} />
                 </div>
                 <div className="flex-1 overflow-auto px-4">
                     {loading ? (

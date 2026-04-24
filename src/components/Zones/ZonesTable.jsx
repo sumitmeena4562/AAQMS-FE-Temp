@@ -27,6 +27,8 @@ const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false, onVi
                             {selectionMode && <th className="py-4 pl-6 pr-2 text-[11px] font-bold text-[#7B8393] align-middle w-10"></th>}
                             <th className="py-4 pr-6 pl-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE ID</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE NAME</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ORGANIZATION</th>
+                            <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">SITE / FLOOR</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">ZONE TYPE</th>
                             <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">INVENTORY COUNT</th>
                             {showQRCode && <th className="py-4 px-6 text-[11px] font-bold text-[#7B8393] uppercase tracking-[0.8px] whitespace-nowrap align-middle">QR CODE</th>}
@@ -36,7 +38,7 @@ const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false, onVi
                     <tbody className="divide-y divide-border-main/60">
                         {data.length === 0 ? (
                             <tr>
-                                <td colSpan={showQRCode ? (selectionMode ? 7 : 6) : (selectionMode ? 6 : 5)} className="py-16 text-center">
+                                <td colSpan={showQRCode ? (selectionMode ? 10 : 9) : (selectionMode ? 9 : 8)} className="py-16 text-center">
                                     <div className="flex flex-col items-center justify-center text-gray animate-in fade-in duration-500">
                                         <p className="text-sm font-semibold text-title mb-1">No zones found</p>
                                         <p className="text-xs">Try adjusting your active filters.</p>
@@ -64,6 +66,21 @@ const ZonesTable = ({ data = [], showQRCode = false, selectionMode = false, onVi
                                             </div>
                                             <span className="text-sm font-semibold text-title whitespace-nowrap">
                                                 {zone.name}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6 align-middle">
+                                        <span className="text-xs font-bold text-gray px-2 py-1 bg-gray-50 border border-gray-100 rounded-[4px] whitespace-nowrap">
+                                            {zone.orgName}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6 align-middle">
+                                        <div className="flex flex-col gap-1">
+                                            <span className="text-[11px] font-bold text-primary/80 uppercase tracking-tight">
+                                                {zone.siteName}
+                                            </span>
+                                            <span className="text-[10px] text-gray font-medium">
+                                                {zone.floorName}
                                             </span>
                                         </div>
                                     </td>

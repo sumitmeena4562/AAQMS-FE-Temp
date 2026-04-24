@@ -65,6 +65,14 @@ const FilterBar = ({
     const renderSite = ['site', 'floor', 'zone'].includes(normalizedLevel);
     const renderFloor = ['floor', 'zone'].includes(normalizedLevel);
 
+    // ─── HELPERS ───
+    const getID = (val) => {
+        if (!val) return '';
+        if (typeof val === 'object' && val.id) return String(val.id);
+        if (typeof val === 'object' && val.pk) return String(val.pk);
+        return String(val);
+    };
+
     // ─── QUERY HOOKS (UNIFIED) ───
     const hierarchyOptions = React.useMemo(() => ({
         includeOrgs: !!renderOrg,
@@ -75,29 +83,29 @@ const FilterBar = ({
 
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading } = useHierarchy(hierarchyOptions);
 
+    const isFloorsExternal = rest.hasOwnProperty('externalFloors') || externalFloors !== null;
     const { data: floorData } = useFloors(selectedSite, {}, {
-        enabled: !externalFloors && renderFloor && selectedSite.length > 0
+        enabled: !isFloorsExternal && renderFloor && selectedSite.length > 0
     });
     
     const allFloors = React.useMemo(() => {
-        if (externalFloors) {
-            // Filter global floors by selected site locally
-            if (selectedSite.length > 0) {
-                return externalFloors.filter(f => {
-                    const sId = f.site_id || f.site?.id || f.site;
-                    return selectedSite.includes(String(sId));
-                });
-            }
-            return externalFloors;
+        const rawFloors = isFloorsExternal ? (externalFloors || []) : (floorData?.results || []);
+        
+        // Filter by selected site locally if needed
+        if (selectedSite.length > 0) {
+            return rawFloors.filter(f => {
+                const sId = getID(f.site_id || f.site);
+                return selectedSite.some(id => String(id) === sId);
+            });
         }
-        return floorData?.results || [];
-    }, [externalFloors, floorData, selectedSite]);
+        return rawFloors;
+    }, [isFloorsExternal, externalFloors, floorData, selectedSite, getID]);
 
     // Dynamic Relational Options mapping (using Real IDs) - Memoized to prevent re-render loops
     const orgOptions = React.useMemo(() => orgs.map(o => ({ value: o.id, label: o.name })), [orgs]);
+
     const coordOptions = React.useMemo(() => allCoordinators.map((c, i) => {
-        // Robust ID extraction
-        const id = c.id || c.pk || c.employee_id || i;
+        const id = getID(c.id || c.pk || c.employee_id || i);
         
         // Robust Name extraction (checking nested user objects and common variants)
         const name = c.name || 
@@ -113,8 +121,8 @@ const FilterBar = ({
         let filtered = allSites;
         if (selectedOrg && selectedOrg.length > 0) {
             filtered = filtered.filter(s => {
-                const orgId = s.organisation_id || s.org_id || s.organisation?.id;
-                return selectedOrg.includes(String(orgId));
+                const orgId = getID(s.organisation_id || s.org_id || s.organisation);
+                return selectedOrg.some(id => String(id) === orgId);
             });
         }
         return filtered.map(s => ({ value: s.id, label: s.site_name || s.name }));
