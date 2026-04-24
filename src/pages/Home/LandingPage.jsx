@@ -34,7 +34,7 @@ const LandingPage = () => {
     // Optimized Scroll Spy for Navigation Highlighting
     const activeSectionId = useScrollSpy([
         'home', 'roles', 'capabilities', 'planning', 'workflow', 'mobile', 'analytics'
-    ], { rootMargin: '-10% 0px -80% 0px', threshold: 0 });
+    ], { rootMargin: '-100px 0px -70% 0px', threshold: 0 });
 
     // Mapping for section IDs to human-readable labels
     const idToLabel = {
@@ -167,9 +167,9 @@ const LandingPage = () => {
             </Suspense>
 
             <Suspense fallback={<SectionLoader height="400px" />}>
-                <section id="cta">
+                <div id="contact" className="scroll-mt-20">
                     <CTA />
-                </section>
+                </div>
             </Suspense>
 
             {/* Premium Footer */}

@@ -146,10 +146,7 @@ const FieldApp = () => {
     const { badge, title, description, features } = FIELD_APP_DATA;
 
     return (
-        <SectionWrapper 
-            id="mobile" 
-            backgroundProps={{ showScanner: false, gridOpacity: 0.12 }}
-        >
+        <SectionWrapper>
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader
                     badge={badge}

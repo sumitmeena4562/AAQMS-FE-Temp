@@ -65,7 +65,11 @@ const Hero = () => {
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-6 sm:gap-10 w-full sm:w-auto px-4 sm:px-0">
-                    <MagneticButton className="w-full sm:w-auto">
+                    <motion.div 
+                        whileHover={{ scale: 1.02 }} 
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full sm:w-auto"
+                    >
                         <Link to="/login" className="w-full sm:w-auto">
                             <Button
                                 variant="primary"
@@ -79,7 +83,7 @@ const Hero = () => {
                                 </svg>
                             </Button>
                         </Link>
-                    </MagneticButton>
+                    </motion.div>
 
                     <div className="flex items-center gap-5 sm:border-l sm:border-border sm:pl-8 group cursor-default">
                         <motion.span

@@ -9,8 +9,6 @@ const RoleFeatures = () => {
 
     return (
         <SectionWrapper 
-            id="roles" 
-            backgroundProps={{ showScanner: false, gridOpacity: 0.08 }}
             className="border-b border-border/50"
         >
             <div className="container mx-auto px-6 relative z-10">

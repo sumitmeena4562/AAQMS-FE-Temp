@@ -11,10 +11,7 @@ const SitePlanning = () => {
     const { badge, title, description, features } = SITE_PLANNING_DATA;
 
     return (
-        <SectionWrapper 
-            id="planning" 
-            backgroundProps={{ showScanner: true, glowIntensity: 0.35, gridOpacity: 0.1 }}
-        >
+        <SectionWrapper>
             {/* Unified Section Header */}
             <SectionHeader
                 badge={badge}
@@ -39,8 +36,8 @@ const SitePlanning = () => {
                         >
                             {/* Floor Plan Mockup - Compact Height */}
                             <div className="w-full h-[320px] sm:h-[360px] bg-background rounded-[18px] relative border border-border flex flex-col shadow-inner group overflow-hidden">
-                                {/* Grid Pattern */}
-                                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+                                {/* Grid Pattern - Darker for better visibility */}
+                                <div className="absolute inset-0 opacity-[0.08] pointer-events-none" 
                                     style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, var(--color-text-title) 1px, transparent 0)', backgroundSize: '18px 18px' }} 
                                     aria-hidden="true"
                                 />
@@ -48,7 +45,7 @@ const SitePlanning = () => {
                                 {/* Zones with micro-interactions */}
                                 <motion.div 
                                     whileHover={{ scale: 1.005, backgroundColor: "rgba(var(--color-primary-rgb), 0.05)" }}
-                                    className="absolute top-[12%] left-[10%] w-[35%] h-[35%] bg-primary/[0.03] border border-primary/20 rounded-[20px] flex flex-col items-center justify-center cursor-help transition-all group/z1 shadow-sm"
+                                    className="absolute top-[12%] left-[10%] w-[35%] h-[35%] bg-primary/[0.04] border border-primary/40 rounded-[20px] flex flex-col items-center justify-center cursor-help transition-all group/z1 shadow-sm"
                                 >
                                     <div className="absolute top-2.5 right-2.5 flex items-center gap-1 bg-primary/10 px-1.5 py-0.5 rounded-full border border-primary/10">
                                         <div className="w-1 h-1 rounded-full bg-primary animate-pulse" />
@@ -59,7 +56,7 @@ const SitePlanning = () => {
                                 
                                 <motion.div 
                                     whileHover={{ scale: 1.005, backgroundColor: "rgba(16, 185, 129, 0.05)" }}
-                                    className="absolute top-[55%] left-[8%] w-[45%] h-[30%] bg-emerald-500/[0.03] border border-emerald-500/20 rounded-[20px] flex items-center justify-center cursor-help transition-all group/z2 shadow-sm"
+                                    className="absolute top-[55%] left-[8%] w-[45%] h-[30%] bg-emerald-500/[0.04] border border-emerald-500/40 rounded-[20px] flex items-center justify-center cursor-help transition-all group/z2 shadow-sm"
                                 >
                                     <span className="text-[9px] font-black text-emerald-600/80 tracking-[0.2em] uppercase group-hover/z2:text-emerald-600 transition-colors">Zone 102</span>
                                 </motion.div>
@@ -67,12 +64,12 @@ const SitePlanning = () => {
                                 <motion.div 
                                     animate={{ opacity: [0.6, 0.8, 0.6] }}
                                     transition={{ duration: 4, repeat: Infinity }}
-                                    className="absolute top-[15%] left-[58%] w-[35%] h-[70%] bg-rose-500/[0.01] border border-dashed border-rose-500/20 rounded-[20px] flex items-center justify-center overflow-hidden"
+                                    className="absolute top-[15%] left-[58%] w-[35%] h-[70%] bg-rose-500/[0.02] border border-dashed border-rose-500/40 rounded-[20px] flex items-center justify-center overflow-hidden"
                                 >
-                                    <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+                                    <div className="absolute inset-0 opacity-[0.06] pointer-events-none" 
                                         style={{ backgroundImage: 'repeating-linear-gradient(45deg, #f43f5e, #f43f5e 1px, transparent 1px, transparent 15px)' }}
                                     />
-                                    <span className="text-[8px] font-black text-rose-500/50 tracking-[0.25em] uppercase text-center px-6 leading-relaxed relative z-10">Restricted Area</span>
+                                    <span className="text-[9px] font-black text-rose-500/70 tracking-[0.25em] uppercase text-center px-6 leading-relaxed relative z-10">Restricted Area</span>
                                 </motion.div>
 
                                 {/* Sensor Nodes */}
@@ -116,8 +113,8 @@ const SitePlanning = () => {
                                         whileTap={{ scale: 0.98 }} 
                                         className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-primary cursor-pointer transition-colors"
                                     >
-                                        <tool.icon className="text-base" aria-hidden="true" />
-                                        <span className="text-[8px] font-black uppercase tracking-widest">{tool.label}</span>
+                                        <tool.icon className="text-lg" aria-hidden="true" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">{tool.label}</span>
                                     </motion.div>
                                 ))}
                             </div>

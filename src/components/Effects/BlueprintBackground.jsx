@@ -55,52 +55,47 @@ const BlueprintBackground = ({
 
             {/* 2. Parallax Wrapper for Arcs */}
             <motion.div 
-                style={{ x: moveX, y: moveY }}
-                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                style={{ x: moveX, y: moveY, translateZ: 0 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none will-change-transform"
             >
                 {/* Central Soft Glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--color-primary)_0%,_transparent_70%)] opacity-[0.03]" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--color-primary)_0%,_transparent_70%)] opacity-[0.02]" />
 
                 {/* Refined Aura Light */}
-                <div className="absolute w-[95%] max-w-[850px] aspect-square rounded-full bg-[radial-gradient(circle_at_center,_#3b82f6_0%,_transparent_65%)] opacity-[0.03] blur-[100px]" />
+                <div className="absolute w-[95%] max-w-[850px] aspect-square rounded-full bg-primary/5 blur-[80px]" />
 
                 {/* Outer Dashed arc with Scanning Spark */}
                 <div className="absolute w-[95%] max-w-[850px] aspect-square rounded-full">
                     <motion.div
                         animate={{ 
-                            opacity: [0.4, arcOpacity, 0.4],
-                            scale: [1, 1.02, 1],
-                            filter: [
-                                `drop-shadow(0 0 2px rgba(59, 130, 246, 0.4))`,
-                                `drop-shadow(0 0 15px rgba(59, 130, 246, 0.7))`
-                            ]
+                            opacity: [0.3, 0.5, 0.3],
+                            scale: [1, 1.01, 1],
                         }}
                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute inset-0 rounded-full border-2 border-primary/60 border-dashed animate-[spin_60s_linear_infinite_reverse]" 
+                        className="absolute inset-0 rounded-full border-2 border-primary/40 border-dashed animate-[spin_60s_linear_infinite_reverse]" 
                     />
                     
-                    {/* THE SCANNING SPARK (Comet Effect) */}
+                    {/* THE SCANNING SPARK */}
                     {showScanner && (
                         <motion.div
                             animate={{ rotate: 360 }}
-                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
                             className="absolute inset-0 rounded-full z-10"
                         >
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_10px_#3b82f6,0_0_20px_rgba(59,130,246,0.4)]">
-                                <div className="absolute inset-0 rounded-full animate-ping bg-secondary opacity-40" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_15px_#3b82f6]">
+                                <div className="absolute inset-0 rounded-full animate-ping bg-secondary opacity-30" />
                             </div>
                         </motion.div>
                     )}
                 </div>
 
-                {/* Inner Solid arc (Subtle Pulse) */}
+                {/* Inner Solid arc */}
                 <motion.div
                     animate={{ 
-                        opacity: [0.15, 0.4, 0.15],
-                        scale: [1, 1.03, 1]
+                        opacity: [0.1, 0.3, 0.1],
                     }}
                     transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                    className={`absolute w-[75%] max-w-[650px] aspect-square rounded-full border border-primary/40 shadow-[0_0_80px_rgba(59,130,246,${glowIntensity})]`}
+                    className="absolute w-[75%] max-w-[650px] aspect-square rounded-full border border-primary/20 shadow-[0_0_60px_rgba(59,130,246,0.05)]"
                 />
             </motion.div>
         </div>

@@ -8,7 +8,7 @@ const Capabilities = () => {
     const { badge, title, description, list } = CAPABILITIES_DATA;
 
     return (
-        <SectionWrapper id="capabilities" backgroundProps={{ showScanner: true, glowIntensity: 0.15 }}>
+        <SectionWrapper>
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader
                     badge={badge}

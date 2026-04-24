@@ -8,12 +8,10 @@ import { cn } from '../../utils/cn';
  */
 const SectionWrapper = ({ 
     children, 
-    className, 
-    id
+    className
 }) => {
     return (
         <section 
-            id={id}
             className={cn(
                 "relative py-16 sm:py-24 overflow-hidden bg-transparent transition-colors duration-500",
                 className

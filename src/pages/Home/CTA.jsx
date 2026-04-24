@@ -10,8 +10,6 @@ const CTA = () => {
 
     return (
         <SectionWrapper 
-            id="contact" 
-            backgroundProps={{ showScanner: false, gridOpacity: 0.1 }}
             className="pt-12 pb-6 sm:pt-24 sm:pb-8 border-t border-border/40"
         >
             <div className="max-w-4xl mx-auto relative z-10">
@@ -37,8 +35,10 @@ const CTA = () => {
 
                         <div className="space-y-4 sm:space-y-6 max-w-2xl w-full">
                             <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-text-title tracking-tight md:tracking-tighter leading-[1.1]">
-                                {title.main} <br className="hidden sm:block" />
-                                <span className="text-primary italic font-black">{title.highlight}</span>
+                                {title.main} {" "}
+                                <span className="text-primary italic font-black text-2xl md:text-4xl lg:text-5xl inline-block">
+                                    {title.highlight}
+                                </span>
                             </h2>
                             
                             <p className="text-text-muted text-sm sm:text-lg font-medium leading-relaxed max-w-[550px] mx-auto opacity-80">

@@ -15,11 +15,11 @@ export const useScrollSpy = (sectionIds, options = { rootMargin: '-20% 0px -70% 
     if (observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveId(entry.target.id);
-        }
-      });
+      // Find the first intersecting entry (topmost in document order)
+      const visibleEntry = entries.find(entry => entry.isIntersecting);
+      if (visibleEntry) {
+        setActiveId(visibleEntry.target.id);
+      }
     }, options);
 
     sectionIds.forEach((id) => {

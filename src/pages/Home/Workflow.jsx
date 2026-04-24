@@ -5,39 +5,7 @@ import Card from '../../components/UI/Card';
 import { WORKFLOW_DATA } from '../../data/landingData';
 import SectionWrapper from '../../components/Layout/SectionWrapper';
 
-const LineSegment = ({ scrollYProgress, index, stepsTotal }) => {
-    // Each row takes an equal chunk of the container's scroll progress
-    const segmentSize = 1 / stepsTotal;
-    const start = index * segmentSize;
-    const end = (index + 1) * segmentSize;
-
-    // Scale the line growth within this row's scroll window
-    // Added a small buffer to ensure segments overlap perfectly
-    const scaleY = useTransform(scrollYProgress, [start, end], [0, 1.05]);
-
-    const isFirst = index === 0;
-    const isLast = index === stepsTotal - 1;
-
-    return (
-        <div className="absolute inset-x-0 top-0 bottom-0 flex justify-center z-0 pointer-events-none">
-            {/* Background Track Segment */}
-            <div className={`w-[2px] bg-border/20 ${isFirst ? 'top-1/2' : 'top-0'} ${isLast ? 'bottom-1/2' : 'bottom-0'} absolute`} />
-
-            {/* Animated Active Segment */}
-            <motion.div
-                style={{
-                    scaleY,
-                    originY: 0,
-                    top: isFirst ? '50%' : '0%',
-                    bottom: isLast ? '50%' : '0%',
-                    left: '50%',
-                    marginLeft: '-1px'
-                }}
-                className="absolute w-[2px] bg-gradient-to-b from-primary via-secondary to-accent shadow-[0_0_15px_var(--color-primary)] opacity-80"
-            />
-        </div>
-    );
-};
+// Removed LineSegment component in favor of a single master line for perfect continuity
 
 const MilestoneNode = ({ scrollYProgress, index, stepsTotal }) => {
     const threshold = index / (stepsTotal - 1);
@@ -121,28 +89,32 @@ const Workflow = () => {
 
     return (
         <SectionWrapper 
-            id="workflow" 
             ref={containerRef}
-            backgroundProps={{ showScanner: false, gridOpacity: 0.1 }}
         >
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader badge={badge} title={title} description={description} />
 
                 <div ref={stepsRef} className="max-w-5xl mx-auto relative mt-20 sm:mt-24">
+                    {/* SINGLE CONTINUOUS PIPELINE LINE - Locked between first and last dots */}
+                    <div className="absolute lg:left-1/2 left-[24px] top-[80px] bottom-[80px] lg:top-[110px] lg:bottom-[110px] w-[2px] -translate-x-1/2 z-0">
+                        {/* Static Track */}
+                        <div className="absolute inset-0 bg-border/20" />
+                        
+                        {/* Animated Active Line */}
+                        <motion.div
+                            style={{ 
+                                scaleY: springProgress,
+                                originY: 0
+                            }}
+                            className="absolute inset-0 bg-gradient-to-b from-primary via-secondary to-accent shadow-[0_0_15px_rgba(var(--color-primary-rgb),0.3)] opacity-80"
+                        />
+                    </div>
+
                     <div className="relative z-10 flex flex-col">
                         {steps.map((step, index) => {
                             const isEven = index % 2 === 0;
                             return (
                                 <div key={index} className="grid grid-cols-[auto_1fr] lg:grid-cols-[1fr_auto_1fr] items-center gap-6 lg:gap-12 relative min-h-[160px] lg:min-h-[220px]">
-                                    {/* Line Segment Logic (Segmented Continuity) */}
-                                    <div className="absolute inset-0 flex lg:justify-center left-[24px] lg:left-0 z-0">
-                                        <LineSegment 
-                                            scrollYProgress={springProgress} 
-                                            index={index} 
-                                            stepsTotal={steps.length} 
-                                        />
-                                    </div>
-
                                     {/* Column 1: Card (Even) / Spacer (Odd) */}
                                     <div className="hidden lg:block z-10">
                                         {isEven ? <WorkflowCard {...step} index={index} /> : null}

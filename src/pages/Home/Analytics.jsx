@@ -47,10 +47,7 @@ const Analytics = () => {
     const { badge, title, description, features, stats } = ANALYTICS_DATA;
 
     return (
-        <SectionWrapper 
-            id="analytics" 
-            backgroundProps={{ showScanner: false, gridOpacity: 0.08 }}
-        >
+        <SectionWrapper>
             <div className="container mx-auto px-6 relative z-10">
                 <SectionHeader
                     badge={badge}

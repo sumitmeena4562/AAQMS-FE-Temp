@@ -89,7 +89,7 @@ const LandingNavbar = ({
                 className={`
                     ${sticky ? 'fixed' : 'relative'} top-0 left-0 right-0 z-50 px-4 sm:px-8 transition-all duration-500
                     ${isScrolled 
-                        ? 'h-16 py-2 glass-panel shadow-sm border-b border-border/10' 
+                        ? 'h-20 py-3 glass-panel shadow-sm border-b border-border/10' 
                         : 'h-24 py-4 bg-transparent border-b border-transparent'}
                 `}
             >
@@ -123,18 +123,31 @@ const LandingNavbar = ({
                                     onMouseEnter={() => setHoveredIdx(idx)}
                                     onMouseLeave={() => setHoveredIdx(null)}
                                 >
-                                    <AnimatePresence>
-                                        {shouldHighlight && (
-                                            <motion.div
-                                                layoutId="pill-bg"
-                                                initial={{ opacity: 0, scale: 0.95 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0.95 }}
-                                                className="absolute inset-x-0 h-9 my-auto bg-primary/5 rounded-full -z-10 border border-primary/5 shadow-sm shadow-primary/5"
-                                                transition={{ type: "spring", stiffness: 480, damping: 38 }}
-                                            />
-                                        )}
-                                    </AnimatePresence>
+                                    {shouldHighlight && (
+                                        <motion.div
+                                            layoutId="pill-bg"
+                                            className="absolute inset-x-0 h-9 my-auto bg-primary/5 rounded-full -z-10 border border-primary/5 shadow-sm shadow-primary/5"
+                                            transition={{ 
+                                                type: "spring", 
+                                                stiffness: 300, 
+                                                damping: 35,
+                                                mass: 1
+                                            }}
+                                        />
+                                    )}
+
+                                    {isActive && (
+                                        <motion.div 
+                                            layoutId="active-marker"
+                                            className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--color-primary-rgb),0.4)] z-20"
+                                            transition={{ 
+                                                type: "spring", 
+                                                stiffness: 300, 
+                                                damping: 35,
+                                                mass: 1
+                                            }}
+                                        />
+                                    )}
 
                                     <motion.a
                                         href={link.href || '#'}
@@ -156,14 +169,6 @@ const LandingNavbar = ({
                                                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="opacity-40"><path d="m6 9 6 6 6-6"/></svg>
                                             )}
                                         </div>
-                                        
-                                        {isActive && (
-                                            <motion.div 
-                                                layoutId="active-marker"
-                                                className="absolute bottom-1 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(var(--color-primary-rgb),0.4)]"
-                                                transition={{ type: 'spring', stiffness: 500, damping: 40 }}
-                                            />
-                                        )}
                                     </motion.a>
                                 </div>
                             );
