@@ -40,23 +40,32 @@ const AuthLayout = ({ children }) => {
 
             {/* --- Left Side: Enterprise Sidebar (Hidden on Mobile) --- */}
             <div 
-                className="hidden lg:flex flex-[1.5] bg-title flex-col justify-start relative overflow-hidden z-10 min-w-[550px]"
-                style={{ clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0 100%)' }}
+                className="hidden lg:flex flex-[1.5] bg-title flex-col justify-start relative overflow-y-auto z-10 min-w-[550px] scrollbar-hide"
+                style={{ 
+                    clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0 100%)',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none'
+                }}
             >
+                {/* Digital Blueprint Grid Overlay */}
+                <div className="absolute inset-0 opacity-[0.05] pointer-events-none" 
+                     style={{ 
+                         backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', 
+                         backgroundSize: '40px 40px' 
+                     }} 
+                />
                 {/* Side Content Background Decoration */}
                 <div className="absolute inset-0 bg-gradient-to-br from-title via-title to-primary/20 opacity-100" />
                 
                 {/* Angled Cut Decoration */}
                 <div className="absolute top-0 right-0 bottom-0 w-24 bg-gradient-to-l from-black/20 to-transparent pointer-events-none" />
 
-                {/* Top: Logo - Perfectly aligned with LandingNavbar grid */}
+                {/* Top: Logo - Properly Aligned */}
                 <motion.div 
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, ease: [0.21, 1, 0.36, 1] }}
-                    whileHover={{ scale: 1.02 }}
-                    className="relative z-10 h-24 flex items-center"
-                    style={{ paddingLeft: 'clamp(2rem, calc((100vw - 1280px) / 2), 20rem)' }}
+                    className="absolute top-0 left-0 h-24 flex items-center px-12 xl:px-16 z-20"
                 >
                     <Link to="/">
                         <Logo size="lg" inverse />
@@ -68,11 +77,7 @@ const AuthLayout = ({ children }) => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 1, 0.36, 1] }}
-                    className="relative z-10 mt-12 lg:mt-16"
-                    style={{ 
-                        paddingLeft: 'clamp(3rem, calc((100vw - 1280px) / 2), 20rem)',
-                        paddingRight: '6rem' 
-                    } }
+                    className="relative z-10 px-16 pt-28 pb-10 w-full block flex-shrink-0"
                 >
                     {/* Badge */}
                     <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-[10px] font-black tracking-[0.2em] text-blue-200 uppercase mb-8 shadow-xl">
@@ -80,27 +85,44 @@ const AuthLayout = ({ children }) => {
                         Enterprise Governance
                     </div>
 
-                    <h1 className="text-[clamp(2.5rem,4.5vw,4.5rem)] font-black text-white leading-[1.05] tracking-tighter mb-6 whitespace-pre-line">
-                        Structured Safety.
-                        <span className="bg-gradient-to-r from-blue-300 to-indigo-200 bg-clip-text text-transparent block mt-1">
-                            Intelligent Monitoring.
-                        </span>
+                    <h1 className="text-3xl xl:text-4xl font-black text-white leading-[1.2] tracking-tight mb-4 max-w-[500px]">
+                        <div>Structured Safety.</div>
+                        <div className="text-blue-300">Intelligent Monitoring.</div>
                     </h1>
 
-                    <p className="text-xl text-gray/90 leading-relaxed max-w-2xl font-medium">
+                    <p className="text-base text-white/70 leading-relaxed font-medium mb-6 w-[450px] block">
                         Seamlessly manage environmental compliance and asset audits with our next-gen predictive engine.
                     </p>
+
+                    {/* Featured List to fill space */}
+                    <div className="flex flex-col gap-5 mb-8 max-w-[400px]">
+                        {[
+                            { title: 'Digital Twin Mapping', desc: 'Real-time spatial visualization' },
+                            { title: 'AI Risk Intelligence', desc: 'Predictive safety protocols' },
+                            { title: 'Immutable Audit Trails', desc: '100% compliance integrity' }
+                        ].map((item, i) => (
+                            <div key={i} className="flex items-center gap-4 group">
+                                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <h4 className="text-sm font-black text-white tracking-wide uppercase mb-1">{item.title}</h4>
+                                    <p className="text-xs text-white/50 font-bold tracking-tight">{item.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
 
                     {/* Footer Stats / Features for Sidebar */}
                     <div className="mt-12 flex gap-8">
                         <div>
                             <div className="text-2xl font-black text-white leading-none">99.9%</div>
-                            <div className="text-[10px] text-gray font-bold uppercase tracking-widest mt-1">Uptime SLA</div>
+                            <div className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1">Uptime SLA</div>
                         </div>
-                        <div className="w-px h-10 bg-white/10" />
+                        <div className="w-px h-8 bg-white/10" />
                         <div>
                             <div className="text-2xl font-black text-white leading-none">256-bit</div>
-                            <div className="text-[10px] text-gray font-bold uppercase tracking-widest mt-1">AES Encryption</div>
+                            <div className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1">AES Encryption</div>
                         </div>
                     </div>
                 </motion.div>

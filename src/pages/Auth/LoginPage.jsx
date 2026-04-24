@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 
 import { loginSchema } from '../../schema/authSchema';
 import AuthForm from '../../components/Auth/AuthForm';
@@ -83,6 +84,9 @@ function LoginPage() {
 
     return (
         <>
+            <Helmet>
+                <title>Login | AAQMS - Enterprise Asset Quality</title>
+            </Helmet>
             <AuthForm
                 title="Sign in to your account"
                 subtitle="Access your enterprise dashboard securely"
@@ -158,17 +162,11 @@ function LoginPage() {
                 )}
             </AuthForm>
 
-            {/* <div className="text-center mt-6">
-                <span className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">
-                    Don't have an account? 
-                    <Link 
-                        to="/register" 
-                        className="text-primary font-black ml-2 hover:underline underline-offset-4"
-                    >
-                        Create One
-                    </Link>
+            <div className="text-center mt-8">
+                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest opacity-60">
+                    Enterprise Portal &bull; Restricted Access
                 </span>
-            </div> */}
+            </div>
 
             <ForgotPasswordModal 
                 isOpen={isForgotPasswordOpen} 
