@@ -14,6 +14,7 @@ const FilterBar = ({
     children,
     showStatus = false,
     showSearch = false,
+    hideCoordFilter = false,
     searchPlaceholder = "Search...",
     hideClearButton = false,
     isCustomFilterActive = false,
@@ -31,7 +32,7 @@ const FilterBar = ({
         resetFilters
     } = useFilterStore();
 
-    const { query: searchQuery, clearSearch } = useSearchStore();
+    const { query: searchQuery, setQuery, clearSearch } = useSearchStore();
     const [_, setSearchParams] = useSearchParams();
 
     const handleResetAll = () => {
@@ -66,10 +67,10 @@ const FilterBar = ({
     // ─── QUERY HOOKS (UNIFIED) ───
     const hierarchyOptions = React.useMemo(() => ({
         includeOrgs: !!renderOrg,
-        includeCoords: !!renderCoord,
+        includeCoords: !!renderCoord && !hideCoordFilter,
         includeSites: !!(renderSite || renderFloor),
-        enabled: !!(renderOrg || renderCoord || renderSite || renderFloor) // CRITICAL: Stop call if nothing to render
-    }), [renderOrg, renderCoord, renderSite, renderFloor]);
+        enabled: !!(renderOrg || (renderCoord && !hideCoordFilter) || renderSite || renderFloor) 
+    }), [renderOrg, renderCoord, renderSite, renderFloor, hideCoordFilter]);
 
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading } = useHierarchy(hierarchyOptions);
 
@@ -94,7 +95,16 @@ const FilterBar = ({
                      
         return { value: id, label: name };
     }), [allCoordinators]);
-    const siteOptions = React.useMemo(() => allSites.map(s => ({ value: s.id, label: s.site_name || s.name })), [allSites]);
+    const siteOptions = React.useMemo(() => {
+        let filtered = allSites;
+        if (selectedOrg && selectedOrg.length > 0) {
+            filtered = filtered.filter(s => {
+                const orgId = s.organisation_id || s.org_id || s.organisation?.id;
+                return selectedOrg.includes(String(orgId));
+            });
+        }
+        return filtered.map(s => ({ value: s.id, label: s.site_name || s.name }));
+    }, [allSites, selectedOrg]);
     const floorOptions = React.useMemo(() => allFloors.map(f => ({ value: f.id, label: f.name })), [allFloors]);
 
 
@@ -120,7 +130,7 @@ const FilterBar = ({
                         />
                     )}
 
-                    {renderCoord && (
+                    {renderCoord && !hideCoordFilter && (
                         <FilterDropdown
                             label="Coordinator"
                             options={coordOptions}
@@ -173,7 +183,7 @@ const FilterBar = ({
                         <div className="w-[200px] ml-1 shrink-0">
                             <Search
                                 placeholder={searchPlaceholder}
-                                onSearch={(val) => setSearch(val)}
+                                onSearch={(val) => setQuery(val)}
                             />
                         </div>
                     )}

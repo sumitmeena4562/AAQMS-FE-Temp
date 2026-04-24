@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useOrganizations, mapOrgToFrontend } from './useOrgQueries';
+import { useOrganizations, mapOrgToFrontend, useAllOrganizations } from './useOrgQueries';
 import { useSites } from './useHierarchyQueries';
 import { useCoordinators } from './useUserQueries';
 import { useFilterStore } from '../../store/useFilterStore';
@@ -29,15 +29,9 @@ export const useHierarchy = (options = {}) => {
     const { selectedOrg } = useFilterStore();
     const activeOrgs = orgId !== null ? (Array.isArray(orgId) ? orgId : [orgId]) : selectedOrg;
 
-    // 1. Organizations (Top level)
-    const orgsQuery = useQuery({
-        queryKey: ['hierarchy', 'orgs'],
-        queryFn: async ({ signal }) => {
-            const response = await organizationService.getOrganizations({ dropdown: 'true', page: 1, pageSize: 1000 }, signal);
-            return (response.results || response.data || response).map(mapOrgToFrontend) || [];
-        },
-        enabled: includeOrgs && enabled,
-        staleTime: 30 * 60 * 1000, // 30 mins
+    // 1. Organizations (Top level) - Uses shared cache
+    const orgsQuery = useAllOrganizations({ 
+        enabled: includeOrgs && enabled 
     });
 
     // 2. Coordinators (Cascading: only if org is selected)
@@ -46,12 +40,12 @@ export const useHierarchy = (options = {}) => {
         { enabled: includeCoords && enabled }
     );
 
-    // 3. Sites (Cascading: only if org is selected)
+    // 3. Sites (Global Fetch for FE Filtering)
     const sitesQuery = useQuery({
-        queryKey: ['hierarchy', 'sites', activeOrgs],
+        queryKey: ['hierarchy', 'sites', 'all'], // Static key for global cache
         queryFn: async ({ signal }) => {
-            const siteFilters = { organisation: activeOrgs.length > 0 ? activeOrgs : undefined };
-            const response = await hierarchyService.getSites(siteFilters, signal);
+            // Fetch ALL sites once to enable instant FE filtering across the app
+            const response = await hierarchyService.getSites({}, signal);
             return response.results || response.data || response || [];
         },
         enabled: includeSites && enabled,

@@ -6,13 +6,18 @@ import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
-import { useSites } from '../../hooks/api/useHierarchyQueries';
-import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
+import { FiHome, FiBriefcase, FiLoader, FiAlertCircle, FiMapPin, FiUsers } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import Pagination from '../../components/UI/Pagination';
+import useDebounce from '../../hooks/useDebounce';
+import useSearchStore from '../../store/useSearchStore';
 
 const SitePlan = () => {
-  const { selectedOrg, selectedCoord, selectedSite, setOrg, setCoord } = useFilterStore();
+  const { 
+    selectedOrg, selectedCoord, selectedSite, 
+    setOrg, setCoord 
+  } = useFilterStore();
+  const { query: searchQuery } = useSearchStore();
   const [isSynced, setIsSynced] = useState(false);
   
   const [searchParams, setSearchParams] = useSearchParams();
@@ -32,21 +37,62 @@ const SitePlan = () => {
     selectedCoord.length > 0 ? selectedCoord : (passedCoordId ? [passedCoordId] : []),
   [selectedCoord, passedCoordId]);
 
-  // --- QUERY HOOKS (Unified Super-API for instant loading) ---
-  const { organizations: orgs, sites: sitePlans, isLoading: loading, error: hierarchyError } = useHierarchy({ 
-    includeSites: true, 
-    includeCoords: false,
-    enabled: isSynced
-  });
+    // --- DATA FETCHING ---
+    const { organizations: orgs, sites: sitePlans, isLoading: loading, error: hierarchyError } = useHierarchy({ 
+        includeSites: true, 
+        includeCoords: false, // EXPLICITLY DISABLED: Speeds up load by avoiding slow admin/ call
+        enabled: isSynced
+    });
 
-  // Client-side filtering for the list cards
-  const filteredSitePlans = useMemo(() => {
-    if (!selectedSite || selectedSite.length === 0) return sitePlans;
-    return sitePlans.filter(p => selectedSite.includes(String(p.id)));
-  }, [sitePlans, selectedSite]);
-  
-  const totalPlans = filteredSitePlans.length;
-  const activePlansCount = filteredSitePlans.filter(p => p.status === 'ACTIVE').length;
+    // Filtering & Searching
+    const filteredSitePlans = useMemo(() => {
+        if (!sitePlans || !Array.isArray(sitePlans)) return [];
+        let data = sitePlans;
+
+        // 1. Organization Filter (FE)
+        if (selectedOrg && selectedOrg.length > 0) {
+            data = data.filter(p => {
+                // Defensive extraction of Org ID
+                const orgId = p.organisation_id || p.org_id || p.organisation?.id || p.organisation;
+                return selectedOrg.includes(String(orgId));
+            });
+        }
+
+        // 2. Search Filter (FE) - Using central searchQuery
+        if (searchQuery) {
+            const q = searchQuery.toLowerCase().trim();
+            data = data.filter(p => 
+                (p.site_name || p.name || '').toLowerCase().includes(q) ||
+                (p.address || '').toLowerCase().includes(q) ||
+                (p.organisation_name || '').toLowerCase().includes(q)
+            );
+        }
+
+        // 3. Filter by selected site from FilterBar
+        if (selectedSite && selectedSite.length > 0) {
+            data = data.filter(p => {
+                const sId = p.id || p.site_id || p.pk;
+                return selectedSite.includes(String(sId));
+            });
+        }
+
+        return data;
+    }, [sitePlans, selectedOrg, selectedSite, searchQuery]);
+
+    // Proper Pagination Slicing
+    const itemsPerPage = 12;
+    const totalPlans = filteredSitePlans.length;
+    const activePlansCount = filteredSitePlans.filter(p => (p.status || p.is_active) === 'ACTIVE' || p.status === 'active' || p.is_active === true).length;
+
+    const paginatedSitePlans = useMemo(() => {
+        const start = (currentPage - 1) * itemsPerPage;
+        return filteredSitePlans.slice(start, start + itemsPerPage);
+    }, [filteredSitePlans, currentPage]);
+
+    // Reset page when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedOrg, selectedSite, searchQuery]);
 
   const handleResetAll = () => {
       setSearchParams({});
@@ -119,7 +165,11 @@ const SitePlan = () => {
 
       {/* MAIN BODY */}
       <main className="flex-1 w-full pb-12 flex flex-col pt-4 sm:pt-6">
-        <FilterBar activeLevel="sites" />
+        <FilterBar 
+          activeLevel="sites" 
+          hideCoordFilter={true} 
+          showSearch={false}
+        />
 
         {loading ? (
             <div className="w-full mt-4">
@@ -143,29 +193,32 @@ const SitePlan = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {filteredSitePlans.map((item, index) => (
-              <div key={item.id || index} className="w-full max-w-[340px]">
-                <OrganizationCard
-                  org={item}
-                  isSiteCard={true}
-                  coordinatorContext={coordInfo}
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {paginatedSitePlans.map((item, index) => (
+                <div key={item.id || index} className="w-full">
+                  <OrganizationCard
+                    org={item}
+                    isSiteCard={true}
+                    coordinatorContext={coordInfo}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {totalPlans > itemsPerPage && (
+              <div className="mt-8 flex justify-center border-t border-border-main/50 pt-8">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={Math.ceil(totalPlans / itemsPerPage)}
+                  onPageChange={setCurrentPage}
+                  totalItems={totalPlans}
+                  itemsPerPage={itemsPerPage}
+                  variant="primary"
                 />
               </div>
-            ))}
-
-            {totalPlans > 10 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={Math.ceil(totalPlans / 10)}
-                onPageChange={setCurrentPage}
-                totalItems={totalPlans}
-                itemsPerPage={10}
-                variant="ghost"
-                className="mt-6 col-span-full"
-              />
             )}
-          </div>
+          </>
         )}
 
         {/* FOOTER */}
