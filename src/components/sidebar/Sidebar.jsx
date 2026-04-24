@@ -58,41 +58,6 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
         }
     };
 
-    const prefetchTimeoutRef = useRef(null);
-    const handlePrefetch = (path) => {
-        if (prefetchTimeoutRef.current) clearTimeout(prefetchTimeoutRef.current);
-        
-        prefetchTimeoutRef.current = setTimeout(async () => {
-            if (path === '/admin/organizations') {
-                queryClient.prefetchQuery({
-                    queryKey: ['organizations', { filters: {}, search: '', page: 1, pageSize: 12 }],
-                    queryFn: async () => {
-                        const response = await organizationService.getOrganizations({ page: 1, page_size: 12 });
-                        const data = response.data || response.results || response;
-                        return Array.isArray(data) ? data.map(mapOrgToFrontend) : [];
-                    }
-                });
-            } else if (path === '/admin/users') {
-                queryClient.prefetchQuery({
-                    queryKey: ['users', 'list', { filters: {}, search: '', page: 1, limit: 12 }],
-                    queryFn: () => userService.getUsers({}, '', 1, 12)
-                });
-            } else if (path === '/admin/inventory') {
-                queryClient.prefetchQuery({
-                    queryKey: ['inventory', { org: 'all', site: 'all', floor: 'all', zone: 'all', search: '' }, 1, 12],
-                    queryFn: async () => {
-                        const response = await inventoryService.getInventory({ page: 1, page_size: 12 });
-                        return {
-                            results: response.results || response,
-                            stats: response.stats || null,
-                            count: response.count || 0,
-                        };
-                    }
-                });
-            }
-        }, 150); // 150ms debounce
-    };
-
     useEffect(() => { if (setMobileOpen) setMobileOpen(false); }, [location.pathname, setMobileOpen]);
 
     const renderSimple = (item) => {
@@ -102,7 +67,6 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
                 {act && <div className="absolute left-[-10px] top-2 bottom-2 w-[3px] bg-primary rounded-r-full shadow-[0_0_8px_rgba(7,34,103,0.2)] transition-all duration-300" />}
                 <NavLink
                     to={item.path}
-                    onMouseEnter={() => handlePrefetch(item.path)}
                     className={({ isActive: act }) => `
                         flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] transition-all duration-200
                         ${collapsed ? 'justify-center px-0 h-10 w-10 mx-auto transition-transform' : 'justify-start'}
@@ -170,7 +134,6 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
 
                                     <NavLink
                                         to={child.path}
-                                        onMouseEnter={() => handlePrefetch(child.path)}
                                         className={`
                                             flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[12px] transition-all duration-200
                                             ${cAct
