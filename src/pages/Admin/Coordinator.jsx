@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
@@ -18,7 +19,7 @@ import UserCard from '../../components/UI/UserCard';
 import useDebounce from '../../hooks/useDebounce';
 import UserAvatar from '../../components/UI/UserAvatar';
 import FilterBar from '../../components/UI/FilterBar';
-import { useUsers, useCoordinatorStats, useUserFormOptions } from '../../hooks/api/useUserQueries';
+import { useUserManagementData } from '../../hooks/api/useUserQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import useSearchStore from '../../store/useSearchStore';
 import TableSkeleton from '../../components/UI/TableSkeleton';
@@ -45,29 +46,41 @@ const Coordinator = React.memo(() => {
     const { query: search } = useSearchStore();
 
     const { updateUser, createUser, bulkAction } = useUserStore();
+    const queryClient = useQueryClient();
 
-    // ── QUERY HOOKS (NEW) ──
-    const debouncedSearch = useDebounce(search, 400);
+    // ── 1. DATA ORCHESTRATION (FE-SIDE) ──
+    // Fetch a large set once to enable instant FE filtering without further network delay
+    const { 
+        users: allUsers, totalCount: apiTotal, stats, formOptions,
+        isLoading, isFetching, refetchAll 
+    } = useUserManagementData(
+        {}, // Get everyone to filter locally
+        '', 
+        1,  
+        500, // Balanced limit for speed + FE filtering coverage
+        { enabled: true }
+    );
 
-    // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
-    const hasSynced = useRef(false);
+    // ── SYNC URL PARAMS → GLOBAL FILTERS (Reactive) ──
     useEffect(() => {
-        if (hasSynced.current) return;
-
         const pOrg = searchParams.get('org_id') || searchParams.get('org');
         const pCoord = searchParams.get('coord_id') || searchParams.get('coord');
 
-        // Logic Review: "Admin direct aaye to sari dikh"
-        if (!pOrg && !pCoord) {
-            resetFilters();
-            setFilters({ role: ['coordinator'] });
-        } else {
-            const orgs = pOrg ? pOrg.split(',') : [];
-            setFilters({ organization: orgs, role: ['coordinator'] });
-        }
+        // Extract current state to compare
+        const currentOrgs = filters.organization || [];
+        const newOrgs = pOrg ? pOrg.split(',') : [];
 
-        hasSynced.current = true;
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+        // Logic Review: "Admin direct aaye to sari dikh"
+        // Only update store if URL params differ from current state to prevent loops
+        if (JSON.stringify(currentOrgs) !== JSON.stringify(newOrgs)) {
+            if (!pOrg && !pCoord) {
+                resetFilters();
+                setFilters({ role: ['coordinator'] });
+            } else {
+                setFilters({ organization: newOrgs, role: ['coordinator'] });
+            }
+        }
+    }, [searchParams, setFilters, resetFilters]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // --- Responsive Pagination Sync ---
     const responsiveLimit = useResponsiveLimit(12);
@@ -77,20 +90,82 @@ const Coordinator = React.memo(() => {
         }
     }, [responsiveLimit, limit, setLimit]);
 
-    // ── DATA FETCHING ──
-    const queryFilters = { ...filters, role: 'coordinator' };
-    const { data: usersData, isLoading: isUsersLoading, refetch, isFetching } = useUsers(queryFilters, debouncedSearch, page, limit);
+    // ── 2. LOCAL FILTERING & SEARCH ──
+    // Derived labels for fallback matching when IDs might mismatch
+    const selectedOrgLabels = useMemo(() => {
+        if (!filters.organization?.length || !formOptions?.organisations) return [];
+        const orgList = formOptions.organisations || [];
+        return orgList
+            .filter(o => filters.organization.some(id => String(id) === String(o.value)))
+            .map(o => o.label?.toLowerCase().trim());
+    }, [filters.organization, formOptions.organisations]);
 
-    // ── FORM OPTIONS (Unified for Filters & Modal) ──
-    const { data: formOptions, isLoading: isLoadingOptions } = useUserFormOptions({ enabled: true });
+    const filteredUsers = useMemo(() => {
+        if (!allUsers || !Array.isArray(allUsers)) return [];
+        
+        return allUsers.filter(user => {
+            // 1. Role Filter
+            const userRole = (user.role_name || user.role?.role_name || (typeof user.role === 'string' ? user.role : '') || '').toLowerCase();
+            const isCoordinator = userRole.includes('coordinator') || userRole.includes('coord');
+            if (!isCoordinator) return false;
+
+            // 2. Search Match
+            const searchStr = search?.toLowerCase().trim();
+            const matchesSearch = !searchStr || 
+                user.name?.toLowerCase().includes(searchStr) ||
+                user.email?.toLowerCase().includes(searchStr) ||
+                user.mobile_number?.toLowerCase().includes(searchStr) ||
+                user.org_name?.toLowerCase().includes(searchStr);
+            
+            if (!matchesSearch) return false;
+
+            // 3. Organization Filter (Robust ID + Label Fallback)
+            const userOrgId = user.organisation_id || user.org_id || 
+                             (typeof user.organisation === 'object' ? user.organisation?.id : user.organisation);
+            const userOrgName = (user.org_name || user.organisation?.name || '').toLowerCase().trim();
+            
+            const matchesOrg = filters.organization?.length === 0 || 
+                filters.organization.some(id => String(id) === String(userOrgId)) ||
+                selectedOrgLabels.includes(userOrgName);
+            
+            if (!matchesOrg) return false;
+
+            // 4. Status Filter
+            const matchesStatus = filters.status?.length === 0 || 
+                filters.status.some(s => s.toLowerCase() === user.status?.toLowerCase());
+            
+            return matchesStatus;
+        });
+    }, [allUsers, search, filters, selectedOrgLabels]);
+
+    // Local Pagination & Sorting
+    const totalCount = filteredUsers.length;
+
+    const sortedUsers = useMemo(() => {
+        if (!Array.isArray(filteredUsers)) return [];
+        return [...filteredUsers].sort((a, b) => {
+            const av = (a[sortKey] || '').toString().toLowerCase();
+            const bv = (b[sortKey] || '').toString().toLowerCase();
+            return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
+        });
+    }, [filteredUsers, sortKey, sortDir]);
+
+    const paginatedUsers = useMemo(() => {
+        const start = (page - 1) * limit;
+        return sortedUsers.slice(start, start + limit);
+    }, [sortedUsers, page, limit]);
+
+    // Auto-reset to page 1 when filter/search changes
+    useEffect(() => {
+        setPage(1);
+    }, [search, filters, setPage]);
 
     // Roles are static for the product
-    const filterOptions = {
+    const filterOptions = useMemo(() => ({
         organizations: (formOptions?.organisations || []).map(o => ({ value: o.value, label: o.label })),
         roles: [{ value: 'coordinator', label: 'Coordinator' }]
-    };
+    }), [formOptions]);
 
-    const totalCount = usersData?.totalCount || 0;
 
     // ── Modal & UI state ──
     const [peekUser, setPeekUser] = useState(null);
@@ -102,22 +177,14 @@ const Coordinator = React.memo(() => {
     const [selectionMode, setSelectionMode] = useState(false);
     const [viewMode] = useState('list');
 
-    // ── Sync peekUser with latest list data (prevents stale snapshot in modal) ──
+    // ── 3. STATE SYNC & DERIVED DATA ──
+    // Sync peekUser with latest list data (prevents stale snapshot in modal)
     const livePeekUser = useMemo(() => {
-        if (!peekUser?.id || !usersData?.users) return peekUser;
-        return usersData.users.find(u => String(u.id) === String(peekUser.id)) || peekUser;
-    }, [peekUser, usersData]);
+        if (!peekUser?.id || !allUsers) return peekUser;
+        return allUsers.find(u => String(u.id) === String(peekUser.id)) || peekUser;
+    }, [peekUser, allUsers]);
 
 
-    const sortedUsers = useMemo(() => {
-        const users = usersData?.users || [];
-        if (!Array.isArray(users)) return [];
-        return [...users].sort((a, b) => {
-            const av = (a[sortKey] || '').toString().toLowerCase();
-            const bv = (b[sortKey] || '').toString().toLowerCase();
-            return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
-        });
-    }, [usersData, sortKey, sortDir]);
 
     // ── Handlers ──
     // Default values for new coordinator (no id = modal treats as "Add" mode)
@@ -160,8 +227,30 @@ const Coordinator = React.memo(() => {
                 toast.success(editingUser?.id ? 'Profile updated' : 'Coordinator added');
             }
 
+            // --- INSTANT CACHE SYNC ---
+            // Manual update to React Query cache so UI changes in 1ms
+            if (editingUser?.id) {
+                // Determine new status from formData or response
+                const updatedStatus = res.data?.status || (data instanceof FormData ? data.get('status') : data.status);
+                
+                queryClient.setQueriesData({ queryKey: ['users', 'admin-orchestrator'] }, (oldData) => {
+                    if (!oldData || !oldData.users) return oldData;
+                    return {
+                        ...oldData,
+                        users: oldData.users.map(u => 
+                            String(u.id) === String(editingUser.id) 
+                                ? { ...u, ...res.data, status: updatedStatus } 
+                                : u
+                        )
+                    };
+                });
+            }
+
             setIsFormOpen(false);
             setEditingUser(null);
+
+            // Background refresh for eventual consistency
+            setTimeout(() => refetchAll(), 100);
         } else {
             toast.error(res.error || 'Failed to save');
         }
@@ -236,15 +325,19 @@ const Coordinator = React.memo(() => {
         {
             header: 'STATUS',
             accessor: 'status',
-            width: '15%',
+            width: '120px',
             align: 'center',
             render: (value) => {
-                const isActive = value?.toLowerCase() === 'active';
+                const status = (value || 'deactive').toLowerCase();
+                const isActive = status === 'active';
                 return (
-                    <div className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 border mx-auto shadow-sm transition-all
-                        ${isActive ? 'bg-emerald-50 text-emerald-700 border-emerald-100/50' : 'bg-rose-50 text-rose-700 border-rose-100/50'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-                        {isActive ? 'Active' : 'Inactive'}
+                    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold tracking-wide uppercase ${
+                        isActive 
+                        ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
+                        : 'bg-rose-50 text-rose-600 border-rose-100'
+                    }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                        {isActive ? 'ACTIVE' : 'DEACTIVE'}
                     </div>
                 );
             }
@@ -288,8 +381,8 @@ const Coordinator = React.memo(() => {
         />
     );
 
-    const currentOrg = filters.organization?.length === 1 ? organizations.find(o => String(o.id) === String(filters.organization[0])) : null;
-    const orgLabel = (filters.organization?.length > 1) ? `Organizations (${filters.organization.length})` : currentOrg?.name || orgNameFromUrl;
+    const currentOrg = filters.organization?.length === 1 ? filterOptions.organizations.find(o => String(o.value) === String(filters.organization[0])) : null;
+    const orgLabel = (filters.organization?.length > 1) ? `Organizations (${filters.organization.length})` : currentOrg?.label || orgNameFromUrl;
 
     const breadcrumbs = useMemo(() => {
         const base = [
@@ -324,7 +417,7 @@ const Coordinator = React.memo(() => {
                 breadcrumbs={breadcrumbs}
                 rightContent={
                     <button 
-                        onClick={() => refetch()}
+                        onClick={() => refetchAll()}
                         disabled={isFetching}
                         className={`flex items-center gap-2 px-4 py-2 bg-white border border-border-main/80 rounded-full shadow-sm hover:shadow-md hover:border-primary/30 transition-all group ${isFetching ? 'opacity-70' : ''}`}
                     >
@@ -348,7 +441,7 @@ const Coordinator = React.memo(() => {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 flex-1 pl-3">
-                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All" multiple={true} loading={isLoadingOptions} />
+                    <FilterDropdown label="Organization" options={filterOptions.organizations} value={filters.organization} onChange={v => setFilters({ ...filters, organization: v })} allLabel="All" multiple={true} loading={isLoading} />
                     <FilterDropdown label="Status" options={[{ value: 'active', label: 'Active' }, { value: 'deactive', label: 'Inactive' }]} value={filters.status} onChange={v => setFilters({ ...filters, status: v })} allLabel="All" multiple={true} />
                 </div>
             </FilterBar>
@@ -366,10 +459,10 @@ const Coordinator = React.memo(() => {
                 </div>
             )}
 
-            {isUsersLoading ? (
+            {isLoading ? (
                 viewMode === 'grid' ? <CardSkeleton count={8} columns={5} /> : <TableSkeleton rows={10} />
-            ) : sortedUsers.length > 0 ? (
-                <DataTable columns={columns} data={sortedUsers} loading={isUsersLoading} selectable={selectionMode} selectedIds={selectedIds} onSelectionChange={(ids) => setSelectedIds(ids)} footer={paginationFooter} />
+            ) : filteredUsers.length > 0 ? (
+                <DataTable columns={columns} data={paginatedUsers} loading={isLoading} selectable={selectionMode} selectedIds={selectedIds} onSelectionChange={(ids) => setSelectedIds(ids)} footer={paginationFooter} />
             ) : (
                 <div className="flex flex-col items-center justify-center py-20 px-6 bg-card/30 border-2 border-dashed border-border-main rounded-[24px]">
                     <div className="w-20 h-20 rounded-full bg-base border border-border-main/50 flex items-center justify-center mb-6 shadow-sm">
