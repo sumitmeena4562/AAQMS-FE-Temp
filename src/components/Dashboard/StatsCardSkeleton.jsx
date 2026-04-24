@@ -3,7 +3,7 @@ import Skeleton from '../UI/Skeleton';
 
 const StatsCardSkeleton = () => {
     return (
-        <div className="bg-card px-6 py-5 rounded-[var(--radius-card)] w-full border border-border-main shadow-card flex flex-col min-h-[148px]">
+        <div className="bg-card px-6 py-5 rounded-[var(--radius-card)] w-full border border-border-main shadow-card flex flex-col min-h-[148px] animate-pulse">
             {/* Header Area Placeholder */}
             <div className="flex items-start justify-between gap-4">
                 <div className="flex flex-col flex-1 gap-2">
@@ -39,7 +39,7 @@ export const MatricCardSkeleton = ({ count = 3 }) => {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: count }).map((_, i) => (
-                <div key={i} className="bg-card px-6 py-[21px] rounded-[var(--radius-card)] w-full border border-border-main/80 flex flex-col gap-4 min-h-[148px]">
+                <div key={i} className="bg-card px-6 py-[21px] rounded-[var(--radius-card)] w-full border border-border-main/80 flex flex-col gap-4 min-h-[148px] animate-pulse">
                     <div className="flex items-start justify-between gap-3">
                         <div className="flex flex-col flex-1 gap-2">
                             <Skeleton width="50%" height="11px" radius="6px" />

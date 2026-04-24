@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
-import { FiBriefcase, FiUsers, FiShield, FiBox, FiActivity } from "react-icons/fi";
+import { FiBriefcase, FiUsers, FiShield, FiBox, FiActivity, FiRefreshCw } from "react-icons/fi";
 import PageHeader from "../../components/UI/PageHeader";
 import StatGrid from "../../components/Dashboard/StatsGrid";
 import { MatricCardRow } from "../../components/Dashboard/MatricCard";
@@ -42,7 +42,7 @@ const itemVariants = {
 
 const Dashboard = () => {
     // ── BOOTSTRAP: 1 unified call fetches Stats, Metrics, History AND Organizations ──
-    const { data: bootstrap, isLoading, isError, dataUpdatedAt } = useDashboardBootstrap();
+    const { data: bootstrap, isLoading, isError, dataUpdatedAt, refetch, isFetching } = useDashboardBootstrap();
 
     // ── Map bootstrap data → UI shapes (MEMOIZED) ──
     const stats = useMemo(() => bootstrap?.stats ? [
@@ -144,7 +144,7 @@ const Dashboard = () => {
                             {/* Core dot */}
                             <div className="relative h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)] group-hover:shadow-[0_0_12px_rgba(16,185,129,0.5)] transition-all" />
                         </div>
-                        <div className="flex flex-col min-w-0">
+                        <div className="flex flex-col min-w-0 mr-1">
                             <span className="text-[10px] font-black text-primary/60 uppercase tracking-[0.2em] leading-tight mb-0.5 group-hover:text-[var(--color-hover-blue)] transition-colors">
                                 System Status
                             </span>
@@ -163,6 +163,15 @@ const Dashboard = () => {
                                 </span>
                             </div>
                         </div>
+
+                        <button 
+                            onClick={() => refetch()}
+                            disabled={isFetching}
+                            className={`p-2 rounded-xl text-primary/40 hover:text-primary hover:bg-primary/5 transition-all active:scale-95 ${isFetching ? 'animate-spin opacity-100 text-primary' : ''}`}
+                            title="Force Refresh Data"
+                        >
+                            <FiRefreshCw size={14} />
+                        </button>
                     </div>
                 }
             />

@@ -34,8 +34,8 @@ const StatsCard = React.memo(({
 
     const autoChange = trend !== undefined ? (
         <span className="flex items-center gap-0.5">
-            {trend > 0 ? <FiArrowUpRight size={14} /> : <FiArrowDownRight size={14} />}
-            {trend > 0 ? '+' : ''}{trend}%
+            {trend > 0 ? <FiArrowUpRight size={14} /> : trend < 0 ? <FiArrowDownRight size={14} /> : null}
+            {trend === 0 ? 'Stable' : `${trend > 0 ? '+' : ''}${trend}%`}
         </span>
     ) : null;
 
