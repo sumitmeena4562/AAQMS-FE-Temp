@@ -87,13 +87,15 @@ const Users = React.memo(() => {
     const isReady = isInitialized && responsiveLimit === limit;
 
     const {
-        users, totalCount, stats, isLoading: isUsersLoading, refetchAll
+        users, totalCount, stats, formOptions, isLoading: isUsersLoading, refetchAll
     } = useUserManagementData(debouncedFilters, debouncedSearch, page, limit, { enabled: isReady });
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
 
-    // ── FORM & FILTER OPTIONS (UNIFIED SINGLE CALL) ──
-    const { data: formOptions, isLoading: isLoadingOptions } = useUserFormOptions({ enabled: isReady });
+    // ── NOTE: Separate form-options call removed to enforce "One Screen = One API" ──
+    // Dropdowns will be populated once the backend developer merges the 'options' key 
+    // into the primary admin/ response.
+    const isLoadingOptions = isUsersLoading && !formOptions?.organisations?.length;
 
     const filterOptions = useMemo(() => ({
         organizations: formOptions?.organisations?.map(o => ({ value: o.value, label: o.label })) || [],

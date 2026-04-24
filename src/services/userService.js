@@ -14,7 +14,8 @@ export const userService = {
                 page_size: pageSize,
                 page: page,
                 search: search?.trim() || undefined,
-                include_stats: 'true'
+                include_stats: 'true',
+                include_options: 'true' // One-call optimization
             };
 
             // Map and clean filters
@@ -30,7 +31,8 @@ export const userService = {
             return {
                 users: data?.results || [],
                 totalCount: data?.count || 0,
-                stats: data?.stats
+                stats: data?.stats,
+                options: data?.options // Consolidated dropdown data
             };
         } catch (error) {
             if (error.name === 'CanceledError') throw error;

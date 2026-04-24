@@ -14,7 +14,7 @@ export const useDashboardBootstrap = () => {
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     refetchOnWindowFocus: false,
-    refetchOnMount: true, // Always get fresh data when entering dashboard
+    refetchOnMount: false, // Use cached data when entering dashboard (Performance)
   });
 };
 
