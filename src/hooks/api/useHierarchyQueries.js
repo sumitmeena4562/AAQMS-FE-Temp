@@ -37,7 +37,6 @@ export const useSites = (filters = {}, options = {}) => {
     // Actually, in this app, we usually fetch by Org-id for lookups.
     staleTime: 10 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
-    placeholderData: (prev) => prev,
     ...options
   });
 };
@@ -84,7 +83,6 @@ export const useZones = (floorId = null, filters = {}, options = {}) => {
     },
     staleTime: 5 * 60 * 1000, // Zones are slightly more dynamic
     gcTime: 30 * 60 * 1000,
-    placeholderData: (prev) => prev,
     ...options
   });
 };

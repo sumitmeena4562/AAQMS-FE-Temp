@@ -81,16 +81,11 @@ const Users = React.memo(() => {
 
     const { updateUser, createUser, bulkAction, exportPDF } = useUserStore();
 
-    // ── QUERY HOOKS (OPTIMIZED + DEBOUNCED) ──
-    // ── QUERY HOOKS (DEBOUNCED FOR PERFORMANCE) ──
-    const debouncedSearch = useDebounce(search, 500);
-    const debouncedFilters = useDebounce(filters, 500);
-
     const isReady = isInitialized && responsiveLimit === limit;
 
     const {
         users, totalCount, stats, formOptions, isLoading: isUsersLoading, refetchAll
-    } = useUserManagementData(debouncedFilters, debouncedSearch, page, limit, { enabled: isReady });
+    } = useUserManagementData({ enabled: isReady });
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();
 
@@ -108,6 +103,21 @@ const Users = React.memo(() => {
         })) || [],
         roles: STATIC_ROLES
     }), [formOptions, STATIC_ROLES]);
+
+    // ── FRONTEND FILTERING HELPERS (Robust matching) ──
+    const selectedOrgLabels = useMemo(() => {
+        if (!filters.organization?.length || !filterOptions.organizations) return [];
+        return filterOptions.organizations
+            .filter(o => filters.organization.some(id => String(id) === String(o.value)))
+            .map(o => o.label?.toLowerCase().trim());
+    }, [filters.organization, filterOptions.organizations]);
+
+    const selectedSiteLabels = useMemo(() => {
+        if (!filters.region?.length || !filterOptions.regions) return [];
+        return filterOptions.regions
+            .filter(o => filters.region.some(id => String(id) === String(o.value)))
+            .map(o => o.label?.toLowerCase().trim());
+    }, [filters.region, filterOptions.regions]);
 
     // Local filtering for Site dropdown based on selected Organization
     const filteredSites = useMemo(() => {
@@ -131,16 +141,73 @@ const Users = React.memo(() => {
         return users.find(u => String(u.id) === String(peekUser.id)) || peekUser;
     }, [peekUser, users]);
 
-    const sortedUsers = useMemo(() => {
+    // ── FRONTEND FILTERING (ZERO-LATENCY) ──
+    const filteredUsers = useMemo(() => {
         if (!Array.isArray(users)) return [];
-        const list = [...users];
+        return users.filter(user => {
+            // ── UNIVERSAL ID RESOLVER ──
+            const getID = (val) => {
+                if (!val) return '';
+                if (typeof val === 'object' && val.id) return String(val.id);
+                if (typeof val === 'object' && val.pk) return String(val.pk);
+                return String(val);
+            };
+
+            const userOrgId = getID(user.organisation_id || user.org_id || user.organisation);
+            const userOrgName = (user.org_name || user.organisation_name || user.organisation?.name || (typeof user.organisation === 'string' ? user.organisation : '') || '').toLowerCase().trim();
+            
+            const userSiteId = getID(user.site_id || user.region_id || user.site || user.region);
+            const userSiteName = (user.site_name || user.region_name || user.site?.name || user.region || '').toLowerCase().trim();
+            
+            const userRole = (user.role?.role_name || user.role?.name || user.role || user.role_name || '').toLowerCase();
+            const userStatus = (user.status || (user.is_active ? 'active' : 'deactive')).toLowerCase();
+
+            // 1. Search Filter
+            const matchesSearch = !search || 
+                user.name?.toLowerCase().includes(search.toLowerCase()) || 
+                user.email?.toLowerCase().includes(search.toLowerCase()) ||
+                userRole.includes(search.toLowerCase()) ||
+                userOrgName.includes(search.toLowerCase());
+
+            // 2. Organization Filter (ID match OR Name fallback)
+            const matchesOrg = !filters.organization?.length || 
+                filters.organization.some(id => String(id) === userOrgId) ||
+                selectedOrgLabels.includes(userOrgName);
+
+            // 3. Site/Region Filter (ID match OR Name fallback)
+            const matchesSite = !filters.region?.length || 
+                filters.region.some(id => String(id) === userSiteId) ||
+                selectedSiteLabels.includes(userSiteName);
+
+            // 4. Role Filter
+            const matchesRole = !filters.role?.length || 
+                filters.role.some(r => userRole.includes(r.toLowerCase()));
+
+            // 5. Status Filter
+            const matchesStatus = !filters.status?.length || 
+                filters.status.includes(userStatus);
+
+            return matchesSearch && matchesOrg && matchesSite && matchesRole && matchesStatus;
+        });
+    }, [users, search, filters, selectedOrgLabels, selectedSiteLabels]);
+
+    const sortedUsers = useMemo(() => {
+        const list = [...filteredUsers];
         list.sort((a, b) => {
             const av = (a[sortKey] || '').toString().toLowerCase();
             const bv = (b[sortKey] || '').toString().toLowerCase();
             return sortDir === 'asc' ? av.localeCompare(bv) : bv.localeCompare(av);
         });
         return list;
-    }, [users, sortKey, sortDir]);
+    }, [filteredUsers, sortKey, sortDir]);
+
+    // FE Pagination
+    const paginatedUsers = useMemo(() => {
+        const start = (page - 1) * limit;
+        return sortedUsers.slice(start, start + limit);
+    }, [sortedUsers, page, limit]);
+
+    const displayTotalCount = sortedUsers.length;
 
     const activeFilterCount = Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v && v !== '' && v !== 'all').length;
 
@@ -367,9 +434,9 @@ const Users = React.memo(() => {
     const paginationFooter = (
         <Pagination
             currentPage={page}
-            totalPages={Math.ceil(totalCount / limit) || 1}
+            totalPages={Math.ceil(displayTotalCount / limit) || 1}
             onPageChange={setPage}
-            totalItems={totalCount}
+            totalItems={displayTotalCount}
             itemsPerPage={limit}
             variant="ghost"
         />
@@ -490,11 +557,11 @@ const Users = React.memo(() => {
             {/* Main Content Area */}
             {isUsersLoading ? (
                 viewMode === 'grid' ? <CardSkeleton count={8} columns={5} /> : <TableSkeleton rows={10} />
-            ) : users.length > 0 ? (
+            ) : filteredUsers.length > 0 ? (
                 viewMode === 'grid' ? (
                     <div className="flex flex-col gap-6 w-full">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
-                            {sortedUsers.map(user => (
+                            {paginatedUsers.map(user => (
                                 <UserCard key={user.id} user={user} selectable={selectionMode} isSelected={selectedIds.includes(user.id)} onSelect={(id) => toggleSelectRow(id)} onEdit={handleEditUser} onView={(u) => { setPeekUser(u); setIsPeekOpen(true); }} />
                             ))}
                         </div>
@@ -503,7 +570,7 @@ const Users = React.memo(() => {
                 ) : (
                     <DataTable
                         columns={columns}
-                        data={sortedUsers}
+                        data={paginatedUsers}
                         loading={isUsersLoading}
                         selectable={selectionMode}
                         selectedIds={selectedIds}

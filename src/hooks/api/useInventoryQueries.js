@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
  * ── INVENTORY QUERIES ──
  */
 
-export const useInventory = (filters = {}, page = 1, pageSize = 20) => {
+export const useInventory = (filters = {}, page = 1, pageSize = 20, options = {}) => {
   // Normalize filters to ensure stable Query Keys
   const cleanFilters = Object.fromEntries(
     Object.entries(filters).filter(([, v]) => 
@@ -44,7 +44,7 @@ export const useInventory = (filters = {}, page = 1, pageSize = 20) => {
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 15 * 60 * 1000,
-    placeholderData: (prev) => prev,
+    ...options
   });
 };
 

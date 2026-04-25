@@ -73,19 +73,19 @@ export const useCoordinatorStats = (orgId = null, options = {}) => {
 };
 
 /**
- * ── OPTIMIZED ORCHESTRATOR HOOK ──
- * Combines Users, Stats, and Filter Hierarchy into a single optimized lifecycle.
+ * ── OPTIMIZED ORCHESTRATOR HOOK (ZERO-LATENCY) ──
+ * Fetches a large batch of users once and enables high-speed frontend filtering.
  */
-export const useUserManagementData = (filters, search, page, limit, options = {}) => {
-    // Production-grade query key including all reactive dependencies
-    const queryKey = ['users', 'admin-orchestrator', { filters, search, page, limit }];
+export const useUserManagementData = (options = {}) => {
+    // Stable query key for the entire batch to maximize cache hits
+    const queryKey = ['users', 'admin-batch'];
 
     const usersQuery = useQuery({
         queryKey,
-        queryFn: ({ signal }) => userService.getUsers(filters, search, page, limit, signal),
-        staleTime: 30000, 
-        gcTime: 1000 * 60 * 15,
-        placeholderData: (prev) => prev, // Prevents UI flickering during transitions
+        queryFn: ({ signal }) => userService.getUsers({}, '', 1, 1000, signal), 
+        staleTime: 10 * 60 * 1000, // 10 minutes - perfectly fresh for admin workflows
+        gcTime: 60 * 60 * 1000,   // 60 minutes retention
+        placeholderData: (prev) => prev,
         refetchOnWindowFocus: false,
         ...options,
     });

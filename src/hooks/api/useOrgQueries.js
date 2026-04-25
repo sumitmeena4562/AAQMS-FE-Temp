@@ -121,7 +121,6 @@ export const useOrganizations = (filters = {}, search = '', page = 1, pageSize =
     },
     staleTime: 10 * 60 * 1000, 
     gcTime: 15 * 60 * 1000,
-    placeholderData: (previousData) => previousData,
     ...options
   });
 };
@@ -136,7 +135,6 @@ export const useOrganizationDetails = (id, options = {}) => {
     enabled: !!id,
     staleTime: 10 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
-    placeholderData: (previousData) => previousData,
     ...options
   });
 };
