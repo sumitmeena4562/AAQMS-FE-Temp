@@ -40,7 +40,7 @@ const AuthLayout = ({ children }) => {
 
             {/* --- Left Side: Enterprise Sidebar (Hidden on Mobile) --- */}
             <div 
-                className="hidden lg:flex flex-[1.5] bg-title flex-col justify-start relative overflow-y-auto z-10 min-w-[550px] scrollbar-hide"
+                className="hidden lg:flex flex-[1.5] bg-title flex-col justify-start relative overflow-hidden z-10 min-w-[550px]"
                 style={{ 
                     clipPath: 'polygon(0 0, 100% 0, 92% 100%, 0 100%)',
                     scrollbarWidth: 'none',
@@ -59,7 +59,7 @@ const AuthLayout = ({ children }) => {
                 
                 {/* Angled Cut Decoration */}
                 <div className="absolute top-0 right-0 bottom-0 w-24 bg-gradient-to-l from-black/20 to-transparent pointer-events-none" />
-
+                
                 {/* Top: Logo - Properly Aligned */}
                 <motion.div 
                     initial={{ opacity: 0, x: -20 }}
@@ -72,30 +72,31 @@ const AuthLayout = ({ children }) => {
                     </Link>
                 </motion.div>
 
+
                 {/* Main: Unified Content Flow */}
                 <motion.div 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: [0.21, 1, 0.36, 1] }}
-                    className="relative z-10 px-16 pt-28 pb-10 w-full block flex-shrink-0"
+                    className="relative z-10 px-12 xl:px-16 pt-36 pb-8 w-full block flex-shrink-0"
                 >
                     {/* Badge */}
-                    <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-[10px] font-black tracking-[0.2em] text-blue-200 uppercase mb-5 shadow-xl">
+                    <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-[10px] font-black tracking-[0.2em] text-blue-200 uppercase mb-2 shadow-xl">
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2 animate-pulse" />
                         Enterprise Governance
                     </div>
 
-                    <h1 className="text-4xl xl:text-5xl font-black text-white leading-[1.1] tracking-tight mb-4 max-w-[500px]">
-                        <div>Structured Safety.</div>
+                    <h1 className="text-4xl xl:text-5xl font-black tracking-tight leading-[1.1] max-w-[500px]">
+                        <div className="text-white mb-1">Structured Safety.</div>
                         <div className="text-blue-300">Intelligent Monitoring.</div>
                     </h1>
 
-                    <p className="text-base text-white/70 leading-relaxed font-medium mb-6 w-[450px] block">
+                    <p className="text-base text-white/70 leading-relaxed font-medium mb-5 w-[450px] block">
                         Seamlessly manage environmental compliance and asset audits with our next-gen predictive engine.
                     </p>
 
                     {/* Featured List to fill space */}
-                    <div className="flex flex-col gap-6 mb-8 max-w-[400px]">
+                    <div className="flex flex-col gap-4 mb-6 max-w-[400px]">
                         {[
                             'Real-time spatial visualization',
                             'Predictive safety protocols',
@@ -111,7 +112,7 @@ const AuthLayout = ({ children }) => {
                     </div>
 
                     {/* Footer Stats / Features for Sidebar */}
-                    <div className="mt-12 flex gap-8">
+                    <div className="mt-10 flex gap-8">
                         <div>
                             <div className="text-2xl font-black text-white leading-none">99.9%</div>
                             <div className="text-[10px] text-white/40 font-bold uppercase tracking-widest mt-1">Uptime SLA</div>
@@ -130,7 +131,7 @@ const AuthLayout = ({ children }) => {
             </div>
 
             {/* --- Right Side: Auth Form --- */}
-            <div className="flex-1 flex items-center justify-center p-4 sm:p-8 md:p-12 relative z-20 overflow-y-auto">
+            <div className="flex-1 flex items-center justify-center p-4 sm:p-8 md:p-12 relative z-20 overflow-hidden">
                 {/* Mobile Logo Only */}
                 <div className="absolute top-6 left-6 sm:top-8 sm:left-8 lg:hidden">
                     <Link to="/">
@@ -138,8 +139,13 @@ const AuthLayout = ({ children }) => {
                     </Link>
                 </div>
 
-                <div className="w-full max-w-[440px] mt-12 lg:mt-0 relative">
+                <div className="w-full max-w-[440px] mt-12 lg:mt-0 relative flex flex-col">
                     {children}
+                    <div className="text-center mt-8 opacity-40">
+                        <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                            Enterprise Portal &bull; Restricted Access
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

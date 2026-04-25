@@ -31,11 +31,11 @@ const SearchField = () => {
 
     return (
         <div className="relative group hidden sm:block">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray group-focus-within:text-primary transition-colors pointer-events-none">
-                <FiSearch size={16} />
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within:text-primary transition-colors pointer-events-none">
+                <FiSearch size={16} strokeWidth={2.5} />
             </span>
             <input
-                className="pl-11 pr-10 py-2 bg-base/50 border border-border-main/50 rounded-[var(--radius-input)] text-sm font-bold text-body outline-none focus:outline-none focus:!outline-none transition-all duration-500 focus:bg-card focus:border-transparent focus:shadow-card-hover w-[320px] focus:w-[420px]"
+                className="pl-11 pr-10 py-2 bg-base/50 border border-slate-400/50 rounded-full text-sm font-bold text-body outline-none focus:outline-none focus:!outline-none transition-all duration-300 focus:bg-card focus:border-primary/30 focus:shadow-[0_0_15px_0px_rgba(7,34,103,0.1),0_0_0_4px_rgba(7,34,103,0.05)] w-[380px]"
                 placeholder={getPlaceholder()}
                 value={query}
                 onChange={e => {

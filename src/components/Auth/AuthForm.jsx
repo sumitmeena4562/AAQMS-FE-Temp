@@ -93,10 +93,23 @@ function AuthForm({
                             type="submit" 
                             variant="primary" 
                             size="lg" 
-                            className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20 transition-all active:scale-95" 
+                            className="w-full h-12 rounded-[var(--radius-button)] font-black tracking-tight text-sm shadow-xl shadow-primary/20 transition-all active:scale-95 group relative overflow-hidden" 
                             loading={isLoading}
                         >
-                            {isLoading ? loadingText : submitText}
+                            <span className="relative z-10 flex items-center justify-center gap-2">
+                                {isLoading ? loadingText : (
+                                    <>
+                                        {submitText}
+                                        <svg 
+                                            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+                                            className="transition-transform duration-300 group-hover:translate-x-1"
+                                        >
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            <polyline points="12 5 19 12 12 19"></polyline>
+                                        </svg>
+                                    </>
+                                )}
+                            </span>
                         </Button>
                     </motion.div>
                 </form>

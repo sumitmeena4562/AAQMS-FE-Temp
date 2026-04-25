@@ -43,26 +43,30 @@ const ProfileDropdown = () => {
             {/* Avatar Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm font-bold transition-all duration-200 hover:ring-2 hover:ring-primary/10 ${isOpen ? 'ring-2 ring-primary/10 shadow-lg' : ''}`}
+                className={`w-9 h-9 rounded-full bg-primary border-2 border-white/10 flex items-center justify-center text-white text-[13px] font-black transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 ${isOpen ? 'ring-4 ring-primary/10 shadow-xl' : ''}`}
             >
                 {initials}
             </button>
 
             {/* Dropdown */}
             {isOpen && (
-                <div className="absolute right-0 top-[calc(100%+12px)] w-[240px] bg-card border border-border-main rounded-2xl shadow-[0_20px_60px_rgba(7,34,103,0.15)] z-[2000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="absolute right-0 top-[calc(100%+12px)] w-[260px] bg-card border border-border-main rounded-2xl shadow-[0_30px_90px_-15px_rgba(7,34,103,0.2)] z-[2000] overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
                     {/* User Info Section */}
-                    <div className="p-4 flex items-center gap-3.5 bg-gradient-to-br from-primary/[0.05] to-transparent border-b border-border-main/50">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-[#6366F1] flex items-center justify-center text-white text-[15px] font-extrabold shadow-md relative shrink-0">
+                    <div className="p-4 flex items-center gap-3.5 bg-gradient-to-br from-primary/[0.03] to-transparent border-b border-border-main/50">
+                        <div className="w-11 h-11 rounded-full bg-primary flex items-center justify-center text-white text-[16px] font-black shadow-lg relative shrink-0">
                             {initials}
-                            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
+                            <span className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 border-[2.5px] border-white shadow-sm" />
                         </div>
                         <div className="overflow-hidden">
-                            <div className="flex items-center gap-1.5 mb-0.5">
-                                <p className="text-title text-sm font-extrabold truncate leading-tight">{fullName}</p>
-                                <span className="text-[9px] font-black bg-primary text-white px-1.5 py-0.5 rounded uppercase tracking-wider">{user?.role || 'USER'}</span>
+                            <div className="flex flex-col gap-0.5 mb-1">
+                                <div className="flex items-center gap-2">
+                                    <p className="text-title text-[15px] font-black truncate leading-tight">{fullName}</p>
+                                </div>
+                                <div className="flex items-center">
+                                    <span className="text-[9px] font-black bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase tracking-widest border border-primary/20">{user?.role || 'USER'}</span>
+                                </div>
                             </div>
-                            <p className="text-gray text-[11px] font-semibold truncate">{email.toLowerCase()}</p>
+                            <p className="text-gray/70 text-[11px] font-bold truncate tracking-tight">{email.toLowerCase()}</p>
                         </div>
                     </div>
 

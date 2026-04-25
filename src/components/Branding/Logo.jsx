@@ -5,7 +5,7 @@ const Logo = ({ collapsed = false, size = 'md', inverse = false, className = '',
     const sizeMap = {
         sm: { icon: 'w-7.5 h-7.5', svg: 16, font: 'text-[11px]', sub: 'text-[8px]', gap: 'gap-2' },
         md: { icon: 'w-8.5 h-8.5', svg: 18, font: 'text-sm', sub: 'text-[9px]', gap: 'gap-2.5' },
-        lg: { icon: 'w-10.5 h-10.5', svg: 22, font: 'text-base', sub: 'text-[10px]', gap: 'gap-3', padding: 'p-5' },
+        lg: { icon: 'w-10.5 h-10.5', svg: 22, font: 'text-lg', sub: 'text-[10px]', gap: 'gap-3' },
     };
 
     const s = sizeMap[size] || sizeMap.md;
