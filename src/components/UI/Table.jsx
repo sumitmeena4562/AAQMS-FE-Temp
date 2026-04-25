@@ -157,13 +157,19 @@ const Table = ({
                             </AnimatePresence>
                         ) : (
                             <tr>
-                                <td colSpan={columns.length + (selectable ? 1 : 0)} className="py-24 text-center">
-                                    <div className="flex flex-col items-center justify-center space-y-3 opacity-60">
-                                        <div className="w-12 h-12 rounded-full bg-base flex items-center justify-center">
-                                            <p className="text-xl">📊</p>
+                                <td colSpan={columns.length + (selectable ? 1 : 0)} className="py-12 px-4 w-full whitespace-normal">
+                                    {typeof emptyMessage === 'string' ? (
+                                        <div className="flex flex-col items-center justify-center space-y-3 opacity-60 py-12 w-full">
+                                            <div className="w-12 h-12 rounded-full bg-base flex items-center justify-center">
+                                                <p className="text-xl">📊</p>
+                                            </div>
+                                            <div className="text-gray font-bold text-sm tracking-tight">{emptyMessage}</div>
                                         </div>
-                                        <div className="text-gray font-bold text-sm tracking-tight">{emptyMessage}</div>
-                                    </div>
+                                    ) : (
+                                        <div className="w-full flex justify-center py-10">
+                                            {emptyMessage}
+                                        </div>
+                                    )}
                                 </td>
                             </tr>
                         )}

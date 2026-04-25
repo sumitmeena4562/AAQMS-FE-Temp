@@ -5,11 +5,11 @@ import Search from './Search';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useSearchParams } from 'react-router-dom';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
-import { useFloors } from '../../hooks/api/useHierarchyQueries';
+import { useFloors, useZones } from '../../hooks/api/useHierarchyQueries';
 import useSearchStore from '../../store/useSearchStore';
 
 const FilterBar = ({
-    activeLevel, // 'coordinators', 'sites', 'floors', 'zones'
+    activeLevel, // 'coordinators', 'sites', 'floors', 'zones', 'inventory'
     className = '',
     children,
     showStatus = false,
@@ -20,6 +20,7 @@ const FilterBar = ({
     isCustomFilterActive = false,
     onClear,
     externalFloors = null,
+    externalZones = null,
     ...rest
 }) => {
     const {
@@ -39,9 +40,33 @@ const FilterBar = ({
     const handleResetAll = () => {
         resetFilters();
         if (onClear) onClear();
-        setSearchParams({});
+        setSearchParams({}, { replace: true });
         clearSearch();
     };
+
+    // ─── CASCADING RESETS ───
+    // When a parent level changes, reset its children to maintain data integrity
+    // Note: We use length as a simple change trigger to avoid deep-comparison loops
+    React.useEffect(() => {
+        if (selectedOrg.length > 0) {
+            setSite([]);
+            setFloor([]);
+            setZone([]);
+        }
+    }, [selectedOrg.length]);
+
+    React.useEffect(() => {
+        if (selectedSite.length > 0) {
+            setFloor([]);
+            setZone([]);
+        }
+    }, [selectedSite.length]);
+
+    React.useEffect(() => {
+        if (selectedFloor.length > 0) {
+            setZone([]);
+        }
+    }, [selectedFloor.length]);
 
 
 
@@ -62,8 +87,9 @@ const FilterBar = ({
     // Only auto-render if an activeLevel is provided to avoid duplicates with manual children
     const renderOrg = activeLevel && normalizedLevel !== 'organization';
     const renderCoord = ['coordinator', 'site', 'floor', 'zone'].includes(normalizedLevel);
-    const renderSite = ['site', 'floor', 'zone'].includes(normalizedLevel);
-    const renderFloor = ['floor', 'zone'].includes(normalizedLevel);
+    const renderSite = ['site', 'floor', 'zone', 'inventory'].includes(normalizedLevel);
+    const renderFloor = ['floor', 'zone', 'inventory'].includes(normalizedLevel);
+    const renderZone = ['zone', 'inventory'].includes(normalizedLevel);
 
     // ─── HELPERS ───
     const getID = (val) => {
@@ -84,8 +110,14 @@ const FilterBar = ({
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading } = useHierarchy(hierarchyOptions);
 
     const isFloorsExternal = rest.hasOwnProperty('externalFloors') || externalFloors !== null;
-    const { data: floorData } = useFloors(selectedSite, {}, {
-        enabled: !isFloorsExternal && renderFloor && selectedSite.length > 0
+    const isZonesExternal = rest.hasOwnProperty('externalZones') || externalZones !== null;
+
+    const { data: floorData } = useFloors(selectedSite, { page_size: 1000 }, {
+        enabled: !isFloorsExternal && renderFloor && (selectedSite.length > 0 || selectedOrg.length > 0)
+    });
+
+    const { data: zoneData } = useZones(selectedFloor, { page_size: 1000 }, {
+        enabled: !isZonesExternal && renderZone && (selectedFloor.length > 0 || selectedSite.length > 0)
     });
     
     const allFloors = React.useMemo(() => {
@@ -101,8 +133,21 @@ const FilterBar = ({
         return rawFloors;
     }, [isFloorsExternal, externalFloors, floorData, selectedSite, getID]);
 
+    const allZones = React.useMemo(() => {
+        const rawZones = isZonesExternal ? (externalZones || []) : (zoneData?.results || []);
+        
+        // Filter by selected floor locally
+        if (selectedFloor.length > 0) {
+            return rawZones.filter(z => {
+                const fId = getID(z.floor_id || z.floor);
+                return selectedFloor.some(id => String(id) === fId);
+            });
+        }
+        return rawZones;
+    }, [isZonesExternal, externalZones, zoneData, selectedFloor, getID]);
+
     // Dynamic Relational Options mapping (using Real IDs) - Memoized to prevent re-render loops
-    const orgOptions = React.useMemo(() => orgs.map(o => ({ value: o.id, label: o.name })), [orgs]);
+    const orgOptions = React.useMemo(() => orgs.map(o => ({ value: getID(o), label: o.name })), [orgs, getID]);
 
     const coordOptions = React.useMemo(() => allCoordinators.map((c, i) => {
         const id = getID(c.id || c.pk || c.employee_id || i);
@@ -116,7 +161,7 @@ const FilterBar = ({
                      `Coordinator #${id}`;
                      
         return { value: id, label: name };
-    }), [allCoordinators]);
+    }), [allCoordinators, getID]);
     const siteOptions = React.useMemo(() => {
         let filtered = allSites;
         if (selectedOrg && selectedOrg.length > 0) {
@@ -125,9 +170,10 @@ const FilterBar = ({
                 return selectedOrg.some(id => String(id) === orgId);
             });
         }
-        return filtered.map(s => ({ value: s.id, label: s.site_name || s.name }));
-    }, [allSites, selectedOrg]);
-    const floorOptions = React.useMemo(() => allFloors.map(f => ({ value: f.id, label: f.name })), [allFloors]);
+        return filtered.map(s => ({ value: getID(s), label: s.site_name || s.name }));
+    }, [allSites, selectedOrg, getID]);
+    const floorOptions = React.useMemo(() => (allFloors || []).map(f => ({ value: getID(f), label: f.name })), [allFloors, getID]);
+    const zoneOptions = React.useMemo(() => (allZones || []).map(z => ({ value: getID(z), label: z.name })), [allZones, getID]);
 
 
 
@@ -181,7 +227,18 @@ const FilterBar = ({
                             options={floorOptions}
                             value={selectedFloor}
                             onChange={(val) => setFloor(val)}
-                            allLabel="Select Floor"
+                            allLabel="All Floors"
+                            multiple={true}
+                        />
+                    )}
+
+                    {renderZone && (
+                        <FilterDropdown
+                            label="Zone"
+                            options={zoneOptions}
+                            value={selectedZone}
+                            onChange={(val) => setZone(val)}
+                            allLabel="All Zones"
                             multiple={true}
                         />
                     )}
