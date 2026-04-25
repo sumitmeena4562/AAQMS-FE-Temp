@@ -11,13 +11,15 @@ const Button = ({
   className, 
   variant = 'primary', 
   size = 'md', 
-  disabled = false,
-  loading = false,
-  loadingText = "Processing...",
+  disabled = false, 
+  loading = false, 
+  loadingText = "Processing...", 
+  icon: Icon,
+  iconPosition = 'left',
   ...props 
 }) => {
   
-  const baseStyles = "inline-flex items-center justify-center font-bold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-50 disabled:pointer-events-none active:scale-95";
+  const baseStyles = "inline-flex items-center justify-center font-bold tracking-tight transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-50 disabled:pointer-events-none active:scale-95 gap-2";
 
   const variants = {
     primary: "bg-primary text-white shadow-soft hover:bg-[var(--color-hover-blue)] hover:shadow-md",
@@ -29,6 +31,12 @@ const Button = ({
     sm: "h-9 px-4 text-xs rounded-sm",
     md: "h-11 px-6 text-sm rounded-md",
     lg: "h-14 px-8 text-base rounded-lg",
+  };
+
+  const renderIcon = () => {
+    if (!Icon) return null;
+    if (typeof Icon === 'function') return <Icon size={size === 'sm' ? 14 : 16} />;
+    return Icon;
   };
 
   return (
@@ -45,7 +53,13 @@ const Button = ({
           </svg>
           {loadingText}
         </span>
-      ) : children}
+      ) : (
+        <>
+          {Icon && iconPosition === 'left' && renderIcon()}
+          {children}
+          {Icon && iconPosition === 'right' && renderIcon()}
+        </>
+      )}
     </button>
   );
 };

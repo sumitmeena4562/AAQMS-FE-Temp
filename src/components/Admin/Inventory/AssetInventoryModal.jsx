@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
-    FiX, FiBox, FiMapPin, FiActivity, FiShield, FiCpu, 
-    FiAlertTriangle, FiCheckCircle, FiInfo, FiLayout, FiAlertCircle
+    FiAlertTriangle, FiCheckCircle, FiInfo, FiLayout, FiAlertCircle,
+    FiClock, FiBriefcase, FiMapPin, FiBox, FiActivity, FiX
 } from "react-icons/fi";
 
 
@@ -9,13 +9,6 @@ const AssetInventoryModal = ({ isOpen, onClose, asset }) => {
     const [showInfo, setShowInfo] = React.useState(true);
 
     if (!isOpen || !asset) return null;
-
-    // Helper for normalized IDs
-    const getID = (obj) => {
-        if (!obj) return '';
-        if (typeof obj === 'string' || typeof obj === 'number') return String(obj);
-        return String(obj.id || obj.pk || '');
-    };
 
     const statusTheme = {
         'Verified': { color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', icon: FiCheckCircle, text: 'Verified' },

@@ -157,4 +157,5 @@ const UserCard = React.memo(({ user, isSelected, onSelect, onEdit, onView, selec
   );
 });
 
+UserCard.displayName = 'UserCard';
 export default UserCard;

@@ -27,7 +27,7 @@ const PageLoader = () => (
 );
 
 const AppRoutes = () => {
-    const { fetchProfile, isBootstrapping } = useAuthStore();
+    const { fetchProfile } = useAuthStore();
 
     React.useEffect(() => {
         // ALWAYS attempt to fetch profile on mount to verify the session HttpOnly cookie.

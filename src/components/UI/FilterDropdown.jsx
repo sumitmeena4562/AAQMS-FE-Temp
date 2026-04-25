@@ -226,4 +226,5 @@ const FilterDropdown = React.memo(({
     );
 });
 
+FilterDropdown.displayName = 'FilterDropdown';
 export default FilterDropdown;

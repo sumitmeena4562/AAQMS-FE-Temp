@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -6,21 +6,17 @@ import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
 const UserFormModal = React.lazy(() => import('../../components/Dashboard/UserFormModal'));
 const ConfirmModal = React.lazy(() => import('../../components/UI/ConfirmModal'));
-import { StatsRow } from '../../components/Dashboard/StatsCard';
 import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
 import {
-    FiUsers, FiUser, FiRefreshCw, FiRefreshCcw, FiCheckCircle, FiAlertCircle, FiClock,
-    FiExternalLink, FiHome, FiShield, FiActivity, FiLayers, FiMail, FiPhone, FiX, FiBriefcase
+    FiUsers, FiUser, FiRefreshCw, FiHome, FiActivity, FiLayers, FiMail, FiPhone, FiBriefcase
 } from 'react-icons/fi';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import Button from '../../components/UI/Button';
 import UserCard from '../../components/UI/UserCard';
-import useDebounce from '../../hooks/useDebounce';
 import UserAvatar from '../../components/UI/UserAvatar';
 import FilterBar from '../../components/UI/FilterBar';
 import { useUserManagementData } from '../../hooks/api/useUserQueries';
-import { useHierarchy } from '../../hooks/api/useHierarchy';
 import useSearchStore from '../../store/useSearchStore';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
@@ -51,7 +47,7 @@ const Coordinator = React.memo(() => {
     // ── 1. DATA ORCHESTRATION (FE-SIDE) ──
     // Fetch a large set once to enable instant FE filtering without further network delay
     const { 
-        users: allUsers, totalCount: apiTotal, stats, formOptions,
+        users: allUsers, formOptions,
         isLoading, isFetching, refetchAll 
     } = useUserManagementData(
         {}, // Get everyone to filter locally
@@ -255,7 +251,7 @@ const Coordinator = React.memo(() => {
             toast.error(res.error || 'Failed to save');
         }
         return res;
-    }, [editingUser, updateUser, createUser]);
+    }, [editingUser, updateUser, createUser, queryClient, refetchAll]);
     const handleBulkActivate = async () => {
         const res = await bulkAction('activate', selectedIds);
         if (res.success) toast.success(`Activated ${selectedIds.length} profiles`);
@@ -491,4 +487,5 @@ const Coordinator = React.memo(() => {
     );
 });
 
+Coordinator.displayName = 'Coordinator';
 export default Coordinator;

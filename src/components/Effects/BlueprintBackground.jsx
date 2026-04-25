@@ -9,9 +9,7 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
  */
 const BlueprintBackground = ({ 
     showScanner = true, 
-    gridOpacity = 0.1,
-    arcOpacity = 0.6,
-    glowIntensity = 0.2
+    gridOpacity = 0.1
 }) => {
     // --- Global Parallax Logic ---
     const mouseX = useMotionValue(0);

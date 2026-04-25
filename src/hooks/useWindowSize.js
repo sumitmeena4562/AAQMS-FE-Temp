@@ -38,7 +38,7 @@ export const useWindowSize = () => {
  * Returns a limit (items per page) based on screen width breakpoints.
  * Optimized for grid layouts of 1, 2, 3, 4, 5 columns.
  */
-export const useResponsiveLimit = (defaultLimit = 12) => {
+export const useResponsiveLimit = () => {
     const { width } = useWindowSize();
 
     if (width >= 1536) return 15; // 2xl: 5 cols * 3 rows

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Button from '../../components/UI/Button';
 import OrganizationCard from '../../components/UI/OrganizationCard';
@@ -6,10 +6,9 @@ import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
-import { FiHome, FiBriefcase, FiLoader, FiAlertCircle, FiMapPin, FiUsers } from 'react-icons/fi';
+import { FiHome, FiBriefcase, FiAlertCircle } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import Pagination from '../../components/UI/Pagination';
-import useDebounce from '../../hooks/useDebounce';
 import useSearchStore from '../../store/useSearchStore';
 
 const SitePlan = () => {
@@ -20,7 +19,7 @@ const SitePlan = () => {
   const { query: searchQuery } = useSearchStore();
   const [isSynced, setIsSynced] = useState(false);
   
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { resetFilters } = useFilterStore();
   const [currentPage, setCurrentPage] = useState(1);
   
@@ -91,13 +90,10 @@ const SitePlan = () => {
 
     // Reset page when filters change
     useEffect(() => {
-        setCurrentPage(1);
-    }, [selectedOrg, selectedSite, searchQuery]);
-
-  const handleResetAll = () => {
-      setSearchParams({});
-      resetFilters();
-  };
+        if (currentPage !== 1) {
+            setTimeout(() => setCurrentPage(1), 0);
+        }
+    }, [selectedOrg, selectedSite, searchQuery, currentPage]);
 
   // URL → Store sync (mount-only guard)
   useEffect(() => {
@@ -112,7 +108,9 @@ const SitePlan = () => {
         if (pCoord) setCoord(pCoord.split(','));
     }
 
-    setIsSynced(true);
+    if (!isSynced) {
+        setTimeout(() => setIsSynced(true), 0);
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const currentOrg = activeOrgId.length === 1 ? orgs.find(o => String(o.id) === String(activeOrgId[0])) : null;
   const orgLabel = activeOrgId.length > 1 ? `Organizations (${activeOrgId.length})` : currentOrg?.name || passedOrgNameFromUrl;

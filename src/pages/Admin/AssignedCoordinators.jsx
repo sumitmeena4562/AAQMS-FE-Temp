@@ -6,7 +6,6 @@ import FilterBar from '../../components/UI/FilterBar';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import CardSkeleton from '../../components/UI/CardSkeleton';
-import Button from '../../components/UI/Button';
 import { FiHome, FiBriefcase, FiGrid, FiList, FiInbox } from 'react-icons/fi';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
@@ -20,8 +19,10 @@ const AssignedCoordinators = () => {
 
   // Reset to page 1 if criteria or page size changes
   useEffect(() => {
-    setCurrentPage(1);
-  }, [pageSize, selectedOrg]);
+    if (currentPage !== 1) {
+      setTimeout(() => setCurrentPage(1), 0);
+    }
+  }, [pageSize, selectedOrg, currentPage]);
   
   // --- QUERY HOOKS (UNIFIED) ---
   const { organizations: orgs, coordinators: coordinatorsListRaw, isLoading } = useHierarchy({ includeSites: false });
@@ -45,7 +46,7 @@ const AssignedCoordinators = () => {
   useEffect(() => {
     if (selectedOrg.length === 0 && passedOrgName && orgs.length > 0) {
       const match = orgs.find(o => o.name.toLowerCase() === passedOrgName.toLowerCase());
-      if (match) setOrg(match.id);
+      if (match) setTimeout(() => setOrg(match.id), 0);
     }
   }, [orgs, selectedOrg.length, passedOrgName, setOrg]); 
 
