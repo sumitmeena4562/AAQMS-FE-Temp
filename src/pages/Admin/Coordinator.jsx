@@ -311,7 +311,7 @@ const Coordinator = React.memo(() => {
             header: 'ORGANIZATION',
             accessor: 'org_name',
             width: '20%',
-            render: (value, row) => (
+            render: (value) => (
                 <div className="flex flex-col">
                     <div className="flex items-center gap-1.5"><FiLayers size={12} className="text-primary/60" /><span className="text-[13px] font-black text-title truncate">{value || 'Unassigned'}</span></div>
                 </div>
