@@ -20,7 +20,7 @@ import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 
-import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiEye } from 'react-icons/fi';
+import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiEye, FiShieldOff } from 'react-icons/fi';
 import useSearchStore from '../../store/useSearchStore';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';

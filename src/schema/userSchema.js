@@ -3,16 +3,14 @@ import { z } from 'zod';
 export const userSchema = z.object({
     name: z.string().min(1, 'Name is required')
         .max(100, { message: "Full name must be less than 100 characters" }),
-    email: z.string().email('Invalid email'),
+    email: z.string().email('Invalid email').or(z.literal('')).optional().nullable(),
     organisation_id: z.string().optional().nullable(),
     organisation: z.string().optional().nullable(),
     role: z.string().min(1, { message: "Role is required" }),
     status: z.enum(['active', 'deactive', 'ACTIVE', 'INACTIVE']),
     region: z.string().optional().nullable(),
     zone: z.string().optional().nullable(),
-    mobile_number: z.string()
-        .min(1, { message: "Contact number is required" })
-        .regex(/^(?:\+91|91)?[6-9]\d{9}$/, { message: "Invalid format. Use +91 or 91 followed by 10 digits (e.g., +91 9876543210)" }),
+    mobile_number: z.string().optional().nullable(),
     coordinator_id: z.string().optional().nullable(),
     assignment: z.string().default('standby'),
     avatar: z.string().optional().nullable(),
