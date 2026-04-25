@@ -56,7 +56,7 @@ const Footer = () => {
                         >
                             <Logo size="lg" className="!p-0" />
                         </Link>
-                        <p className="text-sm text-slate-500 leading-relaxed mb-8 max-w-[300px] font-medium opacity-90">
+                        <p className="text-sm text-slate-500 leading-relaxed mb-5 max-w-[300px] font-medium opacity-90">
                             The advanced engineering blueprint for asset quality monitoring and field safety compliance.
                         </p>
                         <nav className="flex gap-3" aria-label="Social media links">
@@ -69,7 +69,7 @@ const Footer = () => {
                     {/* Dynamic Link Categories */}
                     {FOOTER_LINKS.map((section, idx) => (
                         <div key={idx}>
-                            <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-7 opacity-70 cursor-default">
+                            <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-5 opacity-70 cursor-default">
                                 {section.title}
                             </h4>
                             <nav className="flex flex-col" aria-label={`${section.title} links`}>
@@ -84,7 +84,7 @@ const Footer = () => {
 
                     {/* Contact & Legal — Manual as it uses specific icons/format */}
                     <div className="col-span-2 lg:col-span-1 mt-10 lg:mt-0 pt-10 lg:pt-0 border-t lg:border-t-0 border-slate-200/50">
-                        <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-7 opacity-70 cursor-default">Get in Touch</h4>
+                        <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-5 opacity-70 cursor-default">Get in Touch</h4>
                         <div className="space-y-4">
                             <a 
                                 href={`mailto:${CONTACT_INFO.EMAIL}`}
@@ -119,8 +119,9 @@ const Footer = () => {
                 </div>
             </div>
 
-            {/* Bottom Bar — Now Full Width Line */}
-            <div className="border-t border-slate-200 mt-6">
+            {/* Bottom Bar — Fully matching top border style */}
+            <div className="mt-6 relative border-t border-slate-200">
+                <div className="absolute top-0 left-0 w-full h-px bg-slate-300/50" />
                 <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 flex flex-col md:flex-row justify-center items-center gap-x-12 gap-y-4 text-center">
                     <div className="text-[12px] text-slate-400 font-semibold tracking-tight">
                         {COPYRIGHT_TEXT}
