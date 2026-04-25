@@ -9,8 +9,7 @@ import AuthForm from '../../components/Auth/AuthForm';
 import InputField from '../../components/UI/InputField';
 import Checkbox from '../../components/UI/Checkbox';
 import useAuthStore from '../../store/authStore';
-import { MailIcon, LockIcon } from '../../assets/icon';
-import { FiUser } from 'react-icons/fi';
+import { FiUser, FiLock } from 'react-icons/fi';
 import ForgotPasswordModal from '../../components/Auth/ForgotPasswordModal';
 
 function LoginPage() {
@@ -124,7 +123,7 @@ function LoginPage() {
                                 label="Email Address"
                                 type="email"
                                 placeholder="name@company.com"
-                                icon={<FiUser className="text-gray/40" />}
+                                icon={<FiUser strokeWidth={2.5} />}
                                 {...register('email')}
                                 error={errors.email?.message}
                             />
@@ -135,7 +134,7 @@ function LoginPage() {
                                 label="Password"
                                 type="password"
                                 placeholder="••••••••"
-                                icon={<LockIcon />}
+                                icon={<FiLock strokeWidth={2.5} />}
                                 {...register('password')}
                                 error={errors.password?.message}
                             />
@@ -161,12 +160,6 @@ function LoginPage() {
                     </motion.div>
                 )}
             </AuthForm>
-
-            <div className="text-center mt-8">
-                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest opacity-60">
-                    Enterprise Portal &bull; Restricted Access
-                </span>
-            </div>
 
             <ForgotPasswordModal 
                 isOpen={isForgotPasswordOpen} 

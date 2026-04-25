@@ -70,13 +70,14 @@ const NotificationCenter = () => {
             {/* Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`p-2 rounded-xl text-gray hover:text-title transition-all duration-200 relative group ${isOpen ? 'bg-base text-title' : ''}`}
+                className={`p-2.5 rounded-xl text-slate-700 hover:text-primary hover:bg-primary/5 transition-all duration-200 relative group ${isOpen ? 'bg-primary/10 text-primary' : ''}`}
             >
-                <FiBell size={20} />
+                <FiBell size={20} strokeWidth={2.5} />
                 {unreadCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] font-black flex items-center justify-center border-2 border-white animate-pulse">
-                        {unreadCount}
-                    </span>
+                    <>
+                        <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-600 border border-white z-10" />
+                        <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-blue-600 animate-ping opacity-75" />
+                    </>
                 )}
             </button>
 
