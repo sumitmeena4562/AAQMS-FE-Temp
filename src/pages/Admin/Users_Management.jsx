@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { toast } from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
 import useUserStore from '../../store/userStore';
 import UserPeekView from '../../components/Dashboard/UserPeekView';
 const UserFormModal = React.lazy(() => import('../../components/Dashboard/UserFormModal'));
@@ -30,6 +31,7 @@ import { DESIGN_TOKENS } from '../../constants/designTokens';
 const Users = React.memo(() => {
     const [searchParams] = useSearchParams();
     const { resetFilters } = useUserStore();
+    const queryClient = useQueryClient();
 
     // ── STORES (UI state only) ──
     const {
@@ -240,9 +242,28 @@ const Users = React.memo(() => {
                 toast.success(editingUser ? 'Changes to user profile have been saved' : 'New personnel successfully added to the system');
             }
 
+            // --- INSTANT CACHE SYNC ---
+            if (editingUser?.id) {
+                const updatedStatus = res.data?.status || (data instanceof FormData ? data.get('status') : data.status);
+                
+                queryClient.setQueriesData({ queryKey: ['users', 'admin-batch'] }, (oldData) => {
+                    if (!oldData || !oldData.users) return oldData;
+                    return {
+                        ...oldData,
+                        users: oldData.users.map(u => 
+                            String(u.id) === String(editingUser.id) 
+                                ? { ...u, ...res.data, status: updatedStatus } 
+                                : u
+                        )
+                    };
+                });
+            }
+
             setIsFormOpen(false);
             setEditingUser(null);
-            refetchAll();
+            
+            // Background refresh for eventual consistency
+            setTimeout(() => refetchAll(), 100);
         } else {
             toast.error(res.error || 'Failed to save user');
         }
