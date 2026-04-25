@@ -27,15 +27,15 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
       const orgName = org.organisation_name || location.state?.orgName || new URLSearchParams(location.search).get('org_name') || '';
       const coordName = coordinatorContext?.name || new URLSearchParams(location.search).get('coord') || '';
       const coordId = coordinatorContext?.id || new URLSearchParams(location.search).get('coord_id') || '';
-      
+
       navigate(`/admin/floor-plan?org_id=${orgId}&org_name=${encodeURIComponent(orgName)}&coord_id=${coordId}&coord=${encodeURIComponent(coordName)}&site_id=${org.id}&site=${encodeURIComponent(org.site_name || org.name)}`, {
         state: { site: org, orgName, coordinator: coordinatorContext }
       });
     } else {
       setOrg(org.id);
       // Navigate to coordinators page with specific org filter
-      navigate(`/admin/coordinators?org_id=${org.id}&org_name=${encodeURIComponent(org.name)}`, { 
-        state: { org, from: 'org_card' } 
+      navigate(`/admin/coordinators?org_id=${org.id}&org_name=${encodeURIComponent(org.name)}`, {
+        state: { org, from: 'org_card' }
       });
     }
   };
@@ -109,8 +109,8 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         {/* Header Section */}
         <div>
           <div className="mb-2 min-h-[44px]">
-            <h3 
-              className="text-lg font-bold text-primary tracking-tight leading-tight line-clamp-2 break-all" 
+            <h3
+              className="text-lg font-bold text-primary tracking-tight leading-tight line-clamp-2 break-all"
               title={org.site_name || org.name}
             >
               {org.site_name || org.name}
@@ -120,7 +120,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
           {isSiteCard ? (
             <div className="space-y-1.5">
               {org.organisation_name && (
-                <p 
+                <p
                   className="text-[9px] text-primary/60 font-bold tracking-widest uppercase truncate"
                   title={org.organisation_name}
                 >
@@ -132,7 +132,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <p 
+                <p
                   className="text-[11px] text-secondary font-medium leading-tight line-clamp-1 break-all"
                   title={org.address}
                 >
@@ -141,7 +141,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
               </div>
             </div>
           ) : (
-            <p 
+            <p
               className="text-[9px] text-gray font-bold tracking-widest uppercase opacity-80 mt-1 truncate"
               title={org.industry ? `${org.industry}${org.region ? ` • ${org.region}` : ''}` : (org.region || 'Global')}
             >
@@ -152,7 +152,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         </div>
 
         {/* Stats Section */}
-        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border-main/40">
+        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border-main/80">
           <div className="flex flex-col gap-1">
             <p className="text-[10px] text-gray uppercase font-bold tracking-wider opacity-70">
               {isSiteCard ? 'FLOORS' : 'COORD'}
@@ -180,22 +180,25 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         </div>
 
         {/* Bottom Button */}
-        <button
-          onClick={handleManage}
-          className="mt-auto w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-[var(--color-hover-blue)] hover:text-white hover:border-[var(--color-hover-blue)] transition-all flex items-center justify-center gap-2 group">
-          <span>
-            {isSiteCard ? 'View Floors' : 'Manage Org'}
-          </span>
-          <svg
-            className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </button>
+        <div className="mt-auto pt-4  border-border-main/60">
+          <button
+            onClick={handleManage}
+            className="w-full py-2 px-3 bg-base border border-border-main rounded-lg text-[11px] font-bold text-primary hover:bg-[var(--color-hover-blue)] hover:text-white hover:border-[var(--color-hover-blue)] transition-all flex items-center justify-center gap-2 group">
 
+            <span>
+              {isSiteCard ? 'View Floors' : 'Manage Org'}
+            </span>
+            <svg
+              className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </button>
+
+        </div>
       </div>
     </div>
   );
