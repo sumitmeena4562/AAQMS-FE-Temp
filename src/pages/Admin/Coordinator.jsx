@@ -229,7 +229,7 @@ const Coordinator = React.memo(() => {
                 // Determine new status from formData or response
                 const updatedStatus = res.data?.status || (data instanceof FormData ? data.get('status') : data.status);
                 
-                queryClient.setQueriesData({ queryKey: ['users', 'admin-orchestrator'] }, (oldData) => {
+                queryClient.setQueriesData({ queryKey: ['users', 'admin-batch'] }, (oldData) => {
                     if (!oldData || !oldData.users) return oldData;
                     return {
                         ...oldData,
