@@ -80,12 +80,12 @@ const AuthLayout = ({ children }) => {
                     className="relative z-10 px-16 pt-28 pb-10 w-full block flex-shrink-0"
                 >
                     {/* Badge */}
-                    <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-[10px] font-black tracking-[0.2em] text-blue-200 uppercase mb-8 shadow-xl">
+                    <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-[10px] font-black tracking-[0.2em] text-blue-200 uppercase mb-5 shadow-xl">
                         <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2 animate-pulse" />
                         Enterprise Governance
                     </div>
 
-                    <h1 className="text-3xl xl:text-4xl font-black text-white leading-[1.2] tracking-tight mb-4 max-w-[500px]">
+                    <h1 className="text-4xl xl:text-5xl font-black text-white leading-[1.1] tracking-tight mb-4 max-w-[500px]">
                         <div>Structured Safety.</div>
                         <div className="text-blue-300">Intelligent Monitoring.</div>
                     </h1>
@@ -95,20 +95,17 @@ const AuthLayout = ({ children }) => {
                     </p>
 
                     {/* Featured List to fill space */}
-                    <div className="flex flex-col gap-5 mb-8 max-w-[400px]">
+                    <div className="flex flex-col gap-6 mb-8 max-w-[400px]">
                         {[
-                            { title: 'Digital Twin Mapping', desc: 'Real-time spatial visualization' },
-                            { title: 'AI Risk Intelligence', desc: 'Predictive safety protocols' },
-                            { title: 'Immutable Audit Trails', desc: '100% compliance integrity' }
+                            'Real-time spatial visualization',
+                            'Predictive safety protocols',
+                            '100% compliance integrity'
                         ].map((item, i) => (
-                            <div key={i} className="flex items-center gap-4 group">
-                                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                            <div key={i} className="flex items-center gap-5 group">
+                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.5)]" />
                                 </div>
-                                <div className="flex flex-col">
-                                    <h4 className="text-sm font-black text-white tracking-wide uppercase mb-1">{item.title}</h4>
-                                    <p className="text-xs text-white/50 font-bold tracking-tight">{item.desc}</p>
-                                </div>
+                                <p className="text-sm text-white/70 font-bold tracking-tight">{item}</p>
                             </div>
                         ))}
                     </div>
