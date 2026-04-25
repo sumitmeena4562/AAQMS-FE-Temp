@@ -25,15 +25,15 @@ const SocialIcon = ({ icon: Icon, href, label }) => (
         aria-label={label}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white hover:border-primary hover:-translate-y-1 transition-all duration-300 shadow-sm"
+        className="w-9 h-9 rounded-lg bg-primary/5 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300 shadow-sm"
     >
-        <Icon className="text-lg" />
+        <Icon className="text-sm" />
     </a>
 );
 
 const Footer = () => {
     return (
-        <footer className="bg-slate-50/50 pt-16 sm:pt-20 pb-2 px-6 border-t border-slate-100 relative z-10 overflow-hidden" aria-labelledby="footer-heading">
+        <footer className="bg-slate-50/50 pt-10 sm:pt-14 pb-2 px-4 sm:px-8 border-t border-slate-200 relative z-10 overflow-hidden" aria-labelledby="footer-heading">
             <h2 id="footer-heading" className="sr-only">Footer</h2>
             
             {/* Premium Background Glow */}
@@ -41,8 +41,8 @@ const Footer = () => {
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_50%_0%,_rgba(7,34,103,0.03)_0%,_transparent_70%)]" />
             </div>
 
-            {/* Glossy Top Border */}
-            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+            {/* Top Border Accent - Now Solid for better visibility */}
+            <div className="absolute top-0 left-0 w-full h-px bg-slate-300/50" />
 
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-12 mb-8">
@@ -51,10 +51,10 @@ const Footer = () => {
                     <div className="col-span-2 lg:col-span-1 flex flex-col items-start">
                         <Link 
                             to="/" 
-                            className="mb-6 -ml-5"
+                            className="mb-6 block"
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         >
-                            <Logo size="lg" />
+                            <Logo size="lg" className="!p-0" />
                         </Link>
                         <p className="text-sm text-slate-500 leading-relaxed mb-8 max-w-[300px] font-medium opacity-90">
                             The advanced engineering blueprint for asset quality monitoring and field safety compliance.
@@ -117,13 +117,15 @@ const Footer = () => {
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Bottom Bar */}
-                <div className="pt-5 border-t border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-6">
+            {/* Bottom Bar — Now Full Width Line */}
+            <div className="border-t border-slate-200 mt-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 flex flex-col md:flex-row justify-center items-center gap-x-12 gap-y-4 text-center">
                     <div className="text-[12px] text-slate-400 font-semibold tracking-tight">
                         {COPYRIGHT_TEXT}
                     </div>
-                    <nav className="flex gap-8" aria-label="Legal links">
+                    <nav className="flex flex-wrap justify-center gap-8" aria-label="Legal links">
                         <a href="#" className="text-[12px] text-slate-400 hover:text-primary transition-colors font-bold uppercase tracking-widest">Privacy Policy</a>
                         <a href="#" className="text-[12px] text-slate-400 hover:text-primary transition-colors font-bold uppercase tracking-widest">Terms</a>
                     </nav>
