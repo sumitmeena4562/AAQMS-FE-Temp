@@ -314,7 +314,6 @@ const Coordinator = React.memo(() => {
             render: (value, row) => (
                 <div className="flex flex-col">
                     <div className="flex items-center gap-1.5"><FiLayers size={12} className="text-primary/60" /><span className="text-[13px] font-black text-title truncate">{value || 'Unassigned'}</span></div>
-                    <span className="text-[9px] text-gray/60 font-bold uppercase tracking-wider mt-1">{row?.region || 'National Fleet'}</span>
                 </div>
             )
         },
@@ -341,10 +340,10 @@ const Coordinator = React.memo(() => {
         {
             header: 'ACTIONS',
             accessor: 'id',
-            width: '100px',
-            align: 'right',
+            width: '120px',
+            align: 'center',
             render: (_, row) => (
-                <div className="flex items-center justify-end gap-1.5 pr-2">
+                <div className="flex items-center justify-center gap-1.5">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();

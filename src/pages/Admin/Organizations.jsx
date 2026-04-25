@@ -5,8 +5,7 @@ import {
     useAllOrganizations,
     useIndustryTypes, 
     useCreateOrganization, 
-    useUpdateOrganization, 
-    useBlockOrganization 
+    useUpdateOrganization
 } from '../../hooks/api/useOrgQueries';
 import Button from '../../components/UI/Button';
 
@@ -16,14 +15,12 @@ const OrganizationDetailsModal = React.lazy(() => import('../../components/UI/Or
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import PageHeader from '../../components/UI/PageHeader';
 import DataTable from '../../components/UI/DataTable';
-import DotStatus from '../../components/UI/DotStatus';
-import Badge from '../../components/UI/Badge';
 import FilterBar from '../../components/UI/FilterBar';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 
-import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiShieldOff, FiEye } from 'react-icons/fi';
+import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiEye } from 'react-icons/fi';
 import useSearchStore from '../../store/useSearchStore';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
@@ -80,14 +77,11 @@ const Organizations = React.memo(() => {
     // --- Mutations ---
     const createMutation = useCreateOrganization();
     const updateMutation = useUpdateOrganization();
-    const blockMutation = useBlockOrganization();
-    const isMutating = createMutation.isPending || updateMutation.isPending || blockMutation.isPending;
+    const isMutating = createMutation.isPending || updateMutation.isPending;
 
     // --- Local State ---
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
     const [editingOrg, setEditingOrg] = useState(null);
-    const [orgToBlock, setOrgToBlock] = useState(null);
     const [isViewOnly, setIsViewOnly] = useState(false);
 
     // --- 🔹 ADVANCED LOCAL FILTERING & SEARCH 🔹 ---
@@ -167,21 +161,7 @@ const Organizations = React.memo(() => {
         setIsCreateModalOpen(true);
     }, []);
 
-    const handleBlock = useCallback((org) => {
-        setOrgToBlock(org);
-        setIsBlockModalOpen(true);
-    }, []);
 
-    const confirmBlock = useCallback(async () => {
-        if (!orgToBlock) return;
-        try {
-            await blockMutation.mutateAsync(orgToBlock.id);
-            setIsBlockModalOpen(false);
-            setOrgToBlock(null);
-        } catch (err) {
-            console.error("Block failed", err);
-        }
-    }, [blockMutation, orgToBlock]);
 
     // --- Data Table Columns ---
     const tableColumns = useMemo(() => [
@@ -200,40 +180,36 @@ const Organizations = React.memo(() => {
                             )}
                         </div>
                         <div className="flex items-center gap-1.5 text-[9px] font-black text-gray uppercase tracking-widest leading-none mt-1">
-                            <span className="truncate">{org.industry || 'General'}</span>
+                            <span className="truncate">
+                                {org.industry ? `${org.industry}${org.region ? ` • ${org.region}` : ''}` : (org.region || 'Global')}
+                            </span>
                         </div>
                     </div>
                 </div>
             )
         },
-        {
-            header: 'Industry',
-            accessor: 'industry',
-            width: '15%',
-            className: 'hidden xl:table-cell',
-            render: (val) => (
-                <div className="flex">
-                    <Badge variant="soft" className={`!text-[9px] !px-2 !py-0.5 !font-black !uppercase !tracking-widest border border-current/10 ${!val ? 'text-gray bg-base' : 'text-primary bg-primary/5'}`}>
-                        {val || 'General'}
-                    </Badge>
-                </div>
-            )
-        },
+
         {
             header: 'Oversight',
             accessor: 'stats',
             width: '18%',
-            className: 'text-center hidden md:table-cell',
+            align: 'center',
+            className: 'hidden md:table-cell',
             render: (stats) => (
-                <div className="flex items-center justify-center gap-4">
+                <div className="flex items-center justify-center gap-5 mt-1">
                     <div className="flex flex-col items-center">
                         <span className="text-[14px] font-black text-title leading-none">{stats?.sites || 0}</span>
                         <span className="text-[8px] font-black text-gray uppercase tracking-widest mt-1">Sites</span>
                     </div>
-                    <div className="h-5 w-[1px] bg-border-main/60 shrink-0" />
+                    <div className="h-6 w-[1px] bg-border-main/40 shrink-0" />
                     <div className="flex flex-col items-center">
                         <span className="text-[14px] font-black text-title leading-none">{stats?.coordinators || 0}</span>
-                        <span className="text-[8px] font-black text-gray uppercase tracking-widest mt-1">Units</span>
+                        <span className="text-[8px] font-black text-gray uppercase tracking-widest mt-1">Coordinator</span>
+                    </div>
+                    <div className="h-6 w-[1px] bg-border-main/40 shrink-0" />
+                    <div className="flex flex-col items-center">
+                        <span className="text-[14px] font-black text-title leading-none">{stats?.floors || 0}</span>
+                        <span className="text-[8px] font-black text-gray uppercase tracking-widest mt-1">Floors</span>
                     </div>
                 </div>
             )
@@ -242,33 +218,24 @@ const Organizations = React.memo(() => {
             header: 'Status',
             accessor: 'status',
             width: '15%',
+            align: 'center',
             className: 'hidden sm:table-cell',
             render: (status, org) => {
                 const computedStatus = getOrgStatus(org);
-
                 const isActive = computedStatus === 'ACTIVE';
                 const isPending = computedStatus === 'PENDING';
-                const isBlocked = computedStatus === 'BLOCKED';
-
-                const { COLORS } = DESIGN_TOKENS;
-
-                const style = isActive
-                    ? { backgroundColor: COLORS.BADGES.SUCCESS_BG, color: COLORS.BADGES.SUCCESS_TEXT, borderColor: `${COLORS.BADGES.SUCCESS_TEXT}33` }
-                    : isPending
-                        ? { backgroundColor: COLORS.BADGES.PENDING_BG, color: COLORS.BADGES.PENDING_TEXT, borderColor: `${COLORS.BADGES.PENDING_TEXT}33` }
-                        : isBlocked
-                            ? { backgroundColor: COLORS.BADGES.BLOCKED_BG, color: COLORS.BADGES.BLOCKED_TEXT, borderColor: `${COLORS.BADGES.BLOCKED_TEXT}33` }
-                            : { backgroundColor: COLORS.BADGES.DANGER_BG, color: COLORS.BADGES.DANGER_TEXT, borderColor: `${COLORS.BADGES.DANGER_TEXT}33` };
 
                 return (
-                    <div
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border"
-                        style={style}
-                    >
-                        <DotStatus status={isActive ? 'active' : isPending ? 'pending' : (isBlocked ? 'inactive' : 'inactive')} />
-                        <span className="text-[9px] font-black uppercase tracking-widest leading-none">
+                    <div className="flex justify-center mt-1">
+                        <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border transition-all duration-300 shadow-sm
+                            ${isActive
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-100/50 shadow-emerald-100/20'
+                                : isPending 
+                                    ? 'bg-amber-50 text-amber-700 border-amber-100/50 shadow-amber-100/20'
+                                    : 'bg-rose-50 text-rose-700 border-rose-100/50 shadow-rose-100/20'}`}>
+                            <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : isPending ? 'bg-amber-500' : 'bg-rose-500 hover:scale-110 transition-transform'}`} />
                             {computedStatus}
-                        </span>
+                        </div>
                     </div>
                 );
             }
@@ -279,7 +246,7 @@ const Organizations = React.memo(() => {
             width: '12%',
             className: 'text-right',
             render: (_, org) => (
-                <div className="flex items-center justify-end gap-1.5 pr-1">
+                <div className="flex items-center justify-end gap-1.5 pr-1 mt-1">
                     <button
                         onClick={(e) => { e.stopPropagation(); handleView(org); }}
                         className="w-8 h-8 flex items-center justify-center text-gray hover:text-white hover:bg-primary transition-all rounded-xl shadow-sm active:scale-95"
@@ -295,18 +262,10 @@ const Organizations = React.memo(() => {
                     >
                         <FiEdit2 size={13} />
                     </button>
-                    <button
-                        onClick={(e) => { e.stopPropagation(); handleBlock(org); }}
-                        className="w-8 h-8 flex items-center justify-center text-gray hover:text-amber-600 transition-all rounded-xl hover:bg-amber-50/60 active:scale-95"
-                        title="Block"
-                        disabled={org.isBlocked}
-                    >
-                        <FiShieldOff size={13} />
-                    </button>
                 </div>
             )
         }
-    ], [handleBlock, handleEdit, handleView]);
+    ], [handleEdit, handleView]);
 
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-12">
@@ -332,10 +291,11 @@ const Organizations = React.memo(() => {
                             label="Industry"
                             options={industryOptions}
                             value={filters.industry}
-                            onChange={(v) => setFilters({ ...filters, industry: v })}
+                            onChange={(v) => setFilters({ industry: v })}
                             allLabel="All Industries"
                             multiple={true}
                         />
+
 
                         <FilterDropdown
                             label="Status"
@@ -405,7 +365,6 @@ const Organizations = React.memo(() => {
                                             org={org}
                                             onEdit={() => handleEdit(org)}
                                             onView={() => handleView(org)}
-                                            onBlock={() => handleBlock(org)}
                                         />
                                     </div>
                                 ))}
@@ -478,17 +437,7 @@ const Organizations = React.memo(() => {
                 )}
             </React.Suspense>
 
-            <ConfirmModal
-                isOpen={isBlockModalOpen}
-                onClose={() => { setIsBlockModalOpen(false); setOrgToBlock(null); }}
-                onConfirm={confirmBlock}
-                title="Confirm Organization Deactivation"
-                message={`Are you sure you want to block ${orgToBlock?.name}? This will deactivate their portal access and suspend all ongoing operations. This action is reversible from settings.`}
-                confirmText="Deactivate Access"
-                cancelText="Keep Active"
-                danger={true}
-                loading={isMutating}
-            />
+
         </div>
     );
 });
