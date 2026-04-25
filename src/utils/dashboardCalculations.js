@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiBox, FiClock, FiAlertTriangle, FiUserPlus, FiPackage, FiCheckCircle, FiSettings, FiActivity, FiShield, FiMap, FiBriefcase, FiUsers } from 'react-icons/fi';
+import { FiBox, FiClock, FiAlertTriangle, FiUserPlus, FiPackage, FiCheckCircle, FiSettings, FiActivity, FiShield, FiMap, FiBriefcase, FiUsers, FiLogIn, FiLogOut } from 'react-icons/fi';
 
 /**
  * Calculates percentage growth from a previous value to a current value.
@@ -236,29 +236,41 @@ export const mapToActivityFeed = (rawData) => {
             icon = FiAlertTriangle;
             iconBgClass = 'bg-red-50';
             iconTextClass = 'text-red-600';
+        } else if (typeStr.includes('session') || typeStr.includes('login')) {
+            icon = FiLogIn;
+            iconBgClass = 'bg-emerald-50';
+            iconTextClass = 'text-emerald-600';
+        } else if (typeStr.includes('logout')) {
+            icon = FiLogOut;
+            iconBgClass = 'bg-slate-100';
+            iconTextClass = 'text-slate-600';
         } else if (typeStr.includes('user') || typeStr.includes('officer') || typeStr.includes('admin') || typeStr.includes('coordinator')) {
             icon = FiUserPlus;
             iconBgClass = 'bg-blue-50';
             iconTextClass = 'text-blue-600';
-        } else if (typeStr.includes('inventory') || typeStr.includes('equipment') || typeStr.includes('zone')) {
+        } else if (typeStr.includes('inventory') || typeStr.includes('equipment')) {
             icon = FiPackage;
             iconBgClass = 'bg-orange-50';
             iconTextClass = 'text-orange-600';
+        } else if (typeStr.includes('zone') || typeStr.includes('site') || typeStr.includes('map')) {
+            icon = FiMap;
+            iconBgClass = 'bg-cyan-50';
+            iconTextClass = 'text-cyan-600';
         } else if (typeStr.includes('report') || typeStr.includes('approval') || typeStr.includes('resolved') || typeStr.includes('organisation')) {
             icon = FiCheckCircle;
             iconBgClass = 'bg-purple-50';
             iconTextClass = 'text-purple-600';
-        } else if (typeStr.includes('config') || typeStr.includes('settings')) {
-            icon = FiSettings;
-            iconBgClass = 'bg-gray-100';
-            iconTextClass = 'text-gray-600';
+        } else if (typeStr.includes('config') || typeStr.includes('settings') || typeStr.includes('system')) {
+            icon = FiShield;
+            iconBgClass = 'bg-indigo-50';
+            iconTextClass = 'text-indigo-600';
         }
         
         // Determine status variant for badges/dots
         let statusVariant = 'info';
         if (iconBgClass.includes('red')) statusVariant = 'danger';
-        else if (iconBgClass.includes('orange')) statusVariant = 'warning';
-        else if (iconBgClass.includes('purple')) statusVariant = 'success';
+        else if (iconBgClass.includes('orange') || iconBgClass.includes('cyan')) statusVariant = 'warning';
+        else if (iconBgClass.includes('emerald') || iconBgClass.includes('purple')) statusVariant = 'success';
         
         return {
             ...item,
