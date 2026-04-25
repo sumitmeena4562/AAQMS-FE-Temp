@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 const ChevronIcon = () => (
-  <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <svg className="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
   </svg>
 );
@@ -45,7 +45,7 @@ const Breadcrumb = ({ items = [] }) => {
               <div
                 onClick={handleClick}
                 className="flex items-center gap-1.5 px-1.5 py-1 text-[11.5px] font-medium hover:text-primary transition-all duration-200 group cursor-pointer"
-                style={{ color: DESIGN_TOKENS.COLORS.TEXT_MUTED }}
+                style={{ color: DESIGN_TOKENS.COLORS.TEXT_TITLE }}
               >
                 {item.icon && <span className="opacity-60 group-hover:opacity-100 flex items-center transition-opacity">{item.icon}</span>}
                 <span className="tracking-tight">{item.label}</span>
@@ -54,7 +54,7 @@ const Breadcrumb = ({ items = [] }) => {
 
             {/* Simple Separator */}
             {!isLast && (
-              <div className="opacity-20 text-slate-400">
+              <div className="opacity-40 text-slate-600">
                 <ChevronIcon />
               </div>
             )}

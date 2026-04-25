@@ -143,7 +143,7 @@ const Table = ({
                                                 <td
                                                     key={ci}
                                                     className={`
-                                                        px-2.5 py-2.5 text-[12px] font-medium text-body vertical-middle
+                                                        px-6 py-2.5 text-[12px] font-medium text-body vertical-middle
                                                         ${col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'}
                                                         ${col.className || ''}
                                                     `}

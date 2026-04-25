@@ -143,9 +143,9 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
           ) : (
             <p 
               className="text-[9px] text-gray font-bold tracking-widest uppercase opacity-80 mt-1 truncate"
-              title={`${org.industry} • ${org.region}`}
+              title={org.industry ? `${org.industry}${org.region ? ` • ${org.region}` : ''}` : (org.region || 'Global')}
             >
-              {org.industry} • {org.region}
+              {org.industry ? `${org.industry}${org.region ? ` • ${org.region}` : ''}` : (org.region || 'Global')}
             </p>
           )}
 
@@ -155,7 +155,7 @@ const OrganizationCard = ({ org, isSiteCard = false, coordinatorContext = null, 
         <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border-main/40">
           <div className="flex flex-col gap-1">
             <p className="text-[10px] text-gray uppercase font-bold tracking-wider opacity-70">
-              {isSiteCard ? 'FLOORS' : 'COORDS'}
+              {isSiteCard ? 'FLOORS' : 'COORD'}
             </p>
             <p className="text-[15px] font-bold text-title leading-none">
               {isSiteCard ? totalFloors : totalCoordinators}
