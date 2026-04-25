@@ -49,7 +49,11 @@ const Footer = () => {
 
                     {/* Brand Info */}
                     <div className="col-span-2 lg:col-span-1 flex flex-col items-start">
-                        <Link to="/" className="mb-6 -ml-5">
+                        <Link 
+                            to="/" 
+                            className="mb-6 -ml-5"
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        >
                             <Logo size="lg" />
                         </Link>
                         <p className="text-sm text-slate-500 leading-relaxed mb-8 max-w-[300px] font-medium opacity-90">
