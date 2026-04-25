@@ -8,7 +8,7 @@ export const BRAND_TAGLINE = "Safety Suite";
 export const BRAND_FULL_NAME = "Advanced Asset Quality Management System";
 
 export const CONTACT_INFO = {
-    EMAIL: "support@aaqms.com",
+    EMAIL: "aaqmssupport@gmail.com",
     PHONE: "+91 (800) 123-4567",
     ADDRESS: ["Singaji IT Park, Zone 4,", "SSS, Sandalpur"],
 };
