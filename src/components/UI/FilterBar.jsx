@@ -30,7 +30,6 @@ const FilterBar = ({
         selectedFloor, setFloor,
         selectedZone, setZone,
         selectedStatus, setStatus,
-        searchTerm, setSearch,
         resetFilters
     } = useFilterStore();
 
@@ -53,20 +52,20 @@ const FilterBar = ({
             setFloor([]);
             setZone([]);
         }
-    }, [selectedOrg.length]);
+    }, [selectedOrg.length, setSite, setFloor, setZone]);
 
     React.useEffect(() => {
         if (selectedSite.length > 0) {
             setFloor([]);
             setZone([]);
         }
-    }, [selectedSite.length]);
+    }, [selectedSite.length, setFloor, setZone]);
 
     React.useEffect(() => {
         if (selectedFloor.length > 0) {
             setZone([]);
         }
-    }, [selectedFloor.length]);
+    }, [selectedFloor.length, setZone]);
 
 
 
@@ -92,12 +91,12 @@ const FilterBar = ({
     const renderZone = ['zone', 'inventory'].includes(normalizedLevel);
 
     // ─── HELPERS ───
-    const getID = (val) => {
+    const getID = React.useCallback((val) => {
         if (!val) return '';
         if (typeof val === 'object' && val.id) return String(val.id);
         if (typeof val === 'object' && val.pk) return String(val.pk);
         return String(val);
-    };
+    }, []);
 
     // ─── QUERY HOOKS (UNIFIED) ───
     const hierarchyOptions = React.useMemo(() => ({
@@ -109,8 +108,8 @@ const FilterBar = ({
 
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading } = useHierarchy(hierarchyOptions);
 
-    const isFloorsExternal = rest.hasOwnProperty('externalFloors') || externalFloors !== null;
-    const isZonesExternal = rest.hasOwnProperty('externalZones') || externalZones !== null;
+    const isFloorsExternal = 'externalFloors' in rest || externalFloors !== null;
+    const isZonesExternal = 'externalZones' in rest || externalZones !== null;
 
     const { data: floorData } = useFloors(selectedSite, { page_size: 1000 }, {
         enabled: !isFloorsExternal && renderFloor && (selectedSite.length > 0 || selectedOrg.length > 0)

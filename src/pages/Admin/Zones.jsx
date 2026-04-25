@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import ZonesTable from '../../components/Zones/ZonesTable';
@@ -89,18 +89,17 @@ const Zones = () => {
     const [selectedMediaZone, setSelectedMediaZone] = useState(null);
     const [isMediaModalOpen, setIsMediaModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
+    const [isSyncFinished, setIsSyncFinished] = useState(false);
 
     const { 
         selectedOrg, selectedCoord, selectedSite, selectedFloor,
-        setOrg, setCoord, setSite, setFloor, resetFilters, bulkSync 
+        bulkSync 
     } = useFilterStore();
-    const { query: searchQuery, clearSearch } = useSearchStore();
+    const { query: searchQuery } = useSearchStore();
     
     // URL → Store sync (Atomic Bulk Sync)
-    const hasSynced = useRef(false);
     useEffect(() => {
-        if (hasSynced.current) return;
-        hasSynced.current = true;
+        if (isSyncFinished) return;
 
         const pOrg = searchParams.get('org_id') || searchParams.get('org');
         const pSite = searchParams.get('site_id') || searchParams.get('site');
@@ -110,7 +109,11 @@ const Zones = () => {
         if (pOrg || pSite || pFloor || pCoord) {
             bulkSync({ org: pOrg, site: pSite, floor: pFloor, coord: pCoord });
         }
-    }, [searchParams, bulkSync]);
+        
+        if (!isSyncFinished) {
+            setTimeout(() => setIsSyncFinished(true), 0);
+        }
+    }, [searchParams, bulkSync, isSyncFinished]);
 
     // --- QUERY HOOKS (OPTIMIZED: Zero Latency Pattern) ---
     const { organizations: orgs, sites: allSites } = useHierarchy({ 
@@ -120,18 +123,17 @@ const Zones = () => {
     });
 
     const { data: floorData } = useFloors(undefined, { page_size: 5000 }, {
-        enabled: hasSynced.current
+        enabled: isSyncFinished
     });
     const allFloors = floorData?.results; // Pass undefined/null while loading so FilterBar knows it's not ready
 
     const { data: zoneData = { results: [], total: 0 }, isLoading: loading, error: hierarchyError, refetch: refetchZones } = useZones(
         undefined, // Global fetch
         { page_size: 5000 }, // All zones for FE filtering
-        { enabled: hasSynced.current }
+        { enabled: isSyncFinished }
     );
 
     const zones = zoneData.results || [];
-    const totalZonesCount = zoneData.total || zones.length;
 
     useEffect(() => {
         const newParams = new URLSearchParams();
@@ -231,20 +233,17 @@ const Zones = () => {
 
     const pageSize = useResponsiveLimit(10);
     // 🔹 Auto-reset to page 1 when filters or page size change
-    const [prevParams, setPrevParams] = useState({ q: searchQuery, o: selectedOrg, s: selectedSite, f: selectedFloor, ps: pageSize });
-    if (searchQuery !== prevParams.q || selectedOrg !== prevParams.o || selectedSite !== prevParams.s || selectedFloor !== prevParams.f || pageSize !== prevParams.ps) {
-        setPrevParams({ q: searchQuery, o: selectedOrg, s: selectedSite, f: selectedFloor, ps: pageSize });
-        setCurrentPage(1);
-    }
+    useEffect(() => {
+        if (currentPage !== 1) {
+            setTimeout(() => setCurrentPage(1), 0);
+        }
+    }, [searchQuery, selectedOrg, selectedSite, selectedFloor, pageSize, currentPage]);
+
     const totalPages = Math.ceil(processedZones.length / pageSize);
     const paginatedZones = useMemo(() => {
         return processedZones.slice((currentPage - 1) * pageSize, currentPage * pageSize);
     }, [processedZones, currentPage, pageSize]);
 
-    const handlePreviousPage = () => setCurrentPage(p => p - 1);
-    const handleNextPage = () => setCurrentPage(p => p + 1);
-
-    const handleResetAll = () => { resetFilters(); setSearchParams({}); clearSearch(); };
     const handleViewMedia = (zone) => { setSelectedMediaZone(zone); setIsMediaModalOpen(true); };
 
     return (

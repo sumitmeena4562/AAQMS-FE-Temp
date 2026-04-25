@@ -1,44 +1,29 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterBar from '../../components/UI/FilterBar';
 import FloorCard from '../../components/UI/FloorCard';
-import Button from '../../components/UI/Button';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors } from '../../hooks/api/useHierarchyQueries';
-import { FiHome, FiBriefcase, FiLoader, FiAlertCircle } from 'react-icons/fi';
+import { FiHome, FiBriefcase, FiAlertCircle } from 'react-icons/fi';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import Pagination from '../../components/UI/Pagination';
-import useDebounce from '../../hooks/useDebounce';
-import { useAllOrganizations } from '../../hooks/api/useOrgQueries';
 
 const FloorPlan = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [isSynced, setIsSynced] = useState(false);
-  const { resetFilters, selectedOrg, selectedCoord, selectedSite, selectedFloor, setOrg, setCoord, setSite } = useFilterStore();
+  const { resetFilters, selectedOrg, selectedSite, selectedFloor, setOrg, setCoord, setSite } = useFilterStore();
   
   const [currentPage, setCurrentPage] = useState(1);
   
-  const passedOrgId = searchParams.get('org_id');
   const passedOrgName = searchParams.get('org_name');
   const passedSiteId = searchParams.get('site_id');
   const passedSiteName = searchParams.get('site');
-  const passedCoordId = searchParams.get('coord_id');
-  const passedCoordName = searchParams.get('coord');
-
   const activeSiteId = useMemo(() => 
     selectedSite.length > 0 ? selectedSite : (passedSiteId ? [passedSiteId] : []),
   [selectedSite, passedSiteId]);
-
-  const activeOrgId = useMemo(() => 
-    selectedOrg.length > 0 ? selectedOrg : (passedOrgId ? [passedOrgId] : []),
-  [selectedOrg, passedOrgId]);
-
-  const activeCoordId = useMemo(() => 
-    selectedCoord.length > 0 ? selectedCoord : (passedCoordId ? [passedCoordId] : []),
-  [selectedCoord, passedCoordId]);
 
   // --- DATA FETCHING (GLOBAL: Zero Latency Pattern) ---
   const { data: orgs = [], sites: allSites = [] } = useHierarchy({ 
@@ -51,7 +36,7 @@ const FloorPlan = () => {
     { page_size: 5000 }, // Params (2nd arg)
     { enabled: isSynced } // Options (3rd arg)
   );
-  const floorList = floorData?.results || [];
+  const floorList = useMemo(() => floorData?.results || [], [floorData]);
 
   // Advanced Client-side filtering (Org -> Site -> Floor)
   const filteredFloorList = useMemo(() => {
@@ -85,11 +70,6 @@ const FloorPlan = () => {
   const totalLevels = floorData?.count || 0;
   const activePlansCount = filteredFloorList.length;
 
-  const handleResetAll = () => {
-    setSearchParams({});
-    resetFilters();
-  };
-
   // URL → Store sync (mount-only guard)
   useEffect(() => {
     const pOrg = searchParams.get('org_id') || searchParams.get('org');
@@ -105,13 +85,17 @@ const FloorPlan = () => {
         if (pCoord) setCoord(pCoord.split(','));
     }
 
-    setIsSynced(true);
+    if (!isSynced) {
+        setTimeout(() => setIsSynced(true), 0);
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-reset to page 1 when floor filter changes
   useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedFloor]);
+    if (currentPage !== 1) {
+        setTimeout(() => setCurrentPage(1), 0);
+    }
+  }, [selectedFloor, currentPage]);
   
   // --- Dynamic Naming for Breadcrumbs/Headers ---
   const currentOrg = selectedOrg.length === 1 ? orgs.find(o => String(o.id) === String(selectedOrg[0])) : null;

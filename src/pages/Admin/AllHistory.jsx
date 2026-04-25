@@ -1,13 +1,12 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { FiHome, FiClock, FiBox, FiRefreshCcw } from 'react-icons/fi';
+import React, { useState, useMemo } from 'react';
+import { FiHome } from 'react-icons/fi';
 import PageHeader from '../../components/UI/PageHeader';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import FilterBar from '../../components/UI/FilterBar';
 import DataTable from '../../components/UI/DataTable';
-import Button from '../../components/UI/Button';
 import { useAllHistory } from '../../hooks/api/useDashboardQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
-import { useSites, useFloors } from '../../hooks/api/useHierarchyQueries';
+import { useFloors } from '../../hooks/api/useHierarchyQueries';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import { mapToActivityFeed } from '../../utils/dashboardCalculations';
 import useDebounce from '../../hooks/useDebounce';
@@ -71,7 +70,7 @@ export default function AllHistory() {
     });
     const allFloors = floorData?.results || [];
 
-    const { data: historyData, isLoading, isFetching } = useAllHistory(debouncedQueryParams);
+    const { data: historyData, isLoading } = useAllHistory(debouncedQueryParams);
     
     const totalCount = historyData?.count || 0;
     const totalPages = Math.ceil(totalCount / 10);

@@ -64,18 +64,17 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
     const formOptions = externalFormOptions || internalFormOptions;
     
     // Detailed User Hook for Edit Mode (Fetch IDs if missing from list response)
-    const { data: fullUserDetails, isLoading: isFetchingUserDetails } = useUserDetails(user?.id, { 
+    const { data: fullUserDetails } = useUserDetails(user?.id, { 
         enabled: isOpen && isEdit
     });
 
     // Extract options from the unified hook (matching backend keys)
     const availableOrgs = formOptions?.organisations || [];
     const availableCoordinators = formOptions?.coordinators || [];
-    const allZones = formOptions?.sites || []; 
+    const allZones = React.useMemo(() => formOptions?.sites || [], [formOptions]); 
 
     // Local state for filtered zones based on selected org
     const [assignmentData, setAssignmentData] = useState([]);
-    const [isLoadingSites, setIsLoadingSites] = useState(false);
 
     // Filter zones locally based on organization
     const filterZonesByOrg = useCallback((orgId) => {
@@ -506,7 +505,7 @@ const UserFormModal = ({ isOpen, onClose, onSubmit, user = null, loading = false
                                                                             label: item?.label || 'Unnamed Zone'
                                                                         })).filter(opt => opt.value)}
                                                                         disabled={!watch('organisation_id')}
-                                                                        loading={isLoadingSites}
+                                                                        loading={isLoadingOptions}
                                                                     />
 
                                                                     <SelectField

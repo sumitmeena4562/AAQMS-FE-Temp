@@ -17,7 +17,6 @@ import Button from '../../components/UI/Button';
 import UserAvatar from '../../components/UI/UserAvatar';
 import Badge from '../../components/UI/Badge';
 import FilterBar from '../../components/UI/FilterBar';
-import useDebounce from '../../hooks/useDebounce';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import UserCard from '../../components/UI/UserCard';
@@ -84,7 +83,7 @@ const Users = React.memo(() => {
     const isReady = isInitialized && responsiveLimit === limit;
 
     const {
-        users, totalCount, stats, formOptions, isLoading: isUsersLoading, refetchAll
+        users, stats, formOptions, isLoading: isUsersLoading, refetchAll
     } = useUserManagementData({ enabled: isReady });
 
     const { roles: STATIC_ROLES } = useUserFilterOptions();

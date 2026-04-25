@@ -2,7 +2,6 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useOrgStore } from '../../store/useOrgStore';
 import { getOrgStatus } from '../../utils/orgUtils';
 import { 
-    useOrganizations, 
     useAllOrganizations,
     useIndustryTypes, 
     useCreateOrganization, 
@@ -23,9 +22,6 @@ import FilterBar from '../../components/UI/FilterBar';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import ConfirmModal from '../../components/UI/ConfirmModal';
-import { useQueryClient } from '@tanstack/react-query';
-import { organizationService } from '../../services/organizationService';
-import { mapOrgToFrontend } from '../../hooks/api/useOrgQueries';
 
 import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiShieldOff, FiEye } from 'react-icons/fi';
 import useSearchStore from '../../store/useSearchStore';
@@ -65,29 +61,15 @@ const OrgLogo = React.memo(({ org }) => {
         </div>
     );
 });
+OrgLogo.displayName = 'OrgLogo';
 
 const Organizations = React.memo(() => {
     // --- Global State ---
     const {
         filters, viewMode,
-        addOrg, updateOrg, blockOrg,
         setFilters, setViewMode, resetFilters,
     } = useOrgStore();
     const { query: searchQuery, clearSearch } = useSearchStore();
-    const queryClient = useQueryClient();
-
-    // --- PREFETCH LOGIC ---
-    const handlePrefetch = useCallback((id) => {
-        if (!id) return;
-        queryClient.prefetchQuery({
-            queryKey: ['organization', id],
-            queryFn: async ({ signal }) => {
-                const data = await organizationService.getOrganizationById(id, signal);
-                return mapOrgToFrontend(data);
-            },
-            staleTime: 10 * 60 * 1000
-        });
-    }, [queryClient]);
 
     // --- QUERY HOOK (OPTIMIZED: SINGLE FETCH) ---
     const { data: allOrgs, isLoading, isError, error, refetch } = useAllOrganizations(); 
@@ -143,8 +125,10 @@ const Organizations = React.memo(() => {
 
     // Auto-reset to page 1 when filter/search changes
     useEffect(() => {
-        setCurrentPage(1);
-    }, [filters, searchQuery]);
+        if (currentPage !== 1) {
+            setTimeout(() => setCurrentPage(1), 0);
+        }
+    }, [filters, searchQuery, currentPage]);
 
     const activeFiltersCount = useMemo(() => {
         return Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v !== 'all' && v !== '').length;
@@ -508,5 +492,6 @@ const Organizations = React.memo(() => {
         </div>
     );
 });
+Organizations.displayName = 'Organizations';
 
 export default Organizations;

@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
-import { queryClient } from '../../lib/queryClient';
-import { organizationService } from '../../services/organizationService';
-import { userService } from '../../services/userService';
-import { inventoryService } from '../../services/inventoryService';
-import { mapOrgToFrontend } from '../../hooks/api/useOrgQueries';
 import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 /* ── Animated Collapsible ── */
@@ -39,14 +34,17 @@ const Sidebar = ({ navItems = [], logo, collapsed = false, mobileOpen = false, s
     // 🔹 Auto-open sidebar menus if their child is active
     useEffect(() => {
         if (location.pathname !== prevPath) {
-            setPrevPath(location.pathname);
             const activeParents = {};
             navItems.forEach(item => {
                 if (item.children && isParentActive(item)) {
                     activeParents[item.label] = true;
                 }
             });
-            setOpenMenus(prev => ({ ...prev, ...activeParents }));
+            
+            setTimeout(() => {
+                setPrevPath(location.pathname);
+                setOpenMenus(prev => ({ ...prev, ...activeParents }));
+            }, 0);
         }
     }, [location.pathname, prevPath, navItems, isParentActive]);
 

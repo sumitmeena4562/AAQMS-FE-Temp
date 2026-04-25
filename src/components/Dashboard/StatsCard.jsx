@@ -120,4 +120,7 @@ export const StatsRow = React.memo(({ items = [], columns = 4, className = "" })
     );
 });
 
+StatsCard.displayName = 'StatsCard';
+StatsRow.displayName = 'StatsRow';
+
 export default StatsCard;

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import PageHeader from '../../components/UI/PageHeader';
 import { StatsRow } from '../../components/Dashboard/StatsCard';
@@ -6,8 +6,7 @@ import DataTable from '../../components/UI/DataTable';
 import Badge from '../../components/UI/Badge';
 import {
     FiHome, FiBriefcase, FiBox, FiCheckCircle,
-    FiAlertCircle, FiClock, FiGrid,
-    FiMonitor, FiLayout, FiRefreshCcw,
+    FiAlertCircle, FiClock, FiRefreshCcw,
 } from 'react-icons/fi';
 import AssetIcon from '../../components/Admin/inventory/AssetIcon';
 import Button from '../../components/UI/Button';
@@ -15,22 +14,15 @@ import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
 import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
-import { useQueryClient } from '@tanstack/react-query';
-import { inventoryService } from '../../services/inventoryService';
-
-
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
-import { useFloors, useZones } from '../../hooks/api/useHierarchyQueries';
 import { useInventory } from '../../hooks/api/useInventoryQueries';
 import AssetInventoryModal from '../../components/Admin/inventory/AssetInventoryModal';
 import EmptyState from '../../components/Admin/inventory/EmptyState';
 import AssetCard from '../../components/Admin/inventory/AssetCard';
 import useSearchStore from '../../store/useSearchStore';
-import useDebounce from '../../hooks/useDebounce';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
-import { DESIGN_TOKENS } from '../../constants/designTokens';
 
 
 
@@ -40,7 +32,7 @@ const Inventory = () => {
 
     const {
         selectedOrg, selectedSite, selectedFloor, selectedZone,
-        setOrg, setCoord, setSite, setFloor, setZone, resetFilters
+        setOrg, setSite, setFloor, setZone, resetFilters
     } = useFilterStore();
 
     // ── LOCAL STATE ──
@@ -155,8 +147,10 @@ const Inventory = () => {
 
     // Reset to page 1 if page size changes to avoid 'Invalid page' errors
     useEffect(() => {
-        setCurrentPage(1);
-    }, [PAGE_SIZE]);
+        if (currentPage !== 1) {
+            setTimeout(() => setCurrentPage(1), 0);
+        }
+    }, [PAGE_SIZE, currentPage]);
 
     // ── SYNC GLOBAL FILTERS → URL PARAMS ──
     useEffect(() => {
@@ -170,7 +164,7 @@ const Inventory = () => {
         if (searchQuery) params.set('search', searchQuery);
 
         setSearchParams(params, { replace: true });
-    }, [selectedOrg, selectedSite, selectedFloor, selectedZone, searchQuery, isSynced]);
+    }, [selectedOrg, selectedSite, selectedFloor, selectedZone, searchQuery, isSynced, setSearchParams]);
 
     // ── SYNC URL PARAMS → GLOBAL FILTERS (mount-only guard) ──
     useEffect(() => {
@@ -178,22 +172,23 @@ const Inventory = () => {
         const pSite = searchParams.get('site_id') || searchParams.get('site');
         const pFloor = searchParams.get('floor_id') || searchParams.get('floor');
         const pZone = searchParams.get('zone_id') || searchParams.get('zone');
-        const pSearch = searchParams.get('search') || searchParams.get('q');
 
         if (pOrg) setOrg(pOrg.split(','));
         if (pSite) setSite(pSite.split(','));
         if (pFloor) setFloor(pFloor.split(','));
         if (pZone) setZone(pZone.split(','));
         
-        setIsSynced(true);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+        if (!isSynced) {
+            setTimeout(() => setIsSynced(true), 0);
+        }
+    }, [searchParams, setOrg, setSite, setFloor, setZone, isSynced, setSearchParams]);
 
     // Reset to page 1 if filters change
     useEffect(() => {
-        setCurrentPage(1);
-    }, [selectedOrg, selectedSite, selectedFloor, selectedZone, searchQuery, PAGE_SIZE]);
-
-    const queryClient = useQueryClient();
+        if (currentPage !== 1) {
+            setTimeout(() => setCurrentPage(1), 0);
+        }
+    }, [selectedOrg, selectedSite, selectedFloor, selectedZone, searchQuery, PAGE_SIZE, currentPage]);
 
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
@@ -222,7 +217,7 @@ const Inventory = () => {
 
         base.push({ label: "Inventory", path: "#", isActive: true });
         return base;
-    }, [currentOrg, currentSite, currentFloor, currentZone, selectedOrg, selectedSite, selectedFloor, selectedZone, getID]);
+    }, [currentOrg, currentSite, currentFloor, currentZone, selectedOrg, selectedSite, selectedFloor, selectedZone]);
 
     // ── HANDLERS ──
     const handleReset = () => {
@@ -307,9 +302,7 @@ const Inventory = () => {
                 </div>
             )
         }
-    ], []);
-
-    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    ], [allFloors, allSites, allZones, getID, orgs]);
 
     return (
         <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500 pb-16">

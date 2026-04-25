@@ -1,10 +1,8 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useOrganizations, mapOrgToFrontend, useAllOrganizations } from './useOrgQueries';
-import { useSites } from './useHierarchyQueries';
+import { useAllOrganizations } from './useOrgQueries';
 import { useCoordinators } from './useUserQueries';
 import { useFilterStore } from '../../store/useFilterStore';
-import { organizationService } from '../../services/organizationService';
 import { hierarchyService } from '../../services/hierarchyService';
 
 const EMPTY_ARRAY = [];
@@ -108,11 +106,7 @@ export const useHierarchy = (options = {}) => {
             zones: zonesQuery
         }
     }), [
-        orgsQuery.data, orgsQuery.isLoading, orgsQuery.isFetching, orgsQuery.error,
-        coordsQuery.data, coordsQuery.isLoading, coordsQuery.isFetching, coordsQuery.error,
-        sitesQuery.data, sitesQuery.isLoading, sitesQuery.isFetching, sitesQuery.error,
-        floorsQuery.data, floorsQuery.isLoading, floorsQuery.isFetching, floorsQuery.error,
-        zonesQuery.data, zonesQuery.isLoading, zonesQuery.isFetching, zonesQuery.error,
+        orgsQuery, coordsQuery, sitesQuery, floorsQuery, zonesQuery,
         includeOrgs, includeCoords, includeSites, includeFloors, includeZones
     ]);
 };

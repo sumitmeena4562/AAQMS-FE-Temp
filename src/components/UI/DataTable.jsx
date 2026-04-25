@@ -208,4 +208,5 @@ const DataTable = React.memo(({
     );
 });
 
+DataTable.displayName = 'DataTable';
 export default DataTable;
