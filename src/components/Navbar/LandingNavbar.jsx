@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MdOutlineLanguage } from 'react-icons/md';
-import { FaGithub } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 import Logo from '../Branding/Logo';
 import Button from '../UI/Button';
@@ -177,23 +175,6 @@ const LandingNavbar = ({
 
                     {/* Right — Desktop Buttons & Icons */}
                     <div className="hidden lg:flex items-center justify-end gap-4 xl:gap-6 flex-1">
-                        <div className="flex items-center gap-4 text-muted/50">
-                            <motion.button
-                                whileHover={{ scale: 1.1, color: 'var(--color-primary)' }}
-                                aria-label="Change Language"
-                                className="transition-colors p-1"
-                            >
-                                <MdOutlineLanguage className="text-xl" />
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.1, color: 'var(--color-text)' }}
-                                aria-label="GitHub Repository"
-                                className="transition-colors p-1 hidden xl:block"
-                            >
-                                <FaGithub className="text-lg" />
-                            </motion.button>
-                        </div>
-
                         {buttons.map((btn, i) => renderButton(btn, i))}
                     </div>
 
