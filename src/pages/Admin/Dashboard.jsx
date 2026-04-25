@@ -85,7 +85,6 @@ const Dashboard = () => {
 
     const metricCards = useMemo(() => bootstrap?.metrics
         ? bootstrap.metrics
-            .filter(m => m.label !== "AI Coverage")
             .map(m => ({
             title: m.label,
             value: m.unit ? `${m.value}${m.unit}` : String(m.value ?? 0),

@@ -20,7 +20,11 @@ import TableSkeleton from '../../components/UI/TableSkeleton';
 import CardSkeleton from '../../components/UI/CardSkeleton';
 import ConfirmModal from '../../components/UI/ConfirmModal';
 
+<<<<<<< HEAD
 import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiEye, FiShieldOff } from 'react-icons/fi';
+=======
+import { FiBriefcase, FiInbox, FiRefreshCcw, FiHome, FiEdit2, FiEye, FiShield, FiShieldOff } from 'react-icons/fi';
+>>>>>>> 2aac45a574942606cfe9f6030855f6be5bec28a9
 import useSearchStore from '../../store/useSearchStore';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
