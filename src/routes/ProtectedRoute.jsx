@@ -15,7 +15,7 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
     }
 
     // 3. If allowedRoles is provided, check if user has permission
-    const currentRole = (user?.role || '').toLowerCase();
+    const currentRole = (user?.role || '').toLowerCase().replace(/\s+/g, '_');
     if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
         const validRoles = ['admin', 'coordinator', 'field_officer'];
 

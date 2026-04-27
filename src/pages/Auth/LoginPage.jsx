@@ -44,7 +44,7 @@ function LoginPage() {
 
             toast.success(`Welcome back, ${result.user.name || 'User'}! Authentication successful.`);
             
-            const role = (result.user.role || '').toLowerCase();
+            const role = (result.user.role || '').toLowerCase().replace(/\s+/g, '_');
             if (role === 'coordinator') {
                 navigate('/coordinator/dashboard');
             } else if (role === 'field_officer') {
