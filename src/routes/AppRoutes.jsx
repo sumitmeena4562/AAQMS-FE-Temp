@@ -31,10 +31,7 @@ const AppRoutes = () => {
 
     React.useEffect(() => {
         // ALWAYS attempt to fetch profile on mount to verify the session HttpOnly cookie.
-        // Optimization: Skip if we are explicitly on the login page to reduce network noise.
-        if (window.location.pathname !== '/login') {
-            fetchProfile();
-        }
+        fetchProfile();
     }, [fetchProfile]);
 
     // 🛡️ We no longer block the entire app. 

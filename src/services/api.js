@@ -185,7 +185,7 @@ api.interceptors.response.use(
                         localStorage.removeItem('refresh_token');
 
                         // Force a reload to login if we are stuck in a loop
-                        if (!isPublicEndpoint && window.location.pathname !== '/login') {
+                        if (!isPublicEndpoint && !window.location.pathname.startsWith('/login')) {
                             window.location.href = '/login?session_expired=true';
                         }
                     }

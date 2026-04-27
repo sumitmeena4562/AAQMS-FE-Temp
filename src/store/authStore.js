@@ -33,7 +33,7 @@ const useAuthStore = create((set, get) => ({
   isAuthenticated: !!storage.getUser(), // Initial state based on local data
   user: storage.getUser() || null,
   isLoading: false,
-  isBootstrapping: false, // Still bootstrap to verify with server
+  isBootstrapping: !!storage.getUser(), // Start bootstrapping if we have a user to verify
   isLoggingOut: false,
   error: null,
 
