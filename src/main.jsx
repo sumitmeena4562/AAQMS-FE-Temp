@@ -7,13 +7,10 @@ import './index.css'
 import App from './App.jsx'
 
 // Keep Neon DB alive — ping every 4 minutes to prevent cold start
-const API_BASE = import.meta.env.VITE_API_URL || '/api/';
+const API_BASE = import.meta.env.PROD ? '/api/' : (import.meta.env.VITE_API_URL || '/api/');
 setInterval(() => {
-  // Use relative path if using proxy, otherwise absolute
-  const pingUrl = API_BASE.startsWith('http') 
-    ? `${API_BASE.replace(/\/api\/?$/, '')}/ping/` 
-    : '/ping/';
-  
+  // Always use the relative /ping/ if in production (handled by Vercel proxy)
+  const pingUrl = import.meta.env.PROD ? '/ping/' : `${API_BASE.replace(/\/api\/?$/, '')}/ping/`;
   fetch(pingUrl, { credentials: 'include' }).catch(() => {});
 }, 4 * 60 * 1000);
 
