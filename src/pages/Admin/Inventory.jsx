@@ -8,7 +8,7 @@ import {
     FiHome, FiBriefcase, FiBox, FiCheckCircle,
     FiAlertCircle, FiClock, FiRefreshCcw,
 } from 'react-icons/fi';
-import AssetIcon from '../../components/Admin/inventory/AssetIcon';
+import AssetIcon from '../../components/Admin/Inventory/AssetIcon';
 import Button from '../../components/UI/Button';
 import FilterBar from '../../components/UI/FilterBar';
 import FilterDropdown from '../../components/UI/FilterDropdown';
@@ -17,9 +17,9 @@ import CardSkeleton from '../../components/UI/CardSkeleton';
 import { useFilterStore } from '../../store/useFilterStore';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useInventory } from '../../hooks/api/useInventoryQueries';
-import AssetInventoryModal from '../../components/Admin/inventory/AssetInventoryModal';
-import EmptyState from '../../components/Admin/inventory/EmptyState';
-import AssetCard from '../../components/Admin/inventory/AssetCard';
+import AssetInventoryModal from '../../components/Admin/Inventory/AssetInventoryModal';
+import EmptyState from '../../components/Admin/Inventory/EmptyState';
+import AssetCard from '../../components/Admin/Inventory/AssetCard';
 import useSearchStore from '../../store/useSearchStore';
 import { useResponsiveLimit } from '../../hooks/useWindowSize';
 import Pagination from '../../components/UI/Pagination';
