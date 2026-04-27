@@ -14,6 +14,7 @@ const mapOrgFrontendToBackend = (data) => {
         industry_type: data.industry,
         occupancy_type: data.occupancyType,
         classification: data.classification,
+        classification_of_occupancy: data.classification, // Update both fields for consistency
         contact_person_name: data.contactPerson,
         contact_email: data.contactEmail,
         contact_phone: data.contactPhone,
@@ -122,13 +123,24 @@ export const organizationService = {
     // Update an existing organisation
     updateOrganization: async (id, orgData) => {
         try {
-            const formData = createOrgFormData(orgData);
-            const response = await api.patch(`organisations/${id}/`, formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
-            return response.data;
-        } catch (err) {
-            throw new Error(extractError(err, "Failed to update organisation"));
+            // Check if we have any files to upload
+            const hasFiles = orgData.imageFiles && Object.values(orgData.imageFiles).some(f => f instanceof File || (Array.isArray(f) && f.length > 0));
+
+            if (hasFiles) {
+                const formData = createOrgFormData(orgData);
+                const response = await api.patch(`organisations/${id}/`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                return response.data;
+            } else {
+                // For regular data updates, JSON is more reliable for PATCH in some backends
+                const backendFields = mapOrgFrontendToBackend(orgData);
+                const response = await api.patch(`organisations/${id}/`, backendFields);
+                return response.data;
+            }
+        } catch (error) {
+            console.error('Error updating organization:', error);
+            throw error;
         }
     },
 

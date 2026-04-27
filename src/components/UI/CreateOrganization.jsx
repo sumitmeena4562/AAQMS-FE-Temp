@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useOrganizationDetails } from '../../hooks/api/useOrgQueries';
 import { Plus, X, ChevronRight, ChevronLeft, Building, User, Mail, Phone, MapPin, Globe, Image as ImageIcon } from 'lucide-react';
+import { INDUSTRY_TYPES, OCCUPANCY_TYPES, BUILDING_CLASSIFICATIONS } from '../../constants/orgConstants';
 import InputField from './InputField';
 import SelectField from './SelectField';
 import ImageUploadCard from './ImageUploadCard';
@@ -51,9 +52,9 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
     mode: "all",
     defaultValues: {
       name: '',
-      industry: 'Manufacturing & Heavy Industry',
-      occupancyType: 'Industrial Factory',
-      classification: 'Group H - High Hazard',
+      industry: INDUSTRY_TYPES[0],
+      occupancyType: OCCUPANCY_TYPES[0],
+      classification: BUILDING_CLASSIFICATIONS[0],
       plannedSites: 0,
       contactPerson: '',
       contactEmail: '',
@@ -77,7 +78,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
   const mapOrgBackendToFrontend = (data) => {
     if (!data) return null;
 
-    // Map imagery array back to form object, being resilient to already-mapped data
+    // Map imagery array back to form object
     const imagery = {
       north: data.imagery?.north || '',
       south: data.imagery?.south || '',
@@ -87,32 +88,21 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
       extra: Array.isArray(data.imagery?.extra) ? [...data.imagery.extra] : []
     };
 
-    if (Array.isArray(data.images)) {
-      data.images.forEach(img => {
-        const type = (img.image_type || '').toLowerCase();
-        if (['north', 'south', 'east', 'west', 'profile'].includes(type)) {
-          if (!imagery[type]) imagery[type] = img.image_url;
-        } else if (type === 'extra') {
-          if (!imagery.extra.includes(img.image_url)) imagery.extra.push(img.image_url);
-        }
-      });
-    }
-
     return {
       id: data.id,
-      name: data.organisation_name || data.name || '',
-      industry: data.industry_type || data.industry || 'Manufacturing & Heavy Industry',
-      occupancyType: data.occupancy_type || data.occupancyType || 'Industrial Factory',
-      classification: data.classification || 'Group H - High Hazard',
-      plannedSites: data.planned_sites !== undefined ? data.planned_sites : (data.plannedSites || 0),
-      contactPerson: data.contact_person_name || data.contactPerson || '',
-      contactEmail: data.contact_email || data.contactEmail || '',
-      contactPhone: data.contact_phone || data.contactPhone || '',
+      name: data.name || data.organisation_name || '',
+      industry: data.industry || data.industry_type || '',
+      occupancyType: data.occupancyType || data.occupancy_type || '',
+      classification: data.classification || data.classification_of_occupancy || '',
+      plannedSites: data.plannedSites !== undefined ? data.plannedSites : (data.planned_sites || 0),
+      contactPerson: data.contactPerson || data.contact_person_name || '',
+      contactEmail: data.contactEmail || data.contact_email || '',
+      contactPhone: data.contactPhone || data.contact_phone || '',
       address: data.address || '',
       city: data.city || '',
       state: data.state || '',
       country: data.country || 'India',
-      otherInfo: data.description || data.otherInfo || '',
+      otherInfo: data.otherInfo || data.description || '',
       imagery
     };
   };
@@ -132,9 +122,9 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
       } else {
         reset({
           name: '',
-          industry: 'Manufacturing & Heavy Industry',
-          occupancyType: 'Industrial Factory',
-          classification: 'Group H - High Hazard',
+          industry: INDUSTRY_TYPES[0],
+          occupancyType: OCCUPANCY_TYPES[0],
+          classification: BUILDING_CLASSIFICATIONS[0],
           plannedSites: 0,
           contactPerson: '',
           contactEmail: '',
@@ -158,8 +148,27 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
 
     // eslint-disable-next-line react-hooks/incompatible-library
     const imageryValues = watch('imagery');
-    const nameValue = watch('name');
+    const formValues = watch(); // Watch all to handle dynamic options
     const extraImages = watch('imagery.extra') || [];
+
+    // Dynamic options logic: Include current DB value if it's not in the standard lists
+    const currentIndustryOptions = React.useMemo(() => {
+      const val = formValues.industry;
+      if (val && !INDUSTRY_TYPES.includes(val)) return [val, ...INDUSTRY_TYPES];
+      return INDUSTRY_TYPES;
+    }, [formValues.industry]);
+
+    const currentOccupancyOptions = React.useMemo(() => {
+      const val = formValues.occupancyType;
+      if (val && !OCCUPANCY_TYPES.includes(val)) return [val, ...OCCUPANCY_TYPES];
+      return OCCUPANCY_TYPES;
+    }, [formValues.occupancyType]);
+
+    const currentClassificationOptions = React.useMemo(() => {
+      const val = formValues.classification;
+      if (val && !BUILDING_CLASSIFICATIONS.includes(val)) return [val, ...BUILDING_CLASSIFICATIONS];
+      return BUILDING_CLASSIFICATIONS;
+    }, [formValues.classification]);
 
     const handleImage = (view, url, file) => {
       if (isViewOnly) return;
@@ -207,7 +216,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
       }
     };
 
-    const isNameValid = nameValue?.trim()?.length > 0 && !errors.name;
+    const isNameValid = formValues.name?.trim()?.length > 0 && !errors.name;
 
     const nextStep = async () => {
       let fieldsToValidate = [];
@@ -330,7 +339,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                               icon={<Badge size={14} />}
                               {...register("industry")}
                               error={errors.industry?.message}
-                              options={["Manufacturing & Heavy Industry", "Construction", "Healthcare", "Warehousing"]}
+                              options={currentIndustryOptions}
                               disabled={isViewOnly}
                             />
                           </Motion.div>
@@ -339,7 +348,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                               label="Occupancy Type"
                               {...register("occupancyType")}
                               error={errors.occupancyType?.message}
-                              options={["Industrial Factory", "Commercial Complex", "High-Rise Warehouse", "Retail Outlet"]}
+                              options={currentOccupancyOptions}
                               disabled={isViewOnly}
                             />
                           </Motion.div>
@@ -348,12 +357,7 @@ const CreateOrganization = ({ isOpen = true, org = null, onSubmit, onClose, isVi
                               label="Building Classification"
                               {...register("classification")}
                               error={errors.classification?.message}
-                              options={[
-                                "Group H - High Hazard",
-                                "Group B - Business",
-                                "Group S - Storage",
-                                "Group F - Factory"
-                              ]}
+                              options={currentClassificationOptions}
                               disabled={isViewOnly}
                             />
                           </Motion.div>

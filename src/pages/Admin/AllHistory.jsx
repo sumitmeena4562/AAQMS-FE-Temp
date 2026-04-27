@@ -8,7 +8,6 @@ import { useAllHistory } from '../../hooks/api/useDashboardQueries';
 import { useHierarchy } from '../../hooks/api/useHierarchy';
 import { useFloors } from '../../hooks/api/useHierarchyQueries';
 import TableSkeleton from '../../components/UI/TableSkeleton';
-import { mapToActivityFeed } from '../../utils/dashboardCalculations';
 import useDebounce from '../../hooks/useDebounce';
 import Pagination from '../../components/UI/Pagination';
 
@@ -78,7 +77,7 @@ export default function AllHistory() {
     // ── 4. Derived Data ──
     // Map backend results to frontend activity feed format
     const activityList = useMemo(() => 
-        mapToActivityFeed(historyData?.results || []), 
+        historyData?.results || [], 
         [historyData?.results]);
 
     // ── 5. State Management Actions ──
@@ -140,7 +139,7 @@ export default function AllHistory() {
         },
         {
             header: 'Timestamp',
-            accessor: 'time',
+            accessor: 'fullTime',
             render: (value, row) => (
                 <div className="flex items-center gap-2.5 whitespace-nowrap">
                     <div className={`w-1.5 h-1.5 rounded-full ${row.statusVariant === 'danger' ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.4)]' :

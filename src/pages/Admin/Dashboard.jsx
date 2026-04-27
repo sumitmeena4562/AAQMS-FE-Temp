@@ -50,7 +50,7 @@ const Dashboard = () => {
             value: (bootstrap.stats.total_organisations || 0).toLocaleString(),
             trend: 0, changeType: "neutral",
             description: "Active enterprise hubs",
-            secondaryLabel: `${bootstrap.stats.total_sites || 0} sites total`,
+            secondaryLabel: "System network",
             icon: React.createElement(FiBriefcase, { size: 18 }),
             iconBgClass: "bg-blue-50", iconColorClass: "text-blue-600",
         },
@@ -73,28 +73,43 @@ const Dashboard = () => {
             iconBgClass: "bg-emerald-50", iconColorClass: "text-emerald-600",
         },
         {
-            title: "Total Assets",
-            value: (bootstrap.stats.total_assets || 0).toLocaleString(),
+            title: "Total Sites",
+            value: (bootstrap.stats.total_sites || 0).toLocaleString(),
             trend: 0, changeType: "neutral",
-            description: "Equipment tracked",
-            secondaryLabel: `${bootstrap.stats.risk_alerts || 0} risk alerts`,
-            icon: React.createElement(FiBox, { size: 18 }),
+            description: "Operational locations",
+            secondaryLabel: "Active centers",
+            icon: React.createElement(FiActivity, { size: 18 }),
             iconBgClass: "bg-orange-50", iconColorClass: "text-orange-600",
         },
     ] : null, [bootstrap]);
 
-    const metricCards = useMemo(() => bootstrap?.metrics
-        ? bootstrap.metrics
-            .map(m => ({
+    const metricCards = useMemo(() => {
+        if (!bootstrap) return null;
+
+        // Map dynamic metrics from backend (Verified Assets, Risk Alerts, etc.)
+        const mapped = (bootstrap.metrics || []).map(m => ({
             title: m.label,
             value: m.unit ? `${m.value}${m.unit}` : String(m.value ?? 0),
             icon: React.createElement(FiActivity, { size: 16 }),
-            statusLabel: m.change ? String(m.change).replace('-', '') : "0",
+            statusLabel: m.change ? String(m.change).replace('-', '') : (m.value > 0 ? "Active" : "0"),
             statusVariant: m.trend === 'up' ? 'success' : m.trend === 'down' ? 'danger' : 'info',
-            progress: 70,
             secondaryLabel: m.trend === 'up' ? 'Increasing' : m.trend === 'down' ? 'Decreasing' : 'Stable',
-        }))
-        : null, [bootstrap]);
+        }));
+
+        // Add "Total Assets" to the bottom row as the 3rd card
+        if (bootstrap.stats?.total_assets !== undefined) {
+            mapped.push({
+                title: "Total Assets",
+                value: String(bootstrap.stats.total_assets),
+                icon: React.createElement(FiBox, { size: 16 }),
+                statusLabel: "Tracked",
+                statusVariant: "info",
+                secondaryLabel: `${bootstrap.stats.risk_alerts || 0} risk alerts`
+            });
+        }
+
+        return mapped;
+    }, [bootstrap]);
 
     const activity = useMemo(() => bootstrap?.recent_history || [], [bootstrap]);
 
