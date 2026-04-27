@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { organizationService } from '../../services/organizationService';
+import { INDUSTRY_TYPES, OCCUPANCY_TYPES, BUILDING_CLASSIFICATIONS } from '../../constants/orgConstants';
 
 // Helper to clean mangled Cloudinary URLs (from useOrgStore logic)
 // Helper to clean mangled Cloudinary URLs and ensure relative paths are prefixed
@@ -51,16 +52,16 @@ export const mapOrgToFrontend = (data) => {
     ...data,
     id: String(data.id || data.pk || data.organisation_id || ''),
     name: data.organisation_name || data.site_name || data.name || '',
-    industry: data.industry_type || data.industry || 'General',
+    industry: data.industry_type || data.industry || '',
     occupancyType: data.occupancy_type || data.occupancyType || '',
-    classification: data.classification || '',
+    classification: data.classification_of_occupancy || data.classification || '',
     contactPerson: data.contact_person_name || data.contactPerson || '',
     contactEmail: data.contact_email || data.contactEmail || '',
     contactPhone: data.contact_phone || data.contactPhone || '',
     address: data.address || '',
     city: data.city || '',
     state: data.state || '',
-    country: data.country || '',
+    country: data.country || 'India',
     plannedSites: data.planned_sites || 0,
     plannedFloors: data.planned_floors || 0,
     otherInfo: data.description || data.otherInfo || '',
@@ -160,11 +161,16 @@ export const useAllOrganizations = (options = {}) => {
 export const useIndustryTypes = () => {
   const { data: orgs } = useAllOrganizations();
   return useMemo(() => {
-    if (!orgs) return [];
-    const industries = [...new Set(orgs.map(o => o.industry_type || o.industry).filter(Boolean))];
-    return industries.sort().map(i => ({
+    // Combine standard industries from constants with any custom ones from the data
+    const existingIndustries = orgs 
+      ? orgs.map(o => o.industry_type || o.industry).filter(Boolean)
+      : [];
+    
+    const combinedIndustries = [...new Set([...INDUSTRY_TYPES, ...existingIndustries])];
+    
+    return combinedIndustries.sort().map(i => ({
       value: i,
-      label: i.charAt(0).toUpperCase() + i.slice(1)
+      label: i
     }));
   }, [orgs]);
 };

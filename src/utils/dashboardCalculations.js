@@ -214,6 +214,34 @@ export const formatRelativeTime = (timestamp) => {
 };
 
 /**
+ * Formats ISO timestamp to a full formal string (e.g., "26 Apr 2026, 11:29 AM")
+ */
+export const formatFullTimestamp = (timestamp) => {
+    if (!timestamp) return '—';
+    
+    let sanitized = typeof timestamp === 'string' ? timestamp.trim().replace(' ', 'T') : timestamp;
+    
+    // Handle DD-MM-YYYY or DD/MM/YYYY formats
+    if (typeof sanitized === 'string' && /^\d{2}[-/]\d{2}[-/]\d{4}/.test(sanitized)) {
+        const parts = sanitized.split(/[-/T]/);
+        const timePart = sanitized.includes('T') ? sanitized.split('T')[1] : '';
+        sanitized = `${parts[2]}-${parts[1]}-${parts[0]}${timePart ? 'T' + timePart : ''}`;
+    }
+
+    const date = new Date(sanitized);
+    if (isNaN(date.getTime())) return 'Recently';
+    
+    return date.toLocaleString('en-IN', { 
+        day: '2-digit', 
+        month: 'short', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
+    });
+};
+
+/**
  * Maps raw backend activity data into the format expected by RecentactivityTable.
  * Injects React Icons and dynamic CSS colors based on the activity literal string.
  * @param {Array} rawData - Array of activity logs from backend.
@@ -279,7 +307,8 @@ export const mapToActivityFeed = (rawData) => {
             iconBgClass,
             iconTextClass,
             statusVariant,
-            time: formatRelativeTime(item.time)
+            time: formatRelativeTime(item.time),
+            fullTime: formatFullTimestamp(item.time)
         };
     });
 };
