@@ -7,6 +7,11 @@ import toast from 'react-hot-toast';
  */
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/';
 
+// [DEBUG] Log API configuration in development or if explicitly enabled
+if (import.meta.env.DEV || localStorage.getItem('DEBUG_API')) {
+    console.log(`[AAQMS-API] Initializing with Base URL: ${API_BASE_URL}`);
+}
+
 // Explicit global config for credentials
 axios.defaults.withCredentials = true;
 
@@ -107,7 +112,15 @@ api.interceptors.response.use(
         const isSilent = originalRequest?._silent === true;
 
         if (error.response) {
-            const { status } = error.response;
+            const { status, headers } = error.response;
+            const contentType = headers['content-type'] || '';
+
+            // 0. Handle SPA Rewrites (Server returns index.html instead of JSON error)
+            if (contentType.includes('text/html') || typeof error.response.data === 'string' && error.response.data.includes('<!DOCTYPE html>')) {
+                console.error("[AAQMS-API] Received HTML instead of JSON. This usually means the API URL is wrong or a proxy is missing.");
+                toast.error("API configuration error. Please check environment variables.", { id: 'api-config-error' });
+                return Promise.reject(new Error("Expected JSON response but received HTML. Check VITE_API_URL."));
+            }
 
             // 1. Handling Unauthorized (401) with Token Refresh (and Queuing)
             const isUnauthorized = status === 401 || (error.response.data?.status === false && error.response.data?.errors?.code === 'token_not_valid');

@@ -9,7 +9,12 @@ import App from './App.jsx'
 // Keep Neon DB alive — ping every 4 minutes to prevent cold start
 const API_BASE = import.meta.env.VITE_API_URL || '/api/';
 setInterval(() => {
-  fetch(`${API_BASE.replace('/api/', '')}/ping/`, { credentials: 'include' }).catch(() => {});
+  // Use relative path if using proxy, otherwise absolute
+  const pingUrl = API_BASE.startsWith('http') 
+    ? `${API_BASE.replace(/\/api\/?$/, '')}/ping/` 
+    : '/ping/';
+  
+  fetch(pingUrl, { credentials: 'include' }).catch(() => {});
 }, 4 * 60 * 1000);
 
 createRoot(document.getElementById('root')).render(

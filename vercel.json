@@ -1,6 +1,14 @@
 {
   "rewrites": [
     {
+      "source": "/api/:path*",
+      "destination": "https://aaqms-be.onrender.com/api/:path*"
+    },
+    {
+      "source": "/ping/:path*",
+      "destination": "https://aaqms-be.onrender.com/ping/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

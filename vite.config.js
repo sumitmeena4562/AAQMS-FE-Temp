@@ -49,7 +49,7 @@ export default defineConfig({
       }
     }
   },
-  esbuild: {
-    drop: ['console', 'debugger'], // Strips console.log out in production builds
-  }
+  // esbuild: {
+  //   drop: ['console', 'debugger'], // Strips console.log out in production builds
+  // }
 })
