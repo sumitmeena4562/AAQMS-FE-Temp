@@ -1,31 +1,28 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# Lint and Temporary Reports
-lint_*.txt
-all_files.txt
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Environment
 .env
+.env.*
 .env.local
 .env.*.local
+!.env.example
+
+# Production
+dist/
+dist-ssr/
+
+# Dependencies
+node_modules/
+
+# Logs & Reports
+*.log
+*.txt
+build_error*
+npm-debug.log*
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.sln
+*.sw?

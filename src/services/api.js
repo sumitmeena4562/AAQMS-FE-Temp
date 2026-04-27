@@ -4,8 +4,15 @@ import toast from 'react-hot-toast';
 /**
  * ── CORE API CLIENT ──
  * Environment aware base URL configuration.
+ * FOOLPROOF LOGIC: If we are not on localhost, we MUST use relative paths to trigger the Vercel proxy.
  */
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/';
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE_URL = isLocal ? (import.meta.env.VITE_API_URL || '/api/') : '/api/';
+
+// [DEBUG] Log API configuration
+if (isLocal || localStorage.getItem('DEBUG_API')) {
+    console.log(`[AAQMS-API] Initializing with Base URL: ${API_BASE_URL} (Hostname: ${window.location.hostname})`);
+}
 
 // Explicit global config for credentials
 axios.defaults.withCredentials = true;
@@ -39,6 +46,12 @@ api.interceptors.request.use(
             if (csrfToken) {
                 config.headers['X-CSRFToken'] = csrfToken;
             }
+        }
+
+        // ── AUTHORIZATION HEADER ──
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
         }
         // Remove 'undefined', 'null' or literal "undefined" strings from query params
         if (config.params) {
@@ -107,7 +120,15 @@ api.interceptors.response.use(
         const isSilent = originalRequest?._silent === true;
 
         if (error.response) {
-            const { status } = error.response;
+            const { status, headers } = error.response;
+            const contentType = headers['content-type'] || '';
+
+            // 0. Handle SPA Rewrites (Server returns index.html instead of JSON error)
+            if (contentType.includes('text/html') || typeof error.response.data === 'string' && error.response.data.includes('<!DOCTYPE html>')) {
+                console.error("[AAQMS-API] Received HTML instead of JSON. This usually means the API URL is wrong or a proxy is missing.");
+                toast.error("API configuration error. Please check environment variables.", { id: 'api-config-error' });
+                return Promise.reject(new Error("Expected JSON response but received HTML. Check VITE_API_URL."));
+            }
 
             // 1. Handling Unauthorized (401) with Token Refresh (and Queuing)
             const isUnauthorized = status === 401 || (error.response.data?.status === false && error.response.data?.errors?.code === 'token_not_valid');
@@ -130,25 +151,43 @@ api.interceptors.response.use(
 
                 try {
                     // Critical: Await the response from the refresh endpoint
-                    await axios.post(`${API_BASE_URL}users/token/refresh/`, {}, {
+                    // Using axios directly ensures we don't trigger the interceptor again
+                    const refreshResponse = await axios.post(`${API_BASE_URL}users/token/refresh/`, {
+                        refresh: localStorage.getItem('refresh_token')
+                    }, {
                         withCredentials: true,
-                        // Prevent this request from ever being intercepted/retried recursively
                         _silent: true
                     });
+
+                    if (refreshResponse.data.access) {
+                        localStorage.setItem('access_token', refreshResponse.data.access);
+                        if (refreshResponse.data.refresh) {
+                            localStorage.setItem('refresh_token', refreshResponse.data.refresh);
+                        }
+                    }
 
                     isRefreshing = false;
                     processQueue(null);
 
-                    // Final Retry logic
+                    // Final Retry logic with the original request
                     return api(originalRequest);
                 } catch (refreshError) {
                     processQueue(refreshError);
                     isRefreshing = false;
 
-                    // 🛡️ Cleanup localStorage ONLY if it's a terminal AUTHENTICATION failure.
-                    // This prevents losing the session during transient 500/Database errors.
+                    // 🛡️ TERMINAL FAILURE: If refresh fails with 401/403, the session is dead.
+                    // We must clear state to stop React Query from retrying.
                     if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+                        console.error("[AAQMS-API] Refresh token expired or invalid. Logging out.");
                         localStorage.removeItem('user');
+                        localStorage.removeItem('last_verified');
+                        localStorage.removeItem('access_token');
+                        localStorage.removeItem('refresh_token');
+
+                        // Force a reload to login if we are stuck in a loop
+                        if (!isPublicEndpoint && !window.location.pathname.startsWith('/login')) {
+                            window.location.href = '/login?session_expired=true';
+                        }
                     }
                     return Promise.reject(refreshError);
                 }

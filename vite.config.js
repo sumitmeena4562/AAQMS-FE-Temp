@@ -10,7 +10,7 @@ export default defineConfig({
     allowedHosts: true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       }
@@ -49,7 +49,7 @@ export default defineConfig({
       }
     }
   },
-  esbuild: {
-    drop: ['console', 'debugger'], // Strips console.log out in production builds
-  }
+  // esbuild: {
+  //   drop: ['console', 'debugger'], // Strips console.log out in production builds
+  // }
 })

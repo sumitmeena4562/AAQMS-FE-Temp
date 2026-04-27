@@ -21,6 +21,8 @@ const storage = {
   },
   clearSession: () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
   }
 };
 
@@ -31,7 +33,7 @@ const useAuthStore = create((set, get) => ({
   isAuthenticated: !!storage.getUser(), // Initial state based on local data
   user: storage.getUser() || null,
   isLoading: false,
-  isBootstrapping: false, // Still bootstrap to verify with server
+  isBootstrapping: !!storage.getUser(), // Start bootstrapping if we have a user to verify
   isLoggingOut: false,
   error: null,
 
@@ -56,8 +58,15 @@ const useAuthStore = create((set, get) => ({
       if (loginResponse && loginResponse.user) {
         const userData = { 
           ...loginResponse.user, 
-          role: (loginResponse.user.role || '').toLowerCase() 
+          role: (loginResponse.user.role || '').toLowerCase().replace(/\s+/g, '_') 
         };
+
+        if (loginResponse.access) {
+          localStorage.setItem("access_token", loginResponse.access);
+        }
+        if (loginResponse.refresh) {
+          localStorage.setItem("refresh_token", loginResponse.refresh);
+        }
 
         // BOOTSTRAP OPTIMIZATION: Seed the dashboard summary cache immediately
         if (loginResponse.bootstrap) {
@@ -154,7 +163,7 @@ const useAuthStore = create((set, get) => ({
       ]);
       
       const { data } = response;
-      const userData = { ...data, role: (data.role || '').toLowerCase() };
+      const userData = { ...data, role: (data.role || '').toLowerCase().replace(/\s+/g, '_') };
 
       storage.saveUser(userData);
       localStorage.setItem("last_verified", Date.now().toString());
@@ -170,6 +179,16 @@ const useAuthStore = create((set, get) => ({
       const isAuthError = err.response?.status === 401 || err.response?.status === 403;
 
       if (isAuthError) {
+        // RACE CONDITION PROTECTION:
+        // If we are currently logging in or if we just successfully logged in 
+        // (isAuthenticated is true), don't clear the session based on a stale profile check.
+        const currentState = get();
+        if (currentState.isLoading || currentState.isAuthenticated) {
+            console.debug("[AuthStore] Stale fetchProfile rejected after login/loading.");
+            set({ isBootstrapping: false });
+            return { success: false, error: "Stale request" };
+        }
+
         storage.clearSession();
         set({
           isAuthenticated: false,

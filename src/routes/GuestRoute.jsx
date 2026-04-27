@@ -14,7 +14,7 @@ const GuestRoute = () => {
 
     if (isAuthenticated && user) {
         // Redirect based on role
-        const role = (user?.role || '').toLowerCase();
+        const role = (user?.role || '').toLowerCase().replace(/\s+/g, '_');
         const validRoles = ['admin', 'coordinator', 'field_officer'];
         
         let redirectPath = '/admin/dashboard';
