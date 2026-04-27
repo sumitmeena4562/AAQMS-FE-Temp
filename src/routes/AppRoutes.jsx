@@ -5,8 +5,8 @@ import useAuthStore from '../store/authStore';
 import GlobalLoader from '../components/UI/GlobalLoader';
 
 // Lazy loading components
-const LandingPage = lazy(() => import('../pages/Home/LandingPage'));
-const Login = lazy(() => import('../pages/Auth/LoginPage'));
+import LandingPage from '../pages/Home/LandingPage';
+import Login from '../pages/Auth/LoginPage';
 const Registration = lazy(() => import('../pages/Auth/RegistrationPage'));
 const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPasswordPage'));
 
