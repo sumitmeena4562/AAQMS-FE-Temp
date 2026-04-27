@@ -4,15 +4,14 @@ import toast from 'react-hot-toast';
 /**
  * ── CORE API CLIENT ──
  * Environment aware base URL configuration.
- * In production, we default to the relative path '/api/' to leverage the Vercel proxy (CORS bypass).
+ * FOOLPROOF LOGIC: If we are not on localhost, we MUST use relative paths to trigger the Vercel proxy.
  */
-const API_BASE_URL = import.meta.env.PROD 
-    ? '/api/' 
-    : (import.meta.env.VITE_API_URL || '/api/');
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE_URL = isLocal ? (import.meta.env.VITE_API_URL || '/api/') : '/api/';
 
 // [DEBUG] Log API configuration
-if (import.meta.env.DEV || localStorage.getItem('DEBUG_API')) {
-    console.log(`[AAQMS-API] Initializing with Base URL: ${API_BASE_URL} (Mode: ${import.meta.env.MODE})`);
+if (isLocal || localStorage.getItem('DEBUG_API')) {
+    console.log(`[AAQMS-API] Initializing with Base URL: ${API_BASE_URL} (Hostname: ${window.location.hostname})`);
 }
 
 // Explicit global config for credentials
