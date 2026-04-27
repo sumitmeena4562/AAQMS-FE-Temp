@@ -145,25 +145,32 @@ api.interceptors.response.use(
 
                 try {
                     // Critical: Await the response from the refresh endpoint
+                    // Using axios directly ensures we don't trigger the interceptor again
                     await axios.post(`${API_BASE_URL}users/token/refresh/`, {}, {
                         withCredentials: true,
-                        // Prevent this request from ever being intercepted/retried recursively
                         _silent: true
                     });
 
                     isRefreshing = false;
                     processQueue(null);
 
-                    // Final Retry logic
+                    // Final Retry logic with the original request
                     return api(originalRequest);
                 } catch (refreshError) {
                     processQueue(refreshError);
                     isRefreshing = false;
 
-                    // 🛡️ Cleanup localStorage ONLY if it's a terminal AUTHENTICATION failure.
-                    // This prevents losing the session during transient 500/Database errors.
+                    // 🛡️ TERMINAL FAILURE: If refresh fails with 401/403, the session is dead.
+                    // We must clear state to stop React Query from retrying.
                     if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+                        console.error("[AAQMS-API] Refresh token expired or invalid. Logging out.");
                         localStorage.removeItem('user');
+                        localStorage.removeItem('last_verified');
+                        
+                        // Force a reload to login if we are stuck in a loop
+                        if (!isPublicEndpoint && window.location.pathname !== '/login') {
+                            window.location.href = '/login?session_expired=true';
+                        }
                     }
                     return Promise.reject(refreshError);
                 }
