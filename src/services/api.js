@@ -47,6 +47,12 @@ api.interceptors.request.use(
                 config.headers['X-CSRFToken'] = csrfToken;
             }
         }
+
+        // ── AUTHORIZATION HEADER ──
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
         // Remove 'undefined', 'null' or literal "undefined" strings from query params
         if (config.params) {
             const cleanParams = { ...config.params };
@@ -146,10 +152,19 @@ api.interceptors.response.use(
                 try {
                     // Critical: Await the response from the refresh endpoint
                     // Using axios directly ensures we don't trigger the interceptor again
-                    await axios.post(`${API_BASE_URL}users/token/refresh/`, {}, {
+                    const refreshResponse = await axios.post(`${API_BASE_URL}users/token/refresh/`, {
+                        refresh: localStorage.getItem('refresh_token')
+                    }, {
                         withCredentials: true,
                         _silent: true
                     });
+
+                    if (refreshResponse.data.access) {
+                        localStorage.setItem('access_token', refreshResponse.data.access);
+                        if (refreshResponse.data.refresh) {
+                            localStorage.setItem('refresh_token', refreshResponse.data.refresh);
+                        }
+                    }
 
                     isRefreshing = false;
                     processQueue(null);
@@ -166,7 +181,9 @@ api.interceptors.response.use(
                         console.error("[AAQMS-API] Refresh token expired or invalid. Logging out.");
                         localStorage.removeItem('user');
                         localStorage.removeItem('last_verified');
-                        
+                        localStorage.removeItem('access_token');
+                        localStorage.removeItem('refresh_token');
+
                         // Force a reload to login if we are stuck in a loop
                         if (!isPublicEndpoint && window.location.pathname !== '/login') {
                             window.location.href = '/login?session_expired=true';

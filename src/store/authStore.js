@@ -21,6 +21,8 @@ const storage = {
   },
   clearSession: () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
   }
 };
 
@@ -58,6 +60,13 @@ const useAuthStore = create((set, get) => ({
           ...loginResponse.user, 
           role: (loginResponse.user.role || '').toLowerCase() 
         };
+
+        if (loginResponse.access) {
+          localStorage.setItem("access_token", loginResponse.access);
+        }
+        if (loginResponse.refresh) {
+          localStorage.setItem("refresh_token", loginResponse.refresh);
+        }
 
         // BOOTSTRAP OPTIMIZATION: Seed the dashboard summary cache immediately
         if (loginResponse.bootstrap) {
