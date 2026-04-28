@@ -22,22 +22,21 @@ const NotFound = lazy(() => import('../pages/NotFound'));
  * ── MINIMALIST PAGE LOADER ──
  * Clean, light-themed loading state for session bootstrapping.
  */
-const PageLoader = () => (
-    <GlobalLoader mode="fullScreen" text="Secure Session Check..." size="lg" />
+const PageLoader = ({ text = "Secure Session Check..." }) => (
+    <GlobalLoader mode="fullScreen" text={text} size="lg" />
 );
 
 const AppRoutes = () => {
-    const { fetchProfile } = useAuthStore();
+    const { fetchProfile, isLoggingOut } = useAuthStore();
 
     React.useEffect(() => {
         // ALWAYS attempt to fetch profile on mount to verify the session HttpOnly cookie.
         fetchProfile();
     }, [fetchProfile]);
 
-    // 🛡️ We no longer block the entire app. 
-    // Public routes (Landing Page) render immediately. 
-    // Protected/Guest routes handle bootstrapping internally.
-    // if (isBootstrapping) return <PageLoader />;
+    // 🚪 Show loader during logout to prevent flickering/stale views
+    if (isLoggingOut) return <PageLoader text="Signing out safely..." />;
+
 
     return (
         <BrowserRouter>

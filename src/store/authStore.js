@@ -33,7 +33,7 @@ const useAuthStore = create((set, get) => ({
   isAuthenticated: !!storage.getUser(), // Initial state based on local data
   user: storage.getUser() || null,
   isLoading: false,
-  isBootstrapping: !!storage.getUser(), // Start bootstrapping if we have a user to verify
+  isBootstrapping: false, // Fix: Don't block UI by default
   isLoggingOut: false,
   error: null,
 
@@ -143,6 +143,7 @@ const useAuthStore = create((set, get) => ({
     const isRecentlyVerified = lastVerified && (Date.now() - parseInt(lastVerified)) < 3600000;
 
     if (isAuthenticated && user && isRecentlyVerified) {
+        set({ isBootstrapping: false });
         return { success: true, user };
     }
 
@@ -208,22 +209,36 @@ const useAuthStore = create((set, get) => ({
    * LOGOUT: Clear backend cookies and local state.
    */
   logout: async () => {
-    // 1. Instant UI update for snappy UX
-    set({ isLoggingOut: true, isAuthenticated: false, user: null, error: null });
-    storage.clearSession();
-    toast.success("You have been signed out.");
-
-    // 2. Explicitly clear backend session
+    set({ isLoggingOut: true });
+    
     try {
+        // 1. Tell backend to clear HttpOnly cookies first
         await api.post("users/logout/");
     } catch (err) {
-        console.error("Logout cleanup failed:", err);
+        console.error("Logout backend cleanup failed:", err);
     } finally {
-        // Now it's truly safe to allow bootstraps again (for next session)
-        // Delaying this slightly ensures the redirection happens first
-        setTimeout(() => set({ isLoggingOut: false }), 2000);
+        // 2. Now clear all local state
+        storage.clearSession();
+        localStorage.removeItem("last_verified");
+        
+        set({ 
+          isAuthenticated: false, 
+          user: null, 
+          error: null,
+          isLoggingOut: false 
+        });
+        
+        toast.success("You have been signed out.");
+        
+        // 3. Optional: small delay to ensure state propagates before any re-renders
+        setTimeout(() => {
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+        }, 100);
     }
   },
+
 
   /**
    * REGISTER: Naya account create karna.
