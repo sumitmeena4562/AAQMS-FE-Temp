@@ -175,20 +175,22 @@ api.interceptors.response.use(
                     processQueue(refreshError);
                     isRefreshing = false;
 
-                    // 🛡️ TERMINAL FAILURE: If refresh fails with 401/403, the session is dead.
-                    // We must clear state to stop React Query from retrying.
-                    if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
-                        console.error("[AAQMS-API] Refresh token expired or invalid. Logging out.");
-                        localStorage.removeItem('user');
-                        localStorage.removeItem('last_verified');
-                        localStorage.removeItem('access_token');
-                        localStorage.removeItem('refresh_token');
+                        // 🛡️ TERMINAL FAILURE: If refresh fails with 401/403, the session is dead.
+                        // We must clear state to stop React Query from retrying.
+                        if (refreshError.response?.status === 401 || refreshError.response?.status === 403) {
+                            console.error("[AAQMS-API] Refresh token expired or invalid. Logging out.");
+                            localStorage.removeItem('user');
+                            localStorage.removeItem('last_verified');
+                            localStorage.removeItem('access_token');
+                            localStorage.removeItem('refresh_token');
 
-                        // Force a reload to login if we are stuck in a loop
-                        if (!isPublicEndpoint && !window.location.pathname.startsWith('/login')) {
-                            window.location.href = '/login?session_expired=true';
+                            // Force a reload to login if we are stuck in a loop
+                            // CRITICAL: Don't redirect if we are on the landing page (/)
+                            const isLandingPage = window.location.pathname === '/';
+                            if (!isPublicEndpoint && !window.location.pathname.startsWith('/login') && !isLandingPage) {
+                                window.location.href = '/login?session_expired=true';
+                            }
                         }
-                    }
                     return Promise.reject(refreshError);
                 }
             }
