@@ -6,8 +6,13 @@ import toast from 'react-hot-toast';
  * Environment aware base URL configuration.
  * FOOLPROOF LOGIC: If we are not on localhost, we MUST use relative paths to trigger the Vercel proxy.
  */
-const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const API_BASE_URL = isLocal ? (import.meta.env.VITE_API_URL || '/api/') : '/api/';
+const isLocal = window.location.hostname === 'localhost' || 
+                 window.location.hostname === '127.0.0.1' || 
+                 window.location.hostname.startsWith('192.168.');
+
+const API_BASE_URL = isLocal 
+    ? (import.meta.env.VITE_API_URL || 'http://localhost:8000/api/') 
+    : '/api/';
 
 // [DEBUG] Log API configuration
 if (isLocal || localStorage.getItem('DEBUG_API')) {

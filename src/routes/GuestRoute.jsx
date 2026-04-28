@@ -12,15 +12,18 @@ const GuestRoute = () => {
     // 🔹 Only wait during initial session restore
     if (isBootstrapping) return null;
 
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user && user.role) {
         // Redirect based on role
-        const role = (user?.role || '').toLowerCase().replace(/\s+/g, '_');
+        const role = user.role.toLowerCase().replace(/\s+/g, '_');
         const validRoles = ['admin', 'coordinator', 'field_officer'];
         
         let redirectPath = '/admin/dashboard';
         if (role === 'coordinator') redirectPath = '/coordinator/dashboard';
         else if (role === 'field_officer') redirectPath = '/field-officer/dashboard';
-        else if (!validRoles.includes(role)) redirectPath = '/'; // Unknown role? Go to landing.
+        else if (!validRoles.includes(role)) {
+            console.warn("[GuestRoute] Authenticated user has invalid role:", role);
+            return <Outlet />; // Let them see the login page if role is broken
+        }
                             
         return <Navigate to={redirectPath} replace />;
     }

@@ -30,10 +30,10 @@ import { extractError } from "../utils/errorUtils";
 
 const useAuthStore = create((set, get) => ({
   // --- INITIAL STATE ---
-  isAuthenticated: !!storage.getUser(), // Initial state based on local data
+  isAuthenticated: !!storage.getUser()?.id, // Only consider authenticated if we have a real user ID
   user: storage.getUser() || null,
   isLoading: false,
-  isBootstrapping: false, // Fix: Don't block UI by default
+  isBootstrapping: !!storage.getUser(), // Wait for verification if data exists in storage
   isLoggingOut: false,
   error: null,
 
@@ -135,7 +135,8 @@ const useAuthStore = create((set, get) => ({
     const { isBootstrapping, isAuthenticated, isLoggingOut, user } = get();
 
     // ── Singleton Guard: prevent concurrent bootstrapping ──
-    if (isBootstrapping) return { success: true, message: "Verification already in flight" };
+    // We allow the call if isBootstrapping is true but no user is currently being fetched
+    if (get().isLoading) return { success: true, message: "Verification already in flight" };
     
     // ── Cache Guard: don't re-fetch if already have a user in memory ──
     // Added a small timestamp check to allow re-verification after 1 hour
@@ -150,7 +151,7 @@ const useAuthStore = create((set, get) => ({
     // ── UI Lock: don't bootstrap if manually logging out ──
     if (isLoggingOut) return { success: false, error: "Logging out" };
 
-    set({ isBootstrapping: true, error: null });
+    set({ isBootstrapping: true, isLoading: true, error: null });
     
     // Set a fail-safe timeout
     const timeoutPromise = new Promise((_, reject) =>
@@ -180,16 +181,6 @@ const useAuthStore = create((set, get) => ({
       const isAuthError = err.response?.status === 401 || err.response?.status === 403;
 
       if (isAuthError) {
-        // RACE CONDITION PROTECTION:
-        // If we are currently logging in or if we just successfully logged in 
-        // (isAuthenticated is true), don't clear the session based on a stale profile check.
-        const currentState = get();
-        if (currentState.isLoading || currentState.isAuthenticated) {
-            console.debug("[AuthStore] Stale fetchProfile rejected after login/loading.");
-            set({ isBootstrapping: false });
-            return { success: false, error: "Stale request" };
-        }
-
         storage.clearSession();
         set({
           isAuthenticated: false,
@@ -198,9 +189,23 @@ const useAuthStore = create((set, get) => ({
           isLoading: false,
         });
       } else {
-        // Network errors/timeouts: finish bootstrapping but keep local state
-        set({ isBootstrapping: false, isLoading: false });
+        // Network errors/timeouts or 404s/500s:
+        // If we have no user data but isBootstrapping was true, it means we failed to verify.
+        // We should clear the session to allow the user to see the login page.
+        const currentState = get();
+        if (currentState.isAuthenticated || currentState.user) {
+           console.warn("[AuthStore] Profile verification failed with non-auth error. Clearing session for safety.");
+           storage.clearSession();
+        }
+        
+        set({ 
+          isAuthenticated: false,
+          user: null,
+          isBootstrapping: false, 
+          isLoading: false 
+        });
       }
+      set({ isLoading: false });
       return { success: false, error: err.message };
     }
   },
