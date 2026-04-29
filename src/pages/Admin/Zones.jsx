@@ -237,7 +237,7 @@ const Zones = () => {
         if (currentPage !== 1) {
             setTimeout(() => setCurrentPage(1), 0);
         }
-    }, [searchQuery, selectedOrg, selectedSite, selectedFloor, pageSize, currentPage]);
+    }, [searchQuery, selectedOrg, selectedSite, selectedFloor, pageSize]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const totalPages = Math.ceil(processedZones.length / pageSize);
     const paginatedZones = useMemo(() => {

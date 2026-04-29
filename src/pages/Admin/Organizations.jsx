@@ -122,7 +122,7 @@ const Organizations = React.memo(() => {
         if (currentPage !== 1) {
             setTimeout(() => setCurrentPage(1), 0);
         }
-    }, [filters, searchQuery, currentPage]);
+    }, [filters, searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const activeFiltersCount = useMemo(() => {
         return Object.values(filters).filter(v => Array.isArray(v) ? v.length > 0 : v !== 'all' && v !== '').length;

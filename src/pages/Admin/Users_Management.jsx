@@ -207,6 +207,11 @@ const Users = React.memo(() => {
         const start = (page - 1) * limit;
         return sortedUsers.slice(start, start + limit);
     }, [sortedUsers, page, limit]);
+    
+    // Auto-reset to page 1 when filter/search changes
+    useEffect(() => {
+        setPage(1);
+    }, [search, filters, setPage]);
 
     const displayTotalCount = sortedUsers.length;
 

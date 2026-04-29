@@ -132,7 +132,7 @@ const useAuthStore = create((set, get) => ({
    * FETCH PROFILE: Verifies the session cookie and gets user details.
    */
   fetchProfile: async () => {
-    const { isBootstrapping, isAuthenticated, isLoggingOut, user } = get();
+    const { isAuthenticated, isLoggingOut, user } = get();
 
     // ── Singleton Guard: prevent concurrent bootstrapping ──
     // We allow the call if isBootstrapping is true but no user is currently being fetched

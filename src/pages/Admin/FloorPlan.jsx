@@ -95,7 +95,7 @@ const FloorPlan = () => {
     if (currentPage !== 1) {
         setTimeout(() => setCurrentPage(1), 0);
     }
-  }, [selectedFloor, currentPage]);
+  }, [selectedFloor]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // --- Dynamic Naming for Breadcrumbs/Headers ---
   const currentOrg = selectedOrg.length === 1 ? orgs.find(o => String(o.id) === String(selectedOrg[0])) : null;

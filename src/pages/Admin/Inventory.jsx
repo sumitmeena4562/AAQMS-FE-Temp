@@ -150,7 +150,7 @@ const Inventory = () => {
         if (currentPage !== 1) {
             setTimeout(() => setCurrentPage(1), 0);
         }
-    }, [PAGE_SIZE, currentPage]);
+    }, [PAGE_SIZE]); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ── SYNC GLOBAL FILTERS → URL PARAMS ──
     useEffect(() => {
@@ -188,7 +188,7 @@ const Inventory = () => {
         if (currentPage !== 1) {
             setTimeout(() => setCurrentPage(1), 0);
         }
-    }, [selectedOrg, selectedSite, selectedFloor, selectedZone, searchQuery, PAGE_SIZE, currentPage]);
+    }, [selectedOrg, selectedSite, selectedFloor, selectedZone, searchQuery, PAGE_SIZE]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);

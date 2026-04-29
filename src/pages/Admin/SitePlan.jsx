@@ -93,7 +93,7 @@ const SitePlan = () => {
         if (currentPage !== 1) {
             setTimeout(() => setCurrentPage(1), 0);
         }
-    }, [selectedOrg, selectedSite, searchQuery, currentPage]);
+    }, [selectedOrg, selectedSite, searchQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // URL → Store sync (mount-only guard)
   useEffect(() => {

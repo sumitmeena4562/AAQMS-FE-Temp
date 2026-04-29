@@ -22,7 +22,7 @@ const AssignedCoordinators = () => {
     if (currentPage !== 1) {
       setTimeout(() => setCurrentPage(1), 0);
     }
-  }, [pageSize, selectedOrg, currentPage]);
+  }, [pageSize, selectedOrg]); // eslint-disable-line react-hooks/exhaustive-deps
   
   // --- QUERY HOOKS (UNIFIED) ---
   const { organizations: orgs, coordinators: coordinatorsListRaw, isLoading } = useHierarchy({ includeSites: false });
