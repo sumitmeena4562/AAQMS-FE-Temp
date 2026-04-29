@@ -17,11 +17,12 @@ const ProtectedRoute = ({ allowedRoles = [] }) => {
     // 3. If allowedRoles is provided, check if user has permission
     const currentRole = (user?.role || '').toLowerCase().replace(/\s+/g, '_');
     if (allowedRoles.length > 0 && !allowedRoles.includes(currentRole)) {
-        const validRoles = ['admin', 'coordinator', 'field_officer'];
-
+        const validRoles = ['admin', 'superadmin', 'coordinator', 'field_officer'];
+ 
         let fallbackPath = '/admin/dashboard';
         if (currentRole === 'coordinator') fallbackPath = '/coordinator/dashboard';
         else if (currentRole === 'field_officer') fallbackPath = '/field-officer/dashboard';
+        else if (currentRole === 'superadmin') fallbackPath = '/admin/dashboard';
         else if (!validRoles.includes(currentRole)) fallbackPath = '/';
         
         return <Navigate to={fallbackPath} replace />;
