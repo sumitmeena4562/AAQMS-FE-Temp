@@ -108,14 +108,14 @@ const FilterBar = ({
 
     const { organizations: orgs, coordinators: allCoordinators, sites: allSites, isLoading } = useHierarchy(hierarchyOptions);
 
-    const isFloorsExternal = 'externalFloors' in rest || externalFloors !== null;
-    const isZonesExternal = 'externalZones' in rest || externalZones !== null;
+    const isFloorsExternal = externalFloors !== null;
+    const isZonesExternal = externalZones !== null;
 
-    const { data: floorData } = useFloors(selectedSite, { page_size: 1000 }, {
+    const { data: floorData } = useFloors(selectedSite, { page_size: 5000 }, {
         enabled: !isFloorsExternal && renderFloor && (selectedSite.length > 0 || selectedOrg.length > 0)
     });
 
-    const { data: zoneData } = useZones(selectedFloor, { page_size: 1000 }, {
+    const { data: zoneData } = useZones(selectedFloor, { page_size: 5000 }, {
         enabled: !isZonesExternal && renderZone && (selectedFloor.length > 0 || selectedSite.length > 0)
     });
     

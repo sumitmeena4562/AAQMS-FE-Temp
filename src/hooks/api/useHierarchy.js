@@ -53,9 +53,9 @@ export const useHierarchy = (options = {}) => {
 
     // 4. Floors (Global Fetch for FE Filtering)
     const floorsQuery = useQuery({
-        queryKey: ['hierarchy', 'floors', 'all'],
+        queryKey: ['floors', null, JSON.stringify({ page_size: 5000 })],
         queryFn: async ({ signal }) => {
-            const response = await hierarchyService.getFloors(null, { page_size: 1000 }, signal);
+            const response = await hierarchyService.getFloors(null, { page_size: 5000 }, signal);
             return response.results || response.data || response || [];
         },
         enabled: includeFloors && enabled,
@@ -64,9 +64,9 @@ export const useHierarchy = (options = {}) => {
 
     // 5. Zones (Global Fetch for FE Filtering)
     const zonesQuery = useQuery({
-        queryKey: ['hierarchy', 'zones', 'all'],
+        queryKey: ['zones', null, JSON.stringify({ page_size: 5000 })],
         queryFn: async ({ signal }) => {
-            const response = await hierarchyService.getZones(null, { page_size: 2000 }, signal);
+            const response = await hierarchyService.getZones(null, { page_size: 5000 }, signal);
             return response.results || response.data || response || [];
         },
         enabled: includeZones && enabled,
