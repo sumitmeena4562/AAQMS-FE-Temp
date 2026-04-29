@@ -211,9 +211,9 @@ const Zones = () => {
                     organisation_id: zOrgId, // Standardize for filter
                     site_id: zSiteId,
                     floor_id: zFloorId,
-                    orgName: org?.name || 'Unknown Org',
-                    siteName: site?.name || site?.site_name || 'Unknown Site',
-                    floorName: floor?.name || floor?.floor_name || 'Unknown Floor',
+                    orgName: org?.name || z.org_name || z.organisation_name || z.org || 'Unknown Org',
+                    siteName: site?.name || site?.site_name || z.site_name || z.site || 'Unknown Site',
+                    floorName: floor?.name || floor?.floor_name || z.floor_name || z.floor || 'Unknown Floor',
                     icon: Icon,
                     iconBgClass: bgClass,
                     iconTextClass: txtClass,
