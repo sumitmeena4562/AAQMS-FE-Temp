@@ -57,15 +57,7 @@ const SitePlan = () => {
             });
         }
 
-        // 2. Coordinator Filter (FE) - ENSURE CONTEXTUAL FILTERING
-        if (selectedCoord && selectedCoord.length > 0) {
-            data = data.filter(p => {
-                const coordId = p.coordinator_id || p.coord_id || p.created_by?.id || p.created_by;
-                return selectedCoord.includes(String(coordId));
-            });
-        }
-
-        // 3. Search Filter (FE) - Using central searchQuery
+        // 2. Search Filter (FE) - Using central searchQuery
         if (searchQuery) {
             const q = searchQuery.toLowerCase().trim();
             data = data.filter(p => 
@@ -75,7 +67,7 @@ const SitePlan = () => {
             );
         }
 
-        // 4. Filter by selected site from FilterBar
+        // 3. Filter by selected site from FilterBar
         if (selectedSite && selectedSite.length > 0) {
             data = data.filter(p => {
                 const sId = p.id || p.site_id || p.pk;
@@ -84,7 +76,7 @@ const SitePlan = () => {
         }
 
         return data;
-    }, [sitePlans, selectedOrg, selectedCoord, selectedSite, searchQuery]);
+    }, [sitePlans, selectedOrg, selectedSite, searchQuery]);
 
     // Proper Pagination Slicing
     const itemsPerPage = 12;
